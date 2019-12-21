@@ -6,5 +6,5 @@ lex.yy.c
 # Editors and IDEs
 .vscode/
 
-# Example Chaos program for development
-dev.chs
+# Ignore the scripts that are created for development
+*dev.*

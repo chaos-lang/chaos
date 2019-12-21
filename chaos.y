@@ -19,30 +19,37 @@ bool is_interactive = true;
 %union {
 	int ival;
 	float fval;
+	char *sval;
 }
 
 %token<ival> T_INT
 %token<fval> T_FLOAT
+%token<sval> T_STRING
+%token<sval> T_F_STRING
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
 %token T_NEWLINE T_QUIT
+%token T_PRINT
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
 %type<ival> expression
 %type<fval> mixed_expression
 
-%start calculation
+%start parser
 
 %%
 
-calculation:
-	| calculation line					{ is_interactive ? printf("\n%s ", __SHELL_INDICATOR__) : printf("\n"); }
+parser:
+	| parser line					{ is_interactive ? printf("\n%s ", __SHELL_INDICATOR__) : printf("\n"); }
 ;
 
 line: T_NEWLINE
     | mixed_expression T_NEWLINE		{ printf("%f", $1); }
     | expression T_NEWLINE				{ printf("%i", $1); }
     | T_QUIT T_NEWLINE					{ printf("bye!\n"); exit(0); }
+	| T_PRINT T_INT T_NEWLINE			{ printf("%i", $2); }
+	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s", $2); }
+	| T_PRINT T_STRING T_NEWLINE		{ printf("%s", $2); }
 ;
 
 mixed_expression: T_FLOAT                 		 		{ $$ = $1; }

@@ -23,5 +23,17 @@
 ")"		                        {return T_RIGHT;}
 "exit"		                    {return T_QUIT;}
 "quit"		                    {return T_QUIT;}
+"print"                         {return T_PRINT;}
+
+\"([^\\\"]|\\.)*\" {
+    yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
+    strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
+    return T_F_STRING;
+}
+\'([^\\\']|\\.)*\' {
+    yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
+    strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
+    return T_STRING;
+}
 
 %%
