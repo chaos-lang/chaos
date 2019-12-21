@@ -1,0 +1,7 @@
+chaos
+chaos.tab.c
+chaos.tab.h
+lex.yy.c
+
+# Editors and IDEs
+.vscode/
