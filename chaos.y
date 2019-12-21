@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "utilities/platform.h"
 #include "utilities/language.h"
 #include "utilities/helpers.h"
@@ -11,6 +12,8 @@ extern int yyparse();
 extern FILE* yyin;
 
 void yyerror(const char* s);
+
+bool is_interactive = true;
 %}
 
 %union {
@@ -33,7 +36,7 @@ void yyerror(const char* s);
 %%
 
 calculation:
-	| calculation line					{ printf("\n%s ", __SHELL_INDICATOR__); }
+	| calculation line					{ is_interactive ? printf("\n%s ", __SHELL_INDICATOR__) : printf("\n"); }
 ;
 
 line: T_NEWLINE
@@ -68,14 +71,18 @@ expression: T_INT						{ $$ = $1; }
 
 %%
 
-int main() {
+int main(int argc, char** argv) {
 	printf("%s %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
 	printf("GCC version: %d.%d.%d on %s\n",__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
 
-	yyin = stdin;
+	FILE *fp = argc > 1 ? fopen (argv[1], "r") : stdin;
+
+	is_interactive = (fp != stdin) ? false : true;
+
+	yyin = fp;
 
 	do {
-		printf("%s ", __SHELL_INDICATOR__);
+		!is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
 		yyparse();
 	} while(!feof(yyin));
 

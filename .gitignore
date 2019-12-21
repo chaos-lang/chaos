@@ -5,3 +5,6 @@ lex.yy.c
 
 # Editors and IDEs
 .vscode/
+
+# Example Chaos program for development
+dev.chs
