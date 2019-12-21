@@ -53,6 +53,7 @@ void yyerror(const char* s);
 
 char __language[] = "Chaos Language";
 char __version[] = "0.0.1-alpha";
+char __shell_indicator[] = "###";
 %}
 
 %union {
@@ -75,12 +76,12 @@ char __version[] = "0.0.1-alpha";
 %%
 
 calculation:
-	| calculation line
+	| calculation line					{ printf("\n%s ", __shell_indicator); }
 ;
 
 line: T_NEWLINE
-    | mixed_expression T_NEWLINE		{ printf("%f\n", $1);}
-    | expression T_NEWLINE				{ printf("%i\n", $1); }
+    | mixed_expression T_NEWLINE		{ printf("%f", $1); }
+    | expression T_NEWLINE				{ printf("%i", $1); }
     | T_QUIT T_NEWLINE					{ printf("bye!\n"); exit(0); }
 ;
 
