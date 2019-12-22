@@ -51,7 +51,7 @@ line: T_NEWLINE
     | mixed_expression T_NEWLINE		{ printf("%f\n", $1); }
     | expression T_NEWLINE				{ printf("%i\n", $1); }
 	| variable T_NEWLINE				{ if ($1[0] != '\0') printSymbolValue(getSymbol($1)); }
-    | T_QUIT T_NEWLINE					{ is_interactive ? printf("bye!\n") : printf(""); exit(0); }
+    | T_QUIT T_NEWLINE					{ is_interactive ? printf("%s\n", __BYE_BYE__) : printf(""); exit(0); }
 	| T_PRINT T_INT T_NEWLINE			{ printf("%i\n", $2); }
 	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s\n", $2); }
 	| T_PRINT T_STRING T_NEWLINE		{ printf("%s\n", $2); }
@@ -94,12 +94,15 @@ variable: T_VAR_BOOL						{ }
 %%
 
 int main(int argc, char** argv) {
-	printf("%s Language %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
-	printf("GCC version: %d.%d.%d on %s\n",__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
-
 	FILE *fp = argc > 1 ? fopen (argv[1], "r") : stdin;
 
 	is_interactive = (fp != stdin) ? false : true;
+
+	if (is_interactive) {
+		printf("%s Language %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
+		printf("GCC version: %d.%d.%d on %s\n",__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
+		printf("%s\n\n", __LANGUAGE_MOTTO__);
+	}
 
 	yyin = fp;
 
