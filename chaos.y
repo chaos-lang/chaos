@@ -17,23 +17,26 @@ bool is_interactive = true;
 %}
 
 %union {
+	bool bval;
 	int ival;
 	float fval;
 	char *sval;
 }
 
+%token<bval> T_TRUE T_FALSE
 %token<ival> T_INT
 %token<fval> T_FLOAT
-%token<sval> T_STRING
-%token<sval> T_F_STRING
-%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
+%token<sval> T_STRING T_F_STRING T_VAR
+%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
 %token T_NEWLINE T_QUIT
 %token T_PRINT
+%token T_VAR_BOOL
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
 %type<ival> expression
 %type<fval> mixed_expression
+%type<sval> variable
 
 %start parser
 
@@ -46,6 +49,7 @@ parser:
 line: T_NEWLINE
     | mixed_expression T_NEWLINE		{ printf("%f", $1); }
     | expression T_NEWLINE				{ printf("%i", $1); }
+	| variable T_NEWLINE				{ printf("%s", $1); }
     | T_QUIT T_NEWLINE					{ printf("bye!\n"); exit(0); }
 	| T_PRINT T_INT T_NEWLINE			{ printf("%i", $2); }
 	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s", $2); }
@@ -74,6 +78,11 @@ expression: T_INT						{ $$ = $1; }
 	| expression T_MINUS expression		{ $$ = $1 - $3; }
 	| expression T_MULTIPLY expression	{ $$ = $1 * $3; }
 	| T_LEFT expression T_RIGHT			{ $$ = $2; }
+;
+
+variable: T_VAR_BOOL					{ }
+	| variable T_VAR T_EQUAL T_TRUE			{ $$ = $2; }
+	| variable T_VAR T_EQUAL T_FALSE		{ $$ = $2; }
 ;
 
 %%

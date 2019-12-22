@@ -2,6 +2,8 @@
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 #define YY_DECL int yylex()
 
@@ -15,6 +17,7 @@
 [0-9]+\.[0-9]+                  {yylval.fval = atof(yytext); return T_FLOAT;}
 [0-9]+                          {yylval.ival = atoi(yytext); return T_INT;}
 \n                              {return T_NEWLINE;}
+"="                             {return T_EQUAL;}
 "+"                             {return T_PLUS;}
 "-"                             {return T_MINUS;}
 "*"                             {return T_MULTIPLY;}
@@ -24,6 +27,8 @@
 "exit"                          {return T_QUIT;}
 "quit"                          {return T_QUIT;}
 "print"                         {return T_PRINT;}
+"true"                          {yylval.ival = true; return T_TRUE;}
+"false"                         {yylval.ival = false; return T_FALSE;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
@@ -31,4 +36,6 @@
     return T_F_STRING;
 }
 
+"bool"                          {return T_VAR_BOOL;}
+[a-zA-Z][a-zA-Z0-9]*            {yylval.sval=strdup(yytext); return T_VAR;}
 %%
