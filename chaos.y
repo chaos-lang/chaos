@@ -32,6 +32,8 @@ bool is_interactive = true;
 %token T_NEWLINE T_QUIT
 %token T_PRINT
 %token T_VAR_BOOL
+%token T_DEL
+%token T_SYMBOL_TABLE
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -55,6 +57,7 @@ line: T_NEWLINE
 	| T_PRINT T_INT T_NEWLINE			{ printf("%i\n", $2); }
 	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s\n", $2); }
 	| T_PRINT T_STRING T_NEWLINE		{ printf("%s\n", $2); }
+	| T_SYMBOL_TABLE T_NEWLINE			{ printSymbolTable(); }
 ;
 
 mixed_expression: T_FLOAT                 		 		{ $$ = $1; }
@@ -84,6 +87,7 @@ expression: T_INT						{ $$ = $1; }
 variable: T_VAR								{ $$ = $1; }
 	| variable T_EQUAL T_TRUE				{ updateSymbol($1, $3); $$ = ""; }
 	| variable T_EQUAL T_FALSE				{ updateSymbol($1, $3); $$ = ""; }
+	| T_DEL variable						{ removeSymbol($2); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL						{ }

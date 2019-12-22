@@ -29,6 +29,8 @@
 "print"                         {return T_PRINT;}
 "true"                          {yylval.bval = 1; return T_TRUE;}
 "false"                         {yylval.bval = 0; return T_FALSE;}
+"symbol_table"                  {return T_SYMBOL_TABLE;}
+"del"                           {return T_DEL;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));

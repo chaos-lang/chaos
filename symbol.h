@@ -20,6 +20,7 @@ typedef struct {
 
 Symbol* symbol_cursor;
 Symbol* head_symbol;
+Symbol* foot_symbol;
 
 bool isDefined(char *name);
 
@@ -32,12 +33,13 @@ void addSymbol(char *name, enum Type type, bool b) {
     variable->name = name;
     variable->type = type;
     variable->value.b = b;
-    if (symbol_cursor == NULL) {
-        symbol_cursor = variable;
+    if (head_symbol == NULL) {
         head_symbol = variable;
+        foot_symbol = variable;
     } else {
-        symbol_cursor->next = variable;
-        variable->previous = symbol_cursor;
+        foot_symbol->next = variable;
+        variable->previous = foot_symbol;
+        foot_symbol = variable;
     }
 }
 
@@ -46,6 +48,31 @@ int updateSymbol(char *name, bool b) {
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
             symbol_cursor->value.b = b;
+            return 0;
+        }
+        symbol_cursor = symbol_cursor->next;
+    }
+    throw_error(3, name);
+}
+
+int removeSymbol(char *name) {
+    symbol_cursor = head_symbol;
+    while (symbol_cursor != NULL) {
+        if (strcmp(symbol_cursor->name, name) == 0) {
+            Symbol* previous_symbol = symbol_cursor->previous;
+            if (previous_symbol == NULL) {
+                head_symbol = symbol_cursor->next;
+            } else {
+                previous_symbol->next = symbol_cursor->next;
+            }
+
+            Symbol* next_symbol = symbol_cursor->next;
+            if (next_symbol == NULL) {
+                foot_symbol = symbol_cursor->previous;
+            } else {
+                next_symbol->previous = symbol_cursor->previous;
+            }
+            free(symbol_cursor);
             return 0;
         }
         symbol_cursor = symbol_cursor->next;
@@ -102,4 +129,24 @@ bool isDefined(char *name) {
         symbol_cursor = symbol_cursor->next;
     }
     return false;
+}
+
+void printSymbolTable() {
+    //start from the beginning
+    Symbol *ptr1 = head_symbol;
+    printf("[head] =>");
+    while(ptr1 != NULL) {
+        printf(" %s =>",ptr1->name);
+        ptr1 = ptr1->next;
+    }
+    printf(" [foot]\n");
+
+    //start from the end
+    Symbol *ptr2 = foot_symbol;
+    printf("[foot] =>");
+    while(ptr2 != NULL) {
+        printf(" %s =>",ptr2->name);
+        ptr2 = ptr2->previous;
+    }
+    printf(" [head]\n");
 }
