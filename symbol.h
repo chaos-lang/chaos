@@ -21,7 +21,7 @@ int symbol_counter=0;
 
 bool isDefined(char *name);
 
-int addSymbol(char *name, enum Type type, bool b) {
+void addSymbol(char *name, enum Type type, bool b) {
     isDefined(name);
 
     Symbol variable = {name, type, b};
@@ -29,12 +29,23 @@ int addSymbol(char *name, enum Type type, bool b) {
     symbol_counter++;
 }
 
+int updateSymbol(char *name, bool b) {
+    for (int i = 0; i < sizeof(symbol_table) / sizeof(Symbol); i++) {
+        if (symbol_table[i].name != NULL && strcmp(symbol_table[i].name, &name)) {
+            symbol_table[i].value.b = b;
+            return 0;
+        }
+    }
+    throw_error(3, name);
+}
+
 Symbol* getSymbol(char *name) {
     for (int i = 0; i < sizeof(symbol_table) / sizeof(Symbol); i++) {
-        if (strcmp(symbol_table[i].name, &name)) {
+        if (symbol_table[i].name != NULL && strcmp(symbol_table[i].name, &name)) {
             return &symbol_table[i];
         }
     }
+    throw_error(3, name);
 }
 
 void printSymbolValue(Symbol* symbol) {
@@ -61,6 +72,7 @@ void printSymbolValue(Symbol* symbol) {
             throw_error(1, type);
             break;
     }
+    printf("\n");
 }
 
 bool isDefined(char *name) {

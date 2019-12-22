@@ -44,17 +44,17 @@ bool is_interactive = true;
 %%
 
 parser:
-	| parser line					{ is_interactive ? printf("\n%s ", __SHELL_INDICATOR__) : printf("\n"); }
+	| parser line					{ is_interactive ? printf("%s ", __SHELL_INDICATOR__) : printf(""); }
 ;
 
 line: T_NEWLINE
-    | mixed_expression T_NEWLINE		{ printf("%f", $1); }
-    | expression T_NEWLINE				{ printf("%i", $1); }
-	| variable T_NEWLINE				{ }
-    | T_QUIT T_NEWLINE					{ printf("bye!\n"); exit(0); }
-	| T_PRINT T_INT T_NEWLINE			{ printf("%i", $2); }
-	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s", $2); }
-	| T_PRINT T_STRING T_NEWLINE		{ printf("%s", $2); }
+    | mixed_expression T_NEWLINE		{ printf("%f\n", $1); }
+    | expression T_NEWLINE				{ printf("%i\n", $1); }
+	| variable T_NEWLINE				{ if ($1[0] != '\0') printSymbolValue(getSymbol($1)); }
+    | T_QUIT T_NEWLINE					{ is_interactive ? printf("bye!\n") : printf(""); exit(0); }
+	| T_PRINT T_INT T_NEWLINE			{ printf("%i\n", $2); }
+	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s\n", $2); }
+	| T_PRINT T_STRING T_NEWLINE		{ printf("%s\n", $2); }
 ;
 
 mixed_expression: T_FLOAT                 		 		{ $$ = $1; }
@@ -81,12 +81,14 @@ expression: T_INT						{ $$ = $1; }
 	| T_LEFT expression T_RIGHT			{ $$ = $2; }
 ;
 
-variable: T_VAR								{ printSymbolValue(getSymbol($1)); }
+variable: T_VAR								{ $$ = $1; }
+	| variable T_EQUAL T_TRUE				{ updateSymbol($1, $3); $$ = ""; }
+	| variable T_EQUAL T_FALSE				{ updateSymbol($1, $3); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL						{ }
-	| variable T_VAR T_EQUAL T_TRUE			{ addSymbol($2, BOOL, $4); printf("%s", $4 ? "true" : "false"); }
-	| variable T_VAR T_EQUAL T_FALSE		{ addSymbol($2, BOOL, $4); printf("%s", $4 ? "true" : "false"); }
+	| variable T_VAR T_EQUAL T_TRUE			{ addSymbol($2, BOOL, $4); $$ = ""; }
+	| variable T_VAR T_EQUAL T_FALSE		{ addSymbol($2, BOOL, $4); $$ = ""; }
 ;
 
 %%

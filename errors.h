@@ -12,6 +12,9 @@ void throw_error(int code, char *subject) {
         case 2:
             printf("The variable name '%s' is already defined!\n", subject);
             break;
+        case 3:
+            printf("Undefined variable: '%s'\n", subject);
+            break;
         default:
             printf("Unkown error.");
             break;
