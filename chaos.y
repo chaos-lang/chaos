@@ -52,7 +52,7 @@ parser:
 line: T_NEWLINE
     | mixed_expression T_NEWLINE		{ printf("%f\n", $1); }
     | expression T_NEWLINE				{ printf("%i\n", $1); }
-	| variable T_NEWLINE				{ if ($1[0] != '\0') printSymbolValue(getSymbol($1)); }
+	| variable T_NEWLINE				{ if ($1[0] != '\0' && is_interactive) printSymbolValue(getSymbol($1)); }
     | T_QUIT T_NEWLINE					{ is_interactive ? printf("%s\n", __BYE_BYE__) : printf(""); exit(0); }
 	| T_PRINT T_VAR T_NEWLINE			{ printSymbolValue(getSymbol($2)); }
 	| T_PRINT T_INT T_NEWLINE			{ printf("%i\n", $2); }
