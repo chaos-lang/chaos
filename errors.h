@@ -3,10 +3,14 @@
 #include <string.h>
 
 void throw_error(int code, char *subject) {
+    printf("%s Error - ", __LANGUAGE_NAME__);
     switch (code)
     {
-        case '1':
-            printf("%s", strcat("Unkown variable type: ", subject));
+        case 1:
+            printf("Unkown variable type: '%s'\n", subject);
+            break;
+        case 2:
+            printf("The variable name '%s' is already defined!\n", subject);
             break;
         default:
             printf("Unkown error.");

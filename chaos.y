@@ -92,7 +92,7 @@ variable: T_VAR_BOOL						{ }
 %%
 
 int main(int argc, char** argv) {
-	printf("%s %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
+	printf("%s Language %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
 	printf("GCC version: %d.%d.%d on %s\n",__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
 
 	FILE *fp = argc > 1 ? fopen (argv[1], "r") : stdin;
