@@ -27,7 +27,7 @@ void addSymbol(char *name, enum Type type, bool b) {
 
 Symbol* getSymbol(char *name) {
     for ( int i = 0; i < sizeof(symbol_table) / sizeof(Symbol); i++) {
-        if (strcmp(&symbol_table[i].name, &name)) {
+        if (strcmp(symbol_table[i].name, &name)) {
             return &symbol_table[i];
         }
     }
@@ -38,19 +38,19 @@ void printSymbolValue(Symbol* symbol) {
     switch (symbol->type)
     {
         case BOOL:
-            printf("%i", symbol->value);
+            printf("%s", symbol->value.b ? "true" : "false");
             break;
         case INT:
-            printf("%i", symbol->value);
+            printf("%i", symbol->value.i);
             break;
         case FLOAT:
-            printf("%f", symbol->value);
+            printf("%f", symbol->value.f);
             break;
         case CHAR:
-            printf("%s", symbol->value);
+            printf("%c", symbol->value.c);
             break;
         case STRING:
-            printf("%s", symbol->value);
+            printf("%s", symbol->value.s);
             break;
         default:
             subject[0] = symbol->type;
