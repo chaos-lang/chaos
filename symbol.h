@@ -14,36 +14,53 @@ typedef struct {
         char *s;
         float f;
     } value;
+    struct Symbol* previous;
+    struct Symbol* next;
 } Symbol;
 
-Symbol symbol_table[100];
-int symbol_counter=0;
+Symbol* symbol_cursor;
+Symbol* head_symbol;
 
 bool isDefined(char *name);
 
 void addSymbol(char *name, enum Type type, bool b) {
     isDefined(name);
+    symbol_cursor = head_symbol;
 
-    Symbol variable = {name, type, b};
-    symbol_table[symbol_counter] = variable;
-    symbol_counter++;
+    Symbol* variable;
+    variable = (struct Symbol*)malloc(sizeof(Symbol));
+    variable->name = name;
+    variable->type = type;
+    variable->value.b = b;
+    if (symbol_cursor == NULL) {
+        symbol_cursor = variable;
+        head_symbol = variable;
+    } else {
+        symbol_cursor->next = variable;
+        variable->previous = symbol_cursor;
+    }
 }
 
 int updateSymbol(char *name, bool b) {
-    for (int i = 0; i < sizeof(symbol_table) / sizeof(Symbol); i++) {
-        if (symbol_table[i].name != NULL && strcmp(symbol_table[i].name, &name)) {
-            symbol_table[i].value.b = b;
+    symbol_cursor = head_symbol;
+    while (symbol_cursor != NULL) {
+        if (strcmp(symbol_cursor->name, name) == 0) {
+            symbol_cursor->value.b = b;
             return 0;
         }
+        symbol_cursor = symbol_cursor->next;
     }
     throw_error(3, name);
 }
 
 Symbol* getSymbol(char *name) {
-    for (int i = 0; i < sizeof(symbol_table) / sizeof(Symbol); i++) {
-        if (symbol_table[i].name != NULL && strcmp(symbol_table[i].name, &name)) {
-            return &symbol_table[i];
+    symbol_cursor = head_symbol;
+    while (symbol_cursor != NULL) {
+        if (strcmp(symbol_cursor->name, name) == 0) {
+            Symbol* symbol = symbol_cursor;
+            return symbol;
         }
+        symbol_cursor = symbol_cursor->next;
     }
     throw_error(3, name);
 }
@@ -76,11 +93,13 @@ void printSymbolValue(Symbol* symbol) {
 }
 
 bool isDefined(char *name) {
-    for (int i = 0; i < sizeof(symbol_table) / sizeof(Symbol); i++) {
-        if (symbol_table[i].name != NULL && strcmp(symbol_table[i].name, &name)) {
+    symbol_cursor = head_symbol;
+    while (symbol_cursor != NULL) {
+        if (strcmp(symbol_cursor->name, name) == 0) {
             throw_error(2, name);
             return true;
         }
+        symbol_cursor = symbol_cursor->next;
     }
     return false;
 }
