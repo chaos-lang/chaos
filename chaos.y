@@ -92,8 +92,8 @@ variable: T_VAR								{ $$ = $1; }
 ;
 
 variable: T_VAR_BOOL						{ }
-	| variable T_VAR T_EQUAL T_TRUE			{ addSymbol($2, BOOL, $4); $$ = ""; }
-	| variable T_VAR T_EQUAL T_FALSE		{ addSymbol($2, BOOL, $4); $$ = ""; }
+	| T_VAR_BOOL T_VAR T_EQUAL T_TRUE		{ addSymbol($2, BOOL, $4); $$ = ""; }
+	| T_VAR_BOOL T_VAR T_EQUAL T_FALSE		{ addSymbol($2, BOOL, $4); $$ = ""; }
 ;
 
 %%

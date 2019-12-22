@@ -38,6 +38,6 @@
     return T_F_STRING;
 }
 
-"bool"                          {return T_VAR_BOOL;}
+bool|boolean                    {return T_VAR_BOOL;}
 [a-zA-Z][a-zA-Z0-9]*            {yylval.sval=strdup(yytext); return T_VAR;}
 %%
