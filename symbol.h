@@ -19,32 +19,32 @@ typedef struct {
 } Symbol;
 
 Symbol* symbol_cursor;
-Symbol* head_symbol;
-Symbol* foot_symbol;
+Symbol* start_symbol;
+Symbol* end_symbol;
 
 bool isDefined(char *name);
 
 void addSymbol(char *name, enum Type type, bool b) {
-    isDefined(name);
-    symbol_cursor = head_symbol;
+    if (isDefined(name)) throw_error(2, name);
+    symbol_cursor = start_symbol;
 
-    Symbol* variable;
-    variable = (struct Symbol*)malloc(sizeof(Symbol));
-    variable->name = name;
-    variable->type = type;
-    variable->value.b = b;
-    if (head_symbol == NULL) {
-        head_symbol = variable;
-        foot_symbol = variable;
+    Symbol* symbol;
+    symbol = (struct Symbol*)malloc(sizeof(Symbol));
+    symbol->name = name;
+    symbol->type = type;
+    symbol->value.b = b;
+    if (start_symbol == NULL) {
+        start_symbol = symbol;
+        end_symbol = symbol;
     } else {
-        foot_symbol->next = variable;
-        variable->previous = foot_symbol;
-        foot_symbol = variable;
+        end_symbol->next = symbol;
+        symbol->previous = end_symbol;
+        end_symbol = symbol;
     }
 }
 
 int updateSymbol(char *name, bool b) {
-    symbol_cursor = head_symbol;
+    symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
             symbol_cursor->value.b = b;
@@ -56,19 +56,19 @@ int updateSymbol(char *name, bool b) {
 }
 
 int removeSymbol(char *name) {
-    symbol_cursor = head_symbol;
+    symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
             Symbol* previous_symbol = symbol_cursor->previous;
             if (previous_symbol == NULL) {
-                head_symbol = symbol_cursor->next;
+                start_symbol = symbol_cursor->next;
             } else {
                 previous_symbol->next = symbol_cursor->next;
             }
 
             Symbol* next_symbol = symbol_cursor->next;
             if (next_symbol == NULL) {
-                foot_symbol = symbol_cursor->previous;
+                end_symbol = symbol_cursor->previous;
             } else {
                 next_symbol->previous = symbol_cursor->previous;
             }
@@ -81,7 +81,7 @@ int removeSymbol(char *name) {
 }
 
 Symbol* getSymbol(char *name) {
-    symbol_cursor = head_symbol;
+    symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
             Symbol* symbol = symbol_cursor;
@@ -120,10 +120,9 @@ void printSymbolValue(Symbol* symbol) {
 }
 
 bool isDefined(char *name) {
-    symbol_cursor = head_symbol;
+    symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
-            throw_error(2, name);
             return true;
         }
         symbol_cursor = symbol_cursor->next;
@@ -133,7 +132,7 @@ bool isDefined(char *name) {
 
 void printSymbolTable() {
     //start from the beginning
-    Symbol *ptr1 = head_symbol;
+    Symbol *ptr1 = start_symbol;
     printf("[head] =>");
     while(ptr1 != NULL) {
         printf(" %s =>",ptr1->name);
@@ -142,7 +141,7 @@ void printSymbolTable() {
     printf(" [foot]\n");
 
     //start from the end
-    Symbol *ptr2 = foot_symbol;
+    Symbol *ptr2 = end_symbol;
     printf("[foot] =>");
     while(ptr2 != NULL) {
         printf(" %s =>",ptr2->name);
