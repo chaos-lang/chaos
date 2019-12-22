@@ -6,6 +6,7 @@
 #include "utilities/platform.h"
 #include "utilities/language.h"
 #include "utilities/helpers.h"
+#include "symbol.h"
 
 extern int yylex();
 extern int yyparse();
@@ -49,7 +50,7 @@ parser:
 line: T_NEWLINE
     | mixed_expression T_NEWLINE		{ printf("%f", $1); }
     | expression T_NEWLINE				{ printf("%i", $1); }
-	| variable T_NEWLINE				{ printf("%s", $1); }
+	| variable T_NEWLINE				{ }
     | T_QUIT T_NEWLINE					{ printf("bye!\n"); exit(0); }
 	| T_PRINT T_INT T_NEWLINE			{ printf("%i", $2); }
 	| T_PRINT T_F_STRING T_NEWLINE		{ printf("%s", $2); }
@@ -80,9 +81,12 @@ expression: T_INT						{ $$ = $1; }
 	| T_LEFT expression T_RIGHT			{ $$ = $2; }
 ;
 
-variable: T_VAR_BOOL					{ }
-	| variable T_VAR T_EQUAL T_TRUE			{ $$ = $2; }
-	| variable T_VAR T_EQUAL T_FALSE		{ $$ = $2; }
+variable: T_VAR								{ printSymbolValue(getSymbol($1)); }
+;
+
+variable: T_VAR_BOOL						{ }
+	| variable T_VAR T_EQUAL T_TRUE			{ addSymbol($2, BOOL, $4); printf("%s", $4 ? "true" : "false"); }
+	| variable T_VAR T_EQUAL T_FALSE		{ addSymbol($2, BOOL, $4); printf("%s", $4 ? "true" : "false"); }
 ;
 
 %%

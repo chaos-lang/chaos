@@ -27,8 +27,8 @@
 "exit"                          {return T_QUIT;}
 "quit"                          {return T_QUIT;}
 "print"                         {return T_PRINT;}
-"true"                          {yylval.ival = true; return T_TRUE;}
-"false"                         {yylval.ival = false; return T_FALSE;}
+"true"                          {yylval.bval = 1; return T_TRUE;}
+"false"                         {yylval.bval = 0; return T_FALSE;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
