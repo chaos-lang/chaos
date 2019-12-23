@@ -58,7 +58,7 @@ hello world
 ### Program File as Command-line Argument
 
 ```
-mertyildiran@Corsair:~/Documents/chaos$ chaos dev.chs
+mertyildiran@Corsair:~/Documents/chaos$ chaos dev.kaos
 8
 1231232
 asdasdasd
@@ -183,3 +183,9 @@ This keyword is only useful for the language developers:
 [start] => var1 => var3 => var4 => var5 => var6 => var7 => var8 => [end]
 [end] => var8 => var7 => var6 => var5 => var4 => var3 => var1 => [start]
 ```
+
+## Extras
+
+### Program File Extension
+
+Recommended extension for a Chaos program file is: `.kaos`

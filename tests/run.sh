@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-for filepath in $(find $DIR -name '*.chs'); do
+for filepath in $(find $DIR -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
