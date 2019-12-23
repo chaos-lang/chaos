@@ -195,3 +195,15 @@ void updateSymbolFloat(char *name, float f) {
     value.f = f;
     updateSymbol(name, value);
 }
+
+void addSymbolString(char *name, enum Type type, char *s) {
+    union Value value;
+    value.s = s;
+    addSymbol(name, type, value);
+}
+
+void updateSymbolString(char *name, char *s) {
+    union Value value;
+    value.s = s;
+    updateSymbol(name, value);
+}

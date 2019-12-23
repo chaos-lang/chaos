@@ -35,10 +35,11 @@
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
     strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
-    return T_F_STRING;
+    return T_STRING;
 }
 
 bool|boolean                    {return T_VAR_BOOL;}
 num|number                      {return T_VAR_NUMBER;}
+str|string                      {return T_VAR_STRING;}
 [a-zA-Z][a-zA-Z0-9]*            {yylval.sval=strdup(yytext); return T_VAR;}
 %%
