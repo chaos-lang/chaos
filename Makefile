@@ -11,3 +11,6 @@ chaos: lex.yy.c chaos.tab.c chaos.tab.h
 
 clean:
 	rm chaos chaos.tab.c lex.yy.c chaos.tab.h
+
+install:
+	mv chaos /usr/bin/
