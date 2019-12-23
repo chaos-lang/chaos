@@ -44,6 +44,7 @@ void addSymbol(char *name, enum Type type, union Value value) {
         end_symbol->next = symbol;
         symbol->previous = end_symbol;
         end_symbol = symbol;
+        end_symbol->next = NULL;
     }
 }
 
@@ -68,18 +69,19 @@ int removeSymbol(char *name) {
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
             Symbol* previous_symbol = symbol_cursor->previous;
+            Symbol* next_symbol = symbol_cursor->next;
+
             if (previous_symbol == NULL) {
-                start_symbol = symbol_cursor->next;
+                start_symbol = next_symbol;
+                start_symbol->previous = NULL;
+            } else if (next_symbol == NULL) {
+                end_symbol = previous_symbol;
+                end_symbol->next = NULL;
             } else {
-                previous_symbol->next = symbol_cursor->next;
+                previous_symbol->next = next_symbol;
+                next_symbol->previous = previous_symbol;
             }
 
-            Symbol* next_symbol = symbol_cursor->next;
-            if (next_symbol == NULL) {
-                end_symbol = symbol_cursor->previous;
-            } else {
-                next_symbol->previous = symbol_cursor->previous;
-            }
             free(symbol_cursor);
             return 0;
         }
@@ -141,21 +143,21 @@ bool isDefined(char *name) {
 void printSymbolTable() {
     //start from the beginning
     Symbol *ptr1 = start_symbol;
-    printf("[head] =>");
+    printf("[start] =>");
     while(ptr1 != NULL) {
         printf(" %s =>", ptr1->name);
         ptr1 = ptr1->next;
     }
-    printf(" [foot]\n");
+    printf(" [end]\n");
 
     //start from the end
     Symbol *ptr2 = end_symbol;
-    printf("[foot] =>");
+    printf("[end] =>");
     while(ptr2 != NULL) {
         printf(" %s =>", ptr2->name);
         ptr2 = ptr2->previous;
     }
-    printf(" [head]\n");
+    printf(" [start]\n");
 }
 
 void addSymbolBool(char *name, enum Type type, bool b) {
