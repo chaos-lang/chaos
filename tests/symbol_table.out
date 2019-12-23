@@ -1,0 +1,2 @@
+[start] => var1 => var3 => var4 => var5 => var6 => var7 => var8 => [end]
+[end] => var8 => var7 => var6 => var5 => var4 => var3 => var1 => [start]

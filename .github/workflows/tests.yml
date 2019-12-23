@@ -1,0 +1,24 @@
+name: Automated Tests
+
+on: [push]
+
+jobs:
+  main:
+    name: Main Job
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y install build-essential bison flex
+
+    - name: Build
+      run: |
+        make
+        sudo make install
+
+    - name: Run the tests
+      run: |
+        tests/run.sh
