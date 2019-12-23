@@ -1,19 +1,23 @@
-# Chaos Language
+# Chaos
 
-Turn chaos into magic!
-
+<p align="center">
+    Turn chaos into magic!
+</p>
 <p align="center">
     <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/chaos-lang/chaos?logo=GitHub&style=flat-square">
     <img alt="GitHub Commit Activity" src="https://img.shields.io/github/commit-activity/m/chaos-lang/chaos?logo=GitHub&style=flat-square">
     <a href="https://github.com/chaos-lang/chaos/blob/master/LICENSE">
         <img alt="GitHub License" src="https://img.shields.io/github/license/chaos-lang/chaos?logo=GitHub&style=flat-square">
     </a>
-    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3ALinter%20Checks">
+    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Linter+Checks%22">
         <img alt="GitHub Workflow Linter Checks Status" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Linter%20Checks?logo=GitHub&label=linter%20checks&style=flat-square">
     </a>
-    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3AAutomated%20Tests">
+    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Automated+Tests%22">
         <img alt="GitHub Workflow Automated Tests Status" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Automated%20Tests?logo=GitHub&label=automated%20tests&style=flat-square">
     </a>
+</p>
+<p align="center">
+    Chaos is a purely functional programming language that achieves zero cyclomatic complexity.
 </p>
 
 ## Installation
