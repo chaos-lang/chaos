@@ -24,7 +24,7 @@ Symbol* end_symbol;
 
 bool isDefined(char *name);
 
-void addSymbol(char *name, enum Type type, bool b) {
+void addSymbol(char *name, enum Type type, union Value value) {
     if (isDefined(name)) throw_error(2, name);
     symbol_cursor = start_symbol;
 
@@ -32,7 +32,11 @@ void addSymbol(char *name, enum Type type, bool b) {
     symbol = (struct Symbol*)malloc(sizeof(Symbol));
     symbol->name = name;
     symbol->type = type;
-    symbol->value.b = b;
+    symbol->value.b = value.b;
+    symbol->value.i = value.i;
+    symbol->value.c = value.c;
+    symbol->value.s = value.s;
+    symbol->value.f = value.f;
     if (start_symbol == NULL) {
         start_symbol = symbol;
         end_symbol = symbol;
@@ -43,11 +47,15 @@ void addSymbol(char *name, enum Type type, bool b) {
     }
 }
 
-int updateSymbol(char *name, bool b) {
+int updateSymbol(char *name, union Value value) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
-            symbol_cursor->value.b = b;
+            symbol_cursor->value.b = value.b;
+            symbol_cursor->value.i = value.i;
+            symbol_cursor->value.c = value.c;
+            symbol_cursor->value.s = value.s;
+            symbol_cursor->value.f = value.f;
             return 0;
         }
         symbol_cursor = symbol_cursor->next;
@@ -135,7 +143,7 @@ void printSymbolTable() {
     Symbol *ptr1 = start_symbol;
     printf("[head] =>");
     while(ptr1 != NULL) {
-        printf(" %s =>",ptr1->name);
+        printf(" %s =>", ptr1->name);
         ptr1 = ptr1->next;
     }
     printf(" [foot]\n");
@@ -144,8 +152,32 @@ void printSymbolTable() {
     Symbol *ptr2 = end_symbol;
     printf("[foot] =>");
     while(ptr2 != NULL) {
-        printf(" %s =>",ptr2->name);
+        printf(" %s =>", ptr2->name);
         ptr2 = ptr2->previous;
     }
     printf(" [head]\n");
+}
+
+void addSymbolBool(char *name, enum Type type, bool b) {
+    union Value value;
+    value.b = b;
+    addSymbol(name, type, value);
+}
+
+void updateSymbolBool(char *name, bool b) {
+    union Value value;
+    value.b = b;
+    updateSymbol(name, value);
+}
+
+void addSymbolInt(char *name, enum Type type, int i) {
+    union Value value;
+    value.i = i;
+    addSymbol(name, type, value);
+}
+
+void updateSymbolInt(char *name, int i) {
+    union Value value;
+    value.i = i;
+    updateSymbol(name, value);
 }

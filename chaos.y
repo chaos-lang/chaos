@@ -31,7 +31,7 @@ bool is_interactive = true;
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
 %token T_NEWLINE T_QUIT
 %token T_PRINT
-%token T_VAR_BOOL
+%token T_VAR_BOOL T_VAR_INT
 %token T_DEL
 %token T_SYMBOL_TABLE
 %left T_PLUS T_MINUS
@@ -86,14 +86,19 @@ expression: T_INT						{ $$ = $1; }
 ;
 
 variable: T_VAR								{ $$ = $1; }
-	| variable T_EQUAL T_TRUE				{ updateSymbol($1, $3); $$ = ""; }
-	| variable T_EQUAL T_FALSE				{ updateSymbol($1, $3); $$ = ""; }
+	| variable T_EQUAL T_TRUE				{ updateSymbolBool($1, $3); $$ = ""; }
+	| variable T_EQUAL T_FALSE				{ updateSymbolBool($1, $3); $$ = ""; }
+	| variable T_EQUAL T_INT				{ updateSymbolInt($1, $3); $$ = ""; }
 	| T_DEL variable						{ removeSymbol($2); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL						{ }
-	| T_VAR_BOOL T_VAR T_EQUAL T_TRUE		{ addSymbol($2, BOOL, $4); $$ = ""; }
-	| T_VAR_BOOL T_VAR T_EQUAL T_FALSE		{ addSymbol($2, BOOL, $4); $$ = ""; }
+	| T_VAR_BOOL T_VAR T_EQUAL T_TRUE		{ addSymbolBool($2, BOOL, $4); $$ = ""; }
+	| T_VAR_BOOL T_VAR T_EQUAL T_FALSE		{ addSymbolBool($2, BOOL, $4); $$ = ""; }
+;
+
+variable: T_VAR_INT							{ }
+	| T_VAR_INT T_VAR T_EQUAL T_INT			{ addSymbolInt($2, INT, $4); $$ = ""; }
 ;
 
 %%
