@@ -39,7 +39,6 @@
 }
 
 bool|boolean                    {return T_VAR_BOOL;}
-int|integer                     {return T_VAR_INT;}
-float                           {return T_VAR_FLOAT;}
+num|number                      {return T_VAR_NUMBER;}
 [a-zA-Z][a-zA-Z0-9]*            {yylval.sval=strdup(yytext); return T_VAR;}
 %%
