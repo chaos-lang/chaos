@@ -1,0 +1,25 @@
+name: Linter Checks
+
+on: [push]
+
+jobs:
+  main:
+    name: Main Job
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y install build-essential bison flex
+
+    - name: Build
+      run: |
+        make
+        sudo make install
+
+    - name: Lint with Cppcheck
+      run: |
+        sudo apt-get -y install cppcheck
+        cppcheck .
