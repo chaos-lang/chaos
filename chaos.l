@@ -24,6 +24,9 @@
 "/"                             {return T_DIVIDE;}
 "("                             {return T_LEFT;}
 ")"                             {return T_RIGHT;}
+"["                             {return T_LEFT_BRACKET;}
+"]"                             {return T_RIGHT_BRACKET;}
+","                             {return T_COMMA;}
 "exit"                          {return T_QUIT;}
 "quit"                          {return T_QUIT;}
 "print"                         {return T_PRINT;}
@@ -41,5 +44,6 @@
 bool|boolean                    {return T_VAR_BOOL;}
 num|number                      {return T_VAR_NUMBER;}
 str|string                      {return T_VAR_STRING;}
+list|array                      {return T_VAR_ARRAY;}
 [a-zA-Z][a-zA-Z0-9]*            {yylval.sval=strdup(yytext); return T_VAR;}
 %%

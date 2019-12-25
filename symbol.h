@@ -2,7 +2,7 @@
 #include <string.h>
 #include "errors.h"
 
-enum Type { BOOL, INT, CHAR, STRING, FLOAT };
+enum Type { BOOL, INT, CHAR, STRING, FLOAT, ARRAY };
 
 typedef struct {
     char *name;
@@ -13,18 +13,23 @@ typedef struct {
         char c;
         char *s;
         float f;
+        int children_count;
     } value;
     struct Symbol* previous;
     struct Symbol* next;
+    struct Symbol** children;
 } Symbol;
 
 Symbol* symbol_cursor;
 Symbol* start_symbol;
 Symbol* end_symbol;
 
+Symbol* array_mode = NULL;
+int array_symbol_counter = 0;
+
 bool isDefined(char *name);
 
-void addSymbol(char *name, enum Type type, union Value value) {
+Symbol* addSymbol(char *name, enum Type type, union Value value) {
     if (isDefined(name)) throw_error(2, name);
     symbol_cursor = start_symbol;
 
@@ -37,6 +42,7 @@ void addSymbol(char *name, enum Type type, union Value value) {
     symbol->value.c = value.c;
     symbol->value.s = value.s;
     symbol->value.f = value.f;
+    symbol->value.children_count = 0;
     if (start_symbol == NULL) {
         start_symbol = symbol;
         end_symbol = symbol;
@@ -46,9 +52,13 @@ void addSymbol(char *name, enum Type type, union Value value) {
         end_symbol = symbol;
         end_symbol->next = NULL;
     }
+
+    addSymbolToArray(symbol);
+
+    return symbol;
 }
 
-int updateSymbol(char *name, union Value value) {
+Symbol* updateSymbol(char *name, union Value value) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (strcmp(symbol_cursor->name, name) == 0) {
@@ -57,7 +67,7 @@ int updateSymbol(char *name, union Value value) {
             symbol_cursor->value.c = value.c;
             symbol_cursor->value.s = value.s;
             symbol_cursor->value.f = value.f;
-            return 0;
+            return symbol_cursor;
         }
         symbol_cursor = symbol_cursor->next;
     }
@@ -140,6 +150,21 @@ bool isDefined(char *name) {
     return false;
 }
 
+void addSymbolToArray(Symbol* symbol) {
+    if (array_mode != NULL) {
+        array_mode->children = realloc(
+            array_mode->children,
+            sizeof(Symbol) * ++array_symbol_counter
+        );
+
+        if (array_mode->children == NULL) {
+            throw_error(4, array_mode->name);
+        }
+
+        array_mode->children[array_symbol_counter - 1] = symbol;
+    }
+}
+
 void printSymbolTable() {
     //start from the beginning
     Symbol *ptr1 = start_symbol;
@@ -160,10 +185,10 @@ void printSymbolTable() {
     printf(" [start]\n");
 }
 
-void addSymbolBool(char *name, enum Type type, bool b) {
+void addSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    addSymbol(name, type, value);
+    addSymbol(name, BOOL, value);
 }
 
 void updateSymbolBool(char *name, bool b) {
@@ -172,10 +197,10 @@ void updateSymbolBool(char *name, bool b) {
     updateSymbol(name, value);
 }
 
-void addSymbolInt(char *name, enum Type type, int i) {
+void addSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    addSymbol(name, type, value);
+    addSymbol(name, INT, value);
 }
 
 void updateSymbolInt(char *name, int i) {
@@ -184,10 +209,10 @@ void updateSymbolInt(char *name, int i) {
     updateSymbol(name, value);
 }
 
-void addSymbolFloat(char *name, enum Type type, float f) {
+void addSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    addSymbol(name, type, value);
+    addSymbol(name, FLOAT, value);
 }
 
 void updateSymbolFloat(char *name, float f) {
@@ -196,14 +221,32 @@ void updateSymbolFloat(char *name, float f) {
     updateSymbol(name, value);
 }
 
-void addSymbolString(char *name, enum Type type, char *s) {
+void addSymbolString(char *name, char *s) {
     union Value value;
     value.s = s;
-    addSymbol(name, type, value);
+    addSymbol(name, STRING, value);
 }
 
 void updateSymbolString(char *name, char *s) {
     union Value value;
     value.s = s;
     updateSymbol(name, value);
+}
+
+void addSymbolArray(char *name) {
+    printf("Add array");
+    union Value value;
+    array_mode = addSymbol(name, ARRAY, value);
+}
+
+void updateSymbolArray(char *name) {
+    union Value value;
+    array_mode = updateSymbol(name, value);
+}
+
+void finishArrayMode(char *name) {
+    array_mode->value.children_count = array_symbol_counter;
+    array_mode->name = name;
+    array_mode = NULL;
+    array_symbol_counter = 0;
 }

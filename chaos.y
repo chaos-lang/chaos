@@ -28,10 +28,10 @@ bool is_interactive = true;
 %token<ival> T_INT
 %token<fval> T_FLOAT
 %token<sval> T_STRING T_VAR
-%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
+%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL T_LEFT_BRACKET T_RIGHT_BRACKET T_COMMA
 %token T_NEWLINE T_QUIT
 %token T_PRINT
-%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING
+%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY
 %token T_DEL
 %token T_SYMBOL_TABLE
 %left T_PLUS T_MINUS
@@ -40,6 +40,8 @@ bool is_interactive = true;
 %type<ival> expression
 %type<fval> mixed_expression
 %type<sval> variable
+%type<sval> arraystart
+%type<ival> array
 
 %start parser
 
@@ -90,21 +92,37 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_INT                                        { updateSymbolInt($1, $3); $$ = ""; }
     | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
+    | variable T_EQUAL T_LEFT_BRACKET array                         { updateSymbolArray($1); $$ = ""; }
     | T_DEL variable                                                { removeSymbol($2); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL                                                { }
-    | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, BOOL, $4); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, BOOL, $4); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, $4); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
 ;
 
 variable: T_VAR_NUMBER                                              { }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, INT, $4); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, FLOAT, $4); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
 ;
 
 variable: T_VAR_STRING                                              { }
-    | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, STRING, $4); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
+;
+
+variable: T_VAR_ARRAY                                               { }
+    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishArrayMode($2); $$ = ""; }
+;
+
+arraystart: T_LEFT_BRACKET                                          { addSymbolArray(NULL); }
+    | arraystart array                                              { $$ = ""; }
+;
+
+array: T_INT                                                        { addSymbolInt(NULL, $1); }
+    | array T_COMMA array                                           { $$ = ""; }
+;
+
+array: T_RIGHT_BRACKET                                              { }
 ;
 
 %%

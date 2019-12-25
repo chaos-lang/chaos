@@ -15,6 +15,9 @@ void throw_error(int code, char *subject) {
         case 3:
             printf("Undefined variable: '%s'\n", subject);
             break;
+        case 4:
+            printf("Memory allocation for array '%s' failed!\n", subject);
+            break;
         default:
             printf("Unkown error.");
             break;
