@@ -144,7 +144,7 @@ void printSymbolValue(Symbol* symbol) {
 bool isDefined(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
+        if (symbol_cursor->name != NULL && name != NULL && strcmp(symbol_cursor->name, name) == 0) {
             return true;
         }
         symbol_cursor = symbol_cursor->next;
@@ -236,7 +236,6 @@ void updateSymbolString(char *name, char *s) {
 }
 
 void addSymbolArray(char *name) {
-    printf("Add array");
     union Value value;
     array_mode = addSymbol(name, ARRAY, value);
 }
