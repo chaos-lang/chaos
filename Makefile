@@ -1,6 +1,9 @@
 all: chaos
 
-chaos.tab.c chaos.tab.h:	chaos.y
+dev: lex.yy.c chaos.tab.c chaos.tab.h
+	gcc -o chaos chaos.tab.c lex.yy.c -ggdb
+
+chaos.tab.c chaos.tab.h: chaos.y
 	bison -d chaos.y
 
 lex.yy.c: chaos.l chaos.tab.h
