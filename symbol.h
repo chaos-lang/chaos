@@ -103,7 +103,7 @@ int removeSymbol(char *name) {
 Symbol* getSymbol(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (strcmp(symbol_cursor->name, name) == 0) {
+        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
             Symbol* symbol = symbol_cursor;
             return symbol;
         }
@@ -144,7 +144,7 @@ void printSymbolValue(Symbol* symbol) {
 bool isDefined(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (strcmp(symbol_cursor->name, name) == 0) {
+        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
             return true;
         }
         symbol_cursor = symbol_cursor->next;
