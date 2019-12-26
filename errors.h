@@ -18,6 +18,9 @@ void throw_error(int code, char *subject) {
         case 4:
             printf("Memory allocation for array '%s' failed!\n", subject);
             break;
+        case 5:
+            printf("Illegal element type for the typed array: '%s'\n", subject);
+            break;
         default:
             printf("Unkown error.");
             break;

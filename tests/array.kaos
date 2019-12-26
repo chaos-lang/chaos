@@ -1,4 +1,4 @@
-list a = [1, 2, 3]
+array a = [1, 2, 3]
 print a
 list b = [true, false]
 print b
@@ -6,9 +6,16 @@ list c = [3.2, 345.1665]
 print c
 list d = ['a', 'b', 'c']
 print d
-list e = ["A", "B", "C"]
+array e = ["A", "B", "C"]
 print e
 list f = ['A', "asdasdad12312", 1232, 435.16, true, false]
 print f
 list g = ["asdasdasd,", 123123]
 print g
+
+bool list arr1 = [true, false, true]
+print arr1
+number list arr2 = [1, 2, 63.3, 12321.1515]
+print arr2
+string array arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
+print arr3

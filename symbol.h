@@ -2,7 +2,7 @@
 #include <string.h>
 #include "errors.h"
 
-enum Type { BOOL, INT, CHAR, STRING, FLOAT, ARRAY };
+enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY };
 
 typedef struct {
     char *name;
@@ -264,9 +264,28 @@ void updateSymbolArray(char *name) {
     array_mode = updateSymbol(name, value);
 }
 
-void finishArrayMode(char *name) {
+bool isArrayIllegal(enum Type type) {
+    if (array_mode != NULL && type != ANY) {
+        for (int i = 0; i < array_mode->children_count; i++) {
+            Symbol* symbol = array_mode->children[i];
+            if (type == NUMBER) {
+                if (symbol->type != INT && symbol->type != FLOAT) {
+                    return true;
+                }
+            } else {
+                if (symbol->type != type) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void finishArrayMode(char *name, enum Type type) {
     array_mode->children_count = array_symbol_counter;
     array_mode->name = name;
+    if (isArrayIllegal(type)) throw_error(5, array_mode->name);
     array_mode = NULL;
     array_symbol_counter = 0;
 }
