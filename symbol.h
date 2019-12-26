@@ -13,11 +13,11 @@ typedef struct {
         char c;
         char *s;
         float f;
-        //int children_count;
     } value;
     struct Symbol* previous;
     struct Symbol* next;
     struct Symbol** children;
+    int children_count;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -42,7 +42,8 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol->value.c = value.c;
     symbol->value.s = value.s;
     symbol->value.f = value.f;
-    //symbol->value.children_count = 0;
+    symbol->children_count = 0;
+
     if (start_symbol == NULL) {
         start_symbol = symbol;
         end_symbol = symbol;
@@ -132,13 +133,31 @@ void printSymbolValue(Symbol* symbol) {
             printf("%s", symbol->value.s);
             break;
         case ARRAY:
+            printf("[");
+            for (int i = 0; i < symbol->children_count; i++) {
+                printSymbolValue(symbol->children[i]);
+                if (i + 1 != symbol->children_count) {
+                    printf(", ");
+                }
+            }
+            printf("]");
             break;
         default:
             type[0] = symbol->type;
             throw_error(1, type);
             break;
     }
-    printf("\n");
+}
+
+void printSymbolValueEndWith(Symbol* symbol, char *end)
+{
+    printSymbolValue(symbol);
+    printf("%s", end);
+}
+
+void printSymbolValueEndWithNewLine(Symbol* symbol)
+{
+    printSymbolValueEndWith(symbol, "\n");
 }
 
 bool isDefined(char *name) {
@@ -246,7 +265,7 @@ void updateSymbolArray(char *name) {
 }
 
 void finishArrayMode(char *name) {
-    //array_mode->value.children_count = array_symbol_counter;
+    array_mode->children_count = array_symbol_counter;
     array_mode->name = name;
     array_mode = NULL;
     array_symbol_counter = 0;
