@@ -115,11 +115,23 @@ variable: T_VAR_ARRAY                                               { }
 ;
 
 arraystart: T_LEFT_BRACKET                                          { addSymbolArray(NULL); }
-    | arraystart array                                              { $$ = ""; }
+    | arraystart array                                              { }
 ;
 
+array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
+    | array T_COMMA array                                           { }
+;
+array: T_FALSE                                                      { addSymbolBool(NULL, $1); }
+    | array T_COMMA array                                           { }
+;
 array: T_INT                                                        { addSymbolInt(NULL, $1); }
-    | array T_COMMA array                                           { $$ = ""; }
+    | array T_COMMA array                                           { }
+;
+array: T_FLOAT                                                      { addSymbolFloat(NULL, $1); }
+    | array T_COMMA array                                           { }
+;
+array: T_STRING                                                     { addSymbolString(NULL, $1); }
+    | array T_COMMA array                                           { }
 ;
 
 array: T_RIGHT_BRACKET                                              { }
