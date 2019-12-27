@@ -19,3 +19,7 @@ number list arr2 = [1, 2, 63.3, 12321.1515]
 print arr2
 string array arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
 print arr3
+
+symbol_table
+del f
+symbol_table

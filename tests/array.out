@@ -8,3 +8,7 @@
 [true, false, true]
 [1, 2, 63.299999, 12321.151367]
 [A, asdasdaqs, asdasd123123, .]
+[start] => a => (null) => (null) => (null) => b => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => e => (null) => (null) => (null) => f => (null) => (null) => (null) => (null) => (null) => (null) => g => (null) => (null) => arr1 => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => [end]
+[end] => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => arr1 => (null) => (null) => g => (null) => (null) => (null) => (null) => (null) => (null) => f => (null) => (null) => (null) => e => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => b => (null) => (null) => (null) => a => [start]
+[start] => a => (null) => (null) => (null) => b => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => e => (null) => (null) => (null) => g => (null) => (null) => arr1 => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => [end]
+[end] => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => arr1 => (null) => (null) => g => (null) => (null) => (null) => e => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => b => (null) => (null) => (null) => a => [start]

@@ -2,7 +2,7 @@
 #include <string.h>
 #include "errors.h"
 
-enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ARRAY };
+enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY };
 
 typedef struct {
     char *name;
@@ -28,6 +28,7 @@ Symbol* array_mode = NULL;
 int array_symbol_counter = 0;
 
 bool isDefined(char *name);
+void removeSymbol(Symbol* symbol);
 
 Symbol* addSymbol(char *name, enum Type type, union Value value) {
     if (isDefined(name)) throw_error(2, name);
@@ -75,30 +76,39 @@ Symbol* updateSymbol(char *name, union Value value) {
     throw_error(3, name);
 }
 
-int removeSymbol(char *name) {
+int removeSymbolByName(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (strcmp(symbol_cursor->name, name) == 0) {
-            Symbol* previous_symbol = symbol_cursor->previous;
-            Symbol* next_symbol = symbol_cursor->next;
-
-            if (previous_symbol == NULL) {
-                start_symbol = next_symbol;
-                start_symbol->previous = NULL;
-            } else if (next_symbol == NULL) {
-                end_symbol = previous_symbol;
-                end_symbol->next = NULL;
-            } else {
-                previous_symbol->next = next_symbol;
-                next_symbol->previous = previous_symbol;
+        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
+            if (symbol_cursor->type == ARRAY) {
+                for (int i = 0; i < symbol_cursor->children_count; i++) {
+                    removeSymbol(symbol_cursor->children[i]);
+                }
             }
-
-            free(symbol_cursor);
+            removeSymbol(symbol_cursor);
             return 0;
         }
         symbol_cursor = symbol_cursor->next;
     }
     throw_error(3, name);
+}
+
+void removeSymbol(Symbol* symbol) {
+    Symbol* previous_symbol = symbol->previous;
+    Symbol* next_symbol = symbol->next;
+
+    if (previous_symbol == NULL) {
+        start_symbol = next_symbol;
+        start_symbol->previous = NULL;
+    } else if (next_symbol == NULL) {
+        end_symbol = previous_symbol;
+        end_symbol->next = NULL;
+    } else {
+        previous_symbol->next = next_symbol;
+        next_symbol->previous = previous_symbol;
+    }
+
+    free(symbol);
 }
 
 Symbol* getSymbol(char *name) {
@@ -265,7 +275,7 @@ void updateSymbolArray(char *name) {
 }
 
 bool isArrayIllegal(enum Type type) {
-    if (array_mode != NULL && type != NULL) {
+    if (array_mode != NULL && type != ANY) {
         for (int i = 0; i < array_mode->children_count; i++) {
             Symbol* symbol = array_mode->children[i];
             if (type == NUMBER) {

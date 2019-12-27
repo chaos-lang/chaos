@@ -93,7 +93,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_LEFT_BRACKET array                         { updateSymbolArray($1); $$ = ""; }
-    | T_DEL variable                                                { removeSymbol($2); $$ = ""; }
+    | T_DEL variable                                                { removeSymbolByName($2); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL                                                { }
@@ -114,7 +114,7 @@ variable: T_VAR_STRING                                              { }
 ;
 
 variable: T_VAR_ARRAY                                               { }
-    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishArrayMode($2, NULL); $$ = ""; }
+    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishArrayMode($2, ANY); $$ = ""; }
 ;
 
 arraystart: T_LEFT_BRACKET                                          { addSymbolArray(NULL); }
