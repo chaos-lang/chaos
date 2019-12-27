@@ -7,24 +7,31 @@ void throw_error(int code, char *subject) {
     switch (code)
     {
         case 1:
-            printf("Unkown variable type: '%s'\n", subject);
+            printf("Unkown variable type: '%s'", subject);
             break;
         case 2:
-            printf("The variable name '%s' is already defined!\n", subject);
+            printf("The variable name '%s' is already defined!", subject);
             break;
         case 3:
-            printf("Undefined variable: '%s'\n", subject);
+            printf("Undefined variable: '%s'", subject);
             break;
         case 4:
-            printf("Memory allocation for array '%s' failed!\n", subject);
+            printf("Memory allocation for array '%s' failed!", subject);
             break;
         case 5:
-            printf("Illegal element type for the typed array: '%s'\n", subject);
+            printf("Illegal element type for the typed array: '%s'", subject);
+            break;
+        case 6:
+            printf("Variable %s is not an array!", subject);
+            break;
+        case 7:
+            printf("Undefined index: %s", subject);
             break;
         default:
             printf("Unkown error.");
             break;
     }
+    printf("\n");
 
     exit(code);
 }

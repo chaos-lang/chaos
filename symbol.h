@@ -299,3 +299,19 @@ void finishArrayMode(char *name, enum Type type) {
     array_mode = NULL;
     array_symbol_counter = 0;
 }
+
+Symbol* getArrayElement(char *name, int i) {
+    Symbol* symbol = getSymbol(name);
+    if (symbol->type != ARRAY) throw_error(6, name);
+
+    if (i < 0) {
+        i = symbol->children_count + i;
+    }
+
+    if (i < 0 || i > symbol->children_count - 1) {
+        char buffer[__ITOA_BUFFER_LENGTH__];
+        throw_error(7, itoa(i, buffer, 10));
+    }
+
+    return symbol->children[i];
+}
