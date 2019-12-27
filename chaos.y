@@ -114,7 +114,7 @@ variable: T_VAR_STRING                                              { }
 ;
 
 variable: T_VAR_ARRAY                                               { }
-    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishArrayMode($2, ANY); $$ = ""; }
+    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishArrayMode($2, NULL); $$ = ""; }
 ;
 
 arraystart: T_LEFT_BRACKET                                          { addSymbolArray(NULL); }
