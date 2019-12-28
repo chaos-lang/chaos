@@ -383,3 +383,22 @@ void updateArrayElementString(char* name, int index, char *s) {
     value.s = s;
     updateArrayElement(name, index, STRING, value);
 }
+
+void removeArrayElement(char *name, int i) {
+    Symbol* array = getSymbol(name);
+    Symbol* symbol = getArrayElement(name, i);
+    Symbol** temp = malloc((array->children_count - 1) * sizeof(Symbol));
+
+    // Copy everything before the index
+    if (i != 0)
+        memcpy(temp, array->children, i * sizeof(Symbol));
+
+    // Copy everything after the index
+    if (i != array->children_count - 1)
+        memcpy(temp + i, array->children + i + 1, (array->children_count - i - 1) * sizeof(Symbol));
+
+    free(array->children);
+    array->children = temp;
+    removeSymbol(symbol);
+    array->children_count--;
+}

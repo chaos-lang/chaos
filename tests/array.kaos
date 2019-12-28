@@ -58,3 +58,16 @@ print arr6
 string array arr7 = ['a', 'b', 'c']
 arr7[0] = 'd'
 print arr7
+
+list arr8 = [1, 2, 3, 4, 5]
+print arr8
+del arr8[1]
+print arr8
+del arr8[2]
+print arr8
+del arr8[0]
+print arr8
+del arr8[1]
+print arr8
+del arr8[0]
+print arr8
