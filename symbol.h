@@ -7,6 +7,7 @@ enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY };
 typedef struct {
     char *name;
     enum Type type;
+    enum Type array_type;
     union Value {
         bool b;
         int i;
@@ -308,6 +309,7 @@ bool isArrayIllegal(enum Type type) {
 void finishArrayMode(char *name, enum Type type) {
     array_mode->children_count = array_symbol_counter;
     array_mode->name = name;
+    array_mode->array_type = type;
     if (isArrayIllegal(type)) throw_error(5, array_mode->name);
     array_mode = NULL;
     array_symbol_counter = 0;
@@ -333,4 +335,51 @@ void cloneSymbolToArray(char *name) {
     Symbol* symbol = getSymbol(name);
     Symbol* deep_copy_of_symbol = shallowCopySymbol(symbol);
     addSymbolToArray(symbol);
+}
+
+void updateArrayElement(char *name, int i, enum Type type, union Value value) {
+    Symbol* array = getSymbol(name);
+    if (array->array_type != ANY) {
+        if (array->array_type == NUMBER) {
+            if (type != INT && type != FLOAT) {
+                throw_error(5, array->name);
+            }
+        } else {
+            if (array->array_type != type) {
+                throw_error(5, array->name);
+            }
+        }
+    }
+
+    Symbol* symbol = getArrayElement(name, i);
+    symbol->type = type;
+    symbol->value.b = value.b;
+    symbol->value.i = value.i;
+    symbol->value.c = value.c;
+    symbol->value.s = value.s;
+    symbol->value.f = value.f;
+}
+
+void updateArrayElementBool(char* name, int index, bool b) {
+    union Value value;
+    value.b = b;
+    updateArrayElement(name, index, BOOL, value);
+}
+
+void updateArrayElementInt(char* name, int index, int i) {
+    union Value value;
+    value.i = i;
+    updateArrayElement(name, index, INT, value);
+}
+
+void updateArrayElementFloat(char* name, int index, float f) {
+    union Value value;
+    value.f = f;
+    updateArrayElement(name, index, FLOAT, value);
+}
+
+void updateArrayElementString(char* name, int index, char *s) {
+    union Value value;
+    value.s = s;
+    updateArrayElement(name, index, STRING, value);
 }

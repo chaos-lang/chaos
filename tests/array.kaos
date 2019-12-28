@@ -42,3 +42,19 @@ print arr3[3]
 num x = 5
 array y = [x, 2, 3]
 print y
+
+list arr4 = [1, 2, 3]
+arr4[0] = 5
+print arr4
+
+bool array arr5 = [true, false]
+arr5[0] = false
+print arr5
+
+number list arr6 = [1, 2, 3]
+arr6[0] = 5
+print arr6
+
+string array arr7 = ['a', 'b', 'c']
+arr7[0] = 'd'
+print arr7
