@@ -56,10 +56,21 @@ line: T_NEWLINE
     | expression T_NEWLINE                                          { printf("%i\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getSymbol($1)); }
     | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : printf(""); exit(0); }
-    | T_PRINT T_VAR T_NEWLINE                                       { printSymbolValueEndWithNewLine(getSymbol($2)); }
-    | T_PRINT T_INT T_NEWLINE                                       { printf("%i\n", $2); }
-    | T_PRINT T_STRING T_NEWLINE                                    { printf("%s\n", $2); }
+    | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
+;
+
+print: T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                   { printSymbolValueEndWithNewLine(getArrayElement($1, $3)); }
+;
+print: T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET           { printSymbolValueEndWithNewLine(getArrayElement($1, $4)); }
+;
+print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); }
+;
+print: T_INT                                                        { printf("%i\n", $1); }
+;
+print: T_FLOAT                                                      { printf("%f\n", $1); }
+;
+print: T_STRING                                                     { printf("%s\n", $1); }
 ;
 
 mixed_expression: T_FLOAT                                           { $$ = $1; }
