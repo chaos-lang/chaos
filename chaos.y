@@ -153,6 +153,9 @@ array: T_FLOAT                                                      { addSymbolF
 array: T_STRING                                                     { addSymbolString(NULL, $1); }
     | array T_COMMA array                                           { }
 ;
+array: T_VAR                                                        { cloneSymbolToArray($1); }
+    |                                                               { }
+;
 
 array: T_RIGHT_BRACKET                                              { }
 ;

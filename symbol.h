@@ -29,6 +29,7 @@ int array_symbol_counter = 0;
 
 bool isDefined(char *name);
 void removeSymbol(Symbol* symbol);
+void addSymbolToArray(Symbol* symbol);
 
 Symbol* addSymbol(char *name, enum Type type, union Value value) {
     if (isDefined(name)) throw_error(2, name);
@@ -121,6 +122,18 @@ Symbol* getSymbol(char *name) {
         symbol_cursor = symbol_cursor->next;
     }
     throw_error(3, name);
+}
+
+Symbol* deepCopySymbol(Symbol* symbol) {
+    Symbol* deep_copy_of_symbol;
+    memcpy(&deep_copy_of_symbol, &symbol, sizeof(Symbol));
+    return deep_copy_of_symbol;
+}
+
+Symbol* shallowCopySymbol(Symbol* symbol) {
+    Symbol* shallow_copy_of_symbol;
+    memcpy(shallow_copy_of_symbol, symbol, sizeof(Symbol));
+    return shallow_copy_of_symbol;
 }
 
 void printSymbolValue(Symbol* symbol) {
@@ -314,4 +327,10 @@ Symbol* getArrayElement(char *name, int i) {
     }
 
     return symbol->children[i];
+}
+
+void cloneSymbolToArray(char *name) {
+    Symbol* symbol = getSymbol(name);
+    Symbol* deep_copy_of_symbol = shallowCopySymbol(symbol);
+    addSymbolToArray(symbol);
 }

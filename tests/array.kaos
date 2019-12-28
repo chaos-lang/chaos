@@ -38,3 +38,7 @@ print d[2]
 print e[0]
 print arr2[2]
 print arr3[3]
+
+num x = 5
+array y = [x, 2, 3]
+print y
