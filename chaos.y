@@ -62,7 +62,7 @@ line: T_NEWLINE
 
 print: T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                   { printSymbolValueEndWithNewLine(getArrayElement($1, $3)); }
 ;
-print: T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET           { printSymbolValueEndWithNewLine(getArrayElement($1, $4)); }
+print: T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET           { printSymbolValueEndWithNewLine(getArrayElement($1, -$4)); }
 ;
 print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); }
 ;
