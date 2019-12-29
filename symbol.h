@@ -82,28 +82,27 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value) {
     return symbol;
 }
 
-int removeSymbolByName(char *name) {
-    symbol_cursor = start_symbol;
-    while (symbol_cursor != NULL) {
-        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
-            if (symbol_cursor->type == ARRAY) {
-                for (int i = 0; i < symbol_cursor->children_count; i++) {
-                    removeSymbol(symbol_cursor->children[i]);
-                }
-            }
-            removeSymbol(symbol_cursor);
-            return 0;
+void removeSymbolByName(char *name) {
+    Symbol* symbol = getSymbol(name);
+
+    if (symbol->type == ARRAY || symbol->type == DICT) {
+        for (int i = 0; i < symbol->children_count; i++) {
+            removeSymbol(symbol->children[i]);
         }
-        symbol_cursor = symbol_cursor->next;
     }
-    throw_error(3, name);
+    removeSymbol(symbol);
 }
 
 void removeSymbol(Symbol* symbol) {
     Symbol* previous_symbol = symbol->previous;
     Symbol* next_symbol = symbol->next;
 
-    if (previous_symbol == NULL) {
+    if (previous_symbol == NULL && next_symbol == NULL) {
+        start_symbol = NULL;
+        end_symbol = NULL;
+        free(symbol);
+        return;
+    } else if (previous_symbol == NULL) {
         start_symbol = next_symbol;
         start_symbol->previous = NULL;
     } else if (next_symbol == NULL) {
