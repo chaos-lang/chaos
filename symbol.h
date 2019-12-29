@@ -26,8 +26,7 @@ Symbol* symbol_cursor;
 Symbol* start_symbol;
 Symbol* end_symbol;
 
-Symbol* array_mode = NULL;
-Symbol* dict_mode = NULL;
+Symbol* complex_mode = NULL;
 int symbol_counter = 0;
 
 Symbol* getSymbol(char *name);
@@ -41,7 +40,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     Symbol* symbol;
     symbol = (struct Symbol*)malloc(sizeof(Symbol));
 
-    if (dict_mode != NULL) {
+    if (complex_mode != NULL && complex_mode->type == DICT) {
         symbol->key = name;
     } else {
         if (isDefined(name)) throw_error(2, name);
@@ -141,7 +140,7 @@ void deepCopyArray(char *name, Symbol* symbol) {
         deepCopySymbol(symbol->children[i]);
     }
 
-    finishArrayMode(name, ANY);
+    finishComplexMode(name, ANY);
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex) {
@@ -222,26 +221,18 @@ bool isDefined(char *name) {
 }
 
 void addSymbolToComplex(Symbol* symbol) {
-    Symbol* complex;
+    if (complex_mode == NULL) return;
 
-    if (array_mode != NULL) {
-        complex = array_mode;
-    } else if (dict_mode != NULL) {
-        complex = dict_mode;
-    } else {
-        return;
-    }
-
-    complex->children = realloc(
-        complex->children,
+    complex_mode->children = realloc(
+        complex_mode->children,
         sizeof(Symbol) * ++symbol_counter
     );
 
-    if (complex->children == NULL) {
-        throw_error(4, complex->name);
+    if (complex_mode->children == NULL) {
+        throw_error(4, complex_mode->name);
     }
 
-    complex->children[symbol_counter - 1] = symbol;
+    complex_mode->children[symbol_counter - 1] = symbol;
 }
 
 void printSymbolTable() {
@@ -314,7 +305,7 @@ void updateSymbolString(char *name, char *s) {
 
 void addSymbolArray(char *name) {
     union Value value;
-    array_mode = addSymbol(name, ARRAY, value);
+    complex_mode = addSymbol(name, ARRAY, value);
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum Type extra_type) {
@@ -366,10 +357,10 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     return clone_symbol;
 }
 
-bool isArrayIllegal(enum Type type) {
-    if (array_mode != NULL && type != ANY) {
-        for (int i = 0; i < array_mode->children_count; i++) {
-            Symbol* symbol = array_mode->children[i];
+bool isComplexIllegal(enum Type type) {
+    if (complex_mode != NULL && type != ANY) {
+        for (int i = 0; i < complex_mode->children_count; i++) {
+            Symbol* symbol = complex_mode->children[i];
             if (type == NUMBER) {
                 if (symbol->type != INT && symbol->type != FLOAT) {
                     return true;
@@ -384,21 +375,12 @@ bool isArrayIllegal(enum Type type) {
     return false;
 }
 
-void finishArrayMode(char *name, enum Type type) {
-    array_mode->children_count = symbol_counter;
-    array_mode->name = name;
-    array_mode->array_type = type;
-    if (isArrayIllegal(type)) throw_error(5, array_mode->name);
-    array_mode = NULL;
-    symbol_counter = 0;
-}
-
-void finishDictMode(char *name, enum Type type) {
-    dict_mode->children_count = symbol_counter;
-    dict_mode->name = name;
-    dict_mode->array_type = type;
-    if (isArrayIllegal(type)) throw_error(5, dict_mode->name);
-    dict_mode = NULL;
+void finishComplexMode(char *name, enum Type type) {
+    complex_mode->children_count = symbol_counter;
+    complex_mode->name = name;
+    complex_mode->array_type = type;
+    if (isComplexIllegal(type)) throw_error(5, complex_mode->name);
+    complex_mode = NULL;
     symbol_counter = 0;
 }
 
@@ -490,5 +472,5 @@ void removeArrayElement(char *name, int i) {
 
 void addSymbolDict(char *name) {
     union Value value;
-    dict_mode = addSymbol(name, DICT, value);
+    complex_mode = addSymbol(name, DICT, value);
 }
