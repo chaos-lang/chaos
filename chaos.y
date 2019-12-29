@@ -28,10 +28,11 @@ bool is_interactive = true;
 %token<ival> T_INT
 %token<fval> T_FLOAT
 %token<sval> T_STRING T_VAR
-%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL T_LEFT_BRACKET T_RIGHT_BRACKET T_COMMA
+%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
+%token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_COLON
 %token T_NEWLINE T_QUIT
 %token T_PRINT
-%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY
+%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
 %token T_DEL
 %token T_SYMBOL_TABLE
 %left T_PLUS T_MINUS
@@ -177,6 +178,37 @@ array: T_VAR                                                        { cloneSymbo
 ;
 
 array: T_RIGHT_BRACKET                                              { }
+;
+
+variable: T_VAR_DICT                                                { }
+    | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishDictMode($2, ANY); $$ = ""; }
+;
+
+dictionarystart: T_LEFT_CURLY_BRACKET                               { addSymbolDict(NULL); }
+    | dictionarystart dictionary                                    { }
+;
+
+dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }
+    | dictionary T_COMMA dictionary                                 { }
+;
+
+dictionary: T_STRING T_COLON T_FALSE                                { addSymbolBool($1, $3); }
+    | dictionary T_COMMA dictionary                                 { }
+;
+
+dictionary: T_STRING T_COLON T_INT                                  { addSymbolInt($1, $3); }
+    | dictionary T_COMMA dictionary                                 { }
+;
+
+dictionary: T_STRING T_COLON T_FLOAT                                { addSymbolFloat($1, $3); }
+    | dictionary T_COMMA dictionary                                 { }
+;
+
+dictionary: T_STRING T_COLON T_STRING                               { addSymbolString($1, $3); }
+    | dictionary T_COMMA dictionary                                 { }
+;
+
+dictionary: T_RIGHT_CURLY_BRACKET                                   { }
 ;
 
 %%

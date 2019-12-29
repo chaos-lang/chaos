@@ -2,7 +2,7 @@
 #include <string.h>
 #include "errors.h"
 
-enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY };
+enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT };
 
 typedef struct {
     char *name;
@@ -19,6 +19,7 @@ typedef struct {
     struct Symbol* next;
     struct Symbol** children;
     int children_count;
+    char *key;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -26,20 +27,27 @@ Symbol* start_symbol;
 Symbol* end_symbol;
 
 Symbol* array_mode = NULL;
-int array_symbol_counter = 0;
+Symbol* dict_mode = NULL;
+int symbol_counter = 0;
 
 Symbol* getSymbol(char *name);
 bool isDefined(char *name);
 void removeSymbol(Symbol* symbol);
-void addSymbolToArray(Symbol* symbol);
+void addSymbolToComplex(Symbol* symbol);
 
 Symbol* addSymbol(char *name, enum Type type, union Value value) {
-    if (isDefined(name)) throw_error(2, name);
     symbol_cursor = start_symbol;
 
     Symbol* symbol;
     symbol = (struct Symbol*)malloc(sizeof(Symbol));
-    symbol->name = name;
+
+    if (dict_mode != NULL) {
+        symbol->key = name;
+    } else {
+        if (isDefined(name)) throw_error(2, name);
+        symbol->name = name;
+    }
+
     symbol->type = type;
     symbol->value.b = value.b;
     symbol->value.i = value.i;
@@ -58,7 +66,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
         end_symbol->next = NULL;
     }
 
-    addSymbolToArray(symbol);
+    addSymbolToComplex(symbol);
 
     return symbol;
 }
@@ -198,19 +206,27 @@ bool isDefined(char *name) {
     return false;
 }
 
-void addSymbolToArray(Symbol* symbol) {
+void addSymbolToComplex(Symbol* symbol) {
+    Symbol* complex;
+
     if (array_mode != NULL) {
-        array_mode->children = realloc(
-            array_mode->children,
-            sizeof(Symbol) * ++array_symbol_counter
-        );
-
-        if (array_mode->children == NULL) {
-            throw_error(4, array_mode->name);
-        }
-
-        array_mode->children[array_symbol_counter - 1] = symbol;
+        complex = array_mode;
+    } else if (dict_mode != NULL) {
+        complex = dict_mode;
+    } else {
+        return;
     }
+
+    complex->children = realloc(
+        complex->children,
+        sizeof(Symbol) * ++symbol_counter
+    );
+
+    if (complex->children == NULL) {
+        throw_error(4, complex->name);
+    }
+
+    complex->children[symbol_counter - 1] = symbol;
 }
 
 void printSymbolTable() {
@@ -354,12 +370,21 @@ bool isArrayIllegal(enum Type type) {
 }
 
 void finishArrayMode(char *name, enum Type type) {
-    array_mode->children_count = array_symbol_counter;
+    array_mode->children_count = symbol_counter;
     array_mode->name = name;
     array_mode->array_type = type;
     if (isArrayIllegal(type)) throw_error(5, array_mode->name);
     array_mode = NULL;
-    array_symbol_counter = 0;
+    symbol_counter = 0;
+}
+
+void finishDictMode(char *name, enum Type type) {
+    dict_mode->children_count = symbol_counter;
+    dict_mode->name = name;
+    dict_mode->array_type = type;
+    if (isArrayIllegal(type)) throw_error(5, dict_mode->name);
+    dict_mode = NULL;
+    symbol_counter = 0;
 }
 
 Symbol* getArrayElement(char *name, int i) {
@@ -446,4 +471,9 @@ void removeArrayElement(char *name, int i) {
     array->children = temp;
     removeSymbol(symbol);
     array->children_count--;
+}
+
+void addSymbolDict(char *name) {
+    union Value value;
+    dict_mode = addSymbol(name, DICT, value);
 }
