@@ -28,6 +28,7 @@ Symbol* end_symbol;
 Symbol* array_mode = NULL;
 int array_symbol_counter = 0;
 
+Symbol* getSymbol(char *name);
 bool isDefined(char *name);
 void removeSymbol(Symbol* symbol);
 void addSymbolToArray(Symbol* symbol);
@@ -63,19 +64,14 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
 }
 
 Symbol* updateSymbol(char *name, union Value value) {
-    symbol_cursor = start_symbol;
-    while (symbol_cursor != NULL) {
-        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
-            symbol_cursor->value.b = value.b;
-            symbol_cursor->value.i = value.i;
-            symbol_cursor->value.c = value.c;
-            symbol_cursor->value.s = value.s;
-            symbol_cursor->value.f = value.f;
-            return symbol_cursor;
-        }
-        symbol_cursor = symbol_cursor->next;
-    }
-    throw_error(3, name);
+    Symbol* symbol = getSymbol(name);
+
+    symbol->value.b = value.b;
+    symbol->value.i = value.i;
+    symbol->value.c = value.c;
+    symbol->value.s = value.s;
+    symbol->value.f = value.f;
+    return symbol;
 }
 
 int removeSymbolByName(char *name) {
