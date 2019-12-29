@@ -179,7 +179,7 @@ array: T_FLOAT                                                      { addSymbolF
 array: T_STRING                                                     { addSymbolString(NULL, $1); }
     | array T_COMMA array                                           { }
 ;
-array: T_VAR                                                        { cloneSymbolToArray($1); }
+array: T_VAR                                                        { cloneSymbolToComplex($1, NULL); }
     |                                                               { }
 ;
 
@@ -212,6 +212,10 @@ dictionary: T_STRING T_COLON T_FLOAT                                { addSymbolF
 
 dictionary: T_STRING T_COLON T_STRING                               { addSymbolString($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
+;
+
+dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbolToComplex($3, $1); }
+    |
 ;
 
 dictionary: T_RIGHT_CURLY_BRACKET                                   { }

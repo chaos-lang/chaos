@@ -128,15 +128,15 @@ Symbol* getSymbol(char *name) {
     throw_error(3, name);
 }
 
-Symbol* deepCopySymbol(Symbol* symbol) {
-    return addSymbol(NULL, symbol->type, symbol->value);
+Symbol* deepCopySymbol(Symbol* symbol, char *key) {
+    return addSymbol(key, symbol->type, symbol->value);
 }
 
 void deepCopyArray(char *name, Symbol* symbol) {
     addSymbolArray(NULL);
 
     for (int i = 0; i < symbol->children_count; i++) {
-        deepCopySymbol(symbol->children[i]);
+        deepCopySymbol(symbol->children[i], NULL);
     }
 
     finishComplexMode(name, ANY);
@@ -323,7 +323,7 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum
         if (symbol->array_type != extra_type) throw_error(8, clone_name);
         deepCopyArray(clone_name, symbol);
     } else {
-        clone_symbol = deepCopySymbol(symbol);
+        clone_symbol = deepCopySymbol(symbol, NULL);
         clone_symbol->name = clone_name;
     }
     return clone_symbol;
@@ -347,7 +347,7 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
 
     Symbol* temp_symbol = clone_symbol;
 
-    clone_symbol = deepCopySymbol(symbol);
+    clone_symbol = deepCopySymbol(symbol, NULL);
     clone_symbol->name = clone_name;
 
     removeSymbol(temp_symbol);
@@ -397,8 +397,8 @@ Symbol* getArrayElement(char *name, int i) {
     return symbol->children[i];
 }
 
-void cloneSymbolToArray(char *name) {
-    deepCopySymbol(getSymbol(name));
+void cloneSymbolToComplex(char *name, char *key) {
+    deepCopySymbol(getSymbol(name), key);
 }
 
 void updateArrayElement(char *name, int i, enum Type type, union Value value) {

@@ -21,3 +21,10 @@ symbol_table
 
 print a['a']
 print a["b"]
+
+num k = 5
+dict q = {'a': k, 'b': 2, 'c': 3}
+print q
+k = 32
+print k
+print q
