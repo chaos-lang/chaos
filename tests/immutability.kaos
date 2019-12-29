@@ -1,0 +1,84 @@
+bool a1 = true
+bool b1 = false
+print a1
+print b1
+b1 = a1
+print a1
+print b1
+a1 = false
+print a1
+print b1
+
+num a2 = 5
+num b2 = 3
+print a2
+print b2
+b2 = a2
+print a2
+print b2
+a2 = 1
+print a2
+print b2
+
+num a3 = 3.5
+num b3 = 7.1
+print a3
+print b3
+b3 = a3
+print a3
+print b3
+a3 = 1.2
+print a3
+print b3
+
+str a4 = 'asdasdas'
+str b4 = 'qweqweqwe'
+print a4
+print b4
+b4 = a4
+print a4
+print b4
+a4 = '12312'
+print a4
+print b4
+
+
+bool a5 = true
+bool b5 = a5
+print a5
+print b5
+a5 = false
+print a5
+print b5
+
+num a6 = 5
+num b6 = a6
+print a6
+print b6
+a6 = 1
+print a6
+print b6
+
+num a7 = 3.2
+num b7 = a7
+print a7
+print b7
+a7 = 35.3
+print a7
+print b7
+
+str a8 = 'asdasda'
+str b8 = a8
+print a8
+print b8
+a8 = 'qwqweqwe'
+print a8
+print b8
+
+
+num x = 5
+array y = [x, 2, 3]
+print y
+x = 32
+print x
+print y

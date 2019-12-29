@@ -272,6 +272,47 @@ void addSymbolArray(char *name) {
     array_mode = addSymbol(name, ARRAY, value);
 }
 
+Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name) {
+    Symbol* symbol = getSymbol(name);
+
+    if (type == NUMBER) {
+        if (symbol->type != INT && symbol->type != FLOAT) {
+            throw_error(8, clone_name);
+        }
+    } else {
+        if (symbol->type != type) {
+            throw_error(8, clone_name);
+        }
+    }
+
+    Symbol* clone_symbol = deepCopySymbol(symbol);
+    clone_symbol->name = clone_name;
+    return clone_symbol;
+}
+
+Symbol* updateSymbolByClonning(char *clone_name, char *name) {
+    Symbol* symbol = getSymbol(name);
+    Symbol* clone_symbol = getSymbol(clone_name);
+
+    if (symbol->type == NUMBER) {
+        if (clone_symbol->type != INT && clone_symbol->type != FLOAT) {
+            throw_error(8, clone_name);
+        }
+    } else {
+        if (clone_symbol->type != symbol->type) {
+            throw_error(8, clone_name);
+        }
+    }
+
+    Symbol* temp_symbol = clone_symbol;
+
+    clone_symbol = deepCopySymbol(symbol);
+    clone_symbol->name = clone_name;
+
+    removeSymbol(temp_symbol);
+    return clone_symbol;
+}
+
 bool isArrayIllegal(enum Type type) {
     if (array_mode != NULL && type != ANY) {
         for (int i = 0; i < array_mode->children_count; i++) {
