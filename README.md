@@ -87,12 +87,14 @@ string4
 There are two keywords for **Blooean** data type: `bool` or `boolean`
 
 ```
-bool var1 = true
-boolean var2 = false
-var1 = false
-var2 = true
-print var1
-print var2
+### bool var1 = true
+### boolean var2 = false
+### var1 = false
+### var2 = true
+### print var1
+false
+### print var2
+true
 ```
 
 #### Number
@@ -100,12 +102,14 @@ print var2
 There are two keywords for **Number** data type: `num` or `number`
 
 ```
-num var5 = 5
-var5 = 7
-print var5
-number var6 = 3.2
-var6 = 5.4
-print var6
+### num var5 = 5
+### var5 = 7
+### print var5
+7
+### number var6 = 3.2
+### var6 = 5.4
+### print var6
+5.400000
 ```
 
 #### String
@@ -113,12 +117,171 @@ print var6
 There are two keywords for **String** data type: `str` or `string`
 
 ```
-str var7 = 'string1'
-var7 = 'string2'
-print var7
-string var8 = 'string3'
-var8 = 'string4'
-print var8
+### str var7 = 'string1'
+### var7 = 'string2'
+### print var7
+string2
+### string var8 = 'string3'
+### var8 = 'string4'
+### print var8
+string4
+```
+
+### Complex Data Types
+
+#### Arrays
+
+There are two keywords for **Array** data type: `list` or `array`
+
+```
+### array a = [1, 2, 3]
+### print a
+[1, 2, 3]
+### list b = [true, false]
+### print b
+[true, false]
+### list c = [3.2, 345.1665]
+### print c
+[3.200000, 345.166504]
+### list d = ['a', 'b', 'c']
+### print d
+['a', 'b', 'c']
+### array e = ["A", "B", "C"]
+### print e
+['A', 'B', 'C']
+### list f = ['A', "asdasdad12312", 1232, 435.16, true, false]
+### print f
+['A', 'asdasdad12312', 1232, 435.160004, true, false]
+```
+
+Accessing array elements:
+
+```
+### list d = ['a', 'b', 'c']
+### print d[2]
+c
+### print d[1]
+b
+### print d[0]
+a
+### print d[-1]
+c
+### print d[-2]
+b
+### print d[-3]
+a
+```
+
+Updating array elements:
+
+```
+### list a = [1, 2, 3]
+### a[0] = 5
+### print a
+[5, 2, 3]
+```
+
+Deleting array elements:
+
+```
+### list g = [1, 2, 3, 4, 5]
+### print g
+[1, 2, 3, 4, 5]
+### del g[1]
+### print g
+[1, 3, 4, 5]
+```
+
+#### Typed Arrays
+
+It's possible to create typed arrays in Chaos language
+by prefixing `list` or `array` keywords with [Primitive Data Type](#primitive-data-types) keywords:
+
+```
+### bool list arr1 = [true, false, true]
+### print arr1
+[true, false, true]
+### number list arr2 = [1, 2, 63.3, 12321.1515]
+### print arr2
+[1, 2, 63.299999, 12321.151367]
+### string array arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
+### print arr3
+['A', 'asdasdaqs', 'asdasd123123', '.']
+```
+
+## Immutability
+
+Every variable in Chaos language is **immutable by default**.
+When you assign a variable to another variable, the language's itself
+creates a **deep copy** of that variable. That means; the new(*left-hand*) variable will
+live in a completely different memory region than the old(*right-hand*) variable.
+
+Here are some examples of immutability on Chaos language:
+
+```
+### bool a1 = true
+### bool b1 = false
+### b1 = a1
+### print b1
+true
+### a1 = false
+### print b1
+true
+
+### num a2 = 3.5
+### num b2 = 7.1
+### b2 = a2
+### print b2
+3.500000
+### a2 = 1.2
+### print b2
+3.500000
+```
+
+Immutability is also valid on new variable creation:
+
+```
+### bool a3 = true
+### bool b3 = a3
+### print b3
+true
+### a3 = false
+### print b3
+true
+
+### str a4 = 'asdasda'
+### str b4 = a4
+### print b4
+asdasda
+### a4 = 'qwqweqwe'
+### print b4
+asdasda
+```
+
+Arrays and the elements of arrays are also immutable:
+
+```
+### num x = 5
+### array y = [x, 2, 3]
+### print y
+[5, 2, 3]
+### x = 32
+### print x
+32
+### print y
+[5, 2, 3]
+
+### list z = [1, 2, 3]
+### list t = z
+### print z
+[1, 2, 3]
+### print t
+[1, 2, 3]
+### z[0] = 5
+### print z
+[5, 2, 3]
+### print t
+[1, 2, 3]
 ```
 
 ## Mathematical Expressions
@@ -181,7 +344,7 @@ You have chosen the order!
 ### symbol_table
 
 `symbol_table` command shows all of the variables currently being tracked by Symbol Table.
-This keyword is only useful for the language developers:
+This keyword is only useful for the developers of language's itself:
 
 ```
 [start] => var1 => var3 => var4 => var5 => var6 => var7 => var8 => [end]
