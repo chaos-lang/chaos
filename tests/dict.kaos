@@ -19,5 +19,5 @@ symbol_table
 del b
 symbol_table
 
-a['a']
-a["b"]
+print a['a']
+print a["b"]
