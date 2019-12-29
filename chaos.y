@@ -120,6 +120,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT     { updateArrayElementFloat($1, -$4, $7); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_STRING            { updateArrayElementString($1, $3, $6); $$ = ""; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_STRING    { updateArrayElementString($1, -$4, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET              { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getDictElement($1, $3)); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL                                                { }

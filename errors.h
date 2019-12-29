@@ -33,6 +33,12 @@ void throw_error(int code, char *subject) {
         case 9:
             printf("Arrays are not mass assignable!");
             break;
+        case 10:
+            printf("Variable %s is not a dictionary!", subject);
+            break;
+        case 11:
+            printf("Undefined key: %s", subject);
+            break;
         default:
             printf("Unkown error.");
             break;

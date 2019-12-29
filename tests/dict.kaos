@@ -18,3 +18,6 @@ print dict3
 symbol_table
 del b
 symbol_table
+
+a['a']
+a["b"]

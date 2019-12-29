@@ -145,10 +145,6 @@ void deepCopyArray(char *name, Symbol* symbol) {
 void printSymbolValue(Symbol* symbol, bool is_complex) {
     char type[2] = "\0";
 
-    if (symbol->key != NULL) {
-        printf("'%s': ", symbol->key);
-    }
-
     switch (symbol->type)
     {
         case BOOL:
@@ -183,7 +179,9 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
         case DICT:
             printf("{");
             for (int i = 0; i < symbol->children_count; i++) {
-                printSymbolValue(symbol->children[i], true);
+                Symbol* child = symbol->children[i];
+                printf("'%s': ", child->key);
+                printSymbolValue(child, true);
                 if (i + 1 != symbol->children_count) {
                     printf(", ");
                 }
@@ -472,4 +470,17 @@ void removeArrayElement(char *name, int i) {
 void addSymbolDict(char *name) {
     union Value value;
     complex_mode = addSymbol(name, DICT, value);
+}
+
+Symbol* getDictElement(char *name, char *key) {
+    Symbol* symbol = getSymbol(name);
+    if (symbol->type != DICT) throw_error(10, name);
+
+    for (int i = 0; i < symbol->children_count; i++) {
+        Symbol* child = symbol->children[i];
+        if (child->key != NULL && strcmp(child->key, key) == 0) {
+            return child;
+        }
+    }
+    throw_error(11, key);
 }
