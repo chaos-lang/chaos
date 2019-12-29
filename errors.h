@@ -27,6 +27,9 @@ void throw_error(int code, char *subject) {
         case 7:
             printf("Undefined index: %s", subject);
             break;
+        case 8:
+            printf("Illegal variable type for: '%s'", subject);
+            break;
         default:
             printf("Unkown error.");
             break;

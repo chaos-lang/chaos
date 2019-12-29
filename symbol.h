@@ -63,8 +63,9 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     return symbol;
 }
 
-Symbol* updateSymbol(char *name, union Value value) {
+Symbol* updateSymbol(char *name, enum Type type, union Value value) {
     Symbol* symbol = getSymbol(name);
+    if (symbol->type != type) throw_error(8, name);
 
     symbol->value.b = value.b;
     symbol->value.i = value.i;
@@ -227,7 +228,7 @@ void addSymbolBool(char *name, bool b) {
 void updateSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    updateSymbol(name, value);
+    updateSymbol(name, BOOL, value);
 }
 
 void addSymbolInt(char *name, int i) {
@@ -239,7 +240,7 @@ void addSymbolInt(char *name, int i) {
 void updateSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    updateSymbol(name, value);
+    updateSymbol(name, INT, value);
 }
 
 void addSymbolFloat(char *name, float f) {
@@ -251,7 +252,7 @@ void addSymbolFloat(char *name, float f) {
 void updateSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    updateSymbol(name, value);
+    updateSymbol(name, FLOAT, value);
 }
 
 void addSymbolString(char *name, char *s) {
@@ -263,17 +264,12 @@ void addSymbolString(char *name, char *s) {
 void updateSymbolString(char *name, char *s) {
     union Value value;
     value.s = s;
-    updateSymbol(name, value);
+    updateSymbol(name, STRING, value);
 }
 
 void addSymbolArray(char *name) {
     union Value value;
     array_mode = addSymbol(name, ARRAY, value);
-}
-
-void updateSymbolArray(char *name) {
-    union Value value;
-    array_mode = updateSymbol(name, value);
 }
 
 bool isArrayIllegal(enum Type type) {
