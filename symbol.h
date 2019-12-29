@@ -65,7 +65,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
 Symbol* updateSymbol(char *name, union Value value) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (strcmp(symbol_cursor->name, name) == 0) {
+        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
             symbol_cursor->value.b = value.b;
             symbol_cursor->value.i = value.i;
             symbol_cursor->value.c = value.c;
@@ -126,15 +126,7 @@ Symbol* getSymbol(char *name) {
 }
 
 Symbol* deepCopySymbol(Symbol* symbol) {
-    Symbol* deep_copy_of_symbol;
-    memcpy(&deep_copy_of_symbol, &symbol, sizeof(Symbol));
-    return deep_copy_of_symbol;
-}
-
-Symbol* shallowCopySymbol(Symbol* symbol) {
-    Symbol* shallow_copy_of_symbol;
-    memcpy(shallow_copy_of_symbol, symbol, sizeof(Symbol));
-    return shallow_copy_of_symbol;
+    return addSymbol(NULL, symbol->type, symbol->value);
 }
 
 void printSymbolValue(Symbol* symbol) {
@@ -332,9 +324,7 @@ Symbol* getArrayElement(char *name, int i) {
 }
 
 void cloneSymbolToArray(char *name) {
-    Symbol* symbol = getSymbol(name);
-    Symbol* deep_copy_of_symbol = shallowCopySymbol(symbol);
-    addSymbolToArray(symbol);
+    deepCopySymbol(getSymbol(name));
 }
 
 void updateArrayElement(char *name, int i, enum Type type, union Value value) {

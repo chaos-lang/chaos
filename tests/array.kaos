@@ -42,6 +42,9 @@ print arr3[3]
 num x = 5
 array y = [x, 2, 3]
 print y
+x = 32
+print x
+print y
 
 list arr4 = [1, 2, 3]
 arr4[0] = 5
