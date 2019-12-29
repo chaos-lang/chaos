@@ -38,7 +38,7 @@
 
 ### Unique Features
 
- - There are no control structures. (no `if..else`, no `switch..case`) Decision making possible on function returns: `func myFunc(a, b){ 'x > 0' : f1(x), 'default' : f2(x) }:`
+ - There are no control structures. (no `if..else`, no `switch..case`) Decision making only possible on function returns: `func myFunc(a, b){ 'x > 0' : f1(x), 'default' : f2(x) }:`
  - A single unit test is enough to have 100% coverage on functions, always.
  - Warns you about untested functions in the executed program.
  - Chaos language is not object-oriented. So everything is done by functions and data types.
@@ -220,7 +220,7 @@ Deleting array elements:
 #### Typed Arrays
 
 It's possible to create typed arrays in Chaos language
-by prefixing `list` or `array` keywords with [Primitive Data Type](#primitive-data-types) keywords:
+by prefixing `list` or `array` keywords with a [Primitive Data Type](#primitive-data-types):
 
 ```
 ### bool list arr1 = [true, false, true]
