@@ -136,7 +136,7 @@ void deepCopyArray(char *name, Symbol* symbol) {
     finishArrayMode(name, ANY);
 }
 
-void printSymbolValue(Symbol* symbol) {
+void printSymbolValue(Symbol* symbol, bool is_complex) {
     char type[2] = "\0";
     switch (symbol->type)
     {
@@ -153,12 +153,16 @@ void printSymbolValue(Symbol* symbol) {
             printf("%c", symbol->value.c);
             break;
         case STRING:
-            printf("%s", symbol->value.s);
+            if (is_complex) {
+                printf("'%s'", symbol->value.s);
+            } else {
+                printf("%s", symbol->value.s);
+            }
             break;
         case ARRAY:
             printf("[");
             for (int i = 0; i < symbol->children_count; i++) {
-                printSymbolValue(symbol->children[i]);
+                printSymbolValue(symbol->children[i], true);
                 if (i + 1 != symbol->children_count) {
                     printf(", ");
                 }
@@ -174,7 +178,7 @@ void printSymbolValue(Symbol* symbol) {
 
 void printSymbolValueEndWith(Symbol* symbol, char *end)
 {
-    printSymbolValue(symbol);
+    printSymbolValue(symbol, false);
     printf("%s", end);
 }
 
