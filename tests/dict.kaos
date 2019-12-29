@@ -1,5 +1,9 @@
 dict a = {'a': 1, 'b': 2}
+print a
 dict b = {'a': 1, 'b': 2, 'c': 3}
+print b
 
 json c = {"a": 1, "b": 2}
+print c
 json d = {"a": 1, "b": 2, "c": 3}
+print d

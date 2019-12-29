@@ -146,6 +146,11 @@ void deepCopyArray(char *name, Symbol* symbol) {
 
 void printSymbolValue(Symbol* symbol, bool is_complex) {
     char type[2] = "\0";
+
+    if (symbol->key != NULL) {
+        printf("'%s': ", symbol->key);
+    }
+
     switch (symbol->type)
     {
         case BOOL:
@@ -176,6 +181,16 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                 }
             }
             printf("]");
+            break;
+        case DICT:
+            printf("{");
+            for (int i = 0; i < symbol->children_count; i++) {
+                printSymbolValue(symbol->children[i], true);
+                if (i + 1 != symbol->children_count) {
+                    printf(", ");
+                }
+            }
+            printf("}");
             break;
         default:
             type[0] = symbol->type;
