@@ -30,6 +30,9 @@ void throw_error(int code, char *subject) {
         case 8:
             printf("Illegal variable type for: '%s'", subject);
             break;
+        case 9:
+            printf("Arrays are not mass assignable!");
+            break;
         default:
             printf("Unkown error.");
             break;

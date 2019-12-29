@@ -124,24 +124,28 @@ variable: T_VAR                                                     { $$ = $1; }
 variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbol($2, BOOL, $4); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbol($2, BOOL, $4, ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbol($3, ARRAY, $5, BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL typedarraystart          { finishArrayMode($3, BOOL); $$ = ""; }
 ;
 
 variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, NUMBER, $4); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, NUMBER, $4, ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbol($3, ARRAY, $5, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL typedarraystart        { finishArrayMode($3, NUMBER); $$ = ""; }
 ;
 
 variable: T_VAR_STRING                                              { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, STRING, $4); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, STRING, $4, ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbol($3, ARRAY, $5, STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL typedarraystart        { finishArrayMode($3, STRING); $$ = ""; }
 ;
 
 variable: T_VAR_ARRAY                                               { }
+    | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbol($2, ARRAY, $4, ANY); $$ = "";}
     | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishArrayMode($2, ANY); $$ = ""; }
 ;
 

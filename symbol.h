@@ -126,6 +126,16 @@ Symbol* deepCopySymbol(Symbol* symbol) {
     return addSymbol(NULL, symbol->type, symbol->value);
 }
 
+void deepCopyArray(char *name, Symbol* symbol) {
+    addSymbolArray(NULL);
+
+    for (int i = 0; i < symbol->children_count; i++) {
+        deepCopySymbol(symbol->children[i]);
+    }
+
+    finishArrayMode(name, ANY);
+}
+
 void printSymbolValue(Symbol* symbol) {
     char type[2] = "\0";
     switch (symbol->type)
@@ -272,7 +282,7 @@ void addSymbolArray(char *name) {
     array_mode = addSymbol(name, ARRAY, value);
 }
 
-Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name) {
+Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum Type extra_type) {
     Symbol* symbol = getSymbol(name);
 
     if (type == NUMBER) {
@@ -285,8 +295,14 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name) {
         }
     }
 
-    Symbol* clone_symbol = deepCopySymbol(symbol);
-    clone_symbol->name = clone_name;
+    Symbol* clone_symbol;
+    if (symbol->type == ARRAY) {
+        if (symbol->array_type != extra_type) throw_error(8, clone_name);
+        deepCopyArray(clone_name, symbol);
+    } else {
+        clone_symbol = deepCopySymbol(symbol);
+        clone_symbol->name = clone_name;
+    }
     return clone_symbol;
 }
 
@@ -303,6 +319,8 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
             throw_error(8, clone_name);
         }
     }
+
+    if (clone_symbol->type == ARRAY) throw_error(9, clone_name);
 
     Symbol* temp_symbol = clone_symbol;
 
