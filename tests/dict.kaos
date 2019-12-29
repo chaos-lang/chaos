@@ -14,3 +14,7 @@ number dict dict2 = {'a': 1, "b": 2, 'c': 63.3, 'd': 12321.1515}
 print dict2
 string json dict3 = {'a': 'A', 'b': "asdasdaqs", 'c': 'asdasd123123', 'd': "."}
 print dict3
+
+symbol_table
+del b
+symbol_table
