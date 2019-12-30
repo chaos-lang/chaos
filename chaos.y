@@ -130,7 +130,7 @@ variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbol($2, BOOL, $4, ANY); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbol($3, ARRAY, $5, BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL typedarraystart          { finishComplexMode($3, BOOL); $$ = ""; }
+    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL arraystart               { finishComplexMode($3, BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, BOOL); $$ = ""; }
 ;
 
@@ -139,7 +139,7 @@ variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, NUMBER, $4, ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbol($3, ARRAY, $5, NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL typedarraystart        { finishComplexMode($3, NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, NUMBER); $$ = ""; }
 ;
 
@@ -147,7 +147,7 @@ variable: T_VAR_STRING                                              { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, STRING, $4, ANY); $$ = ""; }
     | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbol($3, ARRAY, $5, STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL typedarraystart        { finishComplexMode($3, STRING); $$ = ""; }
+    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, STRING); $$ = ""; }
 ;
 
@@ -158,10 +158,6 @@ variable: T_VAR_ARRAY                                               { }
 
 arraystart: T_LEFT_BRACKET                                          { addSymbolArray(NULL); }
     | arraystart array                                              { }
-;
-
-typedarraystart: T_LEFT_BRACKET                                     { addSymbolArray(NULL); }
-    | typedarraystart array                                         { }
 ;
 
 array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
@@ -180,7 +176,7 @@ array: T_STRING                                                     { addSymbolS
     | array T_COMMA array                                           { }
 ;
 array: T_VAR                                                        { cloneSymbolToComplex($1, NULL); }
-    |                                                               { }
+    | array T_COMMA array                                           { }
 ;
 
 array: T_RIGHT_BRACKET                                              { }
@@ -215,7 +211,7 @@ dictionary: T_STRING T_COLON T_STRING                               { addSymbolS
 ;
 
 dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbolToComplex($3, $1); }
-    |
+    | dictionary T_COMMA dictionary                                 { }
 ;
 
 dictionary: T_RIGHT_CURLY_BRACKET                                   { }

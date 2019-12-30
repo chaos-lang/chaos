@@ -8,3 +8,6 @@ lex.yy.c
 
 # Ignore the scripts that are created for development
 *dev.*
+
+# Ignore local history
+.history
