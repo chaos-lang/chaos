@@ -501,6 +501,12 @@ void removeComplexElement(char *name, int i, char *key) {
         symbol = getArrayElement(name, i);
     } else if (complex->type == DICT) {
         symbol = getDictElement(name, key);
+        for (int j = 0; j < complex->children_count; j++) {
+            Symbol* child = complex->children[j];
+            if (strcmp(child->key, key) == 0) {
+                i = j;
+            }
+        }
     } else {
         throw_error(12, name);
     }
