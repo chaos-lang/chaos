@@ -402,24 +402,24 @@ void cloneSymbolToComplex(char *name, char *key) {
     deepCopySymbol(getSymbol(name), key);
 }
 
-void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value, enum Type complex_type) {
-    Symbol* array = getSymbol(name);
-    if (array->array_type != ANY) {
-        if (array->array_type == NUMBER) {
+void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
+    Symbol* complex = getSymbol(name);
+    if (complex->array_type != ANY) {
+        if (complex->array_type == NUMBER) {
             if (type != INT && type != FLOAT) {
-                throw_error(5, array->name);
+                throw_error(5, complex->name);
             }
         } else {
-            if (array->array_type != type) {
-                throw_error(5, array->name);
+            if (complex->array_type != type) {
+                throw_error(5, complex->name);
             }
         }
     }
 
     Symbol* symbol;
-    if (complex_type == ARRAY) {
+    if (complex->type == ARRAY) {
         symbol = getArrayElement(name, i);
-    } else if (complex_type == DICT) {
+    } else if (complex->type == DICT) {
         symbol = getDictElement(name, key);
     } else {
         throw_error(12, name);
@@ -432,28 +432,28 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
     symbol->value.f = value.f;
 }
 
-void updateComplexElementBool(char* name, int index, char *key, bool b, enum Type complex_type) {
+void updateComplexElementBool(char* name, int index, char *key, bool b) {
     union Value value;
     value.b = b;
-    updateComplexElement(name, index, key, BOOL, value, complex_type);
+    updateComplexElement(name, index, key, BOOL, value);
 }
 
-void updateComplexElementInt(char* name, int index, char *key, int i, enum Type complex_type) {
+void updateComplexElementInt(char* name, int index, char *key, int i) {
     union Value value;
     value.i = i;
-    updateComplexElement(name, index, key, INT, value, complex_type);
+    updateComplexElement(name, index, key, INT, value);
 }
 
-void updateComplexElementFloat(char* name, int index, char *key, float f, enum Type complex_type) {
+void updateComplexElementFloat(char* name, int index, char *key, float f) {
     union Value value;
     value.f = f;
-    updateComplexElement(name, index, key, FLOAT, value, complex_type);
+    updateComplexElement(name, index, key, FLOAT, value);
 }
 
-void updateComplexElementString(char* name, int index, char *key, char *s, enum Type complex_type) {
+void updateComplexElementString(char* name, int index, char *key, char *s) {
     union Value value;
     value.s = s;
-    updateComplexElement(name, index, key, STRING, value, complex_type);
+    updateComplexElement(name, index, key, STRING, value);
 }
 
 void removeComplexElement(char *name, int i, char *key) {
