@@ -28,3 +28,9 @@ print q
 k = 32
 print k
 print q
+
+a['a'] = 15
+print a
+
+del d['a']
+print d

@@ -456,23 +456,30 @@ void updateComplexElementString(char* name, int index, char *key, char *s, enum 
     updateComplexElement(name, index, key, STRING, value, complex_type);
 }
 
-void removeArrayElement(char *name, int i) {
-    Symbol* array = getSymbol(name);
-    Symbol* symbol = getArrayElement(name, i);
-    Symbol** temp = malloc((array->children_count - 1) * sizeof(Symbol));
+void removeComplexElement(char *name, int i, char *key) {
+    Symbol* complex = getSymbol(name);
+    Symbol* symbol;
+    if (complex->type == ARRAY) {
+        symbol = getArrayElement(name, i);
+    } else if (complex->type == DICT) {
+        symbol = getDictElement(name, key);
+    } else {
+        throw_error(12, name);
+    }
+    Symbol** temp = malloc((complex->children_count - 1) * sizeof(Symbol));
 
     // Copy everything before the index
     if (i != 0)
-        memcpy(temp, array->children, i * sizeof(Symbol));
+        memcpy(temp, complex->children, i * sizeof(Symbol));
 
     // Copy everything after the index
-    if (i != array->children_count - 1)
-        memcpy(temp + i, array->children + i + 1, (array->children_count - i - 1) * sizeof(Symbol));
+    if (i != complex->children_count - 1)
+        memcpy(temp + i, complex->children + i + 1, (complex->children_count - i - 1) * sizeof(Symbol));
 
-    free(array->children);
-    array->children = temp;
+    free(complex->children);
+    complex->children = temp;
     removeSymbol(symbol);
-    array->children_count--;
+    complex->children_count--;
 }
 
 void addSymbolDict(char *name) {
