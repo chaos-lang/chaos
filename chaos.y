@@ -112,16 +112,16 @@ variable: T_VAR                                                     { $$ = $1; }
     | T_DEL variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET   { removeArrayElement($2, -$5); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                 { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, $3)); $$ = ""; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET         { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, -$4)); $$ = ""; }
-    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE              { updateArrayElementBool($1, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE      { updateArrayElementBool($1, -$4, $7); $$ = ""; }
-    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_FALSE             { updateArrayElementBool($1, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FALSE     { updateArrayElementBool($1, -$4, $7); $$ = ""; }
-    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_INT               { updateArrayElementInt($1, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_INT       { updateArrayElementInt($1, -$4, $7); $$ = ""; }
-    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT             { updateArrayElementFloat($1, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT     { updateArrayElementFloat($1, -$4, $7); $$ = ""; }
-    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_STRING            { updateArrayElementString($1, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_STRING    { updateArrayElementString($1, -$4, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE              { updateComplexElementBool($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE      { updateComplexElementBool($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_FALSE             { updateComplexElementBool($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FALSE     { updateComplexElementBool($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_INT               { updateComplexElementInt($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_INT       { updateComplexElementInt($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT             { updateComplexElementFloat($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT     { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_STRING            { updateComplexElementString($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_STRING    { updateComplexElementString($1, -$4, NULL, $7); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET              { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getDictElement($1, $3)); $$ = ""; }
 ;
 

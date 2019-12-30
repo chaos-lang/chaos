@@ -33,6 +33,7 @@ Symbol* getSymbol(char *name);
 bool isDefined(char *name);
 void removeSymbol(Symbol* symbol);
 void addSymbolToComplex(Symbol* symbol);
+Symbol* getDictElement(char *name, char *key);
 
 Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol_cursor = start_symbol;
@@ -401,7 +402,7 @@ void cloneSymbolToComplex(char *name, char *key) {
     deepCopySymbol(getSymbol(name), key);
 }
 
-void updateArrayElement(char *name, int i, enum Type type, union Value value) {
+void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
     Symbol* array = getSymbol(name);
     if (array->array_type != ANY) {
         if (array->array_type == NUMBER) {
@@ -415,7 +416,14 @@ void updateArrayElement(char *name, int i, enum Type type, union Value value) {
         }
     }
 
-    Symbol* symbol = getArrayElement(name, i);
+    Symbol* symbol;
+    if (i != NULL || i == 0) {
+        symbol = getArrayElement(name, i);
+    } else if (key != NULL) {
+        symbol = getDictElement(name, key);
+    } else {
+        throw_error(12, name);
+    }
     symbol->type = type;
     symbol->value.b = value.b;
     symbol->value.i = value.i;
@@ -424,28 +432,28 @@ void updateArrayElement(char *name, int i, enum Type type, union Value value) {
     symbol->value.f = value.f;
 }
 
-void updateArrayElementBool(char* name, int index, bool b) {
+void updateComplexElementBool(char* name, int index, char *key, bool b) {
     union Value value;
     value.b = b;
-    updateArrayElement(name, index, BOOL, value);
+    updateComplexElement(name, index, key, BOOL, value);
 }
 
-void updateArrayElementInt(char* name, int index, int i) {
+void updateComplexElementInt(char* name, int index, char *key, int i) {
     union Value value;
     value.i = i;
-    updateArrayElement(name, index, INT, value);
+    updateComplexElement(name, index, key, INT, value);
 }
 
-void updateArrayElementFloat(char* name, int index, float f) {
+void updateComplexElementFloat(char* name, int index, char *key, float f) {
     union Value value;
     value.f = f;
-    updateArrayElement(name, index, FLOAT, value);
+    updateComplexElement(name, index, key, FLOAT, value);
 }
 
-void updateArrayElementString(char* name, int index, char *s) {
+void updateComplexElementString(char* name, int index, char *key, char *s) {
     union Value value;
     value.s = s;
-    updateArrayElement(name, index, STRING, value);
+    updateComplexElement(name, index, key, STRING, value);
 }
 
 void removeArrayElement(char *name, int i) {

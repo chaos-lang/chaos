@@ -37,7 +37,10 @@ void throw_error(int code, char *subject) {
             printf("Variable %s is not a dictionary!", subject);
             break;
         case 11:
-            printf("Undefined key: %s", subject);
+            printf("Undefined key: '%s'", subject);
+            break;
+        case 12:
+            printf("Unrecognized complex data type for: '%s'", subject);
             break;
         default:
             printf("Unkown error.");
