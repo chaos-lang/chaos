@@ -7,7 +7,7 @@ enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT };
 typedef struct {
     char *name;
     enum Type type;
-    enum Type array_type;
+    enum Type secondary_type;
     union Value {
         bool b;
         int i;
@@ -321,7 +321,7 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum
 
     Symbol* clone_symbol;
     if (symbol->type == ARRAY) {
-        if (symbol->array_type != extra_type) throw_error(8, clone_name);
+        if (symbol->secondary_type != extra_type) throw_error(8, clone_name);
         deepCopyArray(clone_name, symbol);
     } else {
         clone_symbol = deepCopySymbol(symbol, NULL);
@@ -376,7 +376,7 @@ bool isComplexIllegal(enum Type type) {
 void finishComplexMode(char *name, enum Type type) {
     complex_mode->children_count = symbol_counter;
     complex_mode->name = name;
-    complex_mode->array_type = type;
+    complex_mode->secondary_type = type;
     if (isComplexIllegal(type)) throw_error(5, complex_mode->name);
     complex_mode = NULL;
     symbol_counter = 0;
@@ -404,13 +404,13 @@ void cloneSymbolToComplex(char *name, char *key) {
 
 void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
     Symbol* complex = getSymbol(name);
-    if (complex->array_type != ANY) {
-        if (complex->array_type == NUMBER) {
+    if (complex->secondary_type != ANY) {
+        if (complex->secondary_type == NUMBER) {
             if (type != INT && type != FLOAT) {
                 throw_error(5, complex->name);
             }
         } else {
-            if (complex->array_type != type) {
+            if (complex->secondary_type != type) {
                 throw_error(5, complex->name);
             }
         }
