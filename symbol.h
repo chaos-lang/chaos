@@ -133,11 +133,18 @@ Symbol* deepCopySymbol(Symbol* symbol, char *key) {
     return addSymbol(key, symbol->type, symbol->value);
 }
 
-void deepCopyArray(char *name, Symbol* symbol) {
-    addSymbolArray(NULL);
+void deepCopyComplex(char *name, Symbol* symbol) {
+    if (symbol->type == ARRAY) {
+        addSymbolArray(NULL);
+    } else if (symbol->type == DICT) {
+        addSymbolDict(NULL);
+    } else {
+        throw_error(12, symbol->name);
+    }
 
     for (int i = 0; i < symbol->children_count; i++) {
-        deepCopySymbol(symbol->children[i], NULL);
+        Symbol* child = symbol->children[i];
+        deepCopySymbol(child, child->key);
     }
 
     finishComplexMode(name, ANY);
@@ -320,9 +327,9 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum
     }
 
     Symbol* clone_symbol;
-    if (symbol->type == ARRAY) {
+    if (symbol->type == ARRAY || symbol->type == DICT) {
         if (symbol->secondary_type != extra_type) throw_error(8, clone_name);
-        deepCopyArray(clone_name, symbol);
+        deepCopyComplex(clone_name, symbol);
     } else {
         clone_symbol = deepCopySymbol(symbol, NULL);
         clone_symbol->name = clone_name;
@@ -422,7 +429,7 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
     } else if (complex->type == DICT) {
         symbol = getDictElement(name, key);
     } else {
-        throw_error(12, name);
+        throw_error(12, complex->name);
     }
     symbol->type = type;
     symbol->value.b = value.b;

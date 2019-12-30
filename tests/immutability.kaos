@@ -97,3 +97,11 @@ print q
 k = 32
 print k
 print q
+
+dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+dict m = n
+print n
+print m
+n['a'] = 'alt'
+print n
+print m

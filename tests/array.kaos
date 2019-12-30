@@ -52,6 +52,14 @@ x = 32
 print x
 print y
 
+list z = [1, 2, 3]
+list t = z
+print z
+print t
+z[0] = 5
+print z
+print t
+
 list arr4 = [1, 2, 3]
 arr4[0] = 5
 print arr4

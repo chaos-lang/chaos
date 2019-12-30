@@ -48,3 +48,7 @@ asdasda
 {'a': 5, 'b': 2, 'c': 3}
 32
 {'a': 5, 'b': 2, 'c': 3}
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+{'a': 'alt', 'b': 'bar', 'c': 'baz'}
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
