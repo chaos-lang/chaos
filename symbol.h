@@ -463,6 +463,37 @@ void updateComplexElementString(char* name, int index, char *key, char *s) {
     updateComplexElement(name, index, key, STRING, value);
 }
 
+void updateComplexElementSymbol(char* name, int index, char *key, char* source_name) {
+    Symbol* complex = getSymbol(name);
+    Symbol* source = getSymbol(source_name);
+    if (complex->secondary_type != ANY) {
+        if (complex->secondary_type == NUMBER) {
+            if (source->type != INT && source->type != FLOAT) {
+                throw_error(5, complex->name);
+            }
+        } else {
+            if (complex->secondary_type != source->type) {
+                throw_error(5, complex->name);
+            }
+        }
+    }
+
+    Symbol* symbol;
+    if (complex->type == ARRAY) {
+        symbol = getArrayElement(name, index);
+        removeSymbol(symbol);
+        complex->children[index] = deepCopySymbol(source, NULL);
+    } else if (complex->type == DICT) {
+        removeComplexElement(name, NULL, key);
+        complex_mode = complex;
+        symbol_counter = complex->children_count;
+        deepCopySymbol(source, key);
+        finishComplexMode(complex->name, complex->secondary_type);
+    } else {
+        throw_error(12, complex->name);
+    }
+}
+
 void removeComplexElement(char *name, int i, char *key) {
     Symbol* complex = getSymbol(name);
     Symbol* symbol;

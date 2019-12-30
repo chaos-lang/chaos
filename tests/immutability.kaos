@@ -105,3 +105,22 @@ print m
 n['a'] = 'alt'
 print n
 print m
+
+
+list y2 = [1, 2, 3]
+num x2 = 5
+y2[0] = x2
+print x2
+print y2
+x2 = 7
+print x2
+print y2
+
+dict q2 = {'a': 1, 'b': 2, 'c': 3}
+num k2 = 5
+q2['a'] = k2
+print k2
+print q2
+k2 = 7
+print k2
+print q2
