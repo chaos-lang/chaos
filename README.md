@@ -234,6 +234,72 @@ by prefixing `list` or `array` keywords with a [Primitive Data Type](#primitive-
 ['A', 'asdasdaqs', 'asdasd123123', '.']
 ```
 
+#### Dictionaries
+
+There are two keywords for **Dictionary** data type: `json` or `dict`
+
+```
+### dict a = {'a': 1, 'b': 2}
+### print a
+{'a': 1, 'b': 2}
+### dict b = {'a': 1, 'b': 2, 'c': 3}
+### print b
+{'a': 1, 'b': 2, 'c': 3}
+### json c = {"a": 1, "b": 2}
+### print c
+{'a': 1, 'b': 2}
+### json d = {"a": 1, "b": 2, "c": 3}
+### print d
+{'a': 1, 'b': 2, 'c': 3}
+```
+
+Accessing dictonary elements:
+
+```
+### dict a = {'a': 1, 'b': 2, 'c': 3}
+### print a['a']
+1
+### print a["b"]
+2
+```
+
+Updating dictonary values:
+
+```
+### dict a = {'a': 1, 'b': 2, 'c': 3}
+### a['a'] = 5
+### print a
+{'a': 5, 'b': 2, 'c': 3}
+```
+
+Deleting dictionary keys:
+
+```
+### json d = {"a": 1, "b": 2, "c": 3}
+### print d
+{'a': 1, 'b': 2, 'c': 3}
+### del d['a']
+### print d
+{'b': 2, 'c': 3}
+```
+
+#### Typed Dictionaries
+
+It's possible to create typed dictionaries in Chaos language
+by prefixing `json` or `dict` keywords with a [Primitive Data Type](#primitive-data-types):
+
+```
+### bool dict dict1 = {'a': true, 'b': false}
+### print dict1
+{'a': true, 'b': false}
+### number dict dict2 = {'a': 1, "b": 2, 'c': 63.3, 'd': 12321.1515}
+### print dict2
+{'a': 1, 'b': 2, 'c': 63.299999, 'd': 12321.151367}
+### string json dict3 = {'a': 'A', 'b': "asdasdaqs", 'c': 'asdasd123123', 'd': "."}
+### print dict3
+{'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}
+```
+
 ## Immutability
 
 Every variable in Chaos language is **immutable by default**.
@@ -307,6 +373,58 @@ Arrays and the elements of arrays are also immutable:
 [5, 2, 3]
 ### print t
 [1, 2, 3]
+
+### list y2 = [1, 2, 3]
+### num x2 = 5
+### y2[0] = x2
+### print x2
+5
+### print y2
+[5, 2, 3]
+### x2 = 7
+### print x2
+7
+### print y2
+[5, 2, 3]
+```
+
+Dictionaries and the values of dictionaries are also immutable:
+
+```
+### num k = 5
+### dict q = {'a': k, 'b': 2, 'c': 3}
+### print q
+{'a': 5, 'b': 2, 'c': 3}
+### k = 32
+### print k
+32
+### print q
+{'a': 5, 'b': 2, 'c': 3}
+
+### dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+### dict m = n
+### print n
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+### print m
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+### n['a'] = 'alt'
+### print n
+{'a': 'alt', 'b': 'bar', 'c': 'baz'}
+### print m
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+
+### dict q2 = {'a': 1, 'b': 2, 'c': 3}
+### num k2 = 5
+### q2['a'] = k2
+### print k2
+5
+### print q2
+{'b': 2, 'c': 3, 'a': 5}
+### k2 = 7
+### print k2
+7
+### print q2
+{'b': 2, 'c': 3, 'a': 5}
 ```
 
 ## Mathematical Expressions
