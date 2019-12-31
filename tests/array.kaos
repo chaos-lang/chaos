@@ -8,7 +8,14 @@ list d = ['a', 'b', 'c']
 print d
 array e = ["A", "B", "C"]
 print e
-list f = ['A', "asdasdad12312", 1232, 435.16, true, false]
+list f = [
+    'A',
+    "asdasdad12312",
+    1232,
+    435.16,
+    true,
+    false
+]
 print f
 list g = ["asdasdasd,", 123123]
 print g

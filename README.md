@@ -179,6 +179,16 @@ There are two keywords for **Array** data type: `list` or `array`
 ['A', 'asdasdad12312', 1232, 435.160004, true, false]
 ```
 
+Multi-line array definition:
+
+```
+### array a = [
+    'foo',
+    'bar',
+    'baz'
+]
+```
+
 Accessing array elements:
 
 ```
@@ -251,6 +261,16 @@ There are two keywords for **Dictionary** data type: `json` or `dict`
 ### json d = {"a": 1, "b": 2, "c": 3}
 ### print d
 {'a': 1, 'b': 2, 'c': 3}
+```
+
+Multi-line dictionary definition:
+
+```
+### dict a = {
+    'a': 1,
+    'b': 2,
+    'c': 3
+}
 ```
 
 Accessing dictonary elements:

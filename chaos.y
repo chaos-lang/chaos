@@ -168,30 +168,37 @@ variable: T_VAR_ARRAY                                               { }
     | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishComplexMode($2, ANY); $$ = ""; }
 ;
 
-arraystart: T_LEFT_BRACKET                                          { addSymbolArray(NULL); }
-    | arraystart array                                              { }
+arraystart:                                                         { addSymbolArray(NULL); }
+    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { }
+;
+
+array:                                                              { }
+    | T_NEWLINE array                                               { }
 ;
 
 array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
     | array T_COMMA array                                           { }
+    | array T_NEWLINE                                               { }
 ;
 array: T_FALSE                                                      { addSymbolBool(NULL, $1); }
     | array T_COMMA array                                           { }
+    | array T_NEWLINE                                               { }
 ;
 array: T_INT                                                        { addSymbolInt(NULL, $1); }
     | array T_COMMA array                                           { }
+    | array T_NEWLINE                                               { }
 ;
 array: T_FLOAT                                                      { addSymbolFloat(NULL, $1); }
     | array T_COMMA array                                           { }
+    | array T_NEWLINE                                               { }
 ;
 array: T_STRING                                                     { addSymbolString(NULL, $1); }
     | array T_COMMA array                                           { }
+    | array T_NEWLINE                                               { }
 ;
 array: T_VAR                                                        { cloneSymbolToComplex($1, NULL); }
     | array T_COMMA array                                           { }
-;
-
-array: T_RIGHT_BRACKET                                              { }
+    | array T_NEWLINE                                               { }
 ;
 
 variable: T_VAR_DICT                                                { }
@@ -199,35 +206,42 @@ variable: T_VAR_DICT                                                { }
     | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishComplexMode($2, ANY); $$ = ""; }
 ;
 
-dictionarystart: T_LEFT_CURLY_BRACKET                               { addSymbolDict(NULL); }
-    | dictionarystart dictionary                                    { }
+dictionarystart:                                                                { addSymbolDict(NULL); }
+    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { }
+;
+
+dictionary:                                                         { }
+    | T_NEWLINE dictionary                                          { }
 ;
 
 dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
+    | dictionary T_NEWLINE                                          { }
 ;
 
 dictionary: T_STRING T_COLON T_FALSE                                { addSymbolBool($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
+    | dictionary T_NEWLINE                                          { }
 ;
 
 dictionary: T_STRING T_COLON T_INT                                  { addSymbolInt($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
+    | dictionary T_NEWLINE                                          { }
 ;
 
 dictionary: T_STRING T_COLON T_FLOAT                                { addSymbolFloat($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
+    | dictionary T_NEWLINE                                          { }
 ;
 
 dictionary: T_STRING T_COLON T_STRING                               { addSymbolString($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
+    | dictionary T_NEWLINE                                          { }
 ;
 
 dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbolToComplex($3, $1); }
     | dictionary T_COMMA dictionary                                 { }
-;
-
-dictionary: T_RIGHT_CURLY_BRACKET                                   { }
+    | dictionary T_NEWLINE                                          { }
 ;
 
 %%
