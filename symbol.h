@@ -34,6 +34,10 @@ bool isDefined(char *name);
 void removeSymbol(Symbol* symbol);
 void addSymbolToComplex(Symbol* symbol);
 Symbol* getDictElement(char *name, char *key);
+void addSymbolDict(char *name);
+void removeComplexElement(char *name, int i, char *key);
+void addSymbolArray(char *name);
+void finishComplexMode(char *name, enum Type type);
 
 Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol_cursor = start_symbol;
