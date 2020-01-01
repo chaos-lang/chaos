@@ -12,6 +12,9 @@ extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
 
+extern int yylineno;
+extern char *yytext;
+
 void yyerror(const char* s);
 
 bool is_interactive = true;
@@ -268,6 +271,6 @@ int main(int argc, char** argv) {
 }
 
 void yyerror(const char* s) {
-    fprintf(stderr, "Parse error: %s\n", s);
+    fprintf(stderr, "Parse error: %s\nLine: %i\nCause: %s\n", s, yylineno, yytext);
     exit(1);
 }

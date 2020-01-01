@@ -16,7 +16,7 @@
 [ \t]	; // ignore all whitespace
 [0-9]+\.[0-9]+                  {yylval.fval = atof(yytext); return T_FLOAT;}
 [0-9]+                          {yylval.ival = atoi(yytext); return T_INT;}
-\n                              {return T_NEWLINE;}
+\n                              {yylineno = yylineno + 1; return T_NEWLINE;}
 "="                             {return T_EQUAL;}
 "+"                             {return T_PLUS;}
 "-"                             {return T_MINUS;}
