@@ -1,7 +1,7 @@
 # Chaos
 
 <p align="center">
-  <img src="https://i.ibb.co/7V0mKxf/chaos-logo-small.png" alt="Logo" height="300px"/>
+  <img src="https://i.ibb.co/QvCGW0P/chaos-logo.png" alt="Logo" height="300px"/>
 </p>
 
 <p align="center">
