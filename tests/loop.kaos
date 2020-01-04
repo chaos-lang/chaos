@@ -1,0 +1,12 @@
+list a = [
+    1,
+    2,
+    3
+]
+
+20 times do:
+    print a
+end
+
+num b = 32
+print b

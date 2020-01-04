@@ -7,6 +7,7 @@
 #include "utilities/language.h"
 #include "utilities/helpers.h"
 #include "symbol.h"
+#include "loops/times_do.h"
 
 extern int yylex();
 extern int yyparse();
@@ -38,6 +39,7 @@ bool is_interactive = true;
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
 %token T_DEL
 %token T_SYMBOL_TABLE
+%token T_TIMES_DO T_END
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -59,6 +61,7 @@ line: T_NEWLINE
     | mixed_expression T_NEWLINE                                    { printf("%f\n", $1); }
     | expression T_NEWLINE                                          { printf("%i\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getSymbol($1)); }
+    | loop T_NEWLINE                                                { }
     | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : printf(""); exit(0); }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
@@ -245,6 +248,11 @@ dictionary: T_STRING T_COLON T_STRING                               { addSymbolS
 dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbolToComplex($3, $1); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
+;
+
+loop:
+    | T_INT T_TIMES_DO T_COLON                                      { startTimesDo($1); }
+    | T_END                                                         { endLoop(); }
 ;
 
 %%
