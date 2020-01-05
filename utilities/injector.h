@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <memory.h>
-#include "../loops/loop.h"
+#include "loop.h"
 
 extern Loop* loop_mode;
 extern bool inject_mode;

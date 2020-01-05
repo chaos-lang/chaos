@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "utilities/injector.h"
-#include "loops/loop.h"
+#include "loop.h"
 
 #define YY_DECL int yylex()
 

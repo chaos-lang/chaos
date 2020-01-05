@@ -7,7 +7,7 @@
 #include "utilities/language.h"
 #include "utilities/helpers.h"
 #include "symbol.h"
-#include "loops/times_do.h"
+#include "loop.h"
 
 extern int yylex();
 extern int yyparse();
