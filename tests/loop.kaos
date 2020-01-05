@@ -20,3 +20,11 @@ end
 
 string d = "after all the loops"
 print d
+
+foreach a as el:
+    print el
+    el = 5
+    print el
+end
+
+print a

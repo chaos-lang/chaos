@@ -57,6 +57,8 @@ void injectCode(char *code) {
 
 "times do"                      {recordToken(strdup(yytext), yyleng); return T_TIMES_DO;}
 "end"                           {recordToken(strdup(yytext), yyleng); return T_END;}
+"foreach"                       {recordToken(strdup(yytext), yyleng); return T_FOREACH;}
+"as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);

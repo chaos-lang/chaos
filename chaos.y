@@ -40,7 +40,7 @@ bool inject_mode = false;
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
 %token T_DEL
 %token T_SYMBOL_TABLE
-%token T_TIMES_DO T_END
+%token T_TIMES_DO T_FOREACH T_AS T_END
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -259,6 +259,7 @@ dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbo
 
 loop:
     | T_INT T_TIMES_DO T_COLON                                      { startTimesDo($1); }
+    | T_FOREACH T_VAR T_AS T_VAR T_COLON                            { startForeach($2, $4); }
     | T_END                                                         { endLoop(); }
 ;
 
