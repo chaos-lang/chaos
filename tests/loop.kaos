@@ -1,0 +1,30 @@
+list a = [
+    1,
+    2,
+    3
+]
+
+num b = 256
+str c = 'deepest loop'
+
+3 times do:
+    print a
+    4 times do:
+        print b
+        2 times do:
+            print 1
+            print c
+        end
+    end
+end
+
+string d = "after all the loops"
+print d
+
+foreach a as el:
+    print el
+    el = 5
+    print el
+end
+
+print a

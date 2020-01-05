@@ -4,50 +4,73 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "utilities/injector.h"
+#include "loop.h"
 
 #define YY_DECL int yylex()
 
+extern void recordToken(char *token, int length);
+
 #include "chaos.tab.h"
+
+void injectCode(char *code) {
+    inject_mode = true;
+
+    YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
+    YY_BUFFER_STATE new_buffer = yy_scan_string(code);
+    yy_switch_to_buffer(new_buffer);
+    int ret = yyparse();
+    yy_delete_buffer(new_buffer);
+    yy_switch_to_buffer(old_buffer);
+
+    inject_mode = false;
+}
 
 %}
 
 %%
 
-[ \t]	; // ignore all whitespace
-[0-9]+\.[0-9]+                  {yylval.fval = atof(yytext); return T_FLOAT;}
-[0-9]+                          {yylval.ival = atoi(yytext); return T_INT;}
-\n                              {yylineno = yylineno + 1; return T_NEWLINE;}
-"="                             {return T_EQUAL;}
-"+"                             {return T_PLUS;}
-"-"                             {return T_MINUS;}
-"*"                             {return T_MULTIPLY;}
-"/"                             {return T_DIVIDE;}
-"("                             {return T_LEFT;}
-")"                             {return T_RIGHT;}
-"["                             {return T_LEFT_BRACKET;}
-"]"                             {return T_RIGHT_BRACKET;}
-"{"                             {return T_LEFT_CURLY_BRACKET;}
-"}"                             {return T_RIGHT_CURLY_BRACKET;}
-","                             {return T_COMMA;}
-":"                             {return T_COLON;}
-"exit"                          {return T_QUIT;}
-"quit"                          {return T_QUIT;}
-"print"                         {return T_PRINT;}
-"true"                          {yylval.bval = 1; return T_TRUE;}
-"false"                         {yylval.bval = 0; return T_FALSE;}
-"symbol_table"                  {return T_SYMBOL_TABLE;}
-"del"                           {return T_DEL;}
+[ \t]                           {recordToken(strdup(yytext), yyleng);}; // ignore all whitespace
+[0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (loop_mode == NULL) return T_FLOAT;}
+[0-9]+                          {recordToken(strdup(yytext), yyleng); yylval.ival = atoi(yytext); return T_INT;}
+\n                              {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
+"="                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_EQUAL;}
+"+"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_PLUS;}
+"-"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_MINUS;}
+"*"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_MULTIPLY;}
+"/"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_DIVIDE;}
+"("                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_LEFT;}
+")"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_RIGHT;}
+"["                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_LEFT_BRACKET;}
+"]"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_RIGHT_BRACKET;}
+"{"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_LEFT_CURLY_BRACKET;}
+"}"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_RIGHT_CURLY_BRACKET;}
+","                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_COMMA;}
+":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
+"exit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_QUIT;}
+"quit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_QUIT;}
+"print"                         {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_PRINT;}
+"true"                          {recordToken(strdup(yytext), yyleng); yylval.bval = 1; if (loop_mode == NULL) return T_TRUE;}
+"false"                         {recordToken(strdup(yytext), yyleng); yylval.bval = 0; if (loop_mode == NULL) return T_FALSE;}
+"symbol_table"                  {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_SYMBOL_TABLE;}
+"del"                           {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_DEL;}
+
+"times do"                      {recordToken(strdup(yytext), yyleng); return T_TIMES_DO;}
+"end"                           {recordToken(strdup(yytext), yyleng); return T_END;}
+"foreach"                       {recordToken(strdup(yytext), yyleng); return T_FOREACH;}
+"as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
+    recordToken(strdup(yytext), yyleng);
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
     strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
-    return T_STRING;
+    if (loop_mode == NULL) return T_STRING;
 }
 
-bool|boolean                    {return T_VAR_BOOL;}
-num|number                      {return T_VAR_NUMBER;}
-str|string                      {return T_VAR_STRING;}
-list|array                      {return T_VAR_ARRAY;}
-json|dict                       {return T_VAR_DICT;}
-[a-zA-Z][a-zA-Z0-9]*            {yylval.sval=strdup(yytext); return T_VAR;}
+bool|boolean                    {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_BOOL;}
+num|number                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_NUMBER;}
+str|string                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_STRING;}
+list|array                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ARRAY;}
+json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_DICT;}
+[a-zA-Z][a-zA-Z0-9]*            {recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (loop_mode == NULL) return T_VAR;}
 %%

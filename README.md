@@ -447,6 +447,69 @@ Dictionaries and the values of dictionaries are also immutable:
 {'b': 2, 'c': 3, 'a': 5}
 ```
 
+## Loops
+
+All loops ends with `end` keyword in Chaos Language.
+
+### N times do
+
+Syntax for starting an **N times do** loop is: `<NUMBER> times do:`
+
+```
+### str a = 'hello world'
+### 3 times do:
+... 	print a
+... end
+hello world
+hello world
+hello world
+```
+
+### foreach as
+
+Syntax for starting a **foreach as** loop is: `foreach <VAR> as <VAR>:`
+
+```
+### list a = [1, 2, 3]
+### foreach a as el:
+... 	print el
+... 	el = 5
+... 	print el
+... end
+1
+5
+2
+5
+3
+5
+### print a
+[5, 5, 5]
+```
+
+### Nested Loops
+
+It's also possible to create nested loops in Chaos Langauge:
+
+```
+### list a = [1, 2, 3]
+### num b = 32
+### foreach a as el:
+... 	print el
+... 	2 times do:
+...         print b
+... 	end
+... end
+1
+32
+32
+2
+32
+32
+3
+32
+32
+```
+
 ## Mathematical Expressions
 
 ```
