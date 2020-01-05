@@ -9,7 +9,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     echo "Running test: ${testname}"
 
-    test=$(chaos $DIR/$filename)
+    test=$(cat $DIR/$filename | chaos | tail -n +5)
     if [ "$test" == "$out" ]
     then
         echo "OK"
@@ -17,8 +17,4 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
         echo "Fail"
         exit 1
     fi
-done
-
-for dirpath in $(find $DIR -mindepth 1 -maxdepth 1 -type d); do
-    $dirpath/run.sh
 done
