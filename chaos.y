@@ -19,6 +19,7 @@ extern char *yytext;
 void yyerror(const char* s);
 
 bool is_interactive = true;
+bool inject_mode = false;
 %}
 
 %union {
@@ -54,7 +55,13 @@ bool is_interactive = true;
 %%
 
 parser:
-    | parser line                                                   { is_interactive ? printf("%s ", __SHELL_INDICATOR__) : printf(""); }
+    | parser line                                                   {
+        is_interactive ? (
+            loop_mode ? printf("%s ", __SHELL_INDICATOR_BLOCK__) : (
+                inject_mode ? : printf("%s ", __SHELL_INDICATOR__)
+            )
+        ) : printf("");
+    }
 ;
 
 line: T_NEWLINE

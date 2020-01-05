@@ -3,3 +3,4 @@
 #define __LANGUAGE_MOTTO__ "Turn chaos into magic!"
 #define __BYE_BYE__ "You have chosen the order!"
 #define __SHELL_INDICATOR__ "###"
+#define __SHELL_INDICATOR_BLOCK__ "..."

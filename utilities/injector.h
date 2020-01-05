@@ -7,6 +7,7 @@
 #include "../loops/loop.h"
 
 extern Loop* loop_mode;
+extern bool inject_mode;
 
 void injectCode(char *code);
 
