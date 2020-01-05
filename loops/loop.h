@@ -6,6 +6,7 @@ enum LoopType { TIMESDO, FOREACH };
 typedef struct {
     enum LoopType type;
     int iter;
+    int nested_counter;
     char body[];
 } Loop;
 

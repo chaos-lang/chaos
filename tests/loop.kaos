@@ -4,9 +4,18 @@ list a = [
     3
 ]
 
-20 times do:
+num b = 256
+str c = 'deepest loop'
+
+3 times do:
     print a
+    4 times do:
+        print b
+        2 times do:
+            print c
+        end
+    end
 end
 
-num b = 32
-print b
+string d = "after all the loops"
+print d

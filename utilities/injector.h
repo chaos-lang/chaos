@@ -11,7 +11,10 @@ extern Loop* loop_mode;
 void injectCode(char *code);
 
 void recordToken(char *token, int length) {
-    if (loop_mode != NULL && strcmp(token, "end") != 0) {
+    if (loop_mode != NULL) {
+        if (loop_mode->nested_counter == 0 && strcmp(token, "end") == 0) {
+            return;
+        }
         strcat(loop_mode->body, token);
     }
 }
