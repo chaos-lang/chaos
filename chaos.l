@@ -12,8 +12,7 @@ extern void recordToken(char *token, int length);
 
 #include "chaos.tab.h"
 
-void injectCode(char code[]) {
-    loop_mode = NULL;
+void injectCode(char *code) {
     YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
     YY_BUFFER_STATE new_buffer = yy_scan_string(code);
     yy_switch_to_buffer(new_buffer);

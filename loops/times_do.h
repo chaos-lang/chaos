@@ -14,17 +14,11 @@ void startTimesDo(int iter) {
 }
 
 void endLoop() {
-    injectCode(repeatStr(loop_mode->body, loop_mode->iter - 1));
-}
-
-char *repeatStr(char *str, size_t count) {
-    if (count == 0) return NULL;
-    char *ret = malloc (strlen (str) * count + count);
-    if (ret == NULL) return NULL;
-    strcpy (ret, str);
-    while (--count > 0) {
-        strcat (ret, " ");
-        strcat (ret, str);
+    char *body = malloc(strlen(loop_mode->body));
+    strcpy(body, loop_mode->body);
+    int iter = loop_mode->iter;
+    loop_mode = NULL;
+    for (int i = 1; i < iter; i++) {
+        injectCode(body);
     }
-    return ret;
 }

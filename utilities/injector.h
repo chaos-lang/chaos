@@ -8,7 +8,7 @@
 
 extern Loop* loop_mode;
 
-void injectCode(char code[]);
+void injectCode(char *code);
 
 void recordToken(char *token, int length) {
     if (loop_mode != NULL && strcmp(token, "end") != 0) {
