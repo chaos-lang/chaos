@@ -18,13 +18,22 @@ str c = 'deepest loop'
     end
 end
 
-string d = "after all the loops"
-print d
+3 times do:
+    print 'hey'
+    foreach a as el:
+        print el
+    end
+end
 
 foreach a as el:
     print el
     el = 5
-    print el
+    2 times do:
+        print el
+    end
 end
 
 print a
+
+string d = "after all the loops"
+print d

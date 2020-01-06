@@ -72,5 +72,5 @@ num|number                      {recordToken(strdup(yytext), yyleng); if (loop_m
 str|string                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_STRING;}
 list|array                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ARRAY;}
 json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_DICT;}
-[a-zA-Z][a-zA-Z0-9]*            {recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (loop_mode == NULL) return T_VAR;}
+[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (loop_mode == NULL || was_foreach) return T_VAR;}
 %%
