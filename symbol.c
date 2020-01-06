@@ -40,13 +40,16 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
 
 Symbol* updateSymbol(char *name, enum Type type, union Value value) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != type) throw_error(8, name);
-
+    
+    if (symbol->type != ANY && symbol->type != type) throw_error(8, name);
+    
+    symbol->secondary_type = type;
     symbol->value.b = value.b;
     symbol->value.i = value.i;
     symbol->value.c = value.c;
     symbol->value.s = value.s;
     symbol->value.f = value.f;
+    
     return symbol;
 }
 
@@ -163,6 +166,23 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             }
             printf("}");
             break;
+        case ANY:
+            switch (symbol->secondary_type)
+            {
+            case STRING:
+                printf("%s",symbol->value.s);     
+                break;
+            case INT:
+                printf("%i",symbol->value.i);      
+                break; 
+            case FLOAT:
+                printf("%f",symbol->value.f);      
+                break;
+            case BOOL:
+                printf("%s", symbol->value.b ? "true" : "false");        
+                break;
+            }
+            break;    
         default:
             type[0] = symbol->type;
             throw_error(1, type);
@@ -509,4 +529,32 @@ Symbol* getDictElement(char *name, char *key) {
         }
     }
     throw_error(11, key);
+}
+
+void addSymbolAnyString(char *name, char *s) {
+    union Value value;
+    value.s = s;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = STRING;
+}
+
+void addSymbolAnyInt(char *name, int i) {
+    union Value value;
+    value.i = i;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = INT;
+}
+
+void addSymbolAnyFloat(char *name, float f) {
+    union Value value;
+    value.f = f;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = FLOAT;
+}
+
+void addSymbolAnyBool(char *name, bool b) {
+    union Value value;
+    value.b = b;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = BOOL;
 }

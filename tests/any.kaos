@@ -1,0 +1,52 @@
+any var9 = 'string5'
+var9 = 'string6'
+print var9
+any var10 = 'string7'
+var10 = 123
+print var10
+any var11 = 'string8'
+var11 = true
+print var11
+any var12 = 'string9'
+var12 = 5.6
+print var12
+
+any var13 = 123
+var13  = 456
+print var13
+any var14 = 1234
+var14  = 'string10'
+print var14
+any var15 = 12345
+var15  = true
+print var15
+any var16 = 123456
+var16  = 1.43
+print var16
+
+any var17 = true
+var17 = false
+print var17
+any var18 = false
+var18 = 'string11'
+print var18
+any var19 = true
+var19 = 123
+print var19
+any var20 = false
+var20 = 4.1312
+print var20
+
+any var21 = 3.14
+var21 = 1.44
+print var21
+any var22 = 3.55
+var22 = 'string12'
+print var22
+any var23 = 6.55
+var23 = 1424
+print var23
+any var24 = 8.55
+var24 = true
+print var24
+

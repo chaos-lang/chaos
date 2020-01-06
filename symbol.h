@@ -71,6 +71,10 @@ void updateComplexElementString(char* name, int index, char *key, char *s);
 void updateComplexElementSymbol(char* name, int index, char *key, char* source_name);
 void removeComplexElement(char *name, int i, char *key);
 void addSymbolDict(char *name);
+void addSymbolAnyString(char *name, char *s);
+void addSymbolAnyInt(char *name, int i);
+void addSymbolAnyFloat(char *name, float f);
+void addSymbolAnyBool(char *name, bool b);
 Symbol* getDictElement(char *name, char *key);
 
 #endif

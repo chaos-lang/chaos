@@ -37,7 +37,7 @@ bool inject_mode = false;
 %token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_COLON
 %token T_NEWLINE T_QUIT
 %token T_PRINT
-%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
+%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
 %token T_DEL
 %token T_SYMBOL_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END
@@ -179,6 +179,14 @@ variable: T_VAR_STRING                                              { }
 variable: T_VAR_ARRAY                                               { }
     | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbol($2, ARRAY, $4, ANY); $$ = "";}
     | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishComplexMode($2, ANY); $$ = ""; }
+;
+
+variable: T_VAR_ANY                                                 { }
+    | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_INT                                 { addSymbolAnyInt($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_FLOAT                               { addSymbolAnyFloat($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
 ;
 
 arraystart:                                                         { addSymbolArray(NULL); }
