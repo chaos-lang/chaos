@@ -258,8 +258,8 @@ dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbo
 ;
 
 loop:
-    | T_INT T_TIMES_DO T_COLON                                      { startTimesDo($1); }
-    | T_FOREACH T_VAR T_AS T_VAR T_COLON                            { startForeach($2, $4); }
+    | T_INT T_TIMES_DO                                              { startTimesDo($1); }
+    | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
     | T_END                                                         { endLoop(); }
 ;
 

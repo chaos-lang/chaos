@@ -7,28 +7,28 @@ list a = [
 num b = 256
 str c = 'deepest loop'
 
-3 times do:
+3 times do
     print a
-    4 times do:
+    4 times do
         print b
-        2 times do:
+        2 times do
             print 1
             print c
         end
     end
 end
 
-3 times do:
+3 times do
     print 'hey'
-    foreach a as el:
+    foreach a as el
         print el
     end
 end
 
-foreach a as el:
+foreach a as el
     print el
     el = 5
-    2 times do:
+    2 times do
         print el
     end
 end

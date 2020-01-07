@@ -457,7 +457,7 @@ Syntax for starting an **N times do** loop is: `<NUMBER> times do:`
 
 ```
 ### str a = 'hello world'
-### 3 times do:
+### 3 times do
 ... 	print a
 ... end
 hello world
@@ -471,7 +471,7 @@ Syntax for starting a **foreach as** loop is: `foreach <VAR> as <VAR>:`
 
 ```
 ### list a = [1, 2, 3]
-### foreach a as el:
+### foreach a as el
 ... 	print el
 ... 	el = 5
 ... 	print el
@@ -493,9 +493,9 @@ It's also possible to create nested loops in Chaos Langauge:
 ```
 ### list a = [1, 2, 3]
 ### num b = 32
-### foreach a as el:
+### foreach a as el
 ... 	print el
-... 	2 times do:
+... 	2 times do
 ...         print b
 ... 	end
 ... end
