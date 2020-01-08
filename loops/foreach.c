@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "loop.h"
+#include "../utilities/injector.h"
 
 void startForeach(char *array, char *element_name) {
     if (loop_mode != NULL) {
@@ -16,6 +17,8 @@ void startForeach(char *array, char *element_name) {
 
     loop_mode->array = array;
     loop_mode->element.name = element_name;
+
+    recordToken(strdup("\n"), 1);
 }
 
 void startForeachDict(char *array, char *element_key, char *element_value) {
@@ -31,4 +34,6 @@ void startForeachDict(char *array, char *element_key, char *element_value) {
     loop_mode->array = array;
     loop_mode->element.key = element_key;
     loop_mode->element.value = element_value;
+
+    recordToken(strdup("\n"), 1);
 }

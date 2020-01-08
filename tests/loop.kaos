@@ -42,5 +42,15 @@ foreach n as key : val
     print val
 end
 
+3 times do
+    foreach a as el
+        print el
+        foreach n as key : val
+            print key
+            print val
+        end
+    end
+end
+
 string d = "after all the loops"
 print d
