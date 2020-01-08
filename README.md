@@ -453,7 +453,7 @@ All loops ends with `end` keyword in Chaos Language.
 
 ### N times do
 
-Syntax for starting an **N times do** loop is: `<NUMBER> times do:`
+Syntax for starting an **N times do** loop is: `<NUMBER> times do`
 
 ```
 ### str a = 'hello world'
@@ -467,7 +467,7 @@ hello world
 
 ### foreach as
 
-Syntax for starting a **foreach as** loop is: `foreach <VAR> as <VAR>:`
+Syntax for starting a **foreach as** loop on **arrays** is: `foreach <ARRAY> as <VALUE>`
 
 ```
 ### list a = [1, 2, 3]
@@ -484,6 +484,22 @@ Syntax for starting a **foreach as** loop is: `foreach <VAR> as <VAR>:`
 5
 ### print a
 [5, 5, 5]
+```
+
+Syntax for starting a **foreach as** loop on **dictionaries** is: `foreach <DICT> as <KEY> : <VAL>`
+
+```
+### dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+### foreach n as key : val
+... 	print key
+... 	print val
+... end
+a
+foo
+b
+bar
+c
+baz
 ```
 
 ### Nested Loops

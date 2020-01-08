@@ -35,5 +35,12 @@ end
 
 print a
 
+dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+
+foreach n as key : val
+    print key
+    print val
+end
+
 string d = "after all the loops"
 print d

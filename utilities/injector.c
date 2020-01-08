@@ -15,6 +15,7 @@ void recordToken(char *token, int length) {
 }
 
 bool isForeach() {
-    if (strcmp(last_token, "foreach") == 0 || strcmp(last_token, "as") == 0) return true;
+    if (last_token == NULL) return false;
+    if (strcmp(last_token, "foreach") == 0 || strcmp(last_token, "as") == 0 || strcmp(last_token, ":") == 0) return true;
     return false;
 }
