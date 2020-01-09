@@ -2,6 +2,6 @@ num a = 5
 a
 print a
 
-5 times do:
+5 times do
     print a
 end

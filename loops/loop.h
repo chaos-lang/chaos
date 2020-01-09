@@ -4,15 +4,21 @@
 #include <stdio.h>
 #include <string.h>
 
-enum LoopType { TIMESDO, FOREACH };
+enum LoopType { TIMESDO, FOREACH, FOREACH_DICT };
+
+typedef struct {
+    char *name;
+    char *key;
+    char *value;
+} LoopElement;
 
 typedef struct {
     enum LoopType type;
     int iter;
     int nested_counter;
     char *array;
-    char *element;
-    char body[];
+    LoopElement element;
+    char body[1000];
 } Loop;
 
 Loop* loop_mode;

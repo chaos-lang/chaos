@@ -1,7 +1,7 @@
 # Chaos
 
 <p align="center">
-  <img src="https://i.ibb.co/QvCGW0P/chaos-logo.png" alt="Logo" height="300px"/>
+  <img src="https://i.ibb.co/dp6T65X/chaos-logo.png" alt="Logo" height="300px"/>
 </p>
 
 <p align="center">
@@ -453,11 +453,11 @@ All loops ends with `end` keyword in Chaos Language.
 
 ### N times do
 
-Syntax for starting an **N times do** loop is: `<NUMBER> times do:`
+Syntax for starting an **N times do** loop is: `<NUMBER> times do`
 
 ```
 ### str a = 'hello world'
-### 3 times do:
+### 3 times do
 ... 	print a
 ... end
 hello world
@@ -467,11 +467,11 @@ hello world
 
 ### foreach as
 
-Syntax for starting a **foreach as** loop is: `foreach <VAR> as <VAR>:`
+Syntax for starting a **foreach as** loop on **arrays** is: `foreach <ARRAY> as <VALUE>`
 
 ```
 ### list a = [1, 2, 3]
-### foreach a as el:
+### foreach a as el
 ... 	print el
 ... 	el = 5
 ... 	print el
@@ -486,6 +486,22 @@ Syntax for starting a **foreach as** loop is: `foreach <VAR> as <VAR>:`
 [5, 5, 5]
 ```
 
+Syntax for starting a **foreach as** loop on **dictionaries** is: `foreach <DICT> as <KEY> : <VAL>`
+
+```
+### dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+### foreach n as key : val
+... 	print key
+... 	print val
+... end
+a
+foo
+b
+bar
+c
+baz
+```
+
 ### Nested Loops
 
 It's also possible to create nested loops in Chaos Langauge:
@@ -493,9 +509,9 @@ It's also possible to create nested loops in Chaos Langauge:
 ```
 ### list a = [1, 2, 3]
 ### num b = 32
-### foreach a as el:
+### foreach a as el
 ... 	print el
-... 	2 times do:
+... 	2 times do
 ...         print b
 ... 	end
 ... end
