@@ -29,6 +29,8 @@ bool inject_mode = false;
     char *sval;
 }
 
+%token START_PROGRAM
+%token START_PREPARSE
 %token<bval> T_TRUE T_FALSE
 %token<ival> T_INT
 %token<fval> T_FLOAT
@@ -50,9 +52,18 @@ bool inject_mode = false;
 %type<sval> arraystart
 %type<ival> array
 
-%start parser
+%start meta_start
 
 %%
+
+meta_start:
+    | START_PROGRAM parser                                          { }
+    | START_PREPARSE preparser                                      { }
+;
+
+preparser:
+    | preparser T_NEWLINE                                           { }
+;
 
 parser:
     | parser line                                                   {

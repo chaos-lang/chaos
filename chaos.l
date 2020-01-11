@@ -13,8 +13,12 @@ extern void recordToken(char *token, int length);
 
 #include "chaos.tab.h"
 
+bool entered_preparse = true;
+bool entered_program = false;
+
 void injectCode(char *code) {
     inject_mode = true;
+    entered_program = false;
 
     YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
     YY_BUFFER_STATE new_buffer = yy_scan_string(code);
@@ -29,6 +33,20 @@ void injectCode(char *code) {
 %}
 
 %%
+
+%{
+
+if (!entered_preparse) {
+    entered_preparse = true;
+    return START_PREPARSE;
+}
+
+if (!entered_program) {
+    entered_program = true;
+    return START_PROGRAM;
+}
+
+%}
 
 [ \t]                           {recordToken(strdup(yytext), yyleng);}; // ignore all whitespace
 [0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (loop_mode == NULL) return T_FLOAT;}
