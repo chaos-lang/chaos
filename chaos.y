@@ -73,9 +73,42 @@ preparser_line: T_NEWLINE
 ;
 
 function:
-    | T_FUNCTION T_VAR T_LEFT T_RIGHT                               { startFunction($2); }
+    | T_FUNCTION T_VAR function_parameters_start                    { startFunction($2); }
     | T_END                                                         { endLoop(); endFunction(); }
     | T_VAR T_LEFT T_RIGHT                                          { if (phase == PROGRAM) callFunction($1); }
+;
+
+function_parameters_start:                                                          { startFunctionParameters(); }
+    | function_parameters_start T_LEFT function_parameters T_RIGHT                  { }
+;
+
+function_parameters:                                               { }
+    | T_NEWLINE function_parameters                                { }
+;
+
+function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, BOOL); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR                             { addFunctionParameter($2, NUMBER); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_STRING T_VAR                             { addFunctionParameter($2, STRING); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_ARRAY T_VAR                              { addFunctionParameter($2, ARRAY); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, DICT); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
 ;
 
 parser:

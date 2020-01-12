@@ -12,6 +12,7 @@ enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT };
 
 typedef struct {
     char *name;
+    char *secondary_name;
     enum Type type;
     enum Type secondary_type;
     union Value {

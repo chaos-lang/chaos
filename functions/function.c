@@ -3,6 +3,8 @@
 
 #include "function.h"
 
+function_parameters_counter = 0;
+
 void startFunction(char *name) {
     function_mode = getFunction(name);
     if (function_mode != NULL) {
@@ -23,6 +25,21 @@ void startFunction(char *name) {
         end_function = function_mode;
         end_function->next = NULL;
     }
+
+    function_mode->parameters = realloc(
+        function_mode->parameters,
+        sizeof(Symbol) * function_parameters_counter
+    );
+
+    memcpy(
+        function_mode->parameters,
+        function_parameters_mode->parameters,
+        function_parameters_counter * sizeof(Symbol)
+    );
+
+    free(function_parameters_mode);
+    function_parameters_mode = NULL;
+    function_parameters_counter = 0;
 }
 
 void endFunction() {
@@ -46,4 +63,29 @@ Function* getFunction(char *name) {
     }
     return NULL;
     //throw_error(3, name);
+}
+
+void startFunctionParameters() {
+    function_parameters_mode = (struct Function*)malloc(sizeof(Function));
+}
+
+void addFunctionParameter(char *secondary_name, enum Type type) {
+    union Value value;
+    Symbol* symbol = addSymbol(NULL, type, value);
+    symbol->secondary_name = secondary_name;
+
+    addSymbolToFunctionParameters(symbol);
+}
+
+void addSymbolToFunctionParameters(Symbol* symbol) {
+    function_parameters_mode->parameters = realloc(
+        function_parameters_mode->parameters,
+        sizeof(Symbol) * ++function_parameters_counter
+    );
+
+    if (function_parameters_mode->parameters == NULL) {
+        //throw_error(4, complex_mode->name);
+    }
+
+    function_parameters_mode->parameters[function_parameters_counter - 1] = symbol;
 }
