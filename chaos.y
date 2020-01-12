@@ -75,15 +75,19 @@ preparser_line: T_NEWLINE
 function:
     | T_FUNCTION T_VAR function_parameters_start                    { startFunction($2); }
     | T_END                                                         { endLoop(); endFunction(); }
-    | T_VAR T_LEFT T_RIGHT                                          { if (phase == PROGRAM) callFunction($1); }
+    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) callFunction($1); }
 ;
 
-function_parameters_start:                                                          { startFunctionParameters(); }
-    | function_parameters_start T_LEFT function_parameters T_RIGHT                  { }
+function_parameters_start:                                          { startFunctionParameters(); }
+    | function_parameters_start T_LEFT function_parameters T_RIGHT  { }
 ;
 
-function_parameters:                                               { }
-    | T_NEWLINE function_parameters                                { }
+function_call_parameters_start:                                     { }
+    | function_parameters T_RIGHT                                   { }
+;
+
+function_parameters:                                                { }
+    | T_NEWLINE function_parameters                                 { }
 ;
 
 function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, BOOL); }
@@ -107,6 +111,31 @@ function_parameters: T_VAR_ARRAY T_VAR                              { addFunctio
 ;
 
 function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, DICT); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_TRUE                                         { if (phase == PROGRAM) addFunctionCallParameterBool($1); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_FALSE                                        { if (phase == PROGRAM) addFunctionCallParameterBool($1); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_INT                                          { if (phase == PROGRAM) addFunctionCallParameterInt($1); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_FLOAT                                        { if (phase == PROGRAM) addFunctionCallParameterFloat($1); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_STRING                                       { if (phase == PROGRAM) addFunctionCallParameterString($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;

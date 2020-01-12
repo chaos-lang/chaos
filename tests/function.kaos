@@ -14,3 +14,12 @@ func b()
     num val2 = 8
     print val2
 end
+
+func c(bool param1, num param2, str param3)
+	print param1
+	print param2
+	print param3
+end
+
+c(true, 5, 'hello world')
+c(false, 3.5, "OMG!")
