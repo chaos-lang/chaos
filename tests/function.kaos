@@ -1,0 +1,16 @@
+func a()
+    print "inside function a"
+    num val1 = 5
+    print val1
+end
+
+print "first print this"
+
+a()
+b()
+
+func b()
+    print "inside function b"
+    num val2 = 8
+    print val2
+end

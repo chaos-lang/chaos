@@ -8,6 +8,7 @@
 #include "utilities/helpers.h"
 #include "symbol.h"
 #include "loop.h"
+#include "function.h"
 
 extern int yylex();
 extern int yyparse();
@@ -15,6 +16,8 @@ extern FILE* yyin;
 
 extern int yylineno;
 extern char *yytext;
+extern enum Phase { INIT_PREPARSE, PREPARSE, INIT_PROGRAM, PROGRAM };
+extern enum Phase phase;
 
 void yyerror(const char* s);
 
@@ -29,8 +32,7 @@ bool inject_mode = false;
     char *sval;
 }
 
-%token START_PROGRAM
-%token START_PREPARSE
+%token START_PROGRAM START_PREPARSE
 %token<bval> T_TRUE T_FALSE
 %token<ival> T_INT
 %token<fval> T_FLOAT
@@ -42,7 +44,7 @@ bool inject_mode = false;
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
 %token T_DEL
 %token T_SYMBOL_TABLE
-%token T_TIMES_DO T_FOREACH T_AS T_END
+%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -62,13 +64,24 @@ meta_start:
 ;
 
 preparser:
-    | preparser T_NEWLINE                                           { }
+    | preparser preparser_line                                      { }
+;
+
+preparser_line: T_NEWLINE
+    | function T_NEWLINE                                            { }
+    | error T_NEWLINE                                               { yyerrok; }
+;
+
+function:
+    | T_FUNCTION T_VAR T_LEFT T_RIGHT                               { startFunction($2); }
+    | T_END                                                         { endLoop(); endFunction(); }
+    | T_VAR T_LEFT T_RIGHT                                          { if (phase == PROGRAM) callFunction($1); }
 ;
 
 parser:
     | parser line                                                   {
         is_interactive ? (
-            loop_mode ? printf("%s ", __SHELL_INDICATOR_BLOCK__) : (
+            loop_mode || function_mode ? printf("%s ", __SHELL_INDICATOR_BLOCK__) : (
                 inject_mode ? : printf("%s ", __SHELL_INDICATOR__)
             )
         ) : printf("");
@@ -83,6 +96,7 @@ line: T_NEWLINE
     | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : printf(""); exit(0); }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
+    | function T_NEWLINE                                            { }
 ;
 
 print: T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                   { printSymbolValueEndWithNewLine(getArrayElement($1, $3)); }
@@ -272,7 +286,7 @@ loop:
     | T_INT T_TIMES_DO                                              { startTimesDo($1); }
     | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
     | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                      { startForeachDict($2, $4, $6); }
-    | T_END                                                         { endLoop(); }
+    | T_END                                                         { endLoop(); endFunction(); }
 ;
 
 %%
@@ -282,13 +296,14 @@ int main(int argc, char** argv) {
 
     is_interactive = (fp != stdin) ? false : true;
 
+    yyin = fp;
+
     if (is_interactive) {
         printf("%s Language %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
         printf("GCC version: %d.%d.%d on %s\n",__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
         printf("%s\n\n", __LANGUAGE_MOTTO__);
+        phase = INIT_PROGRAM;
     }
-
-    yyin = fp;
 
     do {
         !is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
@@ -299,6 +314,7 @@ int main(int argc, char** argv) {
 }
 
 void yyerror(const char* s) {
+    if (phase == PREPARSE) return;
     fprintf(stderr, "Parse error: %s\nLine: %i\nCause: %s\n", s, yylineno, yytext);
     exit(1);
 }

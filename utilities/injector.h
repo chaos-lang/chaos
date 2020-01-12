@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "loop.h"
+#include "function.h"
 
 extern Loop* loop_mode;
 extern bool inject_mode;
