@@ -9,3 +9,7 @@ hello world
 false
 3.500000
 OMG!
+Array function parameter:
+[1, 2, 3]
+Dictionary function parameter:
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}

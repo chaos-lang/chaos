@@ -140,6 +140,11 @@ function_parameters: T_STRING                                       { if (phase 
     | function_parameters T_NEWLINE                                 { }
 ;
 
+function_parameters: T_VAR                                          { if (phase == PROGRAM) addFunctionCallParameterSymbol($1); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
 parser:
     | parser line                                                   {
         is_interactive ? (
@@ -237,9 +242,9 @@ variable: T_VAR                                                     { $$ = $1; }
 variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbol($2, BOOL, $4, ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbol($3, ARRAY, $5, BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbol($3, DICT, $5, BOOL); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, BOOL, $4, ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, ARRAY, $5, BOOL); $$ = ""; }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, DICT, $5, BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL arraystart               { finishComplexMode($3, BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, BOOL); $$ = ""; }
 ;
@@ -247,24 +252,24 @@ variable: T_VAR_BOOL                                                { }
 variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, NUMBER, $4, ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbol($3, ARRAY, $5, NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbol($3, DICT, $5, NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, NUMBER, $4, ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, ARRAY, $5, NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, NUMBER); $$ = ""; }
 ;
 
 variable: T_VAR_STRING                                              { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbol($2, STRING, $4, ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbol($3, ARRAY, $5, STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbol($3, DICT, $5, STRING); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, STRING, $4, ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, ARRAY, $5, STRING); $$ = ""; }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, STRING); $$ = ""; }
 ;
 
 variable: T_VAR_ARRAY                                               { }
-    | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbol($2, ARRAY, $4, ANY); $$ = "";}
+    | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbolByName($2, ARRAY, $4, ANY); $$ = "";}
     | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishComplexMode($2, ANY); $$ = ""; }
 ;
 
@@ -302,7 +307,7 @@ array: T_VAR                                                        { cloneSymbo
 ;
 
 variable: T_VAR_DICT                                                { }
-    | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbol($2, DICT, $4, ANY); $$ = "";}
+    | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, DICT, $4, ANY); $$ = "";}
     | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishComplexMode($2, ANY); $$ = ""; }
 ;
 

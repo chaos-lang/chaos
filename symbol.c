@@ -100,7 +100,7 @@ Symbol* deepCopySymbol(Symbol* symbol, char *key) {
     return addSymbol(key, symbol->type, symbol->value);
 }
 
-void deepCopyComplex(char *name, Symbol* symbol) {
+Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     if (symbol->type == ARRAY) {
         addSymbolArray(NULL);
     } else if (symbol->type == DICT) {
@@ -114,7 +114,10 @@ void deepCopyComplex(char *name, Symbol* symbol) {
         deepCopySymbol(child, child->key);
     }
 
+    Symbol* symbol_return = complex_mode;
     finishComplexMode(name, ANY);
+
+    return symbol_return;
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex) {
@@ -280,9 +283,13 @@ void addSymbolArray(char *name) {
     complex_mode = addSymbol(name, ARRAY, value);
 }
 
-Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum Type extra_type) {
+Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
     Symbol* symbol = getSymbol(name);
 
+    return createCloneFromSymbol(clone_name, type, symbol, extra_type);
+}
+
+Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
     if (type == NUMBER) {
         if (symbol->type != INT && symbol->type != FLOAT) {
             throw_error(8, clone_name);
@@ -296,7 +303,7 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum
     Symbol* clone_symbol;
     if (symbol->type == ARRAY || symbol->type == DICT) {
         if (symbol->secondary_type != extra_type) throw_error(8, clone_name);
-        deepCopyComplex(clone_name, symbol);
+        clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
         clone_symbol = deepCopySymbol(symbol, NULL);
         clone_symbol->name = clone_name;

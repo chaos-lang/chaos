@@ -57,20 +57,17 @@ void callFunction(char *name) {
         Symbol* parameter = function->parameters[i];
         Symbol* parameter_call = function_parameters_mode->parameters[i];
 
-        parameter->type = parameter_call->type;
-
-        parameter->value.b = parameter_call->value.b;
-        parameter->value.i = parameter_call->value.i;
-        parameter->value.c = parameter_call->value.c;
-        parameter->value.s = parameter_call->value.s;
-        parameter->value.f = parameter_call->value.f;
-
-        parameter->name = parameter->secondary_name;
+        createCloneFromSymbol(parameter->secondary_name, parameter->type, parameter_call, parameter_call->secondary_type);
     }
 
     freeFunctionMode();
 
     injectCode(function->body);
+
+    for (int i = 0; i < function->parameter_count; i++) {
+        Symbol* parameter = function->parameters[i];
+        removeSymbolByName(parameter->secondary_name);
+    }
 }
 
 Function* getFunction(char *name) {
@@ -142,4 +139,8 @@ void addFunctionCallParameterString(char *s) {
     value.s = s;
     Symbol* symbol = addSymbol(NULL, STRING, value);
     addSymbolToFunctionParameters(symbol);
+}
+
+void addFunctionCallParameterSymbol(char *name) {
+    addSymbolToFunctionParameters(getSymbol(name));
 }

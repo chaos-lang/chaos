@@ -15,11 +15,29 @@ func b()
     print val2
 end
 
-func c(bool param1, num param2, str param3)
+func f1(bool param1, num param2, str param3)
 	print param1
 	print param2
 	print param3
 end
 
-c(true, 5, 'hello world')
-c(false, 3.5, "OMG!")
+f1(true, 5, 'hello world')
+f1(false, 3.5, "OMG!")
+
+array c = [1, 2, 3]
+
+func f2(string param1, array param2)
+    print param1
+    print param2
+end
+
+f2('Array function parameter:', c)
+
+dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+
+func f3(string param1, dict param2)
+    print param1
+    print param2
+end
+
+f3('Dictionary function parameter:', d)
