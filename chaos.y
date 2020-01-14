@@ -42,7 +42,7 @@ bool inject_mode = false;
 %token T_NEWLINE T_QUIT
 %token T_PRINT
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
-%token T_DEL
+%token T_DEL T_RETURN
 %token T_SYMBOL_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
 %left T_PLUS T_MINUS
@@ -75,6 +75,7 @@ preparser_line: T_NEWLINE
 function:
     | T_FUNCTION T_VAR function_parameters_start                    { startFunction($2); }
     | T_END                                                         { endLoop(); endFunction(); }
+    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) callFunction($1); }
 ;
 
@@ -216,6 +217,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | T_DEL variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET           { removeComplexElement($2, $4, NULL); $$ = ""; }
     | T_DEL variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET   { removeComplexElement($2, -$5, NULL); $$ = ""; }
     | T_DEL variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET        { removeComplexElement($2, NULL, $4); $$ = ""; }
+    | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                 { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, $3)); $$ = ""; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET         { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, -$4)); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE              { updateComplexElementBool($1, $3, NULL, $6); $$ = ""; }

@@ -26,18 +26,18 @@ f1(false, 3.5, "OMG!")
 
 array c = [1, 2, 3]
 
-func f2(string param1, array param2)
-    print param1
-    print param2
+func f2(string param4, array param5)
+    print param4
+    return param5
 end
 
-f2('Array function parameter:', c)
+print f2('Array function parameter:', c)
 
 dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
 
-func f3(string param1, dict param2)
-    print param1
-    print param2
+func f3(string param6, dict param7)
+    print param6
+    return param7
 end
 
-f3('Dictionary function parameter:', d)
+print f3('Dictionary function parameter:', d)

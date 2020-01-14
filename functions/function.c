@@ -62,7 +62,11 @@ void callFunction(char *name) {
 
     freeFunctionMode();
 
+    executed_function = function;
+
     injectCode(function->body);
+
+    executed_function = NULL;
 
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
@@ -143,4 +147,20 @@ void addFunctionCallParameterString(char *s) {
 
 void addFunctionCallParameterSymbol(char *name) {
     addSymbolToFunctionParameters(getSymbol(name));
+}
+
+void returnSymbol(char *name) {
+    Symbol* symbol = getSymbol(name);
+    executed_function->return_symbol = createCloneFromSymbol(
+        NULL,
+        symbol->type,
+        symbol,
+        symbol->secondary_type
+    );
+}
+
+void printFunctionReturn(char *name) {
+    Function* function = getFunction(name);
+    Symbol* return_symbol = function->return_symbol;
+    printSymbolValueEndWithNewLine(function->return_symbol);
 }
