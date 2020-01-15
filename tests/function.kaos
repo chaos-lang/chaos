@@ -9,7 +9,7 @@ print "first print this"
 a()
 b()
 
-null func b()
+null function b()
     print "inside function b"
     num val2 = 8
     print val2
@@ -18,7 +18,7 @@ end
 str hello = 'hello world'
 number pi = 3.14
 
-nil func f1(bool param1, num param2, str param3)
+nil def f1(bool param1, num param2, str param3)
     param3 = 'hello my friend'
 	print param1
 	print param2
@@ -33,7 +33,7 @@ print pi
 
 array c = [1, 2, 3]
 
-array func f2(string param4, array param5)
+array def f2(string param4, array param5)
     print param4
     return param5
 end

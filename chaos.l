@@ -82,7 +82,6 @@ switch (phase)
 "end"                           {recordToken(strdup(yytext), yyleng); return T_END;}
 "foreach"                       {recordToken(strdup(yytext), yyleng); return T_FOREACH;}
 "as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
-"func"                          {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);
@@ -97,5 +96,6 @@ str|string                      {recordToken(strdup(yytext), yyleng); if (loop_m
 list|array                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_ARRAY;}
 json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_DICT;}
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VOID;}
+func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 [a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (loop_mode == NULL && function_mode == NULL || was_foreach) return T_VAR;}
 %%
