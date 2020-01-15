@@ -5,6 +5,8 @@
 #include "../symbol.h"
 
 void endLoop() {
+    if (loop_mode == NULL) return;
+
     if (loop_mode->nested_counter > 0) {
         loop_mode->nested_counter--;
         return;

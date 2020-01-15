@@ -27,7 +27,7 @@ void throw_error(int code, char *subject) {
             printf("Undefined index: %s", subject);
             break;
         case 8:
-            printf("Illegal variable type for: '%s'", subject);
+            printf("Illegal variable type for variable: '%s'", subject);
             break;
         case 9:
             printf("Arrays are not mass assignable!");
@@ -40,6 +40,9 @@ void throw_error(int code, char *subject) {
             break;
         case 12:
             printf("Unrecognized complex data type for: '%s'", subject);
+            break;
+        case 13:
+            printf("Illegal variable type for function: '%s'", subject);
             break;
         default:
             printf("Unkown error.");

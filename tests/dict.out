@@ -3,7 +3,7 @@
 {'a': 1, 'b': 2}
 {'a': 1, 'b': 2, 'c': 3}
 {'a': true, 'b': false}
-{'a': 1, 'b': 2, 'c': 63.299999, 'd': 12321.151367}
+{'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}
 {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}
 [start] => a => (null) => (null) => b => (null) => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => dict1 => (null) => (null) => dict2 => (null) => (null) => (null) => (null) => dict3 => (null) => (null) => (null) => (null) => [end]
 [end] => (null) => (null) => (null) => (null) => dict3 => (null) => (null) => (null) => (null) => dict2 => (null) => (null) => dict1 => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => (null) => b => (null) => (null) => a => [start]

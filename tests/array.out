@@ -1,12 +1,12 @@
 [1, 2, 3]
 [true, false]
-[3.200000, 345.166504]
+[3.2, 345.167]
 ['a', 'b', 'c']
 ['A', 'B', 'C']
-['A', 'asdasdad12312', 1232, 435.160004, true, false]
+['A', 'asdasdad12312', 1232, 435.16, true, false]
 ['asdasdasd,', 123123]
 [true, false, true]
-[1, 2, 63.299999, 12321.151367]
+[1, 2, 63.3, 12321.2]
 ['A', 'asdasdaqs', 'asdasd123123', '.']
 [start] => a => (null) => (null) => (null) => b => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => e => (null) => (null) => (null) => f => (null) => (null) => (null) => (null) => (null) => (null) => g => (null) => (null) => arr1 => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => [end]
 [end] => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => arr1 => (null) => (null) => g => (null) => (null) => (null) => (null) => (null) => (null) => f => (null) => (null) => (null) => e => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => b => (null) => (null) => (null) => a => [start]
@@ -19,10 +19,10 @@
 2
 1
 false
-345.166504
+345.167
 c
 A
-63.299999
+63.3
 .
 [5, 2, 3]
 32

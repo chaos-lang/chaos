@@ -1,0 +1,18 @@
+first print this
+inside function a
+5
+inside function b
+8
+true
+5
+hello my friend
+false
+3.14
+hello my friend
+hello world
+3.14
+Array function parameter:
+[1, 2, 3]
+Dictionary function parameter:
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+8

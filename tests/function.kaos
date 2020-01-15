@@ -1,0 +1,57 @@
+void func a()
+    print "inside function a"
+    num val1 = 5
+    print val1
+end
+
+print "first print this"
+
+a()
+b()
+
+null function b()
+    print "inside function b"
+    num val2 = 8
+    print val2
+end
+
+str hello = 'hello world'
+number pi = 3.14
+
+nil def f1(bool param1, num param2, str param3)
+    param3 = 'hello my friend'
+	print param1
+	print param2
+	print param3
+end
+
+f1(true, 5, hello)
+f1(false, pi, "OMG!")
+
+print hello
+print pi
+
+array c = [1, 2, 3]
+
+array def f2(string param4, array param5)
+    print param4
+    return param5
+end
+
+print f2('Array function parameter:', c)
+
+dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+
+dict func f3(string param6, dict param7)
+    print param6
+    return param7
+end
+
+print f3('Dictionary function parameter:', d)
+
+num def add(num x, num y)
+    num result = x + y
+    return result
+end
+
+print add(3, 5)

@@ -12,6 +12,13 @@ void recordToken(char *token, int length) {
         }
         strcat(loop_mode->body, token);
     }
+
+    if (function_mode != NULL) {
+        if (strcmp(token, "end") == 0) {
+            return;
+        }
+        strcat(function_mode->body, token);
+    }
 }
 
 bool isForeach() {
