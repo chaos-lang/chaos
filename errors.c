@@ -2,7 +2,10 @@
 #include "utilities/language.h"
 
 void throw_error(int code, char *subject) {
-    printf("%s Error - ", __LANGUAGE_NAME__);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0;41m");
+    #endif
+    printf(" %s Error - ", __LANGUAGE_NAME__);
     switch (code)
     {
         case 1:
@@ -48,7 +51,10 @@ void throw_error(int code, char *subject) {
             printf("Unkown error.");
             break;
     }
-    printf("\n");
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf(" \n");
 
     exit(code);
 }

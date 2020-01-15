@@ -404,9 +404,7 @@ int main(int argc, char** argv) {
     yyin = fp;
 
     if (is_interactive) {
-        printf("%s Language %s (%s %s)\n", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
-        printf("GCC version: %d.%d.%d on %s\n",__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
-        printf("%s\n\n", __LANGUAGE_MOTTO__);
+        greet();
         phase = INIT_PROGRAM;
     }
 
@@ -420,6 +418,10 @@ int main(int argc, char** argv) {
 
 void yyerror(const char* s) {
     if (phase == PREPARSE) return;
-    fprintf(stderr, "Parse error: %s\nLine: %i\nCause: %s\n", s, yylineno, yytext);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        fprintf(stderr, "\033[0;36mParse error: %s\nLine: %i\nCause: %s\n\033[0m", s, yylineno, yytext);
+    #else
+        fprintf(stderr, "Parse error: %s\nLine: %i\nCause: %s\n", s, yylineno, yytext);
+    #endif
     exit(1);
 }
