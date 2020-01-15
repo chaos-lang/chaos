@@ -132,7 +132,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             printf("%i", symbol->value.i);
             break;
         case FLOAT:
-            printf("%f", symbol->value.f);
+            printf("%g", symbol->value.f);
             break;
         case CHAR:
             printf("%c", symbol->value.c);

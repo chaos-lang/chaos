@@ -218,6 +218,8 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR                                        { updateSymbolByClonning($1, $3); $$ = ""; }
+    | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
+    | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
     | T_DEL variable                                                { removeSymbolByName($2); $$ = ""; }
     | T_DEL variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET           { removeComplexElement($2, $4, NULL); $$ = ""; }
     | T_DEL variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET   { removeComplexElement($2, -$5, NULL); $$ = ""; }
@@ -237,6 +239,10 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_STRING    { updateComplexElementString($1, -$4, NULL, $7); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_VAR               { updateComplexElementSymbol($1, $3, NULL, $6); $$ = ""; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_VAR       { updateComplexElementSymbol($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL mixed_expression            { updateComplexElementFloat($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL expression                  { updateComplexElementFloat($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL mixed_expression    { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL expression          { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET              { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getDictElement($1, $3)); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_TRUE           { updateComplexElementBool($1, NULL, $3, $6); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FALSE          { updateComplexElementBool($1, NULL, $3, $6); $$ = ""; }
@@ -244,6 +250,8 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FLOAT          { updateComplexElementFloat($1, NULL, $3, $6); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_STRING         { updateComplexElementString($1, NULL, $3, $6); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_VAR            { updateComplexElementSymbol($1, NULL, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL mixed_expression         { updateComplexElementFloat($1, NULL, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL expression               { updateComplexElementFloat($1, NULL, $3, $6); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL                                                { }
@@ -264,6 +272,8 @@ variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL mixed_expression                   { addSymbolFloat($2, $4); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL expression                         { addSymbolFloat($2, $4); $$ = ""; }
 ;
 
 variable: T_VAR_STRING                                              { }
@@ -296,7 +306,7 @@ array: T_FALSE                                                      { addSymbolB
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
-array: T_INT                                                        { addSymbolInt(NULL, $1); }
+array: T_INT                                                        { addSymbolFloat(NULL, $1); }
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
@@ -336,7 +346,7 @@ dictionary: T_STRING T_COLON T_FALSE                                { addSymbolB
     | dictionary T_NEWLINE                                          { }
 ;
 
-dictionary: T_STRING T_COLON T_INT                                  { addSymbolInt($1, $3); }
+dictionary: T_STRING T_COLON T_INT                                  { addSymbolFloat($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
