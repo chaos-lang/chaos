@@ -202,6 +202,27 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
     | mixed_expression T_MULTIPLY expression                        { $$ = $1 * $3; }
     | mixed_expression T_DIVIDE expression                          { $$ = $1 / $3; }
     | expression T_DIVIDE expression                                { $$ = $1 / (float)$3; }
+    | T_VAR T_PLUS T_VAR                                            { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
+    | T_VAR T_MINUS T_VAR                                           { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
+    | T_VAR T_MULTIPLY T_VAR                                        { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
+    | T_VAR T_DIVIDE T_VAR                                          { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
+    | T_LEFT T_VAR T_RIGHT                                          { $$ = getSymbolValueFloat($2); }
+    | mixed_expression T_PLUS T_VAR                                 { $$ = $1 + getSymbolValueFloat($3); }
+    | mixed_expression T_MINUS T_VAR                                { $$ = $1 + getSymbolValueFloat($3); }
+    | mixed_expression T_MULTIPLY T_VAR                             { $$ = $1 + getSymbolValueFloat($3); }
+    | mixed_expression T_DIVIDE T_VAR                               { $$ = $1 + getSymbolValueFloat($3); }
+    | expression T_PLUS T_VAR                                       { $$ = $1 + getSymbolValueFloat($3); }
+    | expression T_MINUS T_VAR                                      { $$ = $1 + getSymbolValueFloat($3); }
+    | expression T_MULTIPLY T_VAR                                   { $$ = $1 + getSymbolValueFloat($3); }
+    | expression T_DIVIDE T_VAR                                     { $$ = $1 + getSymbolValueFloat($3); }
+    | T_VAR T_PLUS mixed_expression                                 { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_MINUS mixed_expression                                { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_MULTIPLY mixed_expression                             { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_DIVIDE mixed_expression                               { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_PLUS expression                                       { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_MINUS expression                                      { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_MULTIPLY expression                                   { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_DIVIDE expression                                     { $$ = getSymbolValueFloat($1) + $3; }
 ;
 
 expression: T_INT                                                   { $$ = $1; }

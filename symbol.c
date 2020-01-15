@@ -120,6 +120,31 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     return symbol_return;
 }
 
+float getSymbolValueFloat(char *name) {
+    Symbol* symbol = getSymbol(name);
+    char type[2] = "\0";
+    float value;
+    switch (symbol->type)
+    {
+        case BOOL:
+            value = symbol->value.b ? 1.0 : 0.0;
+            return value;
+            break;
+        case INT:
+            value = (float)symbol->value.i;
+            return value;
+            break;
+        case FLOAT:
+            value = symbol->value.f;
+            return value;
+            break;
+        default:
+            type[0] = symbol->type;
+            throw_error(1, type);
+            break;
+    }
+}
+
 void printSymbolValue(Symbol* symbol, bool is_complex) {
     char type[2] = "\0";
 
