@@ -15,14 +15,21 @@ null func b()
     print val2
 end
 
+str hello = 'hello world'
+number pi = 3.14
+
 nil func f1(bool param1, num param2, str param3)
+    param3 = 'hello my friend'
 	print param1
 	print param2
 	print param3
 end
 
-f1(true, 5, 'hello world')
-f1(false, 3.5, "OMG!")
+f1(true, 5, hello)
+f1(false, pi, "OMG!")
+
+print hello
+print pi
 
 array c = [1, 2, 3]
 
