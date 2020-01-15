@@ -4,12 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "../symbol.h"
+#include "../errors.h"
 
 typedef struct {
     char *name;
     struct Symbol** parameters;
     int parameter_count;
-    struct Symbol* return_symbol;
+    enum Type type;
+    struct Symbol* symbol;
     struct Function* previous;
     struct Function* next;
     char body[1000];
@@ -25,7 +27,7 @@ Function* function_parameters_mode;
 
 Function* executed_function;
 
-void startFunction();
+void startFunction(char *name, enum Type type);
 void endFunction();
 void freeFunctionMode();
 Function* getFunction(char *name);

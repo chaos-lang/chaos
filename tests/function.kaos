@@ -1,4 +1,4 @@
-func a()
+void func a()
     print "inside function a"
     num val1 = 5
     print val1
@@ -9,13 +9,13 @@ print "first print this"
 a()
 b()
 
-func b()
+null func b()
     print "inside function b"
     num val2 = 8
     print val2
 end
 
-func f1(bool param1, num param2, str param3)
+nil func f1(bool param1, num param2, str param3)
 	print param1
 	print param2
 	print param3
@@ -26,7 +26,7 @@ f1(false, 3.5, "OMG!")
 
 array c = [1, 2, 3]
 
-func f2(string param4, array param5)
+array func f2(string param4, array param5)
     print param4
     return param5
 end
@@ -35,7 +35,7 @@ print f2('Array function parameter:', c)
 
 dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
 
-func f3(string param6, dict param7)
+dict func f3(string param6, dict param7)
     print param6
     return param7
 end

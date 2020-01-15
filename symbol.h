@@ -8,7 +8,7 @@
 #include "errors.h"
 #include "utilities/helpers.h"
 
-enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT };
+enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT, VOID };
 
 typedef struct {
     char *name;

@@ -42,7 +42,7 @@ bool inject_mode = false;
 %token T_NEWLINE T_QUIT
 %token T_PRINT
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT
-%token T_DEL T_RETURN
+%token T_DEL T_RETURN T_VOID
 %token T_SYMBOL_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
 %left T_PLUS T_MINUS
@@ -73,7 +73,12 @@ preparser_line: T_NEWLINE
 ;
 
 function:
-    | T_FUNCTION T_VAR function_parameters_start                    { startFunction($2); }
+    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, BOOL); }
+    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, NUMBER); }
+    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, STRING); }
+    | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, ARRAY); }
+    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, DICT); }
+    | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, VOID); }
     | T_END                                                         { endLoop(); endFunction(); }
     | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) callFunction($1); }

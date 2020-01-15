@@ -3,7 +3,7 @@
 
 #include "function.h"
 
-void startFunction(char *name) {
+void startFunction(char *name, enum Type type) {
     function_mode = getFunction(name);
     if (function_mode != NULL) {
         memset(function_mode->body, 0, strlen(function_mode->body));
@@ -11,6 +11,7 @@ void startFunction(char *name) {
     }
     function_mode = (struct Function*)malloc(sizeof(Function));
     function_mode->name = name;
+    function_mode->type = type;
     function_mode->parameter_count = 0;
 
     recordToken(strdup("\n"), 1);
@@ -151,7 +152,8 @@ void addFunctionCallParameterSymbol(char *name) {
 
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
-    executed_function->return_symbol = createCloneFromSymbol(
+    if (symbol->type != executed_function->type) throw_error(13, executed_function->name);
+    executed_function->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
         symbol,
@@ -161,6 +163,5 @@ void returnSymbol(char *name) {
 
 void printFunctionReturn(char *name) {
     Function* function = getFunction(name);
-    Symbol* return_symbol = function->return_symbol;
-    printSymbolValueEndWithNewLine(function->return_symbol);
+    printSymbolValueEndWithNewLine(function->symbol);
 }
