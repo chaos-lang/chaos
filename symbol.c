@@ -319,10 +319,8 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         if (symbol->type != INT && symbol->type != FLOAT) {
             throw_error(8, clone_name);
         }
-    } else {
-        if (symbol->type != type) {
-            throw_error(8, clone_name);
-        }
+    } else if (symbol->type != type) {
+        throw_error(8, clone_name);
     }
 
     Symbol* clone_symbol;

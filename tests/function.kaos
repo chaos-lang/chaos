@@ -48,3 +48,10 @@ dict func f3(string param6, dict param7)
 end
 
 print f3('Dictionary function parameter:', d)
+
+num def add(num x, num y)
+    num result = x + y
+    return result
+end
+
+print add(3, 5)

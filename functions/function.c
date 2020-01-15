@@ -152,7 +152,13 @@ void addFunctionCallParameterSymbol(char *name) {
 
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != executed_function->type) throw_error(13, executed_function->name);
+    if (executed_function->type == NUMBER) {
+        if (symbol->type != INT && symbol->type != FLOAT) {
+            throw_error(13, executed_function->name);
+        }
+    } else if (symbol->type != executed_function->type) {
+        throw_error(13, executed_function->name);
+    }
     executed_function->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
