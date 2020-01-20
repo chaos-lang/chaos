@@ -408,6 +408,8 @@ int main(int argc, char** argv) {
         phase = INIT_PROGRAM;
     }
 
+    initMainFunction();
+
     do {
         !is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
         yyparse();

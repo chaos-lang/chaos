@@ -48,18 +48,20 @@ void endFunction() {
 }
 
 void freeFunctionMode() {
-    free(function_parameters_mode);
     function_parameters_mode = NULL;
 }
 
 void callFunction(char *name) {
     Function* function = getFunction(name);
+    scope_override = function;
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
         Symbol* parameter_call = function_parameters_mode->parameters[i];
 
+        if (parameter_call->type == NUMBER) parameter_call->type = FLOAT;
         createCloneFromSymbol(parameter->secondary_name, parameter->type, parameter_call, parameter_call->secondary_type);
     }
+    scope_override = NULL;
 
     freeFunctionMode();
 
@@ -67,12 +69,12 @@ void callFunction(char *name) {
 
     injectCode(function->body);
 
-    executed_function = NULL;
-
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
         removeSymbolByName(parameter->secondary_name);
     }
+
+    executed_function = NULL;
 }
 
 Function* getFunction(char *name) {
@@ -147,7 +149,7 @@ void addFunctionCallParameterString(char *s) {
 }
 
 void addFunctionCallParameterSymbol(char *name) {
-    addSymbolToFunctionParameters(getSymbol(name));
+    addSymbolToFunctionParameters(getSymbolFunctionParameter(name));
 }
 
 void returnSymbol(char *name) {
@@ -170,4 +172,11 @@ void returnSymbol(char *name) {
 void printFunctionReturn(char *name) {
     Function* function = getFunction(name);
     printSymbolValueEndWithNewLine(function->symbol);
+}
+
+void initMainFunction() {
+    main_function = (struct Function*)malloc(sizeof(Function));
+    main_function->name = "main";
+    main_function->type = ANY;
+    main_function->parameter_count = 0;
 }

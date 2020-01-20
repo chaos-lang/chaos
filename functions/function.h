@@ -3,10 +3,13 @@
 
 #include <stdio.h>
 #include <string.h>
+
+typedef struct Function Function;
+
 #include "../symbol.h"
 #include "../errors.h"
 
-typedef struct {
+typedef struct Function {
     char *name;
     struct Symbol** parameters;
     int parameter_count;
@@ -26,6 +29,10 @@ Function* function_mode;
 Function* function_parameters_mode;
 
 Function* executed_function;
+
+Function* main_function;
+
+Function* scope_override;
 
 void startFunction(char *name, enum Type type);
 void endFunction();

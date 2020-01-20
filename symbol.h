@@ -5,12 +5,14 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "errors.h"
-#include "utilities/helpers.h"
-
+typedef struct Symbol Symbol;
 enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT, VOID };
 
-typedef struct {
+#include "errors.h"
+#include "utilities/helpers.h"
+#include "functions/function.h"
+
+typedef struct Symbol {
     char *name;
     char *secondary_name;
     enum Type type;
@@ -27,6 +29,7 @@ typedef struct {
     struct Symbol** children;
     int children_count;
     char *key;
+    struct Function* scope;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -75,5 +78,7 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
 void removeComplexElement(char *name, int i, char *key);
 void addSymbolDict(char *name);
 Symbol* getDictElement(char *name, char *key);
+Function* getCurrentScope();
+Symbol* getSymbolFunctionParameter(char *name);
 
 #endif

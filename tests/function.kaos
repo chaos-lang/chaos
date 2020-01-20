@@ -18,11 +18,14 @@ end
 str hello = 'hello world'
 number pi = 3.14
 
+str param1 = 'testing'
+
 nil def f1(bool param1, num param2, str param3)
     param3 = 'hello my friend'
 	print param1
 	print param2
 	print param3
+    symbol_table
 end
 
 f1(true, 5, hello)
@@ -33,18 +36,18 @@ print pi
 
 array c = [1, 2, 3]
 
-array def f2(string param4, array param5)
-    print param4
-    return param5
+array def f2(string param1, array param2)
+    print param1
+    return param2
 end
 
 print f2('Array function parameter:', c)
 
 dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
 
-dict func f3(string param6, dict param7)
-    print param6
-    return param7
+dict func f3(string param1, dict param2)
+    print param1
+    return param2
 end
 
 print f3('Dictionary function parameter:', d)

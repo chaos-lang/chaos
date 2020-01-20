@@ -22,6 +22,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol->value.s = value.s;
     symbol->value.f = value.f;
     symbol->children_count = 0;
+    symbol->scope = getCurrentScope();
 
     if (start_symbol == NULL) {
         start_symbol = symbol;
@@ -87,7 +88,11 @@ void removeSymbol(Symbol* symbol) {
 Symbol* getSymbol(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (symbol_cursor->name != NULL && strcmp(symbol_cursor->name, name) == 0) {
+        if (
+            symbol_cursor->name != NULL &&
+            strcmp(symbol_cursor->name, name) == 0 &&
+            symbol_cursor->scope == getCurrentScope()
+        ) {
             Symbol* symbol = symbol_cursor;
             return symbol;
         }
@@ -212,7 +217,11 @@ void printSymbolValueEndWithNewLine(Symbol* symbol)
 bool isDefined(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
-        if (symbol_cursor->name != NULL && name != NULL && strcmp(symbol_cursor->name, name) == 0) {
+        if (
+            symbol_cursor->name != NULL &&
+            name != NULL && strcmp(symbol_cursor->name, name) == 0 &&
+            symbol_cursor->scope == getCurrentScope()
+        ) {
             return true;
         }
         symbol_cursor = symbol_cursor->next;
@@ -236,23 +245,14 @@ void addSymbolToComplex(Symbol* symbol) {
 }
 
 void printSymbolTable() {
-    //start from the beginning
     Symbol *ptr1 = start_symbol;
-    printf("[start] =>");
+    printf("[start] =>\n");
     while(ptr1 != NULL) {
-        printf(" %s =>", ptr1->name);
+        Function* scope1 = ptr1->scope;
+        printf("\t{name: %s, scope: %s, type: %i, 2nd_type: %i} =>\n", ptr1->name, scope1->name, ptr1->type, ptr1->secondary_type);
         ptr1 = ptr1->next;
     }
-    printf(" [end]\n");
-
-    //start from the end
-    Symbol *ptr2 = end_symbol;
-    printf("[end] =>");
-    while(ptr2 != NULL) {
-        printf(" %s =>", ptr2->name);
-        ptr2 = ptr2->previous;
-    }
-    printf(" [start]\n");
+    printf("[end]\n");
 }
 
 void addSymbolBool(char *name, bool b) {
@@ -539,4 +539,28 @@ Symbol* getDictElement(char *name, char *key) {
         }
     }
     throw_error(11, key);
+}
+
+Function* getCurrentScope() {
+    if (scope_override != NULL) return scope_override;
+
+    if (executed_function != NULL) {
+        return executed_function;
+    } else if (function_parameters_mode != NULL) {
+        return function_parameters_mode;
+    } else {
+        return main_function;
+    }
+}
+
+Symbol* getSymbolFunctionParameter(char *name) {
+    if (executed_function != NULL) {
+        scope_override = executed_function;
+    } else {
+        scope_override = main_function;
+    }
+
+    Symbol* symbol = getSymbol(name);
+    scope_override = NULL;
+    return symbol;
 }
