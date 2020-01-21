@@ -50,3 +50,9 @@ any var24 = 8.55
 var24 = true
 print var24
 
+any a = 5
+num b = 3
+print a
+print b
+a = b
+print a
