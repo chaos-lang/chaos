@@ -1,17 +1,94 @@
 [1, 2, 3]
 [true, false]
-[3.200000, 345.166504]
+[3.2, 345.167]
 ['a', 'b', 'c']
 ['A', 'B', 'C']
-['A', 'asdasdad12312', 1232, 435.160004, true, false]
+['A', 'asdasdad12312', 1232, 435.16, true, false]
 ['asdasdasd,', 123123]
 [true, false, true]
-[1, 2, 63.299999, 12321.151367]
+[1, 2, 63.3, 12321.2]
 ['A', 'asdasdaqs', 'asdasd123123', '.']
-[start] => a => (null) => (null) => (null) => b => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => e => (null) => (null) => (null) => f => (null) => (null) => (null) => (null) => (null) => (null) => g => (null) => (null) => arr1 => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => [end]
-[end] => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => arr1 => (null) => (null) => g => (null) => (null) => (null) => (null) => (null) => (null) => f => (null) => (null) => (null) => e => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => b => (null) => (null) => (null) => a => [start]
-[start] => a => (null) => (null) => (null) => b => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => e => (null) => (null) => (null) => g => (null) => (null) => arr1 => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => [end]
-[end] => (null) => (null) => (null) => (null) => arr3 => (null) => (null) => (null) => (null) => arr2 => (null) => (null) => (null) => arr1 => (null) => (null) => g => (null) => (null) => (null) => e => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => b => (null) => (null) => (null) => a => [start]
+[start] =>
+	{name: a, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: b, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: c, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: d, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: e, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: f, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: g, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: arr1, scope: main, type: 7, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: arr2, scope: main, type: 7, 2nd_type: 5} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: arr3, scope: main, type: 7, 2nd_type: 3} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+[end]
+[start] =>
+	{name: a, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: b, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: c, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: d, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: e, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: g, scope: main, type: 7, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: arr1, scope: main, type: 7, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: arr2, scope: main, type: 7, 2nd_type: 5} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: arr3, scope: main, type: 7, 2nd_type: 3} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+[end]
 3
 2
 1
@@ -19,10 +96,10 @@
 2
 1
 false
-345.166504
+345.167
 c
 A
-63.299999
+63.3
 .
 [5, 2, 3]
 32

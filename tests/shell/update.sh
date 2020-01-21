@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SUB="$( basename $DIR )"
 
 for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
@@ -8,5 +9,5 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     rm "$DIR/$testname.out"
     cat "$DIR/$filename" | chaos | tail -n +5 > "$DIR/$testname.out"
 
-    echo "Updated: ${testname}"
+    echo "Updated: ${SUB}/${testname}"
 done

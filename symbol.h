@@ -5,13 +5,16 @@
 #include <string.h>
 #include <stdbool.h>
 
+typedef struct Symbol Symbol;
+enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT, VOID };
+
 #include "errors.h"
 #include "utilities/helpers.h"
+#include "functions/function.h"
 
-enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT };
-
-typedef struct {
+typedef struct Symbol {
     char *name;
+    char *secondary_name;
     enum Type type;
     enum Type secondary_type;
     union Value {
@@ -26,6 +29,7 @@ typedef struct {
     struct Symbol** children;
     int children_count;
     char *key;
+    struct Function* scope;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -41,7 +45,8 @@ void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
 Symbol* getSymbol(char *name);
 Symbol* deepCopySymbol(Symbol* symbol, char *key);
-void deepCopyComplex(char *name, Symbol* symbol);
+Symbol* deepCopyComplex(char *name, Symbol* symbol);
+float getSymbolValueFloat(char *name);
 void printSymbolValue(Symbol* symbol, bool is_complex);
 void printSymbolValueEndWith(Symbol* symbol, char *end);
 void printSymbolValueEndWithNewLine(Symbol* symbol);
@@ -57,7 +62,8 @@ void updateSymbolFloat(char *name, float f);
 void addSymbolString(char *name, char *s);
 void updateSymbolString(char *name, char *s);
 void addSymbolArray(char *name);
-Symbol* createCloneFromSymbol(char *clone_name, enum Type type, char *name, enum Type extra_type);
+Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type);
+Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type);
 Symbol* updateSymbolByClonning(char *clone_name, char *name);
 bool isComplexIllegal(enum Type type);
 void finishComplexMode(char *name, enum Type type);
@@ -76,5 +82,7 @@ void addSymbolAnyInt(char *name, int i);
 void addSymbolAnyFloat(char *name, float f);
 void addSymbolAnyBool(char *name, bool b);
 Symbol* getDictElement(char *name, char *key);
+Function* getCurrentScope();
+Symbol* getSymbolFunctionParameter(char *name);
 
 #endif

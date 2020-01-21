@@ -1,2 +1,5 @@
-[start] => var1 => var3 => var4 => [end]
-[end] => var4 => var3 => var1 => [start]
+[start] =>
+	{name: var1, scope: main, type: 0, 2nd_type: 0} =>
+	{name: var3, scope: main, type: 3, 2nd_type: 0} =>
+	{name: var4, scope: main, type: 4, 2nd_type: 0} =>
+[end]

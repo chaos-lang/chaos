@@ -1,0 +1,68 @@
+first print this
+inside function a
+5
+inside function b
+8
+true
+5
+hello my friend
+[start] =>
+	{name: (null), scope: (null), type: 0, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 7, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 8, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: val1, scope: a, type: 4, 2nd_type: 0} =>
+	{name: val2, scope: b, type: 4, 2nd_type: 0} =>
+	{name: hello, scope: main, type: 3, 2nd_type: 0} =>
+	{name: pi, scope: main, type: 4, 2nd_type: 0} =>
+	{name: param1, scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 0, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 1, 2nd_type: 0} =>
+	{name: param1, scope: f1, type: 0, 2nd_type: 0} =>
+	{name: param2, scope: f1, type: 1, 2nd_type: 0} =>
+	{name: param3, scope: f1, type: 3, 2nd_type: 3} =>
+[end]
+false
+3.14
+hello my friend
+[start] =>
+	{name: (null), scope: (null), type: 0, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 7, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 8, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: val1, scope: a, type: 4, 2nd_type: 0} =>
+	{name: val2, scope: b, type: 4, 2nd_type: 0} =>
+	{name: hello, scope: main, type: 3, 2nd_type: 0} =>
+	{name: pi, scope: main, type: 4, 2nd_type: 0} =>
+	{name: param1, scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 0, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 5, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: (null), type: 1, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 3} =>
+	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
+	{name: param1, scope: f1, type: 0, 2nd_type: 0} =>
+	{name: param2, scope: f1, type: 4, 2nd_type: 0} =>
+	{name: param3, scope: f1, type: 3, 2nd_type: 3} =>
+[end]
+hello world
+3.14
+Array function parameter:
+[1, 2, 3]
+Dictionary function parameter:
+{'a': 'foo', 'b': 'bar', 'c': 'baz'}
+8

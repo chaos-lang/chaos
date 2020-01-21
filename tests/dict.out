@@ -3,12 +3,62 @@
 {'a': 1, 'b': 2}
 {'a': 1, 'b': 2, 'c': 3}
 {'a': true, 'b': false}
-{'a': 1, 'b': 2, 'c': 63.299999, 'd': 12321.151367}
+{'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}
 {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}
-[start] => a => (null) => (null) => b => (null) => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => dict1 => (null) => (null) => dict2 => (null) => (null) => (null) => (null) => dict3 => (null) => (null) => (null) => (null) => [end]
-[end] => (null) => (null) => (null) => (null) => dict3 => (null) => (null) => (null) => (null) => dict2 => (null) => (null) => dict1 => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => (null) => b => (null) => (null) => a => [start]
-[start] => a => (null) => (null) => c => (null) => (null) => d => (null) => (null) => (null) => dict1 => (null) => (null) => dict2 => (null) => (null) => (null) => (null) => dict3 => (null) => (null) => (null) => (null) => [end]
-[end] => (null) => (null) => (null) => (null) => dict3 => (null) => (null) => (null) => (null) => dict2 => (null) => (null) => dict1 => (null) => (null) => (null) => d => (null) => (null) => c => (null) => (null) => a => [start]
+[start] =>
+	{name: a, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: b, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: c, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: d, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: dict1, scope: main, type: 8, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: dict2, scope: main, type: 8, 2nd_type: 5} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: dict3, scope: main, type: 8, 2nd_type: 3} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+[end]
+[start] =>
+	{name: a, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: c, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: d, scope: main, type: 8, 2nd_type: 6} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: dict1, scope: main, type: 8, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: dict2, scope: main, type: 8, 2nd_type: 5} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 4, 2nd_type: 0} =>
+	{name: dict3, scope: main, type: 8, 2nd_type: 3} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 3, 2nd_type: 0} =>
+[end]
 1
 2
 {'a': 5, 'b': 2, 'c': 3}

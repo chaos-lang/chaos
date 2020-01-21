@@ -2,7 +2,10 @@
 #include "utilities/language.h"
 
 void throw_error(int code, char *subject) {
-    printf("%s Error - ", __LANGUAGE_NAME__);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0;41m");
+    #endif
+    printf(" %s Error - ", __LANGUAGE_NAME__);
     switch (code)
     {
         case 1:
@@ -27,7 +30,7 @@ void throw_error(int code, char *subject) {
             printf("Undefined index: %s", subject);
             break;
         case 8:
-            printf("Illegal variable type for: '%s'", subject);
+            printf("Illegal variable type for variable: '%s'", subject);
             break;
         case 9:
             printf("Arrays are not mass assignable!");
@@ -41,11 +44,17 @@ void throw_error(int code, char *subject) {
         case 12:
             printf("Unrecognized complex data type for: '%s'", subject);
             break;
+        case 13:
+            printf("Illegal variable type for function: '%s'", subject);
+            break;
         default:
             printf("Unkown error.");
             break;
     }
-    printf("\n");
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf(" \n");
 
     exit(code);
 }

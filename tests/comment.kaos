@@ -1,0 +1,15 @@
+print "hey" // End of Line(EOL) comment
+//print "hey"
+// This is a comment
+#print "hey"
+# This is a comment too
+
+void def a(num b)
+    //print b
+    // This is a comment
+    print b # End of Line(EOL) comment
+    #print b
+    # This is a comment too
+end
+
+a(5)
