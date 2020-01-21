@@ -56,3 +56,8 @@ print a
 print b
 a = b
 print a
+
+num d = 3
+any c = d
+print c
+print d

@@ -341,12 +341,14 @@ Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
-    if (type == NUMBER) {
-        if (symbol->type != INT && symbol->type != FLOAT) {
+    if (type != ANY) {
+        if (type == NUMBER) {
+            if (symbol->type != INT && symbol->type != FLOAT) {
+                throw_error(8, clone_name);
+            }
+        } else if (symbol->type != type) {
             throw_error(8, clone_name);
         }
-    } else if (symbol->type != type) {
-        throw_error(8, clone_name);
     }
 
     Symbol* clone_symbol;
@@ -354,7 +356,11 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         if (symbol->secondary_type != extra_type) throw_error(8, clone_name);
         clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
-        clone_symbol = deepCopySymbol(symbol, NULL);
+        if (type == ANY) {
+            clone_symbol = deepCopySymbolAny(symbol, NULL);
+        } else {
+            clone_symbol = deepCopySymbol(symbol, NULL);
+        }
         clone_symbol->name = clone_name;
     }
     return clone_symbol;
