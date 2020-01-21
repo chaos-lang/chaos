@@ -162,7 +162,7 @@ parser:
 ;
 
 line: T_NEWLINE
-    | mixed_expression T_NEWLINE                                    { if (is_interactive) printf("%f\n", $1); }
+    | mixed_expression T_NEWLINE                                    { if (is_interactive) printf("%g\n", $1); }
     | expression T_NEWLINE                                          { if (is_interactive) printf("%i\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getSymbol($1)); }
     | loop T_NEWLINE                                                { }
