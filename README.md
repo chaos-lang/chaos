@@ -88,19 +88,7 @@ hello world
 
 ```
 mertyildiran@Corsair:~/Documents/chaos$ chaos dev.kaos
-8
-1231232
-asdasdasd
-qweqweqw
-hey
-true
-hey
-7
-5.400000
-string2
-string4
-[start] => var1 => var3 => var4 => var5 => var6 => var7 => var8 => [end]
-[end] => var8 => var7 => var6 => var5 => var4 => var3 => var1 => [start]
+hello world
 ```
 
 ### Comments
@@ -145,7 +133,7 @@ There are two keywords for **Number** data type: `num` or `number`
 ### number var6 = 3.2
 ### var6 = 5.4
 ### print var6
-5.400000
+5.4
 ```
 
 #### String
@@ -178,7 +166,7 @@ There are two keywords for **Array** data type: `list` or `array`
 [true, false]
 ### list c = [3.2, 345.1665]
 ### print c
-[3.200000, 345.166504]
+[3.2, 345.167]
 ### list d = ['a', 'b', 'c']
 ### print d
 ['a', 'b', 'c']
@@ -187,7 +175,7 @@ There are two keywords for **Array** data type: `list` or `array`
 ['A', 'B', 'C']
 ### list f = ['A', "asdasdad12312", 1232, 435.16, true, false]
 ### print f
-['A', 'asdasdad12312', 1232, 435.160004, true, false]
+['A', 'asdasdad12312', 1232, 435.16, true, false]
 ```
 
 Multi-line array definition:
@@ -249,7 +237,7 @@ by prefixing `list` or `array` keywords with a [Primitive Data Type](#primitive-
 [true, false, true]
 ### number list arr2 = [1, 2, 63.3, 12321.1515]
 ### print arr2
-[1, 2, 63.299999, 12321.151367]
+[1, 2, 63.3, 12321.2]
 ### string array arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
 ### print arr3
 ['A', 'asdasdaqs', 'asdasd123123', '.']
@@ -325,7 +313,7 @@ by prefixing `json` or `dict` keywords with a [Primitive Data Type](#primitive-d
 {'a': true, 'b': false}
 ### number dict dict2 = {'a': 1, "b": 2, 'c': 63.3, 'd': 12321.1515}
 ### print dict2
-{'a': 1, 'b': 2, 'c': 63.299999, 'd': 12321.151367}
+{'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}
 ### string json dict3 = {'a': 'A', 'b': "asdasdaqs", 'c': 'asdasd123123', 'd': "."}
 ### print dict3
 {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}
@@ -354,10 +342,10 @@ true
 ### num b2 = 7.1
 ### b2 = a2
 ### print b2
-3.500000
+3.5
 ### a2 = 1.2
 ### print b2
-3.500000
+3.5
 ```
 
 Immutability is also valid on new variable creation:
@@ -652,9 +640,9 @@ Dictionary:
 ### 3 + 5
 8
 ### 145 + 24.8
-169.800003
+169.8
 ### 0.32 + 0.42
-0.740000
+0.74
 ### (3 + 5) * 2
 16
 ```
@@ -709,8 +697,16 @@ You have chosen the order!
 This keyword is only useful for the developers of language's itself:
 
 ```
-[start] => var1 => var3 => var4 => var5 => var6 => var7 => var8 => [end]
-[end] => var8 => var7 => var6 => var5 => var4 => var3 => var1 => [start]
+[start] =>
+	{name: val1, scope: a, type: 4, 2nd_type: 0} =>
+	{name: val2, scope: b, type: 4, 2nd_type: 0} =>
+	{name: hello, scope: main, type: 3, 2nd_type: 0} =>
+	{name: pi, scope: main, type: 4, 2nd_type: 0} =>
+	{name: param1, scope: main, type: 3, 2nd_type: 0} =>
+	{name: param1, scope: f1, type: 0, 2nd_type: 0} =>
+	{name: param2, scope: f1, type: 1, 2nd_type: 0} =>
+	{name: param3, scope: f1, type: 3, 2nd_type: 0} =>
+[end]
 ```
 
 ## Extras
