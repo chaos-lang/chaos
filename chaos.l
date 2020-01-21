@@ -68,6 +68,8 @@ switch (phase)
 "{"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT_CURLY_BRACKET;}
 "}"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT_CURLY_BRACKET;}
 ","                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_COMMA;}
+"//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
+"#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
 "exit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_QUIT;}
 "quit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_QUIT;}

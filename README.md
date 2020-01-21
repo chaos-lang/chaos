@@ -103,6 +103,17 @@ string4
 [end] => var8 => var7 => var6 => var5 => var4 => var3 => var1 => [start]
 ```
 
+### Comments
+
+Commented out lines starts with either `//` or `#`:
+
+```
+### // This is a comment
+### # This is a comment too
+### print "But this is not" // End of Line(EOL) comment
+But this is not
+```
+
 ## Data Types
 
 ### Primitive Data Types
