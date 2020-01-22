@@ -82,6 +82,7 @@ function:
     | T_END                                                         { endLoop(); endFunction(); }
     | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) callFunction($1); }
+    | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
 function_parameters_start:                                          { startFunctionParameters(); }
@@ -170,6 +171,7 @@ line: T_NEWLINE
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
+    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
 print: T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                   { printSymbolValueEndWithNewLine(getArrayElement($1, $3)); }
@@ -403,6 +405,18 @@ loop:
     | T_END                                                         { endLoop(); endFunction(); }
 ;
 
+function_parameters_start: error T_NEWLINE parser                   { if (is_interactive) { yyerrok; yyclearin; } }
+function_call_parameters_start: error T_NEWLINE parser              { if (is_interactive) { yyerrok; yyclearin; } }
+function_parameters: error T_NEWLINE parser                         { if (is_interactive) { yyerrok; yyclearin; } }
+print: error T_NEWLINE parser                                       { if (is_interactive) { yyerrok; yyclearin; } }
+mixed_expression: error T_NEWLINE parser                            { if (is_interactive) { yyerrok; yyclearin; } }
+expression: error T_NEWLINE parser                                  { if (is_interactive) { yyerrok; yyclearin; } }
+variable: error T_NEWLINE parser                                    { if (is_interactive) { yyerrok; yyclearin; } }
+arraystart: error T_NEWLINE parser                                  { if (is_interactive) { yyerrok; yyclearin; } }
+dictionarystart: error T_NEWLINE parser                             { if (is_interactive) { yyerrok; yyclearin; } }
+dictionary: error T_NEWLINE parser                                  { if (is_interactive) { yyerrok; yyclearin; } }
+loop: error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+
 %%
 
 int main(int argc, char** argv) {
@@ -434,5 +448,12 @@ void yyerror(const char* s) {
     #else
         fprintf(stderr, "Parse error: %s\nLine: %i\nCause: %s\n", s, yylineno, yytext);
     #endif
-    exit(1);
+
+    if (is_interactive) {
+        loop_mode = NULL;
+        function_mode = NULL;
+        printf("%s ", __SHELL_INDICATOR__);
+    } else {
+        exit(1);
+    }
 }
