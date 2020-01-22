@@ -41,13 +41,16 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
 
 Symbol* updateSymbol(char *name, enum Type type, union Value value) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != type) throw_error(8, name);
 
+    if (symbol->type != ANY && symbol->type != type) throw_error(8, name);
+
+    symbol->secondary_type = type;
     symbol->value.b = value.b;
     symbol->value.i = value.i;
     symbol->value.c = value.c;
     symbol->value.s = value.s;
     symbol->value.f = value.f;
+
     return symbol;
 }
 
@@ -103,6 +106,12 @@ Symbol* getSymbol(char *name) {
 
 Symbol* deepCopySymbol(Symbol* symbol, char *key) {
     return addSymbol(key, symbol->type, symbol->value);
+}
+
+Symbol* deepCopySymbolAny(Symbol* symbol, char *key) {
+    Symbol* clone_symbol = addSymbol(key, ANY, symbol->value);
+    clone_symbol->secondary_type = symbol->type;
+    return clone_symbol;
 }
 
 Symbol* deepCopyComplex(char *name, Symbol* symbol) {
@@ -195,6 +204,23 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                 }
             }
             printf("}");
+            break;
+        case ANY:
+            switch (symbol->secondary_type)
+            {
+            case STRING:
+                printf("%s",symbol->value.s);
+                break;
+            case INT:
+                printf("%i",symbol->value.i);
+                break;
+            case FLOAT:
+                printf("%g",symbol->value.f);
+                break;
+            case BOOL:
+                printf("%s", symbol->value.b ? "true" : "false");
+                break;
+            }
             break;
         default:
             type[0] = symbol->type;
@@ -315,12 +341,14 @@ Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
-    if (type == NUMBER) {
-        if (symbol->type != INT && symbol->type != FLOAT) {
+    if (type != ANY) {
+        if (type == NUMBER) {
+            if (symbol->type != INT && symbol->type != FLOAT) {
+                throw_error(8, clone_name);
+            }
+        } else if (symbol->type != type) {
             throw_error(8, clone_name);
         }
-    } else if (symbol->type != type) {
-        throw_error(8, clone_name);
     }
 
     Symbol* clone_symbol;
@@ -328,7 +356,11 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         if (symbol->secondary_type != extra_type) throw_error(8, clone_name);
         clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
-        clone_symbol = deepCopySymbol(symbol, NULL);
+        if (type == ANY) {
+            clone_symbol = deepCopySymbolAny(symbol, NULL);
+        } else {
+            clone_symbol = deepCopySymbol(symbol, NULL);
+        }
         clone_symbol->name = clone_name;
     }
     return clone_symbol;
@@ -338,13 +370,15 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     Symbol* symbol = getSymbol(name);
     Symbol* clone_symbol = getSymbol(clone_name);
 
-    if (symbol->type == NUMBER) {
-        if (clone_symbol->type != INT && clone_symbol->type != FLOAT) {
-            throw_error(8, clone_name);
-        }
-    } else {
-        if (clone_symbol->type != symbol->type) {
-            throw_error(8, clone_name);
+    if (clone_symbol->type != ANY) {
+        if (symbol->type == NUMBER) {
+            if (clone_symbol->type != INT && clone_symbol->type != FLOAT) {
+                throw_error(8, clone_name);
+            }
+        } else {
+            if (clone_symbol->type != symbol->type) {
+                throw_error(8, clone_name);
+            }
         }
     }
 
@@ -352,7 +386,11 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
 
     Symbol* temp_symbol = clone_symbol;
 
-    clone_symbol = deepCopySymbol(symbol, NULL);
+    if (clone_symbol->type == ANY) {
+        clone_symbol = deepCopySymbolAny(symbol, NULL);
+    } else {
+        clone_symbol = deepCopySymbol(symbol, NULL);
+    }
     clone_symbol->name = clone_name;
 
     removeSymbol(temp_symbol);
@@ -539,6 +577,34 @@ Symbol* getDictElement(char *name, char *key) {
         }
     }
     throw_error(11, key);
+}
+
+void addSymbolAnyString(char *name, char *s) {
+    union Value value;
+    value.s = s;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = STRING;
+}
+
+void addSymbolAnyInt(char *name, int i) {
+    union Value value;
+    value.i = i;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = INT;
+}
+
+void addSymbolAnyFloat(char *name, float f) {
+    union Value value;
+    value.f = f;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = FLOAT;
+}
+
+void addSymbolAnyBool(char *name, bool b) {
+    union Value value;
+    value.b = b;
+    Symbol* symbol = addSymbol(name, ANY, value);
+    symbol->secondary_type = BOOL;
 }
 
 Function* getCurrentScope() {

@@ -28,7 +28,7 @@ hello my friend
 	{name: (null), scope: (null), type: 1, 2nd_type: 0} =>
 	{name: param1, scope: f1, type: 0, 2nd_type: 0} =>
 	{name: param2, scope: f1, type: 1, 2nd_type: 0} =>
-	{name: param3, scope: f1, type: 3, 2nd_type: 0} =>
+	{name: param3, scope: f1, type: 3, 2nd_type: 3} =>
 [end]
 false
 3.14
@@ -53,11 +53,11 @@ hello my friend
 	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
 	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
 	{name: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), scope: main, type: 0, 2nd_type: 0} =>
+	{name: (null), scope: main, type: 0, 2nd_type: 3} =>
 	{name: (null), scope: (null), type: 3, 2nd_type: 0} =>
 	{name: param1, scope: f1, type: 0, 2nd_type: 0} =>
 	{name: param2, scope: f1, type: 4, 2nd_type: 0} =>
-	{name: param3, scope: f1, type: 3, 2nd_type: 0} =>
+	{name: param3, scope: f1, type: 3, 2nd_type: 3} =>
 [end]
 hello world
 3.14

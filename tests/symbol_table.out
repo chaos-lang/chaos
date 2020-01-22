@@ -2,8 +2,8 @@
 	{name: var1, scope: main, type: 0, 2nd_type: 0} =>
 	{name: var3, scope: main, type: 0, 2nd_type: 0} =>
 	{name: var4, scope: main, type: 0, 2nd_type: 0} =>
-	{name: var5, scope: main, type: 4, 2nd_type: 0} =>
-	{name: var6, scope: main, type: 4, 2nd_type: 0} =>
-	{name: var7, scope: main, type: 3, 2nd_type: 0} =>
-	{name: var8, scope: main, type: 3, 2nd_type: 0} =>
+	{name: var5, scope: main, type: 4, 2nd_type: 4} =>
+	{name: var6, scope: main, type: 4, 2nd_type: 4} =>
+	{name: var7, scope: main, type: 3, 2nd_type: 3} =>
+	{name: var8, scope: main, type: 3, 2nd_type: 3} =>
 [end]

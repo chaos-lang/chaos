@@ -151,6 +151,27 @@ string2
 string4
 ```
 
+#### Any
+
+There is a single keyword for **Any** data type: `any`
+
+```
+### any var9 = true
+### var9 = 7
+### var9 = 'hello world'
+### print var9
+hello world
+### any a = 5
+### num b = 3
+### a = b
+### print a
+3
+### num d = 27
+### any c = d
+### print c
+27
+```
+
 ### Complex Data Types
 
 #### Arrays
