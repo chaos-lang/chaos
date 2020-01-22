@@ -141,12 +141,12 @@ There are two keywords for **Number** data type: `num` or `number`
 There are two keywords for **String** data type: `str` or `string`
 
 ```
-### str var7 = 'string1'
+### str var7 = "string1"
 ### var7 = 'string2'
 ### print var7
 string2
 ### string var8 = 'string3'
-### var8 = 'string4'
+### var8 = "string4"
 ### print var8
 string4
 ```

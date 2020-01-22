@@ -1,6 +1,6 @@
-str var7 = 'string1'
+str var7 = "string1"
 var7 = 'string2'
 print var7
 string var8 = 'string3'
-var8 = 'string4'
+var8 = "string4"
 print var8
