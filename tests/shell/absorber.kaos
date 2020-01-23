@@ -1,0 +1,8 @@
+asdas
+print "hey"
+a = 5
+num a = 5
+print a
+num a = 3
+print a
+exit

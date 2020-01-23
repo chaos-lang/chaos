@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <setjmp.h>
+
 #include "utilities/platform.h"
 #include "utilities/language.h"
 #include "utilities/helpers.h"
@@ -23,6 +25,8 @@ void yyerror(const char* s);
 
 bool is_interactive = true;
 bool inject_mode = false;
+
+jmp_buf InteractiveShellErrorAbsorber;
 %}
 
 %union {
@@ -434,6 +438,21 @@ int main(int argc, char** argv) {
     initMainFunction();
 
     do {
+        if (is_interactive) {
+            if (setjmp(InteractiveShellErrorAbsorber)) {
+                phase = INIT_PROGRAM;
+
+                #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+                    printf("\033[0;44m");
+                #endif
+                printf(" Absorbed by Interactive Shell ");
+                #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+                    printf("\033[0m");
+                #endif
+                printf("\n");
+            }
+        }
+
         !is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
         yyparse();
     } while(!feof(yyin));

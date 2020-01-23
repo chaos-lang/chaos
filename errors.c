@@ -52,9 +52,13 @@ void throw_error(int code, char *subject) {
             break;
     }
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
+        printf(" \033[0m");
     #endif
-    printf(" \n");
+    printf("\n");
 
-    exit(code);
+    if (!is_interactive) {
+        exit(code);
+    } else {
+        longjmp(InteractiveShellErrorAbsorber, 1);
+    }
 }
