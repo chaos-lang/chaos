@@ -6,6 +6,7 @@
 #include <readline/history.h>
 #include "utilities/language.h"
 #include "utilities/injector.h"
+#include "utilities/shell.h"
 #include "loop.h"
 
 #define YY_DECL int yylex()
@@ -35,55 +36,12 @@ void injectCode(char *code) {
 
 int yywrap() { if (phase == PREPARSE) { phase = INIT_PROGRAM; rewind(yyin); return 1; } }
 
-int up_arrow_key_pressed(int count, int key) {
-    rl_replace_line("", 0);
-    return 0;
-}
-
-int down_arrow_key_pressed(int count, int key) {
-    rl_replace_line("", 0);
-    return 0;
-}
-
-int esc_key_pressed(int count, int key) {
-    rl_replace_line("exit", 0);
-    rl_redisplay();
-    printf("\n%s\n", __BYE_BYE__);
-    exit(0);
-}
-
-int tab_key_pressed(int count, int key) {
-    rl_insert_text("    ");
-    return 0;
-}
-
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
 
 static int custom_input(char *buf, int result, int max_size) {
     if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
-
-        rl_command_func_t up_arrow_key_pressed;
-        rl_command_func_t down_arrow_key_pressed;
-        rl_command_func_t esc_key_pressed;
-        rl_command_func_t tab_key_pressed;
-        rl_bind_keyseq("\\e[A", up_arrow_key_pressed);
-        rl_bind_keyseq("\\e[B", down_arrow_key_pressed);
-        rl_bind_key(27, esc_key_pressed); /* ascii code for ESC */
-        rl_bind_key ('\t', tab_key_pressed);
-
-        char *line;
-
-        if (loop_mode || function_mode) {
-            line = readline(__SHELL_INDICATOR_BLOCK__);
-        } else {
-            line = readline(__SHELL_INDICATOR__);
-        }
-
-        sprintf(buf,"%s\n",line);
-        add_history(line);
-        free(line);
-        return strlen(buf);
+        return shell_readline(buf);
     } else {
         errno = 0;
         while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) {
