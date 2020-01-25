@@ -157,13 +157,7 @@ function_parameters: T_VAR                                          { if (phase 
 ;
 
 parser:
-    | parser line                                                   {
-        is_interactive ? (
-            loop_mode || function_mode ? printf("%s ", __SHELL_INDICATOR_BLOCK__) : (
-                inject_mode ? : printf("%s ", __SHELL_INDICATOR__)
-            )
-        ) : printf("");
-    }
+    | parser line                                                   { }
 ;
 
 line: T_NEWLINE
@@ -453,7 +447,6 @@ int main(int argc, char** argv) {
             }
         }
 
-        !is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
         yyparse();
     } while(!feof(yyin));
 
@@ -471,7 +464,6 @@ void yyerror(const char* s) {
     if (is_interactive) {
         loop_mode = NULL;
         function_mode = NULL;
-        printf("%s ", __SHELL_INDICATOR__);
     } else {
         exit(1);
     }

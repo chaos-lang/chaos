@@ -4,40 +4,40 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct Function Function;
+typedef struct _Function _Function;
 
 #include "../symbol.h"
 #include "../errors.h"
 
-typedef struct Function {
+typedef struct _Function {
     char *name;
     struct Symbol** parameters;
     int parameter_count;
     enum Type type;
     struct Symbol* symbol;
-    struct Function* previous;
-    struct Function* next;
+    struct _Function* previous;
+    struct _Function* next;
     char body[1000];
-} Function;
+} _Function;
 
-Function* function_cursor;
-Function* start_function;
-Function* end_function;
+_Function* function_cursor;
+_Function* start_function;
+_Function* end_function;
 
-Function* function_mode;
+_Function* function_mode;
 
-Function* function_parameters_mode;
+_Function* function_parameters_mode;
 
-Function* executed_function;
+_Function* executed_function;
 
-Function* main_function;
+_Function* main_function;
 
-Function* scope_override;
+_Function* scope_override;
 
 void startFunction(char *name, enum Type type);
 void endFunction();
 void freeFunctionMode();
-Function* getFunction(char *name);
+_Function* getFunction(char *name);
 void callFunction(char *name);
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type);

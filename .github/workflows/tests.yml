@@ -12,7 +12,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get -y install build-essential bison flex
+        sudo apt-get -y install build-essential bison flex libreadline-dev
 
     - name: Build
       run: |

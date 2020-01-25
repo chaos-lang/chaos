@@ -274,7 +274,7 @@ void printSymbolTable() {
     Symbol *ptr1 = start_symbol;
     printf("[start] =>\n");
     while(ptr1 != NULL) {
-        Function* scope1 = ptr1->scope;
+        _Function* scope1 = ptr1->scope;
         printf("\t{name: %s, scope: %s, type: %i, 2nd_type: %i} =>\n", ptr1->name, scope1->name, ptr1->type, ptr1->secondary_type);
         ptr1 = ptr1->next;
     }
@@ -607,7 +607,7 @@ void addSymbolAnyBool(char *name, bool b) {
     symbol->secondary_type = BOOL;
 }
 
-Function* getCurrentScope() {
+_Function* getCurrentScope() {
     if (scope_override != NULL) return scope_override;
 
     if (executed_function != NULL) {

@@ -9,7 +9,7 @@ void startFunction(char *name, enum Type type) {
         memset(function_mode->body, 0, strlen(function_mode->body));
         return;
     }
-    function_mode = (struct Function*)malloc(sizeof(Function));
+    function_mode = (struct _Function*)malloc(sizeof(_Function));
     function_mode->name = name;
     function_mode->type = type;
     function_mode->parameter_count = 0;
@@ -52,7 +52,7 @@ void freeFunctionMode() {
 }
 
 void callFunction(char *name) {
-    Function* function = getFunction(name);
+    _Function* function = getFunction(name);
     scope_override = function;
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
@@ -77,11 +77,11 @@ void callFunction(char *name) {
     executed_function = NULL;
 }
 
-Function* getFunction(char *name) {
+_Function* getFunction(char *name) {
     function_cursor = start_function;
     while (function_cursor != NULL) {
         if (function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0) {
-            Function* function = function_cursor;
+            _Function* function = function_cursor;
             return function;
         }
         function_cursor = function_cursor->next;
@@ -91,7 +91,7 @@ Function* getFunction(char *name) {
 }
 
 void startFunctionParameters() {
-    function_parameters_mode = (struct Function*)malloc(sizeof(Function));
+    function_parameters_mode = (struct _Function*)malloc(sizeof(_Function));
     function_parameters_mode->parameter_count = 0;
 }
 
@@ -170,12 +170,12 @@ void returnSymbol(char *name) {
 }
 
 void printFunctionReturn(char *name) {
-    Function* function = getFunction(name);
+    _Function* function = getFunction(name);
     printSymbolValueEndWithNewLine(function->symbol);
 }
 
 void initMainFunction() {
-    main_function = (struct Function*)malloc(sizeof(Function));
+    main_function = (struct _Function*)malloc(sizeof(_Function));
     main_function->name = "main";
     main_function->type = ANY;
     main_function->parameter_count = 0;

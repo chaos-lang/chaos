@@ -29,7 +29,7 @@ typedef struct Symbol {
     struct Symbol** children;
     int children_count;
     char *key;
-    struct Function* scope;
+    struct _Function* scope;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -83,7 +83,7 @@ void addSymbolAnyInt(char *name, int i);
 void addSymbolAnyFloat(char *name, float f);
 void addSymbolAnyBool(char *name, bool b);
 Symbol* getDictElement(char *name, char *key);
-Function* getCurrentScope();
+_Function* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);
 
 #endif
