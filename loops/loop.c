@@ -52,9 +52,4 @@ void endLoop() {
             }
             break;
     }
-
-    // Weird fix for addSymbolToComplex (symbol=0x555555783eb0) at symbol.c:198
-    // malloc.c: No such file or directory.
-    (struct Symbol*)malloc(sizeof(Symbol));
-    (struct Symbol*)malloc(sizeof(Symbol));
 }

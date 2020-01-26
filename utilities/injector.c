@@ -3,7 +3,7 @@
 void recordToken(char *token, int length) {
     if (strcmp(token, " ") != 0) {
         last_token = (char *) malloc(strlen(token) + 1);
-        last_token = token;
+        strcpy(last_token, token);
     }
 
     if (loop_mode != NULL) {
