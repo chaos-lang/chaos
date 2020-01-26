@@ -1,12 +1,28 @@
 #include "shell.h"
 
 int up_arrow_key_pressed(int count, int key) {
-    rl_replace_line("", 0);
+    HIST_ENTRY *shell_history = previous_history();
+    if (shell_history == NULL) return 0;
+    if (strcmp(shell_history->line, rl_line_buffer) == 0) {
+        up_arrow_key_pressed(0, 0);
+        return 0;
+    }
+    rl_replace_line(shell_history->line, 0);
+    rl_redisplay();
+    rl_end_of_line(0, 0);
     return 0;
 }
 
 int down_arrow_key_pressed(int count, int key) {
-    rl_replace_line("", 0);
+    HIST_ENTRY *shell_history = next_history();
+    if (shell_history == NULL) return 0;
+    if (strcmp(shell_history->line, rl_line_buffer) == 0) {
+        down_arrow_key_pressed(0, 0);
+        return 0;
+    }
+    rl_replace_line(shell_history->line, 0);
+    rl_redisplay();
+    rl_end_of_line(0, 0);
     return 0;
 }
 
@@ -42,6 +58,8 @@ int shell_readline(char *buf) {
 
     sprintf(buf,"%s\n",line);
     add_history(line);
+    write_history(NULL);
     free(line);
+
     return strlen(buf);
 }

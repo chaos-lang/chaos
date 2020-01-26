@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <setjmp.h>
+#include <readline/history.h>
 
 #include "utilities/platform.h"
 #include "utilities/language.h"
@@ -425,6 +426,8 @@ int main(int argc, char** argv) {
     yyin = fp;
 
     if (is_interactive) {
+        using_history();
+        read_history(NULL);
         greet();
         phase = INIT_PROGRAM;
     }
