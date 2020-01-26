@@ -9,6 +9,9 @@ lex.yy.c
 # Ignore the scripts that are created for development
 *dev.*
 
+# Bison output files
+bison_*
+
 # Ignore local history
 .history
 
