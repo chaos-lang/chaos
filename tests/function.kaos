@@ -58,3 +58,13 @@ num def add(num x, num y)
 end
 
 print add(3, 5)
+
+void def loopInside()
+    print "start"
+    3 times do
+        print "hey"
+    end
+    print "end"
+end
+
+loopInside()

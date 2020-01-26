@@ -9,7 +9,11 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "loop.h"
+#include "function.h"
+
 char *itoa(int value, char *result, int base);
 char *trim_string(char *str);
+void handle_end_keyword();
 
 #endif

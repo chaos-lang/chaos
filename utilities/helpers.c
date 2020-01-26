@@ -40,3 +40,12 @@ char *trim_string(char *str) {
 
     return str;
 }
+
+void handle_end_keyword() {
+    if (loop_mode != NULL) {
+        endLoop();
+        return;
+    }
+
+    endFunction();
+}

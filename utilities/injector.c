@@ -6,7 +6,7 @@ void recordToken(char *token, int length) {
         strcpy(last_token, token);
     }
 
-    if (loop_mode != NULL) {
+    if (loop_mode != NULL && function_mode == NULL) {
         if (loop_mode->nested_counter == 0 && strcmp(token, "end") == 0) {
             return;
         }
@@ -14,7 +14,7 @@ void recordToken(char *token, int length) {
     }
 
     if (function_mode != NULL) {
-        if (strcmp(token, "end") == 0) {
+        if (loop_mode == NULL && strcmp(token, "end") == 0) {
             return;
         }
         strcat(function_mode->body, token);

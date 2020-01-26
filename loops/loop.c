@@ -13,6 +13,11 @@ void endLoop() {
         return;
     }
 
+    if (function_mode != NULL) {
+        loop_mode = NULL;
+        return;
+    }
+
     char *body = malloc(strlen(loop_mode->body));
     strcpy(body, loop_mode->body);
     int iter = loop_mode->iter;

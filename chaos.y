@@ -74,6 +74,7 @@ preparser:
 
 preparser_line: T_NEWLINE
     | function T_NEWLINE                                            { }
+    | T_END T_NEWLINE                                               { endFunction(); }
     | error T_NEWLINE                                               { yyerrok; }
 ;
 
@@ -84,7 +85,6 @@ function:
     | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, ARRAY); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, VOID); }
-    | T_END                                                         { endLoop(); endFunction(); }
     | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) callFunction($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
@@ -170,6 +170,7 @@ line: T_NEWLINE
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
+    | T_END                                                         { handle_end_keyword(); }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -401,7 +402,6 @@ loop:
     | T_INT T_TIMES_DO                                              { startTimesDo($1); }
     | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
     | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                      { startForeachDict($2, $4, $6); }
-    | T_END                                                         { endLoop(); endFunction(); }
 ;
 
 function_parameters_start: error T_NEWLINE parser                   { if (is_interactive) { yyerrok; yyclearin; } }
