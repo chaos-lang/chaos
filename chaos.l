@@ -6,6 +6,7 @@
 #include <readline/history.h>
 #include "utilities/language.h"
 #include "utilities/injector.h"
+#include "utilities/phase.h"
 #include "utilities/shell.h"
 #include "loop.h"
 
@@ -17,7 +18,6 @@ extern int oerrno;
 
 #include "chaos.tab.h"
 
-enum Phase { INIT_PREPARSE, PREPARSE, INIT_PROGRAM, PROGRAM };
 enum Phase phase = INIT_PREPARSE;
 
 void injectCode(char *code) {
@@ -34,6 +34,7 @@ void injectCode(char *code) {
     inject_mode = false;
 }
 
+#define YY_SKIP_YYWRAP 1
 int yywrap() { if (phase == PREPARSE) { phase = INIT_PROGRAM; rewind(yyin); return 1; } }
 
 #undef YY_INPUT

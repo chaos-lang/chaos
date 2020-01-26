@@ -9,6 +9,7 @@
 #include "utilities/platform.h"
 #include "utilities/language.h"
 #include "utilities/helpers.h"
+#include "utilities/phase.h"
 #include "symbol.h"
 #include "loop.h"
 #include "function.h"
@@ -19,7 +20,6 @@ extern FILE* yyin;
 
 extern int yylineno;
 extern char *yytext;
-extern enum Phase { INIT_PREPARSE, PREPARSE, INIT_PROGRAM, PROGRAM };
 extern enum Phase phase;
 
 void yyerror(const char* s);
@@ -166,7 +166,7 @@ line: T_NEWLINE
     | expression T_NEWLINE                                          { if (is_interactive) printf("%i\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getSymbol($1)); }
     | loop T_NEWLINE                                                { }
-    | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : printf(""); exit(0); }
+    | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : exit(0); }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
@@ -245,7 +245,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | T_DEL variable                                                { removeSymbolByName($2); $$ = ""; }
     | T_DEL variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET           { removeComplexElement($2, $4, NULL); $$ = ""; }
     | T_DEL variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET   { removeComplexElement($2, -$5, NULL); $$ = ""; }
-    | T_DEL variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET        { removeComplexElement($2, NULL, $4); $$ = ""; }
+    | T_DEL variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET        { removeComplexElement($2, 0, $4); $$ = ""; }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                 { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, $3)); $$ = ""; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET         { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, -$4)); $$ = ""; }
@@ -266,14 +266,14 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL mixed_expression    { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL expression          { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET              { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getDictElement($1, $3)); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_TRUE           { updateComplexElementBool($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FALSE          { updateComplexElementBool($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_INT            { updateComplexElementInt($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FLOAT          { updateComplexElementFloat($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_STRING         { updateComplexElementString($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_VAR            { updateComplexElementSymbol($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL mixed_expression         { updateComplexElementFloat($1, NULL, $3, $6); $$ = ""; }
-    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL expression               { updateComplexElementFloat($1, NULL, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_TRUE           { updateComplexElementBool($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FALSE          { updateComplexElementBool($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_INT            { updateComplexElementInt($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FLOAT          { updateComplexElementFloat($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_STRING         { updateComplexElementString($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_VAR            { updateComplexElementSymbol($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL mixed_expression         { updateComplexElementFloat($1, 0, $3, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL expression               { updateComplexElementFloat($1, 0, $3, $6); $$ = ""; }
 ;
 
 variable: T_VAR_BOOL                                                { }

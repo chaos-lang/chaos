@@ -11,7 +11,7 @@ void startForeach(char *array, char *element_name) {
         return;
     }
 
-    loop_mode = (struct Loop*)malloc(sizeof(Loop));
+    loop_mode = (Loop*)malloc(sizeof(Loop));
     loop_mode->type = FOREACH;
     loop_mode->nested_counter = 0;
 
@@ -27,7 +27,7 @@ void startForeachDict(char *array, char *element_key, char *element_value) {
         return;
     }
 
-    loop_mode = (struct Loop*)malloc(sizeof(Loop));
+    loop_mode = (Loop*)malloc(sizeof(Loop));
     loop_mode->type = FOREACH_DICT;
     loop_mode->nested_counter = 0;
 

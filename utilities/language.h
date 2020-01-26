@@ -13,6 +13,8 @@
     #define __SHELL_INDICATOR_BLOCK__ "... "
 #endif
 
+#include <stdio.h>
+
 #include "platform.h"
 
 void greet();

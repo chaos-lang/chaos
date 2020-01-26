@@ -47,7 +47,9 @@ void addFunctionCallParameterBool(bool b);
 void addFunctionCallParameterInt(int i);
 void addFunctionCallParameterFloat(float f);
 void addFunctionCallParameterString(char *s);
+void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);
 void printFunctionReturn(char *name);
+void initMainFunction();
 
 #endif

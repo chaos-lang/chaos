@@ -3,6 +3,7 @@
 
 #include "loop.h"
 #include "../symbol.h"
+#include "../utilities/injector.h"
 
 void endLoop() {
     if (loop_mode == NULL) return;

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "function.h"
+#include "../utilities/injector.h"
 
 void startFunction(char *name, enum Type type) {
     function_mode = getFunction(name);

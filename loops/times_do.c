@@ -11,7 +11,7 @@ void startTimesDo(int iter) {
         return;
     }
 
-    loop_mode = (struct Loop*)malloc(sizeof(Loop));
+    loop_mode = (Loop*)malloc(sizeof(Loop));
     loop_mode->type = TIMESDO;
     loop_mode->iter = iter;
     loop_mode->nested_counter = 0;

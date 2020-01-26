@@ -1,6 +1,6 @@
 #include "symbol.h"
 
-symbol_counter = 0;
+int symbol_counter = 0;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol_cursor = start_symbol;
@@ -520,7 +520,7 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
         removeSymbol(symbol);
         complex->children[index] = deepCopySymbol(source, NULL);
     } else if (complex->type == DICT) {
-        removeComplexElement(name, NULL, key);
+        removeComplexElement(name, 0, key);
         complex_mode = complex;
         symbol_counter = complex->children_count;
         deepCopySymbol(source, key);
