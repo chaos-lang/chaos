@@ -8,6 +8,7 @@ typedef struct _Function _Function;
 
 #include "../symbol.h"
 #include "../errors.h"
+#include "../utilities/shell.h"
 
 typedef struct _Function {
     char *name;

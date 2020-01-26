@@ -10,6 +10,7 @@ enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT, VOID };
 
 #include "errors.h"
 #include "utilities/helpers.h"
+#include "utilities/shell.h"
 #include "functions/function.h"
 
 typedef struct Symbol {

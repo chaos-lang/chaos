@@ -35,6 +35,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     }
 
     addSymbolToComplex(symbol);
+    add_suggestion(name);
 
     return symbol;
 }

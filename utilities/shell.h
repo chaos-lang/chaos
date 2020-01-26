@@ -4,6 +4,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "language.h"
+#include "helpers.h"
 #include "loop.h"
 #include "function.h"
 
@@ -13,5 +14,10 @@ int esc_key_pressed(int count, int key);
 int tab_key_pressed(int count, int key);
 
 int shell_readline(char *buf);
+
+char **suggestion_completion(const char *, int, int);
+char *suggestion_generator(const char *, int);
+int suggestions_length;
+char *suggestions[1000];
 
 #endif

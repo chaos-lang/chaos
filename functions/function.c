@@ -38,6 +38,13 @@ void startFunction(char *name, enum Type type) {
     );
     function_mode->parameter_count = function_parameters_mode->parameter_count;
 
+    if (name != NULL) {
+        char suggestion[80];
+        strcpy(suggestion, name);
+        strcat(suggestion, "()");
+        add_suggestion(suggestion);
+    }
+
     freeFunctionMode();
 }
 

@@ -1,6 +1,6 @@
 #include "helpers.h"
 
-char* itoa(int value, char* result, int base) {
+char *itoa(int value, char *result, int base) {
     if (base < 2 || base > 36) { *result = '\0'; return result; }
 
     char* ptr = result, *ptr1 = result, tmp_char;
@@ -20,4 +20,23 @@ char* itoa(int value, char* result, int base) {
         *ptr1++ = tmp_char;
     }
     return result;
+}
+
+char *trim_string(char *str) {
+    char *end;
+
+    // Trim leading space
+    while(isspace((unsigned char)*str)) str++;
+
+    if(*str == 0)  // All spaces?
+    return str;
+
+    // Trim trailing space
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)) end--;
+
+    // Write new null terminator character
+    end[1] = '\0';
+
+    return str;
 }

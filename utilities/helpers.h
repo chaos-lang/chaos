@@ -6,6 +6,7 @@
 
 #define __ITOA_BUFFER_LENGTH__ 64
 
-char* itoa(int value, char* result, int base);
+char *itoa(int value, char *result, int base);
+char *trim_string(char *str);
 
 #endif
