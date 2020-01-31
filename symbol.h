@@ -86,5 +86,6 @@ void addSymbolAnyBool(char *name, bool b);
 Symbol* getDictElement(char *name, char *key);
 _Function* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);
+void freeAllSymbols();
 
 #endif

@@ -6,12 +6,15 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol_cursor = start_symbol;
 
     Symbol* symbol;
-    symbol = (struct Symbol*)malloc(sizeof(Symbol));
+    symbol = (struct Symbol*)calloc(1, sizeof(Symbol));
 
     if (complex_mode != NULL && complex_mode->type == DICT) {
         symbol->key = name;
     } else {
-        if (isDefined(name)) throw_error(2, name);
+        if (isDefined(name)) {
+            free(symbol);
+            throw_error(2, name);
+        }
         symbol->name = name;
     }
 
@@ -630,4 +633,13 @@ Symbol* getSymbolFunctionParameter(char *name) {
     Symbol* symbol = getSymbol(name);
     scope_override = NULL;
     return symbol;
+}
+
+void freeAllSymbols() {
+    symbol_cursor = start_symbol;
+    while (symbol_cursor != NULL) {
+        Symbol* symbol = symbol_cursor;
+        symbol_cursor = symbol_cursor->next;
+        free(symbol);
+    }
 }

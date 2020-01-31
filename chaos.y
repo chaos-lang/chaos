@@ -10,12 +10,14 @@
 #include "utilities/language.h"
 #include "utilities/helpers.h"
 #include "utilities/phase.h"
+#include "utilities/injector.h"
 #include "symbol.h"
 #include "loop.h"
 #include "function.h"
 
 extern int yylex();
 extern int yyparse();
+extern int yylex_destroy();
 extern FILE* yyin;
 
 extern int yylineno;
@@ -58,6 +60,10 @@ jmp_buf InteractiveShellErrorAbsorber;
 %type<sval> variable
 %type<sval> arraystart
 %type<ival> array
+
+%destructor {
+    free($$);
+} <sval>
 
 %start meta_start
 
@@ -452,6 +458,19 @@ int main(int argc, char** argv) {
 
         yyparse();
     } while(!feof(yyin));
+
+    // Free everything
+    free(last_token);
+    free(main_function);
+    freeAllSymbols();
+    yylex_destroy();
+    if (!is_interactive) {
+        fclose(fp);
+    }
+
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
 
     return 0;
 }
