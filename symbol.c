@@ -9,13 +9,19 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     symbol = (struct Symbol*)calloc(1, sizeof(Symbol));
 
     if (complex_mode != NULL && complex_mode->type == DICT) {
-        symbol->key = name;
+        if (name != NULL) {
+            symbol->key = malloc(1 + strlen(name));
+            strcpy(symbol->key, name);
+        }
     } else {
         if (isDefined(name)) {
             free(symbol);
             throw_error(2, name);
         }
-        symbol->name = name;
+        if (name != NULL) {
+            symbol->name = malloc(1 + strlen(name));
+            strcpy(symbol->name, name);
+        }
     }
 
     symbol->type = type;
@@ -40,6 +46,8 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     addSymbolToComplex(symbol);
     add_suggestion(name);
 
+    free(name);
+
     return symbol;
 }
 
@@ -49,11 +57,9 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value) {
     if (symbol->type != ANY && symbol->type != type) throw_error(8, name);
 
     symbol->secondary_type = type;
-    symbol->value.b = value.b;
-    symbol->value.i = value.i;
-    symbol->value.c = value.c;
-    symbol->value.s = value.s;
-    symbol->value.f = value.f;
+    symbol->value = value;
+
+    free(name);
 
     return symbol;
 }
@@ -129,7 +135,12 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
     for (int i = 0; i < symbol->children_count; i++) {
         Symbol* child = symbol->children[i];
-        deepCopySymbol(child, child->key);
+        char *key = NULL;
+        if (child->key != NULL) {
+            key = malloc(1 + strlen(child->key));
+            strcpy(key, child->key);
+        }
+        deepCopySymbol(child, key);
     }
 
     Symbol* symbol_return = complex_mode;
@@ -279,7 +290,7 @@ void printSymbolTable() {
     printf("[start] =>\n");
     while(ptr1 != NULL) {
         _Function* scope1 = ptr1->scope;
-        printf("\t{name: %s, scope: %s, type: %i, 2nd_type: %i} =>\n", ptr1->name, scope1->name, ptr1->type, ptr1->secondary_type);
+        printf("\t{name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i} =>\n", ptr1->name, ptr1->key, scope1->name, ptr1->type, ptr1->secondary_type);
         ptr1 = ptr1->next;
     }
     printf("[end]\n");
@@ -329,7 +340,9 @@ void addSymbolString(char *name, char *s) {
 
 void updateSymbolString(char *name, char *s) {
     union Value value;
-    value.s = s;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
+    free(s);
     updateSymbol(name, STRING, value);
 }
 
@@ -640,6 +653,9 @@ void freeAllSymbols() {
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
+        //free(symbol->value.s);
+        free(symbol->key);
+        free(symbol->name);
         free(symbol);
     }
 }

@@ -30,6 +30,8 @@ void endLoop() {
 
     Symbol* array;
 
+    loop_execution_mode = true;
+
     switch (loop_type)
     {
         case TIMESDO:
@@ -58,4 +60,6 @@ void endLoop() {
             }
             break;
     }
+
+    loop_execution_mode = false;
 }

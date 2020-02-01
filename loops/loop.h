@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 enum LoopType { TIMESDO, FOREACH, FOREACH_DICT };
 
@@ -22,6 +23,7 @@ typedef struct {
 } Loop;
 
 Loop* loop_mode;
+bool loop_execution_mode;
 
 void endLoop();
 

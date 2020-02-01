@@ -186,7 +186,7 @@ print: T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET           { printSymbo
 ;
 print: T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                { printSymbolValueEndWithNewLine(getDictElement($1, $3)); }
 ;
-print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); }
+print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); if (!loop_execution_mode) free($1); }
 ;
 print: T_INT                                                        { printf("%i\n", $1); }
 ;
@@ -320,7 +320,7 @@ variable: T_VAR_ARRAY                                               { }
 ;
 
 variable: T_VAR_ANY                                                 { }
-    | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; free($4); }
     | T_VAR_ANY T_VAR T_EQUAL T_INT                                 { addSymbolAnyInt($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FLOAT                               { addSymbolAnyFloat($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
