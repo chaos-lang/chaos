@@ -2,7 +2,7 @@
 
 int symbol_counter = 0;
 
-Symbol* addSymbol(char *name, enum Type type, union Value value) {
+Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
     symbol_cursor = start_symbol;
 
     Symbol* symbol;
@@ -25,11 +25,8 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     }
 
     symbol->type = type;
-    symbol->value.b = value.b;
-    symbol->value.i = value.i;
-    symbol->value.c = value.c;
-    symbol->value.s = value.s;
-    symbol->value.f = value.f;
+    symbol->value = value;
+    symbol->value_type = value_type;
     symbol->children_count = 0;
     symbol->scope = getCurrentScope();
 
@@ -51,13 +48,13 @@ Symbol* addSymbol(char *name, enum Type type, union Value value) {
     return symbol;
 }
 
-Symbol* updateSymbol(char *name, enum Type type, union Value value) {
+Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
     Symbol* symbol = getSymbol(name);
 
     if (symbol->type != ANY && symbol->type != type) throw_error(8, name);
 
-    symbol->secondary_type = type;
     symbol->value = value;
+    symbol->value_type = value_type;
 
     free(name);
 
@@ -115,11 +112,11 @@ Symbol* getSymbol(char *name) {
 }
 
 Symbol* deepCopySymbol(Symbol* symbol, char *key) {
-    return addSymbol(key, symbol->type, symbol->value);
+    return addSymbol(key, symbol->type, symbol->value, symbol->value_type);
 }
 
 Symbol* deepCopySymbolAny(Symbol* symbol, char *key) {
-    Symbol* clone_symbol = addSymbol(key, ANY, symbol->value);
+    Symbol* clone_symbol = addSymbol(key, ANY, symbol->value, symbol->value_type);
     clone_symbol->secondary_type = symbol->type;
     return clone_symbol;
 }
@@ -151,25 +148,25 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
 float getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
-    char type[2] = "\0";
+    char value_type[2] = "\0";
     float value;
-    switch (symbol->type)
+    switch (symbol->value_type)
     {
-        case BOOL:
+        case V_BOOL:
             value = symbol->value.b ? 1.0 : 0.0;
             return value;
             break;
-        case INT:
+        case V_INT:
             value = (float)symbol->value.i;
             return value;
             break;
-        case FLOAT:
+        case V_FLOAT:
             value = symbol->value.f;
             return value;
             break;
         default:
-            type[0] = symbol->type;
-            throw_error(1, type);
+            value_type[0] = symbol->value_type;
+            throw_error(1, value_type);
             break;
     }
 }
@@ -187,9 +184,6 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             break;
         case FLOAT:
             printf("%g", symbol->value.f);
-            break;
-        case CHAR:
-            printf("%c", symbol->value.c);
             break;
         case STRING:
             if (is_complex) {
@@ -221,18 +215,18 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             printf("}");
             break;
         case ANY:
-            switch (symbol->secondary_type)
+            switch (symbol->value_type)
             {
-            case STRING:
-                printf("%s",symbol->value.s);
+            case V_STRING:
+                printf("%s", symbol->value.s);
                 break;
-            case INT:
-                printf("%i",symbol->value.i);
+            case V_INT:
+                printf("%i", symbol->value.i);
                 break;
-            case FLOAT:
-                printf("%g",symbol->value.f);
+            case V_FLOAT:
+                printf("%g", symbol->value.f);
                 break;
-            case BOOL:
+            case V_BOOL:
                 printf("%s", symbol->value.b ? "true" : "false");
                 break;
             }
@@ -299,43 +293,43 @@ void printSymbolTable() {
 void addSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    addSymbol(name, BOOL, value);
+    addSymbol(name, BOOL, value, V_BOOL);
 }
 
 void updateSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    updateSymbol(name, BOOL, value);
+    updateSymbol(name, BOOL, value, V_BOOL);
 }
 
 void addSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    addSymbol(name, INT, value);
+    addSymbol(name, INT, value, V_INT);
 }
 
 void updateSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    updateSymbol(name, INT, value);
+    updateSymbol(name, INT, value, V_INT);
 }
 
 void addSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    addSymbol(name, FLOAT, value);
+    addSymbol(name, FLOAT, value, V_FLOAT);
 }
 
 void updateSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    updateSymbol(name, FLOAT, value);
+    updateSymbol(name, FLOAT, value, V_FLOAT);
 }
 
 void addSymbolString(char *name, char *s) {
     union Value value;
     value.s = s;
-    addSymbol(name, STRING, value);
+    addSymbol(name, STRING, value, V_STRING);
 }
 
 void updateSymbolString(char *name, char *s) {
@@ -343,12 +337,12 @@ void updateSymbolString(char *name, char *s) {
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
     free(s);
-    updateSymbol(name, STRING, value);
+    updateSymbol(name, STRING, value, V_STRING);
 }
 
 void addSymbolArray(char *name) {
     union Value value;
-    complex_mode = addSymbol(name, ARRAY, value);
+    complex_mode = addSymbol(name, ARRAY, value, V_VOID);
 }
 
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
@@ -484,11 +478,7 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
         throw_error(12, complex->name);
     }
     symbol->type = type;
-    symbol->value.b = value.b;
-    symbol->value.i = value.i;
-    symbol->value.c = value.c;
-    symbol->value.s = value.s;
-    symbol->value.f = value.f;
+    symbol->value = value;
 }
 
 void updateComplexElementBool(char* name, int index, char *key, bool b) {
@@ -580,7 +570,7 @@ void removeComplexElement(char *name, int i, char *key) {
 
 void addSymbolDict(char *name) {
     union Value value;
-    complex_mode = addSymbol(name, DICT, value);
+    complex_mode = addSymbol(name, DICT, value, V_VOID);
 }
 
 Symbol* getDictElement(char *name, char *key) {
@@ -599,29 +589,25 @@ Symbol* getDictElement(char *name, char *key) {
 void addSymbolAnyString(char *name, char *s) {
     union Value value;
     value.s = s;
-    Symbol* symbol = addSymbol(name, ANY, value);
-    symbol->secondary_type = STRING;
+    addSymbol(name, ANY, value, V_STRING);
 }
 
 void addSymbolAnyInt(char *name, int i) {
     union Value value;
     value.i = i;
-    Symbol* symbol = addSymbol(name, ANY, value);
-    symbol->secondary_type = INT;
+    addSymbol(name, ANY, value, V_INT);
 }
 
 void addSymbolAnyFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    Symbol* symbol = addSymbol(name, ANY, value);
-    symbol->secondary_type = FLOAT;
+    addSymbol(name, ANY, value, V_FLOAT);
 }
 
 void addSymbolAnyBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    Symbol* symbol = addSymbol(name, ANY, value);
-    symbol->secondary_type = BOOL;
+    addSymbol(name, ANY, value, V_BOOL);
 }
 
 _Function* getCurrentScope() {

@@ -105,7 +105,7 @@ void startFunctionParameters() {
 
 void addFunctionParameter(char *secondary_name, enum Type type) {
     union Value value;
-    Symbol* symbol = addSymbol(NULL, type, value);
+    Symbol* symbol = addSymbol(NULL, type, value, V_VOID);
     symbol->secondary_name = secondary_name;
 
     addSymbolToFunctionParameters(symbol);
@@ -131,28 +131,28 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
 void addFunctionCallParameterBool(bool b) {
     union Value value;
     value.b = b;
-    Symbol* symbol = addSymbol(NULL, BOOL, value);
+    Symbol* symbol = addSymbol(NULL, BOOL, value, V_BOOL);
     addSymbolToFunctionParameters(symbol);
 }
 
 void addFunctionCallParameterInt(int i) {
     union Value value;
     value.i = i;
-    Symbol* symbol = addSymbol(NULL, INT, value);
+    Symbol* symbol = addSymbol(NULL, INT, value, V_INT);
     addSymbolToFunctionParameters(symbol);
 }
 
 void addFunctionCallParameterFloat(float f) {
     union Value value;
     value.f = f;
-    Symbol* symbol = addSymbol(NULL, FLOAT, value);
+    Symbol* symbol = addSymbol(NULL, FLOAT, value, V_FLOAT);
     addSymbolToFunctionParameters(symbol);
 }
 
 void addFunctionCallParameterString(char *s) {
     union Value value;
     value.s = s;
-    Symbol* symbol = addSymbol(NULL, STRING, value);
+    Symbol* symbol = addSymbol(NULL, STRING, value, V_STRING);
     addSymbolToFunctionParameters(symbol);
 }
 

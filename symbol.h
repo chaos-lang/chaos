@@ -7,6 +7,7 @@
 
 typedef struct Symbol Symbol;
 enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT, VOID };
+enum ValueType { V_BOOL, V_INT, V_FLOAT, V_STRING, V_VOID };
 
 #include "errors.h"
 #include "utilities/helpers.h"
@@ -21,10 +22,10 @@ typedef struct Symbol {
     union Value {
         bool b;
         int i;
-        char c;
         char *s;
         float f;
     } value;
+    enum ValueType value_type;
     struct Symbol* previous;
     struct Symbol* next;
     struct Symbol** children;
@@ -40,8 +41,8 @@ Symbol* end_symbol;
 Symbol* complex_mode;
 int symbol_counter;
 
-Symbol* addSymbol(char *name, enum Type type, union Value value);
-Symbol* updateSymbol(char *name, enum Type type, union Value value);
+Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
+Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
 Symbol* getSymbol(char *name);

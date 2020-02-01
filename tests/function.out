@@ -28,7 +28,7 @@ hello my friend
 	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
 	{name: param1, key: (null), scope: f1, type: 0, 2nd_type: 0} =>
 	{name: param2, key: (null), scope: f1, type: 1, 2nd_type: 0} =>
-	{name: param3, key: (null), scope: f1, type: 3, 2nd_type: 3} =>
+	{name: param3, key: (null), scope: f1, type: 3, 2nd_type: 0} =>
 [end]
 false
 3.14
@@ -57,7 +57,7 @@ hello my friend
 	{name: (null), key: (null), scope: (null), type: 3, 2nd_type: 0} =>
 	{name: param1, key: (null), scope: f1, type: 0, 2nd_type: 0} =>
 	{name: param2, key: (null), scope: f1, type: 4, 2nd_type: 0} =>
-	{name: param3, key: (null), scope: f1, type: 3, 2nd_type: 3} =>
+	{name: param3, key: (null), scope: f1, type: 3, 2nd_type: 0} =>
 [end]
 hello world
 3.14
