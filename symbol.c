@@ -80,7 +80,7 @@ void removeSymbol(Symbol* symbol) {
     if (previous_symbol == NULL && next_symbol == NULL) {
         start_symbol = NULL;
         end_symbol = NULL;
-        free(symbol);
+        freeSymbol(symbol);
         return;
     } else if (previous_symbol == NULL) {
         start_symbol = next_symbol;
@@ -93,6 +93,13 @@ void removeSymbol(Symbol* symbol) {
         next_symbol->previous = previous_symbol;
     }
 
+    freeSymbol(symbol);
+}
+
+void freeSymbol(Symbol* symbol) {
+    if (symbol->value_type == V_STRING) free(symbol->value.s);
+    free(symbol->key);
+    free(symbol->name);
     free(symbol);
 }
 
@@ -358,8 +365,10 @@ void addSymbolArray(char *name) {
 
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
     Symbol* symbol = getSymbol(name);
-
-    return createCloneFromSymbol(clone_name, type, symbol, extra_type);
+    Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
+    free(name);
+    free(clone_name);
+    return clone_symbol;
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
@@ -377,7 +386,10 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         } else {
             clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
         }
-        clone_symbol->name = clone_name;
+        if (clone_name != NULL) {
+            clone_symbol->name = malloc(1 + strlen(clone_name));
+            strcpy(clone_symbol->name, clone_name);
+        }
     }
     return clone_symbol;
 }
@@ -399,7 +411,10 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     } else {
         clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
     }
-    clone_symbol->name = clone_name;
+    clone_symbol->name = malloc(1 + strlen(clone_name));
+    strcpy(clone_symbol->name, clone_name);
+    free(clone_name);
+    free(name);
 
     removeSymbol(temp_symbol);
     return clone_symbol;
@@ -419,7 +434,10 @@ bool isComplexIllegal(enum Type type) {
 
 void finishComplexMode(char *name, enum Type type) {
     complex_mode->children_count = symbol_counter;
-    complex_mode->name = name;
+    if (name != NULL) {
+        complex_mode->name = malloc(1 + strlen(name));
+        strcpy(complex_mode->name, name);
+    }
     complex_mode->secondary_type = type;
     if (isComplexIllegal(type)) throw_error(5, complex_mode->name);
     complex_mode = NULL;
@@ -615,9 +633,6 @@ void freeAllSymbols() {
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
-        if (symbol->value_type == V_STRING) free(symbol->value.s);
-        free(symbol->key);
-        free(symbol->name);
-        free(symbol);
+        freeSymbol(symbol);
     }
 }

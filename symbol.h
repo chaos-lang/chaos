@@ -45,6 +45,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
+void freeSymbol(Symbol* symbol);
 Symbol* getSymbol(char *name);
 Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key);
 Symbol* deepCopyComplex(char *name, Symbol* symbol);

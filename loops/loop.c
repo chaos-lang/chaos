@@ -52,7 +52,10 @@ void endLoop() {
             array = getSymbol(array_name);
             for (int i = 0; i < array->children_count; i++) {
                 Symbol* child = array->children[i];
-                addSymbolString(element_key, child->key);
+                char *key = malloc(1 + strlen(child->key));
+                strcpy(key, child->key);
+
+                addSymbolString(element_key, key);
                 child->name = element_value;
                 injectCode(body);
                 child->name = NULL;
