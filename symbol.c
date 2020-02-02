@@ -285,20 +285,20 @@ void addSymbolToComplex(Symbol* symbol) {
 }
 
 void printSymbolTable() {
-    Symbol *ptr1 = start_symbol;
+    Symbol *symbol = start_symbol;
     printf("[start] =>\n");
-    while(ptr1 != NULL) {
-        _Function* scope1 = ptr1->scope;
+    while(symbol != NULL) {
+        _Function* scope = symbol->scope;
         printf(
             "\t{name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i, value_type: %i} =>\n",
-            ptr1->name,
-            ptr1->key,
-            scope1->name,
-            ptr1->type,
-            ptr1->secondary_type,
-            ptr1->value_type
+            symbol->name,
+            symbol->key,
+            scope->name,
+            symbol->type,
+            symbol->secondary_type,
+            symbol->value_type
         );
-        ptr1 = ptr1->next;
+        symbol = symbol->next;
     }
     printf("[end]\n");
 }
