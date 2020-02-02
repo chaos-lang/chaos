@@ -98,6 +98,7 @@ void removeSymbol(Symbol* symbol) {
 
 void freeSymbol(Symbol* symbol) {
     if (symbol->value_type == V_STRING) free(symbol->value.s);
+    if (symbol->children_count > 0) free(symbol->children);
     free(symbol->key);
     free(symbol->name);
     free(symbol);
@@ -348,7 +349,9 @@ void updateSymbolFloat(char *name, float f) {
 
 void addSymbolString(char *name, char *s) {
     union Value value;
-    value.s = s;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
+    free(s);
     addSymbol(name, STRING, value, V_STRING);
 }
 
@@ -463,6 +466,7 @@ Symbol* getArrayElement(char *name, int i) {
 void cloneSymbolToComplex(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
     deepCopySymbol(symbol, symbol->type, key);
+    free(name);
 }
 
 void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
@@ -480,7 +484,11 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
         throw_error(12, complex->name);
     }
     symbol->type = type;
+    if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
+
+    free(name);
+    free(key);
 }
 
 void updateComplexElementBool(char* name, int index, char *key, bool b) {
@@ -503,7 +511,9 @@ void updateComplexElementFloat(char* name, int index, char *key, float f) {
 
 void updateComplexElementString(char* name, int index, char *key, char *s) {
     union Value value;
-    value.s = s;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
+    free(s);
     updateComplexElement(name, index, key, STRING, value);
 }
 
@@ -528,6 +538,9 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
     } else {
         throw_error(12, complex->name);
     }
+
+    free(name);
+    free(source_name);
 }
 
 void removeComplexElement(char *name, int i, char *key) {
@@ -560,6 +573,10 @@ void removeComplexElement(char *name, int i, char *key) {
     complex->children = temp;
     removeSymbol(symbol);
     complex->children_count--;
+
+    if (complex->children_count == 0) {
+        free(complex->children);
+    }
 }
 
 void addSymbolDict(char *name) {
