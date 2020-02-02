@@ -172,7 +172,7 @@ line: T_NEWLINE
     | expression T_NEWLINE                                          { if (is_interactive) printf("%i\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getSymbol($1)); }
     | loop T_NEWLINE                                                { }
-    | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : exit(0); }
+    | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : freeAllSymbols(); YYABORT; exit(0); }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
