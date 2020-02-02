@@ -179,11 +179,16 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
         case BOOL:
             printf("%s", symbol->value.b ? "true" : "false");
             break;
-        case INT:
-            printf("%i", symbol->value.i);
-            break;
-        case FLOAT:
-            printf("%g", symbol->value.f);
+        case NUMBER:
+            switch (symbol->value_type)
+            {
+                case V_INT:
+                    printf("%i", symbol->value.i);
+                    break;
+                case V_FLOAT:
+                    printf("%g", symbol->value.f);
+                    break;
+            }
             break;
         case STRING:
             if (is_complex) {
@@ -305,25 +310,25 @@ void updateSymbolBool(char *name, bool b) {
 void addSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    addSymbol(name, INT, value, V_INT);
+    addSymbol(name, NUMBER, value, V_INT);
 }
 
 void updateSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    updateSymbol(name, INT, value, V_INT);
+    updateSymbol(name, NUMBER, value, V_INT);
 }
 
 void addSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    addSymbol(name, FLOAT, value, V_FLOAT);
+    addSymbol(name, NUMBER, value, V_FLOAT);
 }
 
 void updateSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    updateSymbol(name, FLOAT, value, V_FLOAT);
+    updateSymbol(name, NUMBER, value, V_FLOAT);
 }
 
 void addSymbolString(char *name, char *s) {
@@ -352,14 +357,8 @@ Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
-    if (type != ANY) {
-        if (type == NUMBER) {
-            if (symbol->type != INT && symbol->type != FLOAT) {
-                throw_error(8, clone_name);
-            }
-        } else if (symbol->type != type) {
-            throw_error(8, clone_name);
-        }
+    if (type != ANY && symbol->type != type) {
+        throw_error(8, clone_name);
     }
 
     Symbol* clone_symbol;
@@ -381,16 +380,8 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     Symbol* symbol = getSymbol(name);
     Symbol* clone_symbol = getSymbol(clone_name);
 
-    if (clone_symbol->type != ANY) {
-        if (symbol->type == NUMBER) {
-            if (clone_symbol->type != INT && clone_symbol->type != FLOAT) {
-                throw_error(8, clone_name);
-            }
-        } else {
-            if (clone_symbol->type != symbol->type) {
-                throw_error(8, clone_name);
-            }
-        }
+    if (clone_symbol->type != ANY && clone_symbol->type != symbol->type) {
+        throw_error(8, clone_name);
     }
 
     if (clone_symbol->type == ARRAY) throw_error(9, clone_name);
@@ -412,14 +403,8 @@ bool isComplexIllegal(enum Type type) {
     if (complex_mode != NULL && type != ANY) {
         for (int i = 0; i < complex_mode->children_count; i++) {
             Symbol* symbol = complex_mode->children[i];
-            if (type == NUMBER) {
-                if (symbol->type != INT && symbol->type != FLOAT) {
-                    return true;
-                }
-            } else {
-                if (symbol->type != type) {
-                    return true;
-                }
+            if (symbol->type != type) {
+                return true;
             }
         }
     }
@@ -457,16 +442,8 @@ void cloneSymbolToComplex(char *name, char *key) {
 
 void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
     Symbol* complex = getSymbol(name);
-    if (complex->secondary_type != ANY) {
-        if (complex->secondary_type == NUMBER) {
-            if (type != INT && type != FLOAT) {
-                throw_error(5, complex->name);
-            }
-        } else {
-            if (complex->secondary_type != type) {
-                throw_error(5, complex->name);
-            }
-        }
+    if (complex->secondary_type != ANY && complex->secondary_type != type) {
+        throw_error(5, complex->name);
     }
 
     Symbol* symbol;
@@ -490,13 +467,13 @@ void updateComplexElementBool(char* name, int index, char *key, bool b) {
 void updateComplexElementInt(char* name, int index, char *key, int i) {
     union Value value;
     value.i = i;
-    updateComplexElement(name, index, key, INT, value);
+    updateComplexElement(name, index, key, NUMBER, value);
 }
 
 void updateComplexElementFloat(char* name, int index, char *key, float f) {
     union Value value;
     value.f = f;
-    updateComplexElement(name, index, key, FLOAT, value);
+    updateComplexElement(name, index, key, NUMBER, value);
 }
 
 void updateComplexElementString(char* name, int index, char *key, char *s) {
@@ -508,16 +485,8 @@ void updateComplexElementString(char* name, int index, char *key, char *s) {
 void updateComplexElementSymbol(char* name, int index, char *key, char* source_name) {
     Symbol* complex = getSymbol(name);
     Symbol* source = getSymbol(source_name);
-    if (complex->secondary_type != ANY) {
-        if (complex->secondary_type == NUMBER) {
-            if (source->type != INT && source->type != FLOAT) {
-                throw_error(5, complex->name);
-            }
-        } else {
-            if (complex->secondary_type != source->type) {
-                throw_error(5, complex->name);
-            }
-        }
+    if (complex->secondary_type != ANY && complex->secondary_type != source->type) {
+        throw_error(5, complex->name);
     }
 
     Symbol* symbol;

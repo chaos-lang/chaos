@@ -66,7 +66,6 @@ void callFunction(char *name) {
         Symbol* parameter = function->parameters[i];
         Symbol* parameter_call = function_parameters_mode->parameters[i];
 
-        if (parameter_call->type == NUMBER) parameter_call->type = FLOAT;
         createCloneFromSymbol(parameter->secondary_name, parameter->type, parameter_call, parameter_call->secondary_type);
     }
     scope_override = NULL;
@@ -138,14 +137,14 @@ void addFunctionCallParameterBool(bool b) {
 void addFunctionCallParameterInt(int i) {
     union Value value;
     value.i = i;
-    Symbol* symbol = addSymbol(NULL, INT, value, V_INT);
+    Symbol* symbol = addSymbol(NULL, NUMBER, value, V_INT);
     addSymbolToFunctionParameters(symbol);
 }
 
 void addFunctionCallParameterFloat(float f) {
     union Value value;
     value.f = f;
-    Symbol* symbol = addSymbol(NULL, FLOAT, value, V_FLOAT);
+    Symbol* symbol = addSymbol(NULL, NUMBER, value, V_FLOAT);
     addSymbolToFunctionParameters(symbol);
 }
 
@@ -162,11 +161,7 @@ void addFunctionCallParameterSymbol(char *name) {
 
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
-    if (executed_function->type == NUMBER) {
-        if (symbol->type != INT && symbol->type != FLOAT) {
-            throw_error(13, executed_function->name);
-        }
-    } else if (symbol->type != executed_function->type) {
+    if (symbol->type != executed_function->type) {
         throw_error(13, executed_function->name);
     }
     executed_function->symbol = createCloneFromSymbol(

@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 typedef struct Symbol Symbol;
-enum Type { BOOL, INT, CHAR, STRING, FLOAT, NUMBER, ANY, ARRAY, DICT, VOID };
+enum Type { BOOL, NUMBER, STRING, ANY, ARRAY, DICT, VOID };
 enum ValueType { V_BOOL, V_INT, V_FLOAT, V_STRING, V_VOID };
 
 #include "errors.h"
