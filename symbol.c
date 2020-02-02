@@ -534,7 +534,7 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
         complex_mode = complex;
         symbol_counter = complex->children_count;
         deepCopySymbol(source, source->type, key);
-        finishComplexMode(complex->name, complex->secondary_type);
+        finishComplexMode(NULL, complex->secondary_type);
     } else {
         throw_error(12, complex->name);
     }
