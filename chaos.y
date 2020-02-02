@@ -192,7 +192,7 @@ print: T_INT                                                        { printf("%i
 ;
 print: T_FLOAT                                                      { printf("%f\n", $1); }
 ;
-print: T_STRING                                                     { printf("%s\n", $1); }
+print: T_STRING                                                     { printf("%s\n", $1); free($1); }
 ;
 
 mixed_expression: T_FLOAT                                           { $$ = $1; }

@@ -53,6 +53,7 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
 
     if (symbol->type != ANY && symbol->type != type) throw_error(8, name);
 
+    if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
     symbol->value_type = value_type;
 
@@ -111,13 +112,12 @@ Symbol* getSymbol(char *name) {
     throw_error(3, name);
 }
 
-Symbol* deepCopySymbol(Symbol* symbol, char *key) {
-    return addSymbol(key, symbol->type, symbol->value, symbol->value_type);
-}
-
-Symbol* deepCopySymbolAny(Symbol* symbol, char *key) {
-    Symbol* clone_symbol = addSymbol(key, ANY, symbol->value, symbol->value_type);
-    clone_symbol->secondary_type = symbol->type;
+Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
+    Symbol* clone_symbol = addSymbol(key, type, symbol->value, symbol->value_type);
+    if (symbol->value_type == V_STRING) {
+        clone_symbol->value.s = malloc(1 + strlen(symbol->value.s));
+        strcpy(clone_symbol->value.s, symbol->value.s);
+    }
     return clone_symbol;
 }
 
@@ -137,7 +137,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
             key = malloc(1 + strlen(child->key));
             strcpy(key, child->key);
         }
-        deepCopySymbol(child, key);
+        deepCopySymbol(child, child->type, key);
     }
 
     Symbol* symbol_return = complex_mode;
@@ -347,9 +347,7 @@ void addSymbolString(char *name, char *s) {
 
 void updateSymbolString(char *name, char *s) {
     union Value value;
-    value.s = malloc(1 + strlen(s));
-    strcpy(value.s, s);
-    free(s);
+    value.s = s;
     updateSymbol(name, STRING, value, V_STRING);
 }
 
@@ -375,9 +373,9 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
         if (type == ANY) {
-            clone_symbol = deepCopySymbolAny(symbol, NULL);
+            clone_symbol = deepCopySymbol(symbol, ANY, NULL);
         } else {
-            clone_symbol = deepCopySymbol(symbol, NULL);
+            clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
         }
         clone_symbol->name = clone_name;
     }
@@ -397,9 +395,9 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     Symbol* temp_symbol = clone_symbol;
 
     if (clone_symbol->type == ANY) {
-        clone_symbol = deepCopySymbolAny(symbol, NULL);
+        clone_symbol = deepCopySymbol(symbol, ANY, NULL);
     } else {
-        clone_symbol = deepCopySymbol(symbol, NULL);
+        clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
     }
     clone_symbol->name = clone_name;
 
@@ -445,7 +443,8 @@ Symbol* getArrayElement(char *name, int i) {
 }
 
 void cloneSymbolToComplex(char *name, char *key) {
-    deepCopySymbol(getSymbol(name), key);
+    Symbol* symbol = getSymbol(name);
+    deepCopySymbol(symbol, symbol->type, key);
 }
 
 void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
@@ -501,12 +500,12 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
     if (complex->type == ARRAY) {
         symbol = getArrayElement(name, index);
         removeSymbol(symbol);
-        complex->children[index] = deepCopySymbol(source, NULL);
+        complex->children[index] = deepCopySymbol(source, source->type, NULL);
     } else if (complex->type == DICT) {
         removeComplexElement(name, 0, key);
         complex_mode = complex;
         symbol_counter = complex->children_count;
-        deepCopySymbol(source, key);
+        deepCopySymbol(source, source->type, key);
         finishComplexMode(complex->name, complex->secondary_type);
     } else {
         throw_error(12, complex->name);
@@ -616,7 +615,7 @@ void freeAllSymbols() {
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
-        //free(symbol->value.s);
+        if (symbol->value_type == V_STRING) free(symbol->value.s);
         free(symbol->key);
         free(symbol->name);
         free(symbol);

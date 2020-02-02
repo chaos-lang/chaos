@@ -46,8 +46,7 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
 void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
 Symbol* getSymbol(char *name);
-Symbol* deepCopySymbol(Symbol* symbol, char *key);
-Symbol* deepCopySymbolAny(Symbol* symbol, char *key);
+Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key);
 Symbol* deepCopyComplex(char *name, Symbol* symbol);
 float getSymbolValueFloat(char *name);
 void printSymbolValue(Symbol* symbol, bool is_complex);
