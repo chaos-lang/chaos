@@ -21,11 +21,9 @@ number pi = 3.14
 str param1 = 'testing'
 
 nil def f1(bool param1, num param2, str param3)
-    param3 = 'hello my friend'
-	print param1
-	print param2
-	print param3
-    symbol_table
+    print param1
+    print param2
+    print param3
 end
 
 f1(true, 5, hello)
