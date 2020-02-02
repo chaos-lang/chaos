@@ -289,7 +289,15 @@ void printSymbolTable() {
     printf("[start] =>\n");
     while(ptr1 != NULL) {
         _Function* scope1 = ptr1->scope;
-        printf("\t{name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i} =>\n", ptr1->name, ptr1->key, scope1->name, ptr1->type, ptr1->secondary_type);
+        printf(
+            "\t{name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i, value_type: %i} =>\n",
+            ptr1->name,
+            ptr1->key,
+            scope1->name,
+            ptr1->type,
+            ptr1->secondary_type,
+            ptr1->value_type
+        );
         ptr1 = ptr1->next;
     }
     printf("[end]\n");

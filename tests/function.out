@@ -7,57 +7,57 @@ true
 5
 hello my friend
 [start] =>
-	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 4, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 5, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: val1, key: (null), scope: a, type: 1, 2nd_type: 0} =>
-	{name: val2, key: (null), scope: b, type: 1, 2nd_type: 0} =>
-	{name: hello, key: (null), scope: main, type: 2, 2nd_type: 0} =>
-	{name: pi, key: (null), scope: main, type: 1, 2nd_type: 0} =>
-	{name: param1, key: (null), scope: main, type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: main, type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: param1, key: (null), scope: f1, type: 0, 2nd_type: 0} =>
-	{name: param2, key: (null), scope: f1, type: 1, 2nd_type: 0} =>
-	{name: param3, key: (null), scope: f1, type: 2, 2nd_type: 0} =>
+	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 4, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 5, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: val1, key: (null), scope: a, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: val2, key: (null), scope: b, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: hello, key: (null), scope: main, type: 2, 2nd_type: 0, value_type: 3} =>
+	{name: pi, key: (null), scope: main, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: param1, key: (null), scope: main, type: 2, 2nd_type: 0, value_type: 3} =>
+	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: main, type: 0, 2nd_type: 0, value_type: 0} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 1} =>
+	{name: param1, key: (null), scope: f1, type: 0, 2nd_type: 0, value_type: 0} =>
+	{name: param2, key: (null), scope: f1, type: 1, 2nd_type: 0, value_type: 1} =>
+	{name: param3, key: (null), scope: f1, type: 2, 2nd_type: 0, value_type: 3} =>
 [end]
 false
 3.14
 hello my friend
 [start] =>
-	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 4, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 5, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: val1, key: (null), scope: a, type: 1, 2nd_type: 0} =>
-	{name: val2, key: (null), scope: b, type: 1, 2nd_type: 0} =>
-	{name: hello, key: (null), scope: main, type: 2, 2nd_type: 0} =>
-	{name: pi, key: (null), scope: main, type: 1, 2nd_type: 0} =>
-	{name: param1, key: (null), scope: main, type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: main, type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: main, type: 0, 2nd_type: 0} =>
-	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0} =>
-	{name: param1, key: (null), scope: f1, type: 0, 2nd_type: 0} =>
-	{name: param2, key: (null), scope: f1, type: 1, 2nd_type: 0} =>
-	{name: param3, key: (null), scope: f1, type: 2, 2nd_type: 0} =>
+	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 4, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 5, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: val1, key: (null), scope: a, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: val2, key: (null), scope: b, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: hello, key: (null), scope: main, type: 2, 2nd_type: 0, value_type: 3} =>
+	{name: pi, key: (null), scope: main, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: param1, key: (null), scope: main, type: 2, 2nd_type: 0, value_type: 3} =>
+	{name: (null), key: (null), scope: (null), type: 0, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 4} =>
+	{name: (null), key: (null), scope: main, type: 0, 2nd_type: 0, value_type: 0} =>
+	{name: (null), key: (null), scope: (null), type: 1, 2nd_type: 0, value_type: 1} =>
+	{name: (null), key: (null), scope: main, type: 0, 2nd_type: 0, value_type: 0} =>
+	{name: (null), key: (null), scope: (null), type: 2, 2nd_type: 0, value_type: 3} =>
+	{name: param1, key: (null), scope: f1, type: 0, 2nd_type: 0, value_type: 0} =>
+	{name: param2, key: (null), scope: f1, type: 1, 2nd_type: 0, value_type: 2} =>
+	{name: param3, key: (null), scope: f1, type: 2, 2nd_type: 0, value_type: 3} =>
 [end]
 hello world
 3.14
