@@ -57,6 +57,8 @@ void throw_error(int code, char *subject) {
     printf("\n");
 
     if (!is_interactive) {
+        free(subject);
+        freeEverything();
         exit(code);
     } else {
         longjmp(InteractiveShellErrorAbsorber, 1);

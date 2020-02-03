@@ -25,11 +25,14 @@ extern char *yytext;
 extern enum Phase phase;
 
 void yyerror(const char* s);
+void freeEverything();
 
 bool is_interactive = true;
 bool inject_mode = false;
 
 jmp_buf InteractiveShellErrorAbsorber;
+
+FILE *fp;
 %}
 
 %union {
@@ -425,7 +428,7 @@ loop: error T_NEWLINE parser                                        { if (is_int
 %%
 
 int main(int argc, char** argv) {
-    FILE *fp = argc > 1 ? fopen (argv[1], "r") : stdin;
+    fp = argc > 1 ? fopen (argv[1], "r") : stdin;
 
     is_interactive = (fp != stdin) ? false : true;
 
@@ -459,18 +462,7 @@ int main(int argc, char** argv) {
         yyparse();
     } while(!feof(yyin));
 
-    // Free everything
-    free(last_token);
-    free(main_function);
-    freeAllSymbols();
-    yylex_destroy();
-    if (!is_interactive) {
-        fclose(fp);
-    }
-
-    fclose(stdin);
-    fclose(stdout);
-    fclose(stderr);
+    freeEverything();
 
     return 0;
 }
@@ -487,6 +479,23 @@ void yyerror(const char* s) {
         loop_mode = NULL;
         function_mode = NULL;
     } else {
+        freeEverything();
         exit(1);
     }
+}
+
+void freeEverything() {
+    free(last_token);
+    free(main_function);
+    freeAllSymbols();
+
+    yylex_destroy();
+
+    if (!is_interactive) {
+        fclose(fp);
+    }
+
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
 }

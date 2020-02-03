@@ -7,6 +7,7 @@
 #include <setjmp.h>
 #include <string.h>
 
+extern void freeEverything();
 extern bool is_interactive;
 extern jmp_buf InteractiveShellErrorAbsorber;
 
