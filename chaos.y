@@ -186,7 +186,7 @@ print: T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET           { printSymbo
 ;
 print: T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                { printSymbolValueEndWithNewLine(getDictElement($1, $3)); free($1); free($3); }
 ;
-print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); if (!loop_execution_mode) free($1); }
+print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); free($1); }
 ;
 print: T_INT                                                        { printf("%i\n", $1); }
 ;

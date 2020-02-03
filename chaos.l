@@ -112,9 +112,11 @@ switch (phase)
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);
-    yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
-    strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
-    if (loop_mode == NULL && function_mode == NULL) return T_STRING;
+    if (loop_mode == NULL && function_mode == NULL) {
+        yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
+        strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
+        return T_STRING;
+    }
 }
 
 bool|boolean                    {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_BOOL;}
@@ -125,5 +127,5 @@ json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_m
 any                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ANY;}
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
-[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (loop_mode == NULL && function_mode == NULL || was_foreach) return T_VAR;}
+[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%
