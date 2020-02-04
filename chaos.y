@@ -94,8 +94,8 @@ function:
     | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, ARRAY); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, VOID); }
-    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } }
-    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) callFunction($1); }
+    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } free($2); }
+    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1); } free($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -156,12 +156,12 @@ function_parameters: T_FLOAT                                        { if (phase 
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_STRING                                       { if (phase == PROGRAM) addFunctionCallParameterString($1); }
+function_parameters: T_STRING                                       { if (phase == PROGRAM) { addFunctionCallParameterString($1); } free($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR                                          { if (phase == PROGRAM) addFunctionCallParameterSymbol($1); }
+function_parameters: T_VAR                                          { if (phase == PROGRAM) { addFunctionCallParameterSymbol($1); } free($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -488,6 +488,7 @@ void freeEverything() {
     free(last_token);
     free(main_function);
     freeAllSymbols();
+    freeAllFunctions();
 
     yylex_destroy();
 

@@ -101,6 +101,7 @@ void freeSymbol(Symbol* symbol) {
     if (symbol->children_count > 0) free(symbol->children);
     free(symbol->key);
     free(symbol->name);
+    free(symbol->secondary_name);
     free(symbol);
 }
 
@@ -156,6 +157,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
 float getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
+    free(name);
     char value_type[2] = "\0";
     float value;
     switch (symbol->value_type)

@@ -14,6 +14,7 @@ void endLoop() {
     }
 
     if (function_mode != NULL) {
+        free(loop_mode);
         loop_mode = NULL;
         return;
     }

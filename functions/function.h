@@ -51,5 +51,7 @@ void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);
 void printFunctionReturn(char *name);
 void initMainFunction();
+void freeFunction(_Function* function);
+void freeAllFunctions();
 
 #endif

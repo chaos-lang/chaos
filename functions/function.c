@@ -8,10 +8,12 @@ void startFunction(char *name, enum Type type) {
     function_mode = getFunction(name);
     if (function_mode != NULL) {
         memset(function_mode->body, 0, strlen(function_mode->body));
+        free(name);
         return;
     }
-    function_mode = (struct _Function*)malloc(sizeof(_Function));
-    function_mode->name = name;
+    function_mode = (struct _Function*)calloc(1, sizeof(_Function));
+    function_mode->name = malloc(1 + strlen(name));
+    strcpy(function_mode->name, name);
     function_mode->type = type;
     function_mode->parameter_count = 0;
 
@@ -46,6 +48,7 @@ void startFunction(char *name, enum Type type) {
         add_suggestion(suggestion);
     }
 
+    free(name);
     freeFunctionMode();
 }
 
@@ -56,6 +59,12 @@ void endFunction() {
 }
 
 void freeFunctionMode() {
+    if (function_parameters_mode == NULL) return;
+
+    if (function_parameters_mode->parameter_count > 0) {
+        free(function_parameters_mode->parameters);
+    }
+    free(function_parameters_mode);
     function_parameters_mode = NULL;
 }
 
@@ -98,16 +107,18 @@ _Function* getFunction(char *name) {
 }
 
 void startFunctionParameters() {
-    function_parameters_mode = (struct _Function*)malloc(sizeof(_Function));
+    function_parameters_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_parameters_mode->parameter_count = 0;
 }
 
 void addFunctionParameter(char *secondary_name, enum Type type) {
     union Value value;
     Symbol* symbol = addSymbol(NULL, type, value, V_VOID);
-    symbol->secondary_name = secondary_name;
+    symbol->secondary_name = malloc(1 + strlen(secondary_name));
+    strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol);
+    free(secondary_name);
 }
 
 void addSymbolToFunctionParameters(Symbol* symbol) {
@@ -150,7 +161,8 @@ void addFunctionCallParameterFloat(float f) {
 
 void addFunctionCallParameterString(char *s) {
     union Value value;
-    value.s = s;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
     Symbol* symbol = addSymbol(NULL, STRING, value, V_STRING);
     addSymbolToFunctionParameters(symbol);
 }
@@ -170,6 +182,7 @@ void returnSymbol(char *name) {
         symbol,
         symbol->secondary_type
     );
+    free(name);
 }
 
 void printFunctionReturn(char *name) {
@@ -182,4 +195,19 @@ void initMainFunction() {
     main_function->name = "main";
     main_function->type = ANY;
     main_function->parameter_count = 0;
+}
+
+void freeFunction(_Function* function) {
+    free(function->name);
+    free(function->parameters);
+    free(function);
+}
+
+void freeAllFunctions() {
+    function_cursor = start_function;
+    while (function_cursor != NULL) {
+        _Function* function = function_cursor;
+        function_cursor = function_cursor->next;
+        freeFunction(function);
+    }
 }
