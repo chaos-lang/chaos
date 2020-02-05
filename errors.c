@@ -56,8 +56,8 @@ void throw_error(int code, char *subject) {
     #endif
     printf("\n");
 
+    free(subject);
     if (!is_interactive) {
-        free(subject);
         freeEverything();
         exit(code);
     } else {

@@ -174,6 +174,7 @@ void addFunctionCallParameterSymbol(char *name) {
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != executed_function->type) {
+        free(name);
         throw_error(13, executed_function->name);
     }
     executed_function->symbol = createCloneFromSymbol(

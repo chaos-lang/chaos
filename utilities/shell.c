@@ -1,6 +1,6 @@
 #include "shell.h"
 
-int suggestions_length = 4;
+int suggestions_length = __LANGUAGE_KEYWORD_COUNT__;
 char *suggestions[1000] = {
     "exit",
     "quit",

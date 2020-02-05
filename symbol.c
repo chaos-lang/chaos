@@ -136,6 +136,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     } else if (symbol->type == DICT) {
         addSymbolDict(NULL);
     } else {
+        free(name);
         throw_error(12, symbol->name);
     }
 
@@ -404,10 +405,14 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     Symbol* clone_symbol = getSymbol(clone_name);
 
     if (clone_symbol->type != ANY && clone_symbol->type != symbol->type) {
+        free(name);
         throw_error(8, clone_name);
     }
 
-    if (clone_symbol->type == ARRAY) throw_error(9, clone_name);
+    if (clone_symbol->type == ARRAY) {
+        free(name);
+        throw_error(9, clone_name);
+    }
 
     Symbol* temp_symbol = clone_symbol;
 
@@ -444,7 +449,10 @@ void finishComplexMode(char *name, enum Type type) {
         strcpy(complex_mode->name, name);
     }
     complex_mode->secondary_type = type;
-    if (isComplexIllegal(type)) throw_error(5, complex_mode->name);
+    if (isComplexIllegal(type)) {
+        free(name);
+        throw_error(5, complex_mode->name);
+    }
     complex_mode = NULL;
     symbol_counter = 0;
 }
@@ -458,6 +466,7 @@ Symbol* getArrayElement(char *name, int i) {
     }
 
     if (i < 0 || i > symbol->children_count - 1) {
+        free(name);
         char buffer[__ITOA_BUFFER_LENGTH__];
         throw_error(7, itoa(i, buffer, 10));
     }
@@ -474,6 +483,7 @@ void cloneSymbolToComplex(char *name, char *key) {
 void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
     Symbol* complex = getSymbol(name);
     if (complex->secondary_type != ANY && complex->secondary_type != type) {
+        free(name);
         throw_error(5, complex->name);
     }
 
@@ -483,6 +493,7 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
     } else if (complex->type == DICT) {
         symbol = getDictElement(name, key);
     } else {
+        free(name);
         throw_error(12, complex->name);
     }
     symbol->type = type;
@@ -523,6 +534,8 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
     Symbol* complex = getSymbol(name);
     Symbol* source = getSymbol(source_name);
     if (complex->secondary_type != ANY && complex->secondary_type != source->type) {
+        free(name);
+        free(source_name);
         throw_error(5, complex->name);
     }
 
@@ -538,6 +551,8 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
         deepCopySymbol(source, source->type, key);
         finishComplexMode(NULL, complex->secondary_type);
     } else {
+        free(name);
+        free(source_name);
         throw_error(12, complex->name);
     }
 
@@ -559,6 +574,8 @@ void removeComplexElement(char *name, int i, char *key) {
             }
         }
     } else {
+        free(name);
+        free(key);
         throw_error(12, name);
     }
     Symbol** temp = malloc((complex->children_count - 1) * sizeof(Symbol));
@@ -588,7 +605,10 @@ void addSymbolDict(char *name) {
 
 Symbol* getDictElement(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != DICT) throw_error(10, name);
+    if (symbol->type != DICT) {
+        free(key);
+        throw_error(10, name);
+    }
 
     for (int i = 0; i < symbol->children_count; i++) {
         Symbol* child = symbol->children[i];
@@ -596,6 +616,7 @@ Symbol* getDictElement(char *name, char *key) {
             return child;
         }
     }
+    free(name);
     throw_error(11, key);
 }
 

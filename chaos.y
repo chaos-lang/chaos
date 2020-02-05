@@ -173,9 +173,17 @@ parser:
 line: T_NEWLINE
     | mixed_expression T_NEWLINE                                    { if (is_interactive) printf("%g\n", $1); }
     | expression T_NEWLINE                                          { if (is_interactive) printf("%i\n", $1); }
-    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getSymbol($1)); }
+    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getSymbol($1)); free($1); } }
     | loop T_NEWLINE                                                { }
-    | T_QUIT T_NEWLINE                                              { is_interactive ? printf("%s\n", __BYE_BYE__) : freeAllSymbols(); YYABORT; exit(0); }
+    | T_QUIT T_NEWLINE                                              {
+        if (is_interactive) {
+            printf("%s\n", __BYE_BYE__);
+        } else {
+            YYABORT;
+        }
+        freeEverything();
+        exit(0);
+    }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
@@ -494,6 +502,11 @@ void freeEverything() {
 
     if (!is_interactive) {
         fclose(fp);
+    } else {
+        clear_history();
+        for (int i = __LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
+            free(suggestions[i]);
+        }
     }
 
     fclose(stdin);
