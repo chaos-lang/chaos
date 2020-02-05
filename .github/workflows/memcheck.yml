@@ -1,0 +1,24 @@
+name: Memory Leak Checks
+
+on: [push]
+
+jobs:
+  main:
+    name: memcheck
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y install build-essential bison flex libreadline-dev valgrind
+
+    - name: Build
+      run: |
+        make
+        sudo make install
+
+    - name: Run the memory leak checks
+      run: |
+        tests/memcheck.sh
