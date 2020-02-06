@@ -378,7 +378,10 @@ Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
-    if (type != ANY && symbol->type != type) {
+    if (type != ANY &&
+        symbol->type != ANY &&
+        symbol->type != type
+    ) {
         throw_error(8, clone_name);
     }
 
@@ -389,6 +392,12 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
     } else {
         if (type == ANY) {
             clone_symbol = deepCopySymbol(symbol, ANY, NULL);
+        } else if (symbol->type == ANY) {
+            char *temp_clone_name = malloc(1 + strlen(clone_name));
+            strcpy(temp_clone_name, clone_name);
+            Symbol* temp_symbol = createSymbolWithoutValueType(temp_clone_name, type);
+            clone_symbol = assignByTypeCasting(temp_symbol, symbol);
+            removeSymbol(temp_symbol);
         } else {
             clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
         }
@@ -407,7 +416,7 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     if (clone_symbol->type != ANY &&
         symbol->type != ANY &&
         clone_symbol->type != symbol->type
-        ) {
+    ) {
         free(name);
         throw_error(8, clone_name);
     }
@@ -684,7 +693,7 @@ void freeAllSymbols() {
 
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
     char buffer[__ITOA_BUFFER_LENGTH__];
-    char* val;
+    char *val;
     switch (clone_symbol->value_type)
     {
         case V_BOOL:
@@ -795,4 +804,29 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
             break;
     }
     return deepCopySymbol(clone_symbol, clone_symbol->type, NULL);
+}
+
+Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
+    union Value value;
+    enum ValueType value_type;
+
+    switch (type)
+    {
+        case BOOL:
+            value_type = V_BOOL;
+            break;
+        case NUMBER:
+            value_type = V_FLOAT;
+            break;
+        case STRING:
+            value.s = malloc(1 + strlen(""));
+            strcpy(value.s, "");
+            value_type = V_STRING;
+            break;
+        default:
+            throw_error(8, name);
+            break;
+    }
+
+    return addSymbol(name, type, value, value_type);
 }

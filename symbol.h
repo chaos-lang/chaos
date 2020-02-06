@@ -89,5 +89,6 @@ _Function* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);
 void freeAllSymbols();
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol);
+Symbol* createSymbolWithoutValueType(char *name, enum Type type);
 
 #endif

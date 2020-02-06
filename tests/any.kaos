@@ -66,220 +66,286 @@ print "START OF any to type safe variable assignments"
 
 del a
 del b
+del c
 any a = false
 bool b = true
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 0
 bool b = true
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 222
 bool b = false
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 0.0
 bool b = true
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 222.22
 bool b = false
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = ""
 bool b = true
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = "asd"
 bool b = false
 print a
 print b
 b = a
+bool c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = false
 num b = 333
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = true
 num b = 333
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 444
 num b = 333
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 555.55
 num b = 333
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = "666"
 num b = 333
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = false
 num b = 333.33
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = true
 num b = 333.33
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 444
 num b = 333.33
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 555
 num b = 333.33
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = "666"
 num b = 333.33
 print a
 print b
 b = a
+num c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = false
 string b = "hey"
 print a
 print b
 b = a
+string c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = true
 string b = "hey"
 print a
 print b
 b = a
+string c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 333
 string b = "hey"
 print a
 print b
 b = a
+string c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = 333.33
 string b = "hey"
 print a
 print b
 b = a
+string c = a
 print a
 print b
+print c
 
 del a
 del b
+del c
 any a = "universe"
 string b = "hey"
 print a
 print b
 b = a
+string c = a
 print a
 print b
+print c
