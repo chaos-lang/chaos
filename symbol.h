@@ -88,5 +88,6 @@ Symbol* getDictElement(char *name, char *key);
 _Function* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);
 void freeAllSymbols();
+Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol);
 
 #endif

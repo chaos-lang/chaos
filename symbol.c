@@ -404,7 +404,10 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     Symbol* symbol = getSymbol(name);
     Symbol* clone_symbol = getSymbol(clone_name);
 
-    if (clone_symbol->type != ANY && clone_symbol->type != symbol->type) {
+    if (clone_symbol->type != ANY &&
+        symbol->type != ANY &&
+        clone_symbol->type != symbol->type
+        ) {
         free(name);
         throw_error(8, clone_name);
     }
@@ -418,6 +421,8 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
 
     if (clone_symbol->type == ANY) {
         clone_symbol = deepCopySymbol(symbol, ANY, NULL);
+    } else if (symbol->type == ANY) {
+        clone_symbol = assignByTypeCasting(clone_symbol, symbol);
     } else {
         clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
     }
@@ -675,4 +680,119 @@ void freeAllSymbols() {
         symbol_cursor = symbol_cursor->next;
         freeSymbol(symbol);
     }
+}
+
+Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
+    char buffer[__ITOA_BUFFER_LENGTH__];
+    char* val;
+    switch (clone_symbol->value_type)
+    {
+        case V_BOOL:
+            switch (symbol->value_type)
+            {
+                case V_BOOL:
+                    clone_symbol->value.b = symbol->value.b;
+                    break;
+                case V_INT:
+                    if (symbol->value.i != 0) {
+                        clone_symbol->value.b = true;
+                    } else {
+                        clone_symbol->value.b = false;
+                    }
+                    break;
+                case V_FLOAT:
+                    if (symbol->value.f != 0.0) {
+                        clone_symbol->value.b = true;
+                    } else {
+                        clone_symbol->value.b = false;
+                    }
+                    break;
+                case V_STRING:
+                    if (symbol->value.s[0] != '\0') {
+                        clone_symbol->value.b = true;
+                    } else {
+                        clone_symbol->value.b = false;
+                    }
+                    break;
+                default:
+                    throw_error(8, clone_symbol->name);
+                    break;
+            }
+            break;
+        case V_INT:
+            switch (symbol->value_type)
+            {
+                case V_BOOL:
+                    clone_symbol->value.i = symbol->value.b ? 1 : 0;
+                    break;
+                case V_INT:
+                    clone_symbol->value.i = symbol->value.i;
+                    break;
+                case V_FLOAT:
+                    clone_symbol->value.i = (int)symbol->value.f;
+                    break;
+                case V_STRING:
+                    clone_symbol->value.i = atoi(symbol->value.s);
+                    break;
+                default:
+                    throw_error(8, clone_symbol->name);
+                    break;
+            }
+            break;
+        case V_FLOAT:
+            switch (symbol->value_type)
+            {
+                case V_BOOL:
+                    clone_symbol->value.f = symbol->value.b ? 1.0 : 0.0;
+                    break;
+                case V_INT:
+                    clone_symbol->value.f = (float)symbol->value.i;
+                    break;
+                case V_FLOAT:
+                    clone_symbol->value.f = symbol->value.f;
+                    break;
+                case V_STRING:
+                    clone_symbol->value.f = atof(symbol->value.s);
+                    break;
+                default:
+                    throw_error(8, clone_symbol->name);
+                    break;
+            }
+            break;
+        case V_STRING:
+            switch (symbol->value_type)
+            {
+                case V_BOOL:
+                    free(clone_symbol->value.s);
+                    val = symbol->value.b ? "true" : "false";
+                    clone_symbol->value.s = malloc(1 + strlen(val));
+                    strcpy(clone_symbol->value.s, val);
+                    break;
+                case V_INT:
+                    free(clone_symbol->value.s);
+                    val = itoa(symbol->value.i, buffer, 10);
+                    clone_symbol->value.s = malloc(1 + strlen(val));
+                    strcpy(clone_symbol->value.s, val);
+                    break;
+                case V_FLOAT:
+                    free(clone_symbol->value.s);
+                    val = gcvt(symbol->value.f, 6, buffer);
+                    clone_symbol->value.s = malloc(1 + strlen(val));
+                    strcpy(clone_symbol->value.s, val);
+                    break;
+                case V_STRING:
+                    free(clone_symbol->value.s);
+                    clone_symbol->value.s = malloc(1 + strlen(symbol->value.s));
+                    strcpy(clone_symbol->value.s, symbol->value.s);
+                    break;
+                default:
+                    throw_error(8, clone_symbol->name);
+                    break;
+            }
+            break;
+        default:
+            throw_error(8, clone_symbol->name);
+            break;
+    }
+    return deepCopySymbol(clone_symbol, clone_symbol->type, NULL);
 }
