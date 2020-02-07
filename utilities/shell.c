@@ -63,6 +63,13 @@ int esc_key_pressed(int count, int key) {
     rl_replace_line("exit", 0);
     rl_redisplay();
     printf("\n%s\n", __BYE_BYE__);
+    freeEverything();
+    exit(0);
+}
+
+int ctrl_d_key_pressed() {
+    printf("\n%s\n", __BYE_BYE__);
+    freeEverything();
     exit(0);
 }
 
@@ -88,6 +95,10 @@ int shell_readline(char *buf) {
         line = readline(__SHELL_INDICATOR_BLOCK__);
     } else {
         line = readline(__SHELL_INDICATOR__);
+    }
+
+    if (line == NULL) {
+        ctrl_d_key_pressed();
     }
 
     sprintf(buf,"%s\n",line);
