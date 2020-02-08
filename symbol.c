@@ -16,7 +16,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     } else {
         if (isDefined(name)) {
             free(symbol);
-            throw_error(2, name);
+            throw_error(3, name);
         }
         if (name != NULL) {
             symbol->name = malloc(1 + strlen(name));
@@ -51,7 +51,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
     Symbol* symbol = getSymbol(name);
 
-    if (symbol->type != ANY && symbol->type != type) throw_error(8, name);
+    if (symbol->type != ANY && symbol->type != type) throw_error(9, name);
 
     if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
@@ -118,7 +118,7 @@ Symbol* getSymbol(char *name) {
         }
         symbol_cursor = symbol_cursor->next;
     }
-    throw_error(3, name);
+    throw_error(4, name);
 }
 
 Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
@@ -137,7 +137,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
         addSymbolDict(NULL);
     } else {
         free(name);
-        throw_error(12, symbol->name);
+        throw_error(13, symbol->name);
     }
 
     for (int i = 0; i < symbol->children_count; i++) {
@@ -177,7 +177,7 @@ float getSymbolValueFloat(char *name) {
             break;
         default:
             value_type[0] = symbol->value_type;
-            throw_error(1, value_type);
+            throw_error(2, value_type);
             break;
     }
 }
@@ -249,7 +249,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             break;
         default:
             type[0] = symbol->type;
-            throw_error(1, type);
+            throw_error(2, type);
             break;
     }
 }
@@ -289,7 +289,7 @@ void addSymbolToComplex(Symbol* symbol) {
     );
 
     if (complex_mode->children == NULL) {
-        throw_error(4, complex_mode->name);
+        throw_error(5, complex_mode->name);
     }
 
     complex_mode->children[symbol_counter - 1] = symbol;
@@ -382,12 +382,12 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         symbol->type != ANY &&
         symbol->type != type
     ) {
-        throw_error(8, clone_name);
+        throw_error(9, clone_name);
     }
 
     Symbol* clone_symbol;
     if (symbol->type == ARRAY || symbol->type == DICT) {
-        if (symbol->secondary_type != extra_type) throw_error(8, clone_name);
+        if (symbol->secondary_type != extra_type) throw_error(9, clone_name);
         clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
         if (type == ANY) {
@@ -418,12 +418,12 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
         clone_symbol->type != symbol->type
     ) {
         free(name);
-        throw_error(8, clone_name);
+        throw_error(9, clone_name);
     }
 
     if (clone_symbol->type == ARRAY) {
         free(name);
-        throw_error(9, clone_name);
+        throw_error(10, clone_name);
     }
 
     Symbol* temp_symbol = clone_symbol;
@@ -465,7 +465,7 @@ void finishComplexMode(char *name, enum Type type) {
     complex_mode->secondary_type = type;
     if (isComplexIllegal(type)) {
         free(name);
-        throw_error(5, complex_mode->name);
+        throw_error(6, complex_mode->name);
     }
     complex_mode = NULL;
     symbol_counter = 0;
@@ -473,7 +473,7 @@ void finishComplexMode(char *name, enum Type type) {
 
 Symbol* getArrayElement(char *name, int i) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != ARRAY) throw_error(6, name);
+    if (symbol->type != ARRAY) throw_error(7, name);
 
     if (i < 0) {
         i = symbol->children_count + i;
@@ -482,7 +482,7 @@ Symbol* getArrayElement(char *name, int i) {
     if (i < 0 || i > symbol->children_count - 1) {
         free(name);
         char buffer[__ITOA_BUFFER_LENGTH__];
-        throw_error(7, itoa(i, buffer, 10));
+        throw_error(8, itoa(i, buffer, 10));
     }
 
     return symbol->children[i];
@@ -498,7 +498,7 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
     Symbol* complex = getSymbol(name);
     if (complex->secondary_type != ANY && complex->secondary_type != type) {
         free(name);
-        throw_error(5, complex->name);
+        throw_error(6, complex->name);
     }
 
     Symbol* symbol;
@@ -508,7 +508,7 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
         symbol = getDictElement(name, key);
     } else {
         free(name);
-        throw_error(12, complex->name);
+        throw_error(13, complex->name);
     }
     symbol->type = type;
     if (symbol->value_type == V_STRING) free(symbol->value.s);
@@ -550,7 +550,7 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
     if (complex->secondary_type != ANY && complex->secondary_type != source->type) {
         free(name);
         free(source_name);
-        throw_error(5, complex->name);
+        throw_error(6, complex->name);
     }
 
     Symbol* symbol;
@@ -567,7 +567,7 @@ void updateComplexElementSymbol(char* name, int index, char *key, char* source_n
     } else {
         free(name);
         free(source_name);
-        throw_error(12, complex->name);
+        throw_error(13, complex->name);
     }
 
     free(name);
@@ -590,7 +590,7 @@ void removeComplexElement(char *name, int i, char *key) {
     } else {
         free(name);
         free(key);
-        throw_error(12, name);
+        throw_error(13, name);
     }
     Symbol** temp = malloc((complex->children_count - 1) * sizeof(Symbol));
 
@@ -621,7 +621,7 @@ Symbol* getDictElement(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != DICT) {
         free(key);
-        throw_error(10, name);
+        throw_error(11, name);
     }
 
     for (int i = 0; i < symbol->children_count; i++) {
@@ -631,7 +631,7 @@ Symbol* getDictElement(char *name, char *key) {
         }
     }
     free(name);
-    throw_error(11, key);
+    throw_error(12, key);
 }
 
 void addSymbolAnyString(char *name, char *s) {
@@ -724,7 +724,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     }
                     break;
                 default:
-                    throw_error(8, clone_symbol->name);
+                    throw_error(9, clone_symbol->name);
                     break;
             }
             break;
@@ -744,7 +744,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     clone_symbol->value.i = atoi(symbol->value.s);
                     break;
                 default:
-                    throw_error(8, clone_symbol->name);
+                    throw_error(9, clone_symbol->name);
                     break;
             }
             break;
@@ -764,7 +764,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     clone_symbol->value.f = atof(symbol->value.s);
                     break;
                 default:
-                    throw_error(8, clone_symbol->name);
+                    throw_error(9, clone_symbol->name);
                     break;
             }
             break;
@@ -795,12 +795,12 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     strcpy(clone_symbol->value.s, symbol->value.s);
                     break;
                 default:
-                    throw_error(8, clone_symbol->name);
+                    throw_error(9, clone_symbol->name);
                     break;
             }
             break;
         default:
-            throw_error(8, clone_symbol->name);
+            throw_error(9, clone_symbol->name);
             break;
     }
     return deepCopySymbol(clone_symbol, clone_symbol->type, NULL);
@@ -824,7 +824,7 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
             value_type = V_STRING;
             break;
         default:
-            throw_error(8, name);
+            throw_error(9, name);
             break;
     }
 

@@ -103,7 +103,7 @@ _Function* getFunction(char *name) {
         function_cursor = function_cursor->next;
     }
     return NULL;
-    //throw_error(3, name);
+    //throw_error(4, name);
 }
 
 void startFunctionParameters() {
@@ -132,7 +132,7 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
     );
 
     if (function_parameters_mode->parameters == NULL) {
-        //throw_error(4, complex_mode->name);
+        //throw_error(5, complex_mode->name);
     }
 
     function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = symbol;
@@ -175,7 +175,7 @@ void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != executed_function->type) {
         free(name);
-        throw_error(13, executed_function->name);
+        throw_error(14, executed_function->name);
     }
     executed_function->symbol = createCloneFromSymbol(
         NULL,
