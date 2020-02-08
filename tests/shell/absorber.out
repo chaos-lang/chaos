@@ -1,7 +1,7 @@
-[0;41m Chaos Error - Undefined variable: 'asdas' [0m
+[0;41m Chaos Error - Undefined variable: asdas [0m
 [0;44m Absorbed by Interactive Shell [0m
 hey
-[0;41m Chaos Error - Undefined variable: 'a' [0m
+[0;41m Chaos Error - Undefined variable: a [0m
 [0;44m Absorbed by Interactive Shell [0m
 5
 [0;41m Chaos Error - The variable name 'a' is already defined! [0m

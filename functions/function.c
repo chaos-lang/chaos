@@ -119,8 +119,10 @@ _Function* getFunction(char *name) {
         }
         function_cursor = function_cursor->next;
     }
+    if (phase == PROGRAM) {
+        throw_error(15, name);
+    }
     return NULL;
-    //throw_error(4, name);
 }
 
 void startFunctionParameters() {
@@ -156,7 +158,7 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
     );
 
     if (function_parameters_mode->parameters == NULL) {
-        //throw_error(5, complex_mode->name);
+        throw_error(16, NULL);
     }
 
     function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = symbol;
