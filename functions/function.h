@@ -9,6 +9,9 @@ typedef struct _Function _Function;
 #include "../symbol.h"
 #include "../errors.h"
 #include "../utilities/shell.h"
+#include "../utilities/phase.h"
+
+extern enum Phase phase;
 
 typedef struct _Function {
     char *name;
@@ -18,6 +21,7 @@ typedef struct _Function {
     struct Symbol* symbol;
     struct _Function* previous;
     struct _Function* next;
+    struct _Function* parent_scope;
     char body[1000];
 } _Function;
 
@@ -32,6 +36,7 @@ _Function* function_parameters_mode;
 _Function* executed_function;
 
 _Function* main_function;
+_Function* scopeless;
 
 _Function* scope_override;
 
@@ -51,6 +56,7 @@ void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);
 void printFunctionReturn(char *name);
 void initMainFunction();
+void initScopeless();
 void freeFunction(_Function* function);
 void freeAllFunctions();
 

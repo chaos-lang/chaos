@@ -495,6 +495,7 @@ void yyerror(const char* s) {
 void freeEverything() {
     free(last_token);
     free(main_function);
+    free(scopeless);
     freeAllSymbols();
     freeAllFunctions();
 

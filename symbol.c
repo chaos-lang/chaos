@@ -29,6 +29,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     symbol->value_type = value_type;
     symbol->children_count = 0;
     symbol->scope = getCurrentScope();
+    symbol->role = DEFAULT;
 
     if (start_symbol == NULL) {
         start_symbol = symbol;
@@ -301,13 +302,15 @@ void printSymbolTable() {
     while(symbol != NULL) {
         _Function* scope = symbol->scope;
         printf(
-            "\t{name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i, value_type: %i} =>\n",
+            "\t{name: %s, 2nd_name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i, value_type: %i, role: %i} =>\n",
             symbol->name,
+            symbol->secondary_name,
             symbol->key,
             scope->name,
             symbol->type,
             symbol->secondary_type,
-            symbol->value_type
+            symbol->value_type,
+            symbol->role
         );
         symbol = symbol->next;
     }
@@ -678,8 +681,15 @@ Symbol* getSymbolFunctionParameter(char *name) {
     }
 
     Symbol* symbol = getSymbol(name);
+    scope_override = scopeless;
+    Symbol* clone_symbol = createCloneFromSymbol(
+        NULL,
+        symbol->type,
+        symbol,
+        symbol->secondary_type
+    );
     scope_override = NULL;
-    return symbol;
+    return clone_symbol;
 }
 
 void freeAllSymbols() {
@@ -829,4 +839,15 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
     }
 
     return addSymbol(name, type, value, value_type);
+}
+
+void removeSymbolsByScope(_Function* scope) {
+    symbol_cursor = start_symbol;
+    while (symbol_cursor != NULL) {
+        Symbol* symbol = symbol_cursor;
+        symbol_cursor = symbol_cursor->next;
+        if (strcmp(symbol->scope->name, scope->name) == 0) {
+            removeSymbol(symbol);
+        }
+    }
 }

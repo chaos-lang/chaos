@@ -81,7 +81,9 @@ void callFunction(char *name) {
 
     freeFunctionMode();
 
+    _Function* parent_scope = getCurrentScope();
     executed_function = function;
+    executed_function->parent_scope = parent_scope;
 
     injectCode(function->body);
 
@@ -89,6 +91,8 @@ void callFunction(char *name) {
         Symbol* parameter = function->parameters[i];
         removeSymbolByName(parameter->secondary_name);
     }
+
+    removeSymbolsByScope(function);
 
     executed_function = NULL;
 }
@@ -122,6 +126,14 @@ void addFunctionParameter(char *secondary_name, enum Type type) {
 }
 
 void addSymbolToFunctionParameters(Symbol* symbol) {
+    if (phase == PREPARSE) {
+        symbol->role = PARAM;
+    } else if (phase == PROGRAM) {
+        symbol->role = CALL_PARAM;
+        symbol->param_of = function_parameters_mode;
+    }
+    symbol->scope = scopeless;
+
     if (function_parameters_mode == NULL) {
         startFunctionParameters();
     }
@@ -177,12 +189,14 @@ void returnSymbol(char *name) {
         free(name);
         throw_error(14, executed_function->name);
     }
+    scope_override = executed_function->parent_scope;
     executed_function->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
         symbol,
         symbol->secondary_type
     );
+    scope_override = NULL;
     free(name);
 }
 
@@ -196,6 +210,14 @@ void initMainFunction() {
     main_function->name = "main";
     main_function->type = ANY;
     main_function->parameter_count = 0;
+    initScopeless();
+}
+
+void initScopeless() {
+    scopeless = (struct _Function*)malloc(sizeof(_Function));
+    scopeless->name = "N/A";
+    scopeless->type = ANY;
+    scopeless->parameter_count = 0;
 }
 
 void freeFunction(_Function* function) {

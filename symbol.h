@@ -8,6 +8,7 @@
 typedef struct Symbol Symbol;
 enum Type { BOOL, NUMBER, STRING, ANY, ARRAY, DICT, VOID };
 enum ValueType { V_BOOL, V_INT, V_FLOAT, V_STRING, V_VOID };
+enum Role { DEFAULT, PARAM, CALL_PARAM };
 
 #include "errors.h"
 #include "utilities/helpers.h"
@@ -32,6 +33,8 @@ typedef struct Symbol {
     int children_count;
     char *key;
     struct _Function* scope;
+    enum Role role;
+    struct _Function* param_of;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -90,5 +93,6 @@ Symbol* getSymbolFunctionParameter(char *name);
 void freeAllSymbols();
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol);
 Symbol* createSymbolWithoutValueType(char *name, enum Type type);
+void removeSymbolsByScope(_Function* scope);
 
 #endif
