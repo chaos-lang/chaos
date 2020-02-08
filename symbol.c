@@ -302,7 +302,7 @@ void printSymbolTable() {
     while(symbol != NULL) {
         _Function* scope = symbol->scope;
         printf(
-            "\t{name: %s, 2nd_name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i, value_type: %i, role: %i} =>\n",
+            "\t{name: %s, 2nd_name: %s, key: %s, scope: %s, type: %i, 2nd_type: %i, value_type: %i, role: %i, param_of: %s} =>\n",
             symbol->name,
             symbol->secondary_name,
             symbol->key,
@@ -310,7 +310,8 @@ void printSymbolTable() {
             symbol->type,
             symbol->secondary_type,
             symbol->value_type,
-            symbol->role
+            symbol->role,
+            symbol->param_of != NULL ? symbol->param_of->name : ""
         );
         symbol = symbol->next;
     }

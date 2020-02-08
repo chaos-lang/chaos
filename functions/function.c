@@ -9,6 +9,10 @@ void startFunction(char *name, enum Type type) {
     if (function_mode != NULL) {
         memset(function_mode->body, 0, strlen(function_mode->body));
         free(name);
+        for (int i = 0; i < function_parameters_mode->parameter_count; i++) {
+            Symbol* parameter = function_parameters_mode->parameters[i];
+            removeSymbol(parameter);
+        }
         return;
     }
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
@@ -40,6 +44,12 @@ void startFunction(char *name, enum Type type) {
         function_parameters_mode->parameter_count * sizeof(Symbol)
     );
     function_mode->parameter_count = function_parameters_mode->parameter_count;
+
+
+    for (int i = 0; i < function_mode->parameter_count; i++) {
+        Symbol* parameter = function_mode->parameters[i];
+        parameter->param_of = function_mode;
+    }
 
     if (name != NULL) {
         char suggestion[80];
@@ -75,7 +85,10 @@ void callFunction(char *name) {
         Symbol* parameter = function->parameters[i];
         Symbol* parameter_call = function_parameters_mode->parameters[i];
 
-        createCloneFromSymbol(parameter->secondary_name, parameter->type, parameter_call, parameter_call->secondary_type);
+        parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
+        strcpy(parameter_call->name, parameter->secondary_name);
+        parameter_call->scope = function;
+        parameter_call->param_of = function;
     }
     scope_override = NULL;
 
@@ -130,7 +143,6 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
         symbol->role = PARAM;
     } else if (phase == PROGRAM) {
         symbol->role = CALL_PARAM;
-        symbol->param_of = function_parameters_mode;
     }
     symbol->scope = scopeless;
 
