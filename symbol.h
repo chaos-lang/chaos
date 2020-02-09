@@ -33,6 +33,7 @@ typedef struct Symbol {
     int children_count;
     char *key;
     struct _Function* scope;
+    int recursion_depth;
     enum Role role;
     struct _Function* param_of;
 } Symbol;

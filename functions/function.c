@@ -88,6 +88,7 @@ void callFunction(char *name) {
         parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
         strcpy(parameter_call->name, parameter->secondary_name);
         parameter_call->scope = function;
+        parameter_call->recursion_depth = recursion_depth + 1;
         parameter_call->param_of = function;
     }
     scope_override = NULL;
@@ -106,12 +107,12 @@ void callFunction(char *name) {
 
     injectCode(function->body);
 
-    recursion_depth--;
-
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
         removeSymbolByName(parameter->secondary_name);
     }
+
+    recursion_depth--;
 
     removeSymbolsByScope(function);
 
