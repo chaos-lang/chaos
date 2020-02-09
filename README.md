@@ -77,10 +77,10 @@ sudo make install
 ### Interactive Shell
 
 ```
-mertyildiran@Corsair:~/Documents/chaos$ chaos
-Chaos Language 0.0.1-alpha (Dec 23 2019 04:18:23)
-GCC version: 7.4.0 on linux
-Turn chaos into magic!
+$ chaos
+    Chaos Language 0.0.1-alpha (Dec 23 2019 04:18:23)
+    GCC version: 7.4.0 on linux
+    Turn chaos into magic!
 
 ### print "hello world"
 hello world
@@ -90,7 +90,7 @@ hello world
 ### Program File as Command-line Argument
 
 ```
-mertyildiran@Corsair:~/Documents/chaos$ chaos dev.kaos
+$ chaos dev.kaos
 hello world
 ```
 
@@ -722,14 +722,11 @@ This keyword is only useful for the developers of language's itself:
 
 ```
 [start] =>
-	{name: val1, scope: a, type: 4, 2nd_type: 0} =>
-	{name: val2, scope: b, type: 4, 2nd_type: 0} =>
-	{name: hello, scope: main, type: 3, 2nd_type: 0} =>
-	{name: pi, scope: main, type: 4, 2nd_type: 0} =>
-	{name: param1, scope: main, type: 3, 2nd_type: 0} =>
-	{name: param1, scope: f1, type: 0, 2nd_type: 0} =>
-	{name: param2, scope: f1, type: 1, 2nd_type: 0} =>
-	{name: param3, scope: f1, type: 3, 2nd_type: 0} =>
+	{name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 4, role: 1, param_of: f1} =>
+	{name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 4, role: 1, param_of: f1} =>
+	{name: (null), 2nd_name: param3, key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 4, role: 1, param_of: f1} =>
+	{name: hello, 2nd_name: (null), key: (null), scope: main, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
+	{name: pi, 2nd_name: (null), key: (null), scope: main, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: } =>
 [end]
 ```
 
