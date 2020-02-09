@@ -53,6 +53,9 @@ void throw_error(int code, char *subject) {
         case 16:
             printf("Memory allocation for the function is failed!");
             break;
+        case 17:
+            printf("Maximum recursion depth %i exceeded!", __MAX_RECURSION_DEPTH__);
+            break;
         default:
             printf("Unkown error.");
             break;

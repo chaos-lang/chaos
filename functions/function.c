@@ -98,7 +98,15 @@ void callFunction(char *name) {
     executed_function = function;
     executed_function->parent_scope = parent_scope;
 
+    recursion_depth++;
+
+    if (recursion_depth > __MAX_RECURSION_DEPTH__) {
+        throw_error(17, NULL);
+    }
+
     injectCode(function->body);
+
+    recursion_depth--;
 
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
@@ -224,6 +232,7 @@ void initMainFunction() {
     main_function->name = "main";
     main_function->type = ANY;
     main_function->parameter_count = 0;
+    recursion_depth = 0;
     initScopeless();
 }
 

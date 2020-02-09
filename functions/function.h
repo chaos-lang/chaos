@@ -40,6 +40,8 @@ _Function* scopeless;
 
 _Function* scope_override;
 
+int recursion_depth;
+
 void startFunction(char *name, enum Type type);
 void endFunction();
 void freeFunctionMode();
