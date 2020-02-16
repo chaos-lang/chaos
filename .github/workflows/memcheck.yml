@@ -3,8 +3,8 @@ name: Memory Leak Checks
 on: [push]
 
 jobs:
-  main:
-    name: memcheck
+  ubuntu:
+    name: ubuntu
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +31,144 @@ jobs:
         make clean
         make clang
         sudo make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck
+
+  debian:
+    name: debian
+    runs-on: ubuntu-latest
+    container:
+      image: debian:stable
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        apt update
+        apt install -y make valgrind
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck
+
+  centos:
+    name: centos
+    runs-on: ubuntu-latest
+    container:
+      image: centos:latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        yum install -y which make valgrind
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck
+
+  fedora:
+    name: fedora
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        dnf install -y which make valgrind
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck
+
+  archlinux:
+    name: archlinux
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S --noconfirm which make valgrind
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
 
     - name: Run the memory leak checks (clang)
       run: |

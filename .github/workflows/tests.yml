@@ -46,7 +46,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt update
-        apt install make
+        apt install -y make
         make requirements
 
     - name: Build (gcc)
