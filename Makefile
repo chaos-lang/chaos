@@ -4,6 +4,9 @@ default:
 	export CHAOS_COMPILER=gcc
 	${MAKE} chaos
 
+requirements:
+	./requirements.sh
+
 clang:
 	export CHAOS_COMPILER=clang
 	${MAKE} chaos

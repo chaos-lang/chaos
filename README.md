@@ -57,7 +57,7 @@
 Install the requirements:
 
 ```
-sudo apt install build-essential bison flex libreadline-dev
+sudo make requirements
 ```
 
 Compile the interpreter:
