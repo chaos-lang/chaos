@@ -122,6 +122,7 @@ Symbol* getSymbol(char *name) {
         symbol_cursor = symbol_cursor->next;
     }
     throw_error(4, name);
+    return NULL;
 }
 
 Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
@@ -183,6 +184,7 @@ float getSymbolValueFloat(char *name) {
             throw_error(2, value_type);
             break;
     }
+    return 0.0;
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex) {
@@ -201,6 +203,10 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     break;
                 case V_FLOAT:
                     printf("%g", symbol->value.f);
+                    break;
+                default:
+                    type[0] = symbol->value_type;
+                    throw_error(18, type);
                     break;
             }
             break;
@@ -236,18 +242,22 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
         case ANY:
             switch (symbol->value_type)
             {
-            case V_STRING:
-                printf("%s", symbol->value.s);
-                break;
-            case V_INT:
-                printf("%i", symbol->value.i);
-                break;
-            case V_FLOAT:
-                printf("%g", symbol->value.f);
-                break;
-            case V_BOOL:
-                printf("%s", symbol->value.b ? "true" : "false");
-                break;
+                case V_STRING:
+                    printf("%s", symbol->value.s);
+                    break;
+                case V_INT:
+                    printf("%i", symbol->value.i);
+                    break;
+                case V_FLOAT:
+                    printf("%g", symbol->value.f);
+                    break;
+                case V_BOOL:
+                    printf("%s", symbol->value.b ? "true" : "false");
+                    break;
+                default:
+                    type[0] = symbol->value_type;
+                    throw_error(18, type);
+                    break;
             }
             break;
         default:
@@ -640,6 +650,7 @@ Symbol* getDictElement(char *name, char *key) {
     }
     free(name);
     throw_error(12, key);
+    return NULL;
 }
 
 void addSymbolAnyString(char *name, char *s) {

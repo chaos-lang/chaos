@@ -14,11 +14,22 @@ jobs:
       run: |
         sudo apt-get -y install build-essential bison flex libreadline-dev
 
-    - name: Build
+    - name: Build (gcc)
       run: |
+        make clean
         make
         sudo make install
 
-    - name: Run the tests
+    - name: Run the tests (gcc)
+      run: |
+        tests/run.sh
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        sudo make install
+
+    - name: Run the tests (clang)
       run: |
         tests/run.sh

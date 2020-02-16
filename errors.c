@@ -56,6 +56,9 @@ void throw_error(int code, char *subject) {
         case 17:
             printf("Maximum recursion depth %i exceeded!", __MAX_RECURSION_DEPTH__);
             break;
+        case 18:
+            printf("Unexpected value type: %s", subject);
+            break;
         default:
             printf("Unkown error.");
             break;

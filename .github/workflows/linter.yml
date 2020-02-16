@@ -14,12 +14,7 @@ jobs:
       run: |
         sudo apt-get -y install build-essential bison flex libreadline-dev
 
-    - name: Build
-      run: |
-        make
-        sudo make install
-
     - name: Lint with Cppcheck
       run: |
         sudo apt-get -y install cppcheck
-        cppcheck .
+        cppcheck --force .

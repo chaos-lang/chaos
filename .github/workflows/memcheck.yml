@@ -14,11 +14,22 @@ jobs:
       run: |
         sudo apt-get -y install build-essential bison flex libreadline-dev valgrind
 
-    - name: Build
+    - name: Build (gcc)
       run: |
+        make clean
         make
         sudo make install
 
-    - name: Run the memory leak checks
+    - name: Run the memory leak checks (gcc)
+      run: |
+        tests/memcheck.sh
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        sudo make install
+
+    - name: Run the memory leak checks (clang)
       run: |
         tests/memcheck.sh

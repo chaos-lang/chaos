@@ -35,7 +35,7 @@ void injectCode(char *code) {
 }
 
 #define YY_SKIP_YYWRAP 1
-int yywrap() { if (phase == PREPARSE) { phase = INIT_PROGRAM; rewind(yyin); return 1; } }
+int yywrap() { if (phase == PREPARSE) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
 
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
@@ -53,6 +53,7 @@ static int custom_input(char *buf, int result, int max_size) {
             errno = 0;
             clearerr(yyin);
         }
+        return result;
     }
 }
 %}
@@ -127,5 +128,5 @@ json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_m
 any                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ANY;}
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
-[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
+[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((loop_mode == NULL && function_mode == NULL) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%
