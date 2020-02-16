@@ -35,3 +35,12 @@ clean:
 
 install:
 	mv chaos /usr/bin/
+
+lint:
+	cppcheck --force .
+
+test:
+	./tests/run.sh
+
+memcheck:
+	./tests/memcheck.sh

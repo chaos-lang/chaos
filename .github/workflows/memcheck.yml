@@ -12,7 +12,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get -y install build-essential bison flex libreadline-dev valgrind
+        sudo make requirements
 
     - name: Build (gcc)
       run: |
@@ -22,7 +22,7 @@ jobs:
 
     - name: Run the memory leak checks (gcc)
       run: |
-        tests/memcheck.sh
+        make memcheck
 
     - name: Build (clang)
       run: |
@@ -32,4 +32,4 @@ jobs:
 
     - name: Run the memory leak checks (clang)
       run: |
-        tests/memcheck.sh
+        make memcheck
