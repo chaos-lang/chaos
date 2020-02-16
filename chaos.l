@@ -53,6 +53,7 @@ static int custom_input(char *buf, int result, int max_size) {
             errno = 0;
             clearerr(yyin);
         }
+        return result;
     }
 }
 %}
