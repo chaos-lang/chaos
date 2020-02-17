@@ -173,3 +173,38 @@ jobs:
     - name: Run the memory leak checks (clang)
       run: |
         make memcheck
+
+  alpine:
+    name: alpine
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        apk update
+        apk add bash which make valgrind
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck

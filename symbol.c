@@ -811,7 +811,8 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     break;
                 case V_FLOAT:
                     free(clone_symbol->value.s);
-                    val = gcvt(symbol->value.f, 6, buffer);
+                    sprintf(buffer, "%g", symbol->value.f);
+                    val = buffer;
                     clone_symbol->value.s = malloc(1 + strlen(val));
                     strcpy(clone_symbol->value.s, val);
                     break;
