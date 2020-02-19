@@ -9,5 +9,9 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     echo "Running memcheck: ${SUB}/${testname}"
 
-    cat $DIR/$filename | valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos || exit 1
+    if [[ "$OSTYPE" == "linux"* ]]; then
+        cat $DIR/$filename | valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos || exit 1
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        cat $DIR/$filename | /tmp/DrMemory/bin64/drmemory -exit_code_if_errors 1 -- chaos || exit 1
+    fi
 done

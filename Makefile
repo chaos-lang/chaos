@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 .ONESHELL:
 
 default:
@@ -34,7 +36,7 @@ clean:
 	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h
 
 install:
-	mv chaos /usr/bin/
+	mv chaos /usr/local/bin/
 
 lint:
 	cppcheck --force .

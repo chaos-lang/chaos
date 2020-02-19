@@ -3,8 +3,8 @@ name: Automated Tests
 on: [push]
 
 jobs:
-  main:
-    name: tests
+  linux:
+    name: linux
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}
@@ -82,6 +82,39 @@ jobs:
 
     - name: Build (clang)
       run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the tests (clang)
+      run: |
+        make test
+
+  macos:
+    name: macos
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        source ~/.bash_profile
+        make clean
+        make
+        make install
+
+    - name: Run the tests (gcc)
+      run: |
+        make test
+
+    - name: Build (clang)
+      run: |
+        source ~/.bash_profile
         make clean
         make clang
         make install

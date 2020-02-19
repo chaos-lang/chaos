@@ -3,8 +3,8 @@ name: Memory Leak Checks
 on: [push]
 
 jobs:
-  main:
-    name: memcheck
+  linux:
+    name: linux
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}
@@ -82,6 +82,42 @@ jobs:
 
     - name: Build (clang)
       run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck
+
+  macos:
+    name: macos
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        wget -O /tmp/DrMemory-MacOS-2.3.18309.tar.gz https://github.com/DynamoRIO/drmemory/releases/download/release_2.3.18309C/DrMemory-MacOS-2.3.18309.tar.gz
+        tar -C /tmp/ -xvf /tmp/DrMemory-MacOS-2.3.18309.tar.gz
+        mv /tmp/DrMemory-MacOS-2.3.18309/ /tmp/DrMemory/
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        source ~/.bash_profile
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck
+
+    - name: Build (clang)
+      run: |
+        source ~/.bash_profile
         make clean
         make clang
         make install
