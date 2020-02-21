@@ -1,3 +1,4 @@
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "shell.h"
 
 int suggestions_length = __LANGUAGE_KEYWORD_COUNT__;
@@ -147,3 +148,4 @@ int add_suggestion(char *suggestion) {
     suggestions_length++;
     return 0;
 }
+#endif

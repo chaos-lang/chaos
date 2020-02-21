@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <setjmp.h>
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include <readline/history.h>
+#endif
 
 #include "utilities/platform.h"
 #include "utilities/language.h"
@@ -167,7 +169,15 @@ function_parameters: T_VAR                                          { if (phase 
 ;
 
 parser:
-    | parser line                                                   { }
+    | parser line                                                   {
+        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        is_interactive ? (
+            loop_mode || function_mode ? printf("%s ", __SHELL_INDICATOR_BLOCK__) : (
+                inject_mode ? : printf("%s ", __SHELL_INDICATOR__)
+            )
+        ) : printf("");
+        #endif
+    }
 ;
 
 line: T_NEWLINE
@@ -443,8 +453,10 @@ int main(int argc, char** argv) {
     yyin = fp;
 
     if (is_interactive) {
+        #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         using_history();
         read_history(NULL);
+        #endif
         greet();
         phase = INIT_PROGRAM;
     }
@@ -467,6 +479,9 @@ int main(int argc, char** argv) {
             }
         }
 
+        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        !is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
+        #endif
         yyparse();
     } while(!feof(yyin));
 
@@ -486,6 +501,9 @@ void yyerror(const char* s) {
     if (is_interactive) {
         loop_mode = NULL;
         function_mode = NULL;
+        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        printf("%s ", __SHELL_INDICATOR__);
+        #endif
     } else {
         freeEverything();
         exit(1);
@@ -504,10 +522,12 @@ void freeEverything() {
     if (!is_interactive) {
         fclose(fp);
     } else {
+        #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();
         for (int i = __LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
             free(suggestions[i]);
         }
+        #endif
     }
 
     fclose(stdin);

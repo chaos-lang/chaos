@@ -2,12 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
 #include "utilities/language.h"
 #include "utilities/injector.h"
 #include "utilities/phase.h"
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "utilities/shell.h"
+#endif
 #include "loop.h"
 
 #define YY_DECL int yylex()
@@ -37,6 +41,7 @@ void injectCode(char *code) {
 #define YY_SKIP_YYWRAP 1
 int yywrap() { if (phase == PREPARSE) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
 
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
 
@@ -56,6 +61,7 @@ static int custom_input(char *buf, int result, int max_size) {
         return result;
     }
 }
+#endif
 %}
 
 %%

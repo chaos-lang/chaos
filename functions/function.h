@@ -8,7 +8,10 @@ typedef struct _Function _Function;
 
 #include "../symbol.h"
 #include "../errors.h"
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "../utilities/shell.h"
+#endif
+#include "../utilities/language.h"
 #include "../utilities/phase.h"
 
 extern enum Phase phase;

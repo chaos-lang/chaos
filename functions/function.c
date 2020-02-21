@@ -51,12 +51,14 @@ void startFunction(char *name, enum Type type) {
         parameter->param_of = function_mode;
     }
 
+    #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     if (name != NULL) {
         char suggestion[80];
         strcpy(suggestion, name);
         strcat(suggestion, "()");
         add_suggestion(suggestion);
     }
+    #endif
 
     free(name);
     freeFunctionMode();

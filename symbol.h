@@ -12,7 +12,9 @@ enum Role { DEFAULT, PARAM, CALL_PARAM };
 
 #include "errors.h"
 #include "utilities/helpers.h"
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "utilities/shell.h"
+#endif
 #include "functions/function.h"
 
 typedef struct Symbol {
