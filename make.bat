@@ -11,6 +11,11 @@ IF [%1]==[] (
 ) ELSE IF [%1]==[install] (
     move chaos.exe C:\Windows\System32\
     EXIT /B 0
+) ELSE IF [%1]==[test] (
+    CD TESTS
+    CALL run.bat
+    CD ..
+    EXIT /B 0
 )
 win_flex chaos.l
 win_bison -d chaos.y
