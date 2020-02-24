@@ -125,3 +125,41 @@ jobs:
     - name: Run the memory leak checks (clang)
       run: |
         make memcheck
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      shell: cmd
+      run: |
+        choco install drmemory.portable --version=2.3.0 --confirm
+        call make.bat requirements
+
+    - name: Build (gcc)
+      shell: cmd
+      run: |
+        call make.bat clean
+        call make.bat
+        call make.bat install
+
+    - name: Run the memory leak checks (gcc)
+      shell: cmd
+      run: |
+        call make.bat memcheck
+
+    - name: Build (clang)
+      shell: cmd
+      run: |
+        call RefreshEnv.cmd
+        call make.bat clean
+        call make.bat clang
+        call make.bat install
+
+    - name: Run the memory leak checks (clang)
+      shell: cmd
+      run: |
+        call make.bat memcheck
