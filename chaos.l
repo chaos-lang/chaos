@@ -100,6 +100,12 @@ switch (phase)
 "{"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT_CURLY_BRACKET;}
 "}"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT_CURLY_BRACKET;}
 ","                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_COMMA;}
+"=="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_EQUAL;}
+"!="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_NOT_EQUAL;}
+">"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_GREAT;}
+"<"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_SMALL;}
+">="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_GREAT_EQUAL;}
+"<="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_SMALL_EQUAL;}
 "//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 "#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}

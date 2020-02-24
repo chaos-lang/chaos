@@ -470,6 +470,21 @@ Dictionaries and the values of dictionaries are also immutable:
 {'b': 2, 'c': 3, 'a': 5}
 ```
 
+## Operators
+
+### Relational Operators
+
+Relational operators in Chaos language are exactly the same as the relational operators in C language:
+
+| Operator |                                   Description                                               |  Example |
+|----------|:-------------------------------------------------------------------------------------------:|---------:|
+| `==`     | Checks if the values of two operands are equal or not.                                      | `a == b` |
+| `!=`     | Checks if the values of two operands are equal or not.                                      | `a != b` |
+| `>`      | Checks if the value of left operand is greater than the value of right operand.             | `a > b`  |
+| `<`      | Checks if the value of left operand is less than the value of right operand.                | `a < b`  |
+| `>=`     | Checks if the value of left operand is greater than or equal to the value of right operand. | `a >= b` |
+| `<=`     | Checks if the value of left operand is less than or equal to the value of right operand.    | `a <= b` |
+
 ## Loops
 
 All loops ends with `end` keyword in Chaos Language.
