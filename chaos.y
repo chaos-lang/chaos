@@ -224,7 +224,6 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
     | mixed_expression T_MINUS mixed_expression                     { $$ = $1 - $3; }
     | mixed_expression T_MULTIPLY mixed_expression                  { $$ = $1 * $3; }
     | mixed_expression T_DIVIDE mixed_expression                    { $$ = $1 / $3; }
-    | T_LEFT mixed_expression T_RIGHT                               { $$ = $2; }
     | expression T_PLUS mixed_expression                            { $$ = $1 + $3; }
     | expression T_MINUS mixed_expression                           { $$ = $1 - $3; }
     | expression T_MULTIPLY mixed_expression                        { $$ = $1 * $3; }
@@ -255,12 +254,89 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
     | T_VAR T_MINUS expression                                      { $$ = getSymbolValueFloat($1) + $3; }
     | T_VAR T_MULTIPLY expression                                   { $$ = getSymbolValueFloat($1) + $3; }
     | T_VAR T_DIVIDE expression                                     { $$ = getSymbolValueFloat($1) + $3; }
+    | mixed_expression T_REL_EQUAL mixed_expression                 { $$ = $1 == $3; }
+    | mixed_expression T_REL_NOT_EQUAL mixed_expression             { $$ = $1 != $3; }
+    | mixed_expression T_REL_GREAT mixed_expression                 { $$ = $1 > $3; }
+    | mixed_expression T_REL_SMALL mixed_expression                 { $$ = $1 < $3; }
+    | mixed_expression T_REL_GREAT_EQUAL mixed_expression           { $$ = $1 >= $3; }
+    | mixed_expression T_REL_SMALL_EQUAL mixed_expression           { $$ = $1 <= $3; }
+    | mixed_expression T_LOGIC_AND mixed_expression                 { $$ = $1 && $3; }
+    | mixed_expression T_LOGIC_OR mixed_expression                  { $$ = $1 || $3; }
+    | mixed_expression T_REL_EQUAL expression                       { $$ = $1 == $3; }
+    | mixed_expression T_REL_NOT_EQUAL expression                   { $$ = $1 != $3; }
+    | mixed_expression T_REL_GREAT expression                       { $$ = $1 > $3; }
+    | mixed_expression T_REL_SMALL expression                       { $$ = $1 < $3; }
+    | mixed_expression T_REL_GREAT_EQUAL expression                 { $$ = $1 >= $3; }
+    | mixed_expression T_REL_SMALL_EQUAL expression                 { $$ = $1 <= $3; }
+    | mixed_expression T_LOGIC_AND expression                       { $$ = $1 && $3; }
+    | mixed_expression T_LOGIC_OR expression                        { $$ = $1 || $3; }
+    | expression T_REL_EQUAL mixed_expression                       { $$ = $1 == $3; }
+    | expression T_REL_NOT_EQUAL mixed_expression                   { $$ = $1 != $3; }
+    | expression T_REL_GREAT mixed_expression                       { $$ = $1 > $3; }
+    | expression T_REL_SMALL mixed_expression                       { $$ = $1 < $3; }
+    | expression T_REL_GREAT_EQUAL mixed_expression                 { $$ = $1 >= $3; }
+    | expression T_REL_SMALL_EQUAL mixed_expression                 { $$ = $1 <= $3; }
+    | expression T_LOGIC_AND mixed_expression                       { $$ = $1 && $3; }
+    | expression T_LOGIC_OR mixed_expression                        { $$ = $1 || $3; }
+    | T_LOGIC_NOT mixed_expression                                  { $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
+    | T_VAR T_REL_EQUAL mixed_expression                            { $$ = getSymbolValueBool($1) == $3; }
+    | T_VAR T_REL_NOT_EQUAL mixed_expression                        { $$ = getSymbolValueBool($1) != $3; }
+    | T_VAR T_REL_GREAT mixed_expression                            { $$ = getSymbolValueBool($1) > $3; }
+    | T_VAR T_REL_SMALL mixed_expression                            { $$ = getSymbolValueBool($1) < $3; }
+    | T_VAR T_REL_GREAT_EQUAL mixed_expression                      { $$ = getSymbolValueBool($1) >= $3; }
+    | T_VAR T_REL_SMALL_EQUAL mixed_expression                      { $$ = getSymbolValueBool($1) <= $3; }
+    | T_VAR T_LOGIC_AND mixed_expression                            { $$ = getSymbolValueBool($1) && $3; }
+    | T_VAR T_LOGIC_OR mixed_expression                             { $$ = getSymbolValueBool($1) || $3; }
+    | mixed_expression T_REL_EQUAL T_VAR                            { $$ = $1 == getSymbolValueBool($3); }
+    | mixed_expression T_REL_NOT_EQUAL T_VAR                        { $$ = $1 != getSymbolValueBool($3); }
+    | mixed_expression T_REL_GREAT T_VAR                            { $$ = $1 > getSymbolValueBool($3); }
+    | mixed_expression T_REL_SMALL T_VAR                            { $$ = $1 < getSymbolValueBool($3); }
+    | mixed_expression T_REL_GREAT_EQUAL T_VAR                      { $$ = $1 >= getSymbolValueBool($3); }
+    | mixed_expression T_REL_SMALL_EQUAL T_VAR                      { $$ = $1 <= getSymbolValueBool($3); }
+    | mixed_expression T_LOGIC_AND T_VAR                            { $$ = $1 && getSymbolValueBool($3); }
+    | mixed_expression T_LOGIC_OR T_VAR                             { $$ = $1 || getSymbolValueBool($3); }
+    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); }
+    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); }
+    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); }
+    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); }
+    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); }
+    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_AND T_VAR                                       { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); }
+    | T_LEFT mixed_expression T_RIGHT                               { $$ = $2; }
 ;
 
 expression: T_INT                                                   { $$ = $1; }
     | expression T_PLUS expression                                  { $$ = $1 + $3; }
     | expression T_MINUS expression                                 { $$ = $1 - $3; }
     | expression T_MULTIPLY expression                              { $$ = $1 * $3; }
+    | expression T_REL_EQUAL expression                             { $$ = $1 == $3; }
+    | expression T_REL_NOT_EQUAL expression                         { $$ = $1 != $3; }
+    | expression T_REL_GREAT expression                             { $$ = $1 > $3; }
+    | expression T_REL_SMALL expression                             { $$ = $1 < $3; }
+    | expression T_REL_GREAT_EQUAL expression                       { $$ = $1 >= $3; }
+    | expression T_REL_SMALL_EQUAL expression                       { $$ = $1 <= $3; }
+    | expression T_LOGIC_AND expression                             { $$ = $1 && $3; }
+    | expression T_LOGIC_OR expression                              { $$ = $1 || $3; }
+    | T_LOGIC_NOT expression                                        { $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
+    | T_VAR T_REL_EQUAL expression                                  { $$ = getSymbolValueBool($1) == $3; }
+    | T_VAR T_REL_NOT_EQUAL expression                              { $$ = getSymbolValueBool($1) != $3; }
+    | T_VAR T_REL_GREAT expression                                  { $$ = getSymbolValueBool($1) > $3; }
+    | T_VAR T_REL_SMALL expression                                  { $$ = getSymbolValueBool($1) < $3; }
+    | T_VAR T_REL_GREAT_EQUAL expression                            { $$ = getSymbolValueBool($1) >= $3; }
+    | T_VAR T_REL_SMALL_EQUAL expression                            { $$ = getSymbolValueBool($1) <= $3; }
+    | T_VAR T_LOGIC_AND expression                                  { $$ = getSymbolValueBool($1) && $3; }
+    | T_VAR T_LOGIC_OR expression                                   { $$ = getSymbolValueBool($1) || $3; }
+    | expression T_REL_EQUAL T_VAR                                  { $$ = $1 == getSymbolValueBool($3); }
+    | expression T_REL_NOT_EQUAL T_VAR                              { $$ = $1 != getSymbolValueBool($3); }
+    | expression T_REL_GREAT T_VAR                                  { $$ = $1 > getSymbolValueBool($3); }
+    | expression T_REL_SMALL T_VAR                                  { $$ = $1 < getSymbolValueBool($3); }
+    | expression T_REL_GREAT_EQUAL T_VAR                            { $$ = $1 >= getSymbolValueBool($3); }
+    | expression T_REL_SMALL_EQUAL T_VAR                            { $$ = $1 <= getSymbolValueBool($3); }
+    | expression T_LOGIC_AND T_VAR                                  { $$ = $1 && getSymbolValueBool($3); }
+    | expression T_LOGIC_OR T_VAR                                   { $$ = $1 || getSymbolValueBool($3); }
     | T_LEFT expression T_RIGHT                                     { $$ = $2; }
 ;
 
@@ -343,13 +419,13 @@ boolean_expression: T_FALSE                                         { $$ = $1; }
 variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_TRUE                                       { updateSymbolBool($1, $3); $$ = ""; }
     | variable T_EQUAL T_FALSE                                      { updateSymbolBool($1, $3); $$ = ""; }
-    | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
     | variable T_EQUAL T_INT                                        { updateSymbolInt($1, $3); $$ = ""; }
     | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR                                        { updateSymbolByClonning($1, $3); $$ = ""; }
     | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
+    | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
     | T_DEL variable                                                { removeSymbolByName($2); $$ = ""; free($2); }
     | T_DEL variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET           { removeComplexElement($2, $4, NULL); $$ = ""; free($2); }
     | T_DEL variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET   { removeComplexElement($2, -$5, NULL); $$ = ""; free($2); }
@@ -390,6 +466,8 @@ variable: T_VAR                                                     { $$ = $1; }
 variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL expression                           { addSymbolBool($2, $4); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL mixed_expression                     { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, BOOL, $4, ANY); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, ARRAY, $5, BOOL); $$ = ""; }
