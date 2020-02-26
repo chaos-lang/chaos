@@ -58,6 +58,7 @@ FILE *fp;
 %token T_SYMBOL_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
+%token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -270,24 +271,34 @@ boolean_expression: T_TRUE                                          { $$ = $1; }
     | boolean_expression T_REL_SMALL boolean_expression             { $$ = $1 < $3; }
     | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { $$ = $1 >= $3; }
     | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { $$ = $1 <= $3; }
+    | boolean_expression T_LOGIC_AND boolean_expression             { $$ = $1 && $3; }
+    | boolean_expression T_LOGIC_OR boolean_expression              { $$ = $1 || $3; }
+    | T_LOGIC_NOT boolean_expression                                { $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
     | T_VAR T_REL_EQUAL boolean_expression                          { $$ = getSymbolValueBool($1) == $3; }
     | T_VAR T_REL_NOT_EQUAL boolean_expression                      { $$ = getSymbolValueBool($1) != $3; }
     | T_VAR T_REL_GREAT boolean_expression                          { $$ = getSymbolValueBool($1) > $3; }
     | T_VAR T_REL_SMALL boolean_expression                          { $$ = getSymbolValueBool($1) < $3; }
     | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) >= $3; }
     | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) <= $3; }
+    | T_VAR T_LOGIC_AND boolean_expression                          { $$ = getSymbolValueBool($1) && $3; }
+    | T_VAR T_LOGIC_OR boolean_expression                           { $$ = getSymbolValueBool($1) || $3; }
     | boolean_expression T_REL_EQUAL T_VAR                          { $$ = $1 == getSymbolValueBool($3); }
     | boolean_expression T_REL_NOT_EQUAL T_VAR                      { $$ = $1 != getSymbolValueBool($3); }
     | boolean_expression T_REL_GREAT T_VAR                          { $$ = $1 > getSymbolValueBool($3); }
     | boolean_expression T_REL_SMALL T_VAR                          { $$ = $1 < getSymbolValueBool($3); }
     | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { $$ = $1 >= getSymbolValueBool($3); }
     | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { $$ = $1 <= getSymbolValueBool($3); }
-    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3);; }
-    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3);; }
-    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3);; }
-    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3);; }
-    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3);; }
-    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3);; }
+    | boolean_expression T_LOGIC_AND T_VAR                          { $$ = $1 && getSymbolValueBool($3); }
+    | boolean_expression T_LOGIC_OR T_VAR                           { $$ = $1 || getSymbolValueBool($3); }
+    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); }
+    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); }
+    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); }
+    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); }
+    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); }
+    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_AND T_VAR                                       { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); }
     | T_LEFT expression T_RIGHT                                     { $$ = $2; }
 ;
 
@@ -298,24 +309,34 @@ boolean_expression: T_FALSE                                         { $$ = $1; }
     | boolean_expression T_REL_SMALL boolean_expression             { $$ = $1 < $3; }
     | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { $$ = $1 >= $3; }
     | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { $$ = $1 <= $3; }
+    | boolean_expression T_LOGIC_AND boolean_expression             { $$ = $1 && $3; }
+    | boolean_expression T_LOGIC_OR boolean_expression              { $$ = $1 || $3; }
+    | T_LOGIC_NOT boolean_expression                                { $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
     | T_VAR T_REL_EQUAL boolean_expression                          { $$ = getSymbolValueBool($1) == $3; }
     | T_VAR T_REL_NOT_EQUAL boolean_expression                      { $$ = getSymbolValueBool($1) != $3; }
     | T_VAR T_REL_GREAT boolean_expression                          { $$ = getSymbolValueBool($1) > $3; }
     | T_VAR T_REL_SMALL boolean_expression                          { $$ = getSymbolValueBool($1) < $3; }
     | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) >= $3; }
     | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) <= $3; }
+    | T_VAR T_LOGIC_AND boolean_expression                          { $$ = getSymbolValueBool($1) && $3; }
+    | T_VAR T_LOGIC_OR boolean_expression                           { $$ = getSymbolValueBool($1) || $3; }
     | boolean_expression T_REL_EQUAL T_VAR                          { $$ = $1 == getSymbolValueBool($3); }
     | boolean_expression T_REL_NOT_EQUAL T_VAR                      { $$ = $1 != getSymbolValueBool($3); }
     | boolean_expression T_REL_GREAT T_VAR                          { $$ = $1 > getSymbolValueBool($3); }
     | boolean_expression T_REL_SMALL T_VAR                          { $$ = $1 < getSymbolValueBool($3); }
     | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { $$ = $1 >= getSymbolValueBool($3); }
     | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { $$ = $1 <= getSymbolValueBool($3); }
-    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3);; }
-    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3);; }
-    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3);; }
-    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3);; }
-    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3);; }
-    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3);; }
+    | boolean_expression T_LOGIC_AND T_VAR                          { $$ = $1 && getSymbolValueBool($3); }
+    | boolean_expression T_LOGIC_OR T_VAR                           { $$ = $1 || getSymbolValueBool($3); }
+    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); }
+    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); }
+    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); }
+    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); }
+    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); }
+    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_AND T_VAR                                       { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); }
     | T_LEFT expression T_RIGHT                                     { $$ = $2; }
 ;
 

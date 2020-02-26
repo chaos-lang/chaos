@@ -485,6 +485,16 @@ Relational operators in Chaos language are exactly the same as the relational op
 | `>=`     | Checks if the value of left operand is greater than or equal to the value of right operand. | `a >= b` |
 | `<=`     | Checks if the value of left operand is less than or equal to the value of right operand.    | `a <= b` |
 
+### Logical Operators
+
+Logical operators in Chaos language, is a combination of the logical operators in C and Python language:
+
+| Operator    |                         Description                       |             Example |
+|-------------|:---------------------------------------------------------:|--------------------:|
+| `&&`, `and` | Logical AND operator.                                     | `a && b`, `a and b` |
+| `||`, `or`  | Logical OR operator.                                      | `a || b`, `a or b`  |
+| `!`, `not`  | Logical NOT operator.                                     | `!a`, `not a`       |
+
 ## Loops
 
 All loops ends with `end` keyword in Chaos Language.

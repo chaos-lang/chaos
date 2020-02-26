@@ -31,7 +31,10 @@ char *suggestions[1000] = {
     "nil",
     "func",
     "function",
-    "def"
+    "def",
+    "and",
+    "or",
+    "not"
 };
 
 int up_arrow_key_pressed(int count, int key) {

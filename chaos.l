@@ -106,6 +106,9 @@ switch (phase)
 "<"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_SMALL;}
 ">="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_GREAT_EQUAL;}
 "<="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_SMALL_EQUAL;}
+\&\&|and                        {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_AND;}
+\|\||or                         {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_OR;}
+\!|not                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_NOT;}
 "//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 "#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
