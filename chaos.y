@@ -305,7 +305,7 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
     | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); }
     | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); }
     | T_VAR T_LOGIC_AND T_VAR                                       { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); }
-    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); }
+    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); free($3); }
     | T_LEFT mixed_expression T_RIGHT                               { $$ = $2; }
 ;
 
