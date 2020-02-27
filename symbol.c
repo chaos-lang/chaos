@@ -923,3 +923,24 @@ void removeSymbolsByScope(_Function* scope) {
         }
     }
 }
+
+int incrementThenAssign(char *name, int i) {
+    char *name1 = malloc(1 + strlen(name));
+    strcpy(name1, name);
+    char *name2 = malloc(1 + strlen(name));
+    strcpy(name2, name);
+
+    updateSymbolInt(name2, getSymbolValueInt(name1) + i);
+    return getSymbolValueInt(name);
+}
+
+int assignThenIncrement(char *name, int i) {
+    char *name1 = malloc(1 + strlen(name));
+    strcpy(name1, name);
+    char *name2 = malloc(1 + strlen(name));
+    strcpy(name2, name);
+
+    int result = getSymbolValueInt(name);
+    updateSymbolInt(name2, getSymbolValueInt(name1) + i);
+    return result;
+}

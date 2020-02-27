@@ -115,6 +115,8 @@ switch (phase)
 "~"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_NOT;}
 "<<"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_LEFT_SHIFT;}
 ">>"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_RIGHT_SHIFT;}
+"++"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_INCREMENT;}
+"--"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DECREMENT;}
 "//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 "#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}

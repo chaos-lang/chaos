@@ -60,6 +60,7 @@ FILE *fp;
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
+%token T_INCREMENT T_DECREMENT
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -360,6 +361,14 @@ expression: T_INT                                                   { $$ = $1; }
     | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
     | T_BITWISE_NOT expression                                      { $$ = ~ $2; }
     | T_BITWISE_NOT T_VAR                                           { $$ = ~ getSymbolValueInt($2); }
+    | T_INCREMENT expression                                        { $$ = ++ $2; }
+    | expression T_INCREMENT                                        { $$ = $1 ++; }
+    | T_DECREMENT expression                                        { $$ = -- $2; }
+    | expression T_DECREMENT                                        { $$ = $1 --; }
+    | T_INCREMENT T_VAR                                             { $$ = incrementThenAssign($2, 1); }
+    | T_VAR T_INCREMENT                                             { $$ = assignThenIncrement($1, 1); }
+    | T_DECREMENT T_VAR                                             { $$ = incrementThenAssign($2, -1); }
+    | T_VAR T_DECREMENT                                             { $$ = assignThenIncrement($1, -1); }
     | T_LEFT expression T_RIGHT                                     { $$ = $2; }
 ;
 

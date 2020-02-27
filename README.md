@@ -508,6 +508,16 @@ Bitwise operators in Chaos language are exactly the same as the bitwise operator
 | `<<`     | Binary Left Shift Operator. The left operands value is moved left by the number of bits specified by the right operand.   | `a << 1` |
 | `>>`     | Binary Right Shift Operator. The left operands value is moved right by the number of bits specified by the right operand. | `a >> 1` |
 
+### Unary Operators
+
+Chaos language also supports unary operators like paranthesis: `()`, pre-/post-increment: `++a, a++` and pre-/post-decrement: `--a, a--` just like in C language.
+
+*Note1: There are intentionally no ternary or conditional operators to facilitate the **zero cyclomatic complexity** requirement.*
+
+*Note2: There are no arithmetic assignment operators because we believe having those operators, resulting more error-prone code.*
+
+*Note3: Modulus, exponent and floor division is provided by the standart library as functions instead of as operators for the favor of less error-prone code.*
+
 ## Loops
 
 All loops ends with `end` keyword in Chaos Language.
