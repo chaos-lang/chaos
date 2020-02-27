@@ -57,6 +57,7 @@ Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key);
 Symbol* deepCopyComplex(char *name, Symbol* symbol);
 float getSymbolValueFloat(char *name);
 bool getSymbolValueBool(char *name);
+int getSymbolValueInt(char *name);
 void printSymbolValue(Symbol* symbol, bool is_complex);
 void printSymbolValueEndWith(Symbol* symbol, char *end);
 void printSymbolValueEndWithNewLine(Symbol* symbol);

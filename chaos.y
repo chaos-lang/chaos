@@ -59,6 +59,7 @@ FILE *fp;
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
+%token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -319,8 +320,11 @@ expression: T_INT                                                   { $$ = $1; }
     | expression T_REL_SMALL_EQUAL expression                       { $$ = $1 <= $3; }
     | expression T_LOGIC_AND expression                             { $$ = $1 && $3; }
     | expression T_LOGIC_OR expression                              { $$ = $1 || $3; }
-    | T_LOGIC_NOT expression                                        { $$ = ! $2; }
-    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
+    | expression T_BITWISE_AND expression                           { $$ = $1 & $3; }
+    | expression T_BITWISE_OR expression                            { $$ = $1 | $3; }
+    | expression T_BITWISE_XOR expression                           { $$ = $1 ^ $3; }
+    | expression T_BITWISE_LEFT_SHIFT expression                    { $$ = $1 << $3; }
+    | expression T_BITWISE_RIGHT_SHIFT expression                   { $$ = $1 >> $3; }
     | T_VAR T_REL_EQUAL expression                                  { $$ = getSymbolValueBool($1) == $3; }
     | T_VAR T_REL_NOT_EQUAL expression                              { $$ = getSymbolValueBool($1) != $3; }
     | T_VAR T_REL_GREAT expression                                  { $$ = getSymbolValueBool($1) > $3; }
@@ -329,6 +333,11 @@ expression: T_INT                                                   { $$ = $1; }
     | T_VAR T_REL_SMALL_EQUAL expression                            { $$ = getSymbolValueBool($1) <= $3; }
     | T_VAR T_LOGIC_AND expression                                  { $$ = getSymbolValueBool($1) && $3; }
     | T_VAR T_LOGIC_OR expression                                   { $$ = getSymbolValueBool($1) || $3; }
+    | T_VAR T_BITWISE_AND expression                                { $$ = getSymbolValueInt($1) & $3; }
+    | T_VAR T_BITWISE_OR expression                                 { $$ = getSymbolValueInt($1) | $3; }
+    | T_VAR T_BITWISE_XOR expression                                { $$ = getSymbolValueInt($1) ^ $3; }
+    | T_VAR T_BITWISE_LEFT_SHIFT expression                         { $$ = getSymbolValueInt($1) << $3; }
+    | T_VAR T_BITWISE_RIGHT_SHIFT expression                        { $$ = getSymbolValueInt($1) >> $3; }
     | expression T_REL_EQUAL T_VAR                                  { $$ = $1 == getSymbolValueBool($3); }
     | expression T_REL_NOT_EQUAL T_VAR                              { $$ = $1 != getSymbolValueBool($3); }
     | expression T_REL_GREAT T_VAR                                  { $$ = $1 > getSymbolValueBool($3); }
@@ -337,6 +346,20 @@ expression: T_INT                                                   { $$ = $1; }
     | expression T_REL_SMALL_EQUAL T_VAR                            { $$ = $1 <= getSymbolValueBool($3); }
     | expression T_LOGIC_AND T_VAR                                  { $$ = $1 && getSymbolValueBool($3); }
     | expression T_LOGIC_OR T_VAR                                   { $$ = $1 || getSymbolValueBool($3); }
+    | expression T_BITWISE_AND T_VAR                                { $$ = $1 & getSymbolValueInt($3); }
+    | expression T_BITWISE_OR T_VAR                                 { $$ = $1 | getSymbolValueInt($3); }
+    | expression T_BITWISE_XOR T_VAR                                { $$ = $1 ^ getSymbolValueInt($3); }
+    | expression T_BITWISE_LEFT_SHIFT T_VAR                         { $$ = $1 << getSymbolValueInt($3); }
+    | expression T_BITWISE_RIGHT_SHIFT T_VAR                        { $$ = $1 >> getSymbolValueInt($3); }
+    | T_VAR T_BITWISE_AND T_VAR                                     { $$ = getSymbolValueInt($1) & getSymbolValueInt($3);; }
+    | T_VAR T_BITWISE_OR T_VAR                                      { $$ = getSymbolValueInt($1) | getSymbolValueInt($3);; }
+    | T_VAR T_BITWISE_XOR T_VAR                                     { $$ = getSymbolValueInt($1) ^ getSymbolValueInt($3);; }
+    | T_VAR T_BITWISE_LEFT_SHIFT T_VAR                              { $$ = getSymbolValueInt($1) << getSymbolValueInt($3);; }
+    | T_VAR T_BITWISE_RIGHT_SHIFT T_VAR                             { $$ = getSymbolValueInt($1) >> getSymbolValueInt($3);; }
+    | T_LOGIC_NOT expression                                        { $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
+    | T_BITWISE_NOT expression                                      { $$ = ~ $2; }
+    | T_BITWISE_NOT T_VAR                                           { $$ = ~ getSymbolValueInt($2); }
     | T_LEFT expression T_RIGHT                                     { $$ = $2; }
 ;
 

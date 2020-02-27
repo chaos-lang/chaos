@@ -477,7 +477,7 @@ Dictionaries and the values of dictionaries are also immutable:
 Relational operators in Chaos language are exactly the same as the relational operators in C language:
 
 | Operator |                                   Description                                               |  Example |
-|----------|:-------------------------------------------------------------------------------------------:|---------:|
+|:---------|:-------------------------------------------------------------------------------------------:|---------:|
 | `==`     | Checks if the values of two operands are equal or not.                                      | `a == b` |
 | `!=`     | Checks if the values of two operands are equal or not.                                      | `a != b` |
 | `>`      | Checks if the value of left operand is greater than the value of right operand.             | `a > b`  |
@@ -490,10 +490,23 @@ Relational operators in Chaos language are exactly the same as the relational op
 Logical operators in Chaos language, is a combination of the logical operators in C and Python language:
 
 | Operator    |                         Description                       |             Example |
-|-------------|:---------------------------------------------------------:|--------------------:|
+|:------------|:---------------------------------------------------------:|--------------------:|
 | `&&`, `and` | Logical AND operator.                                     | `a && b`, `a and b` |
 | `||`, `or`  | Logical OR operator.                                      | `a || b`, `a or b`  |
 | `!`, `not`  | Logical NOT operator.                                     | `!a`, `not a`       |
+
+### Bitwise Operators
+
+Bitwise operators in Chaos language are exactly the same as the bitwise operators in C language:
+
+| Operator |                                   Description                                                                             |  Example |
+|:---------|:-------------------------------------------------------------------------------------------------------------------------:|---------:|
+| `&`      | Binary AND Operator copies a bit to the result if it exists in both operands.                                             | `a & b`  |
+| `|`      | Binary OR Operator copies a bit if it exists in either operand.                                                           | `a | b`  |
+| `^`      | Binary XOR Operator copies the bit if it is set in one operand but not both.                                              | `a ^ b`  |
+| `~`      | Binary One's Complement Operator is unary and has the effect of 'flipping' bits.                                          | `~a`     |
+| `<<`     | Binary Left Shift Operator. The left operands value is moved left by the number of bits specified by the right operand.   | `a << 1` |
+| `>>`     | Binary Right Shift Operator. The left operands value is moved right by the number of bits specified by the right operand. | `a >> 1` |
 
 ## Loops
 

@@ -215,6 +215,33 @@ bool getSymbolValueBool(char *name) {
     return false;
 }
 
+int getSymbolValueInt(char *name) {
+    Symbol* symbol = getSymbol(name);
+    free(name);
+    char value_type[2] = "\0";
+    int value;
+    switch (symbol->value_type)
+    {
+        case V_BOOL:
+            value = symbol->value.b ? 1 : 0;
+            return value;
+            break;
+        case V_INT:
+            value = symbol->value.i;
+            return value;
+            break;
+        case V_FLOAT:
+            value = (int)symbol->value.f;
+            return value;
+            break;
+        default:
+            value_type[0] = symbol->value_type;
+            throw_error(2, value_type);
+            break;
+    }
+    return 0;
+}
+
 void printSymbolValue(Symbol* symbol, bool is_complex) {
     char type[2] = "\0";
 

@@ -109,6 +109,12 @@ switch (phase)
 \&\&|and                        {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_AND;}
 \|\||or                         {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_OR;}
 \!|not                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_NOT;}
+"&"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_AND;}
+"|"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_OR;}
+"^"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_XOR;}
+"~"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_NOT;}
+"<<"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_LEFT_SHIFT;}
+">>"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_RIGHT_SHIFT;}
 "//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 "#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
