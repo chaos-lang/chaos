@@ -20,6 +20,7 @@ void startFunction(char *name, enum Type type) {
     strcpy(function_mode->name, name);
     function_mode->type = type;
     function_mode->parameter_count = 0;
+    function_mode->decision_length = 0;
 
     recordToken(strdup("\n"), 1);
 
@@ -108,6 +109,8 @@ void callFunction(char *name) {
     }
 
     injectCode(function->body);
+
+    executeDecision(function);
 
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
@@ -249,6 +252,10 @@ void initScopeless() {
 void freeFunction(_Function* function) {
     free(function->name);
     free(function->parameters);
+    for (int i = 0; i < function->decision_length; i++) {
+        free(function->decision_expressions[i]);
+        free(function->decision_functions[i]);
+    }
     free(function);
 }
 
@@ -259,4 +266,73 @@ void freeAllFunctions() {
         function_cursor = function_cursor->next;
         freeFunction(function);
     }
+}
+
+bool block(enum BlockType type) {
+    switch (type)
+    {
+        case B_EXPRESSION:
+            if (decision_mode != NULL) {
+                decision_expression_mode = decision_mode;
+                decision_function_mode = NULL;
+                return true;
+            }
+            break;
+        case B_FUNCTION:
+            if (decision_mode != NULL) {
+                decision_function_mode = decision_mode;
+                decision_expression_mode = NULL;
+                return true;
+            }
+            break;
+        default:
+            return false;
+            break;
+    }
+    return false;
+}
+
+void finishDecisionMode() {
+    decision_mode->decision_functions[decision_mode->decision_length] = malloc(1 + strlen(trim_string(decision_buffer)));
+    strcpy(decision_mode->decision_functions[decision_mode->decision_length], trim_string(decision_buffer));
+    memset(decision_buffer, 0, strlen(trim_string(decision_buffer)));
+    decision_mode->decision_length++;
+    decision_mode = NULL;
+    decision_expression_mode = NULL;
+    decision_function_mode = NULL;
+}
+
+void executeDecision(_Function* function) {
+    if (function->decision_length <= 0) {
+        return;
+    }
+    _Function* executed_function_backup = executed_function;
+
+    union Value value;
+    value.b = false;
+    char expression_buffer[1000] = "";
+    char function_buffer[1000] = "";
+    char *name = malloc(1 + strlen(__LANGUAGE_NAME__));
+    strcpy(name, __LANGUAGE_NAME__);
+    Symbol* symbol = addSymbol(name, BOOL, value, V_BOOL);
+
+    for (int i = 0; i < function->decision_length; i++) {
+        strcat(expression_buffer, __LANGUAGE_NAME__);
+        strcat(expression_buffer, " = ");
+        strcat(expression_buffer, function->decision_expressions[i]);
+        strcat(expression_buffer, "\n");
+
+        injectCode(expression_buffer);
+
+        if (symbol->value.b) {
+            strcat(function_buffer, function->decision_functions[i]);
+            strcat(function_buffer, "\n");
+            injectCode(function_buffer);
+            break;
+        }
+    }
+
+    removeSymbol(symbol);
+
+    executed_function = executed_function_backup;
 }

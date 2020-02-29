@@ -15,6 +15,7 @@ typedef struct _Function _Function;
 #include "../utilities/phase.h"
 
 extern enum Phase phase;
+enum BlockType { B_EXPRESSION, B_FUNCTION };
 
 typedef struct _Function {
     char *name;
@@ -25,6 +26,9 @@ typedef struct _Function {
     struct _Function* previous;
     struct _Function* next;
     struct _Function* parent_scope;
+    char *decision_expressions[1000];
+    char *decision_functions[1000];
+    int decision_length;
     char body[1000];
 } _Function;
 
@@ -42,6 +46,11 @@ _Function* main_function;
 _Function* scopeless;
 
 _Function* scope_override;
+
+_Function* decision_mode;
+_Function* decision_expression_mode;
+_Function* decision_function_mode;
+char decision_buffer[1000];
 
 int recursion_depth;
 
@@ -64,5 +73,8 @@ void initMainFunction();
 void initScopeless();
 void freeFunction(_Function* function);
 void freeAllFunctions();
+bool block(enum BlockType type);
+void finishDecisionMode();
+void executeDecision(_Function* function);
 
 #endif

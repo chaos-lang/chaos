@@ -1,0 +1,11 @@
+nil def hey()
+    print "hey"
+end
+
+num def add(num x, num y)
+    num z = x + y
+    bool a = true
+    return z
+end { a && true : hey() }
+
+print add(3, 5)

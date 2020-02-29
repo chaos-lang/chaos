@@ -90,7 +90,7 @@ preparser:
 
 preparser_line: T_NEWLINE
     | function T_NEWLINE                                            { }
-    | T_END T_NEWLINE                                               { endFunction(); }
+    | T_END decisionstart                                           { }
     | error T_NEWLINE                                               { yyerrok; }
 ;
 
@@ -143,32 +143,32 @@ function_parameters: T_VAR_DICT T_VAR                               { addFunctio
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_TRUE                                         { if (phase == PROGRAM) addFunctionCallParameterBool($1); }
+function_parameters: T_TRUE                                         { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_FALSE                                        { if (phase == PROGRAM) addFunctionCallParameterBool($1); }
+function_parameters: T_FALSE                                        { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_INT                                          { if (phase == PROGRAM) addFunctionCallParameterInt($1); }
+function_parameters: T_INT                                          { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterInt($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_FLOAT                                        { if (phase == PROGRAM) addFunctionCallParameterFloat($1); }
+function_parameters: T_FLOAT                                        { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterFloat($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_STRING                                       { if (phase == PROGRAM) { addFunctionCallParameterString($1); } free($1); }
+function_parameters: T_STRING                                       { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterString($1); } free($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR                                          { if (phase == PROGRAM) { addFunctionCallParameterSymbol($1); } free($1); }
+function_parameters: T_VAR                                          { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterSymbol($1); } free($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -202,7 +202,7 @@ line: T_NEWLINE
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
-    | T_END                                                         { handle_end_keyword(); }
+    | T_END decisionstart                                           { }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -372,80 +372,80 @@ expression: T_INT                                                   { $$ = $1; }
     | T_LEFT expression T_RIGHT                                     { $$ = $2; }
 ;
 
-boolean_expression: T_TRUE                                          { $$ = $1; }
-    | boolean_expression T_REL_EQUAL boolean_expression             { $$ = $1 == $3; }
-    | boolean_expression T_REL_NOT_EQUAL boolean_expression         { $$ = $1 != $3; }
-    | boolean_expression T_REL_GREAT boolean_expression             { $$ = $1 > $3; }
-    | boolean_expression T_REL_SMALL boolean_expression             { $$ = $1 < $3; }
-    | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { $$ = $1 >= $3; }
-    | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { $$ = $1 <= $3; }
-    | boolean_expression T_LOGIC_AND boolean_expression             { $$ = $1 && $3; }
-    | boolean_expression T_LOGIC_OR boolean_expression              { $$ = $1 || $3; }
-    | T_LOGIC_NOT boolean_expression                                { $$ = ! $2; }
-    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
-    | T_VAR T_REL_EQUAL boolean_expression                          { $$ = getSymbolValueBool($1) == $3; }
-    | T_VAR T_REL_NOT_EQUAL boolean_expression                      { $$ = getSymbolValueBool($1) != $3; }
-    | T_VAR T_REL_GREAT boolean_expression                          { $$ = getSymbolValueBool($1) > $3; }
-    | T_VAR T_REL_SMALL boolean_expression                          { $$ = getSymbolValueBool($1) < $3; }
-    | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) >= $3; }
-    | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) <= $3; }
-    | T_VAR T_LOGIC_AND boolean_expression                          { $$ = getSymbolValueBool($1) && $3; }
-    | T_VAR T_LOGIC_OR boolean_expression                           { $$ = getSymbolValueBool($1) || $3; }
-    | boolean_expression T_REL_EQUAL T_VAR                          { $$ = $1 == getSymbolValueBool($3); }
-    | boolean_expression T_REL_NOT_EQUAL T_VAR                      { $$ = $1 != getSymbolValueBool($3); }
-    | boolean_expression T_REL_GREAT T_VAR                          { $$ = $1 > getSymbolValueBool($3); }
-    | boolean_expression T_REL_SMALL T_VAR                          { $$ = $1 < getSymbolValueBool($3); }
-    | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { $$ = $1 >= getSymbolValueBool($3); }
-    | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { $$ = $1 <= getSymbolValueBool($3); }
-    | boolean_expression T_LOGIC_AND T_VAR                          { $$ = $1 && getSymbolValueBool($3); }
-    | boolean_expression T_LOGIC_OR T_VAR                           { $$ = $1 || getSymbolValueBool($3); }
-    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); }
-    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); }
-    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); }
-    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); }
-    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); }
-    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); }
-    | T_VAR T_LOGIC_AND T_VAR                                       { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); }
-    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); }
-    | T_LEFT expression T_RIGHT                                     { $$ = $2; }
+boolean_expression: T_TRUE                                          { if (!block(B_EXPRESSION)) $$ = $1; }
+    | boolean_expression T_REL_EQUAL boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
+    | boolean_expression T_REL_NOT_EQUAL boolean_expression         { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
+    | boolean_expression T_REL_GREAT boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
+    | boolean_expression T_REL_SMALL boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
+    | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
+    | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
+    | boolean_expression T_LOGIC_AND boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
+    | boolean_expression T_LOGIC_OR boolean_expression              { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
+    | T_LOGIC_NOT boolean_expression                                { if (!block(B_EXPRESSION)) $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { if (!block(B_EXPRESSION)) { $$ = ! getSymbolValueBool($2); } else { free($2); } }
+    | T_VAR T_REL_EQUAL boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) == $3; } else { free($1); } }
+    | T_VAR T_REL_NOT_EQUAL boolean_expression                      { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) != $3; } else { free($1); } }
+    | T_VAR T_REL_GREAT boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) > $3; } else { free($1); } }
+    | T_VAR T_REL_SMALL boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) < $3; } else { free($1); } }
+    | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) >= $3; } else { free($1); } }
+    | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) <= $3; } else { free($1); } }
+    | T_VAR T_LOGIC_AND boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && $3; } else { free($1); } }
+    | T_VAR T_LOGIC_OR boolean_expression                           { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || $3; } else { free($1); } }
+    | boolean_expression T_REL_EQUAL T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 == getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_NOT_EQUAL T_VAR                      { if (!block(B_EXPRESSION)) { $$ = $1 != getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_GREAT T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 > getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_SMALL T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 < getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { if (!block(B_EXPRESSION)) { $$ = $1 >= getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { if (!block(B_EXPRESSION)) { $$ = $1 <= getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_LOGIC_AND T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 && getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_LOGIC_OR T_VAR                           { if (!block(B_EXPRESSION)) { $$ = $1 || getSymbolValueBool($3); } else { free($3); } }
+    | T_VAR T_REL_EQUAL T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_GREAT T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_SMALL T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_LOGIC_AND T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_LOGIC_OR T_VAR                                        { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_LEFT boolean_expression T_RIGHT                             { if (!block(B_EXPRESSION)) $$ = $2; }
 ;
 
-boolean_expression: T_FALSE                                         { $$ = $1; }
-    | boolean_expression T_REL_EQUAL boolean_expression             { $$ = $1 == $3; }
-    | boolean_expression T_REL_NOT_EQUAL boolean_expression         { $$ = $1 != $3; }
-    | boolean_expression T_REL_GREAT boolean_expression             { $$ = $1 > $3; }
-    | boolean_expression T_REL_SMALL boolean_expression             { $$ = $1 < $3; }
-    | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { $$ = $1 >= $3; }
-    | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { $$ = $1 <= $3; }
-    | boolean_expression T_LOGIC_AND boolean_expression             { $$ = $1 && $3; }
-    | boolean_expression T_LOGIC_OR boolean_expression              { $$ = $1 || $3; }
-    | T_LOGIC_NOT boolean_expression                                { $$ = ! $2; }
-    | T_LOGIC_NOT T_VAR                                             { $$ = ! getSymbolValueBool($2); }
-    | T_VAR T_REL_EQUAL boolean_expression                          { $$ = getSymbolValueBool($1) == $3; }
-    | T_VAR T_REL_NOT_EQUAL boolean_expression                      { $$ = getSymbolValueBool($1) != $3; }
-    | T_VAR T_REL_GREAT boolean_expression                          { $$ = getSymbolValueBool($1) > $3; }
-    | T_VAR T_REL_SMALL boolean_expression                          { $$ = getSymbolValueBool($1) < $3; }
-    | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) >= $3; }
-    | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { $$ = getSymbolValueBool($1) <= $3; }
-    | T_VAR T_LOGIC_AND boolean_expression                          { $$ = getSymbolValueBool($1) && $3; }
-    | T_VAR T_LOGIC_OR boolean_expression                           { $$ = getSymbolValueBool($1) || $3; }
-    | boolean_expression T_REL_EQUAL T_VAR                          { $$ = $1 == getSymbolValueBool($3); }
-    | boolean_expression T_REL_NOT_EQUAL T_VAR                      { $$ = $1 != getSymbolValueBool($3); }
-    | boolean_expression T_REL_GREAT T_VAR                          { $$ = $1 > getSymbolValueBool($3); }
-    | boolean_expression T_REL_SMALL T_VAR                          { $$ = $1 < getSymbolValueBool($3); }
-    | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { $$ = $1 >= getSymbolValueBool($3); }
-    | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { $$ = $1 <= getSymbolValueBool($3); }
-    | boolean_expression T_LOGIC_AND T_VAR                          { $$ = $1 && getSymbolValueBool($3); }
-    | boolean_expression T_LOGIC_OR T_VAR                           { $$ = $1 || getSymbolValueBool($3); }
-    | T_VAR T_REL_EQUAL T_VAR                                       { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); }
-    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); }
-    | T_VAR T_REL_GREAT T_VAR                                       { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); }
-    | T_VAR T_REL_SMALL T_VAR                                       { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); }
-    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); }
-    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); }
-    | T_VAR T_LOGIC_AND T_VAR                                       { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); }
-    | T_VAR T_LOGIC_OR T_VAR                                        { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); }
-    | T_LEFT expression T_RIGHT                                     { $$ = $2; }
+boolean_expression: T_FALSE                                         { if (!block(B_EXPRESSION)) $$ = $1; }
+    | boolean_expression T_REL_EQUAL boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
+    | boolean_expression T_REL_NOT_EQUAL boolean_expression         { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
+    | boolean_expression T_REL_GREAT boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
+    | boolean_expression T_REL_SMALL boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
+    | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
+    | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
+    | boolean_expression T_LOGIC_AND boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
+    | boolean_expression T_LOGIC_OR boolean_expression              { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
+    | T_LOGIC_NOT boolean_expression                                { if (!block(B_EXPRESSION)) $$ = ! $2; }
+    | T_LOGIC_NOT T_VAR                                             { if (!block(B_EXPRESSION)) { $$ = ! getSymbolValueBool($2); } else { free($2); } }
+    | T_VAR T_REL_EQUAL boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) == $3; } else { free($1); } }
+    | T_VAR T_REL_NOT_EQUAL boolean_expression                      { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) != $3; } else { free($1); } }
+    | T_VAR T_REL_GREAT boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) > $3; } else { free($1); } }
+    | T_VAR T_REL_SMALL boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) < $3; } else { free($1); } }
+    | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) >= $3; } else { free($1); } }
+    | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) <= $3; } else { free($1); } }
+    | T_VAR T_LOGIC_AND boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && $3; } else { free($1); } }
+    | T_VAR T_LOGIC_OR boolean_expression                           { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || $3; } else { free($1); } }
+    | boolean_expression T_REL_EQUAL T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 == getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_NOT_EQUAL T_VAR                      { if (!block(B_EXPRESSION)) { $$ = $1 != getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_GREAT T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 > getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_SMALL T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 < getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { if (!block(B_EXPRESSION)) { $$ = $1 >= getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { if (!block(B_EXPRESSION)) { $$ = $1 <= getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_LOGIC_AND T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 && getSymbolValueBool($3); } else { free($3); } }
+    | boolean_expression T_LOGIC_OR T_VAR                           { if (!block(B_EXPRESSION)) { $$ = $1 || getSymbolValueBool($3); } else { free($3); } }
+    | T_VAR T_REL_EQUAL T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) == getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) != getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_GREAT T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) > getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_SMALL T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) < getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) >= getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) <= getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_LOGIC_AND T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_VAR T_LOGIC_OR T_VAR                                        { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); } else { free($1); free($3); } }
+    | T_LEFT boolean_expression T_RIGHT                             { if (!block(B_EXPRESSION)) $$ = $2; }
 ;
 
 variable: T_VAR                                                     { $$ = $1; }
@@ -623,6 +623,20 @@ loop:
     | T_INT T_TIMES_DO                                              { startTimesDo($1); }
     | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
     | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                      { startForeachDict($2, $4, $6); }
+;
+
+decisionstart:                                                                      { decision_mode = function_mode; handle_end_keyword(); }
+    | decisionstart T_LEFT_CURLY_BRACKET decision T_RIGHT_CURLY_BRACKET             { }
+    | decisionstart T_NEWLINE                                                       { decision_mode = NULL; }
+;
+
+decision:                                                                           { }
+    | T_NEWLINE decision                                                            { }
+;
+
+decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start    { finishDecisionMode(); free($3); }
+    | decision T_COMMA decision                                                     { }
+    | decision T_NEWLINE                                                            { }
 ;
 
 function_parameters_start: error T_NEWLINE parser                   { if (is_interactive) { yyerrok; yyclearin; } }
