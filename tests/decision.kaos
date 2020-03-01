@@ -18,7 +18,7 @@ num def sub(num x, num y)
     num z = x - y
     bool a = true
     return z
-end { a && false : hey(), default : hoy() }
+end { y > x : hey(), default : hoy() }
 
 print sub(5, 3)
 
@@ -32,9 +32,18 @@ num def f2()
     return b
 end
 
-num def f3(num x, num y)
+num def f3()
+    num c = 103
+    return c
+end
+
+num def f4(num x, num y)
     num z = x + y
     bool a = true
-end { a && false : f1(), default : f2() }
+end {
+    z == 8  : f1(),
+    z > 10  : f2(),
+    default : f3()
+}
 
-print f3(3, 5)
+print f4(3, 5)
