@@ -28,6 +28,7 @@ typedef struct _Function {
     struct _Function* parent_scope;
     char *decision_expressions[1000];
     char *decision_functions[1000];
+    char *decision_default;
     int decision_length;
     char body[1000];
 } _Function;
@@ -74,7 +75,8 @@ void initScopeless();
 void freeFunction(_Function* function);
 void freeAllFunctions();
 bool block(enum BlockType type);
-void finishDecisionMode();
+void addBooleanDecision();
+void addDefaultDecision();
 void executeDecision(_Function* function);
 
 #endif

@@ -2,6 +2,10 @@ nil def hey()
     print "hey"
 end
 
+nil def hoy()
+    print "hoy"
+end
+
 num def add(num x, num y)
     num z = x + y
     bool a = true
@@ -9,3 +13,11 @@ num def add(num x, num y)
 end { a && true : hey() }
 
 print add(3, 5)
+
+num def sub(num x, num y)
+    num z = x - y
+    bool a = true
+    return z
+end { a && false : hey(), default : hoy() }
+
+print sub(5, 3)

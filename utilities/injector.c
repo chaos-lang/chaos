@@ -23,12 +23,15 @@ void recordToken(char *token, int length) {
     }
 
     if (decision_mode != NULL) {
-        if (strcmp(token, "{") == 0 || strcmp(token, "}") == 0) {
+        if (strcmp(token, "{") == 0 || strcmp(token, "}") == 0 || strcmp(token, ",") == 0) {
             free(token);
             return;
         }
         if (strcmp(token, ":") == 0) {
             free(token);
+            if (strlen(trim_string(decision_buffer)) == 0) {
+                return;
+            }
             decision_mode->decision_expressions[decision_mode->decision_length] = malloc(1 + strlen(trim_string(decision_buffer)));
             strcpy(decision_mode->decision_expressions[decision_mode->decision_length], trim_string(decision_buffer));
             memset(decision_buffer, 0, strlen(trim_string(decision_buffer)));

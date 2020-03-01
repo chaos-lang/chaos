@@ -34,7 +34,8 @@ char *suggestions[1000] = {
     "def",
     "and",
     "or",
-    "not"
+    "not",
+    "default"
 };
 
 int up_arrow_key_pressed(int count, int key) {

@@ -128,6 +128,7 @@ switch (phase)
 "symbol_table"                  {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_SYMBOL_TABLE;}
 "del"                           {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DEL;}
 "return"                        {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RETURN;}
+"default"                       {if (loop_mode == NULL && function_mode == NULL) return T_DEFAULT;}
 
 "times do"                      {recordToken(strdup(yytext), yyleng); return T_TIMES_DO;}
 "end"                           {recordToken(strdup(yytext), yyleng); return T_END;}

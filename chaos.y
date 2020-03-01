@@ -54,7 +54,7 @@ FILE *fp;
 %token T_NEWLINE T_QUIT
 %token T_PRINT
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
-%token T_DEL T_RETURN T_VOID
+%token T_DEL T_RETURN T_VOID T_DEFAULT
 %token T_SYMBOL_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
@@ -236,26 +236,26 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
     | mixed_expression T_DIVIDE expression                          { $$ = $1 / $3; }
     | expression T_DIVIDE expression                                { $$ = $1 / (float)$3; }
     | T_VAR T_PLUS T_VAR                                            { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
-    | T_VAR T_MINUS T_VAR                                           { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
-    | T_VAR T_MULTIPLY T_VAR                                        { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
-    | T_VAR T_DIVIDE T_VAR                                          { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
+    | T_VAR T_MINUS T_VAR                                           { $$ = getSymbolValueFloat($1) - getSymbolValueFloat($3); }
+    | T_VAR T_MULTIPLY T_VAR                                        { $$ = getSymbolValueFloat($1) * getSymbolValueFloat($3); }
+    | T_VAR T_DIVIDE T_VAR                                          { $$ = getSymbolValueFloat($1) / getSymbolValueFloat($3); }
     | T_LEFT T_VAR T_RIGHT                                          { $$ = getSymbolValueFloat($2); }
     | mixed_expression T_PLUS T_VAR                                 { $$ = $1 + getSymbolValueFloat($3); }
-    | mixed_expression T_MINUS T_VAR                                { $$ = $1 + getSymbolValueFloat($3); }
-    | mixed_expression T_MULTIPLY T_VAR                             { $$ = $1 + getSymbolValueFloat($3); }
-    | mixed_expression T_DIVIDE T_VAR                               { $$ = $1 + getSymbolValueFloat($3); }
+    | mixed_expression T_MINUS T_VAR                                { $$ = $1 - getSymbolValueFloat($3); }
+    | mixed_expression T_MULTIPLY T_VAR                             { $$ = $1 * getSymbolValueFloat($3); }
+    | mixed_expression T_DIVIDE T_VAR                               { $$ = $1 / getSymbolValueFloat($3); }
     | expression T_PLUS T_VAR                                       { $$ = $1 + getSymbolValueFloat($3); }
-    | expression T_MINUS T_VAR                                      { $$ = $1 + getSymbolValueFloat($3); }
-    | expression T_MULTIPLY T_VAR                                   { $$ = $1 + getSymbolValueFloat($3); }
-    | expression T_DIVIDE T_VAR                                     { $$ = $1 + getSymbolValueFloat($3); }
+    | expression T_MINUS T_VAR                                      { $$ = $1 - getSymbolValueFloat($3); }
+    | expression T_MULTIPLY T_VAR                                   { $$ = $1 * getSymbolValueFloat($3); }
+    | expression T_DIVIDE T_VAR                                     { $$ = $1 / getSymbolValueFloat($3); }
     | T_VAR T_PLUS mixed_expression                                 { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_MINUS mixed_expression                                { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_MULTIPLY mixed_expression                             { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_DIVIDE mixed_expression                               { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_MINUS mixed_expression                                { $$ = getSymbolValueFloat($1) - $3; }
+    | T_VAR T_MULTIPLY mixed_expression                             { $$ = getSymbolValueFloat($1) * $3; }
+    | T_VAR T_DIVIDE mixed_expression                               { $$ = getSymbolValueFloat($1) / $3; }
     | T_VAR T_PLUS expression                                       { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_MINUS expression                                      { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_MULTIPLY expression                                   { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_DIVIDE expression                                     { $$ = getSymbolValueFloat($1) + $3; }
+    | T_VAR T_MINUS expression                                      { $$ = getSymbolValueFloat($1) - $3; }
+    | T_VAR T_MULTIPLY expression                                   { $$ = getSymbolValueFloat($1) * $3; }
+    | T_VAR T_DIVIDE expression                                     { $$ = getSymbolValueFloat($1) / $3; }
     | mixed_expression T_REL_EQUAL mixed_expression                 { $$ = $1 == $3; }
     | mixed_expression T_REL_NOT_EQUAL mixed_expression             { $$ = $1 != $3; }
     | mixed_expression T_REL_GREAT mixed_expression                 { $$ = $1 > $3; }
@@ -626,7 +626,7 @@ loop:
 ;
 
 decisionstart:                                                                      { decision_mode = function_mode; handle_end_keyword(); }
-    | decisionstart T_LEFT_CURLY_BRACKET decision T_RIGHT_CURLY_BRACKET             { }
+    | decisionstart T_LEFT_CURLY_BRACKET decision T_RIGHT_CURLY_BRACKET             { decision_mode = NULL; }
     | decisionstart T_NEWLINE                                                       { decision_mode = NULL; }
 ;
 
@@ -634,7 +634,12 @@ decision:                                                                       
     | T_NEWLINE decision                                                            { }
 ;
 
-decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start    { finishDecisionMode(); free($3); }
+decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start    { addBooleanDecision(); free($3); }
+    | decision T_COMMA decision                                                     { }
+    | decision T_NEWLINE                                                            { }
+;
+
+decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start             { addDefaultDecision(); free($3); }
     | decision T_COMMA decision                                                     { }
     | decision T_NEWLINE                                                            { }
 ;

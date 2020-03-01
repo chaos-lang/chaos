@@ -256,6 +256,7 @@ void freeFunction(_Function* function) {
         free(function->decision_expressions[i]);
         free(function->decision_functions[i]);
     }
+    free(function->decision_default);
     free(function);
 }
 
@@ -292,12 +293,19 @@ bool block(enum BlockType type) {
     return false;
 }
 
-void finishDecisionMode() {
+void addBooleanDecision() {
     decision_mode->decision_functions[decision_mode->decision_length] = malloc(1 + strlen(trim_string(decision_buffer)));
     strcpy(decision_mode->decision_functions[decision_mode->decision_length], trim_string(decision_buffer));
     memset(decision_buffer, 0, strlen(trim_string(decision_buffer)));
     decision_mode->decision_length++;
-    decision_mode = NULL;
+    decision_expression_mode = NULL;
+    decision_function_mode = NULL;
+}
+
+void addDefaultDecision() {
+    decision_mode->decision_default = realloc(decision_mode->decision_default, 1 + strlen(trim_string(decision_buffer)));
+    strcpy(decision_mode->decision_default, trim_string(decision_buffer));
+    memset(decision_buffer, 0, strlen(trim_string(decision_buffer)));
     decision_expression_mode = NULL;
     decision_function_mode = NULL;
 }
@@ -310,6 +318,7 @@ void executeDecision(_Function* function) {
 
     union Value value;
     value.b = false;
+    bool is_decision_made = false;
     char expression_buffer[1000] = "";
     char function_buffer[1000] = "";
     char *name = malloc(1 + strlen(__LANGUAGE_NAME__));
@@ -328,11 +337,18 @@ void executeDecision(_Function* function) {
             strcat(function_buffer, function->decision_functions[i]);
             strcat(function_buffer, "\n");
             injectCode(function_buffer);
+            is_decision_made = true;
             break;
         }
     }
 
     removeSymbol(symbol);
+
+    if (!is_decision_made && function->decision_default != NULL) {
+        strcat(function_buffer, function->decision_default);
+        strcat(function_buffer, "\n");
+        injectCode(function_buffer);
+    }
 
     executed_function = executed_function_backup;
 }

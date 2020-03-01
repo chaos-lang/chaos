@@ -364,7 +364,7 @@ del b
 num a = 3
 num b = 5
 num c = (a + b) * a
-print c  // Bug: current: 11, actual: 24
+print c
 del a
 del b
 del c
