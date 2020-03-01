@@ -59,6 +59,9 @@ void throw_error(int code, char *subject) {
         case 18:
             printf("Unexpected value type: %s", subject);
             break;
+        case 19:
+            printf("The function '%s' did not return anything!", subject);
+            break;
         default:
             printf("Unkown error.");
             break;

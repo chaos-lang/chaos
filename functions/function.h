@@ -51,6 +51,7 @@ _Function* scope_override;
 _Function* decision_mode;
 _Function* decision_expression_mode;
 _Function* decision_function_mode;
+Symbol* decision_symbol_chain;
 char decision_buffer[1000];
 
 int recursion_depth;

@@ -21,3 +21,20 @@ num def sub(num x, num y)
 end { a && false : hey(), default : hoy() }
 
 print sub(5, 3)
+
+num def f1()
+    num a = 101
+    return a
+end
+
+num def f2()
+    num b = 102
+    return b
+end
+
+num def f3(num x, num y)
+    num z = x + y
+    bool a = true
+end { a && false : f1(), default : f2() }
+
+print f3(3, 5)

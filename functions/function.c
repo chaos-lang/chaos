@@ -112,6 +112,11 @@ void callFunction(char *name) {
 
     executeDecision(function);
 
+    if (function->type != VOID && function->symbol == NULL) {
+        throw_error(19, name);
+        return;
+    }
+
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
         removeSymbolByName(parameter->secondary_name);
@@ -224,12 +229,24 @@ void returnSymbol(char *name) {
         symbol,
         symbol->secondary_type
     );
+
+    decision_symbol_chain = createCloneFromSymbol(
+        NULL,
+        symbol->type,
+        symbol,
+        symbol->secondary_type
+    );
+
     scope_override = NULL;
     free(name);
 }
 
 void printFunctionReturn(char *name) {
     _Function* function = getFunction(name);
+    if (function->symbol == NULL) {
+        throw_error(19, name);
+        return;
+    }
     printSymbolValueEndWithNewLine(function->symbol);
 }
 
@@ -351,4 +368,17 @@ void executeDecision(_Function* function) {
     }
 
     executed_function = executed_function_backup;
+
+    if (executed_function_backup->type != VOID && executed_function_backup->symbol == NULL) {
+        executed_function_backup->symbol = createCloneFromSymbol(
+            NULL,
+            decision_symbol_chain->type,
+            decision_symbol_chain,
+            decision_symbol_chain->secondary_type
+        );
+        executed_function_backup->symbol->scope = executed_function->parent_scope;
+    }
+    if (decision_symbol_chain != NULL) {
+        removeSymbol(decision_symbol_chain);
+    }
 }
