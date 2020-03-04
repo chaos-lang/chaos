@@ -62,6 +62,9 @@ void throw_error(int code, char *subject) {
         case 19:
             printf("The function '%s' did not return anything!", subject);
             break;
+        case 20:
+            printf("The module '%s' is either empty or not exists on the path!", subject);
+            break;
         default:
             printf("Unkown error.");
             break;

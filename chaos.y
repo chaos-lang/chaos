@@ -35,6 +35,8 @@ bool inject_mode = false;
 jmp_buf InteractiveShellErrorAbsorber;
 
 FILE *fp;
+char *program_file_path;
+char *program_file_dir;
 %}
 
 %union {
@@ -50,13 +52,13 @@ FILE *fp;
 %token<fval> T_FLOAT
 %token<sval> T_STRING T_VAR
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
-%token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_COLON
+%token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_DOT T_COLON
 %token T_NEWLINE T_QUIT
 %token T_PRINT
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
 %token T_DEL T_RETURN T_VOID T_DEFAULT
 %token T_SYMBOL_TABLE
-%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION
+%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
@@ -90,6 +92,7 @@ preparser:
 
 preparser_line: T_NEWLINE
     | function T_NEWLINE                                            { }
+    | T_IMPORT module T_NEWLINE                                     { handleModuleImport(); }
     | T_END decisionstart                                           { }
     | error T_NEWLINE                                               { yyerrok; }
 ;
@@ -203,6 +206,7 @@ line: T_NEWLINE
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
+    | T_IMPORT module T_NEWLINE                                    { }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -629,6 +633,10 @@ decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start         
     | decision T_NEWLINE                                                            { }
 ;
 
+module: T_VAR                                                                       { if (phase == PREPARSE) { addModuleToModuleBuffer($1); } else { free($1); } }
+    | module T_DOT module                                                           { }
+;
+
 function_parameters_start: error T_NEWLINE parser                   { if (is_interactive) { yyerrok; yyclearin; } }
 function_call_parameters_start: error T_NEWLINE parser              { if (is_interactive) { yyerrok; yyclearin; } }
 function_parameters: error T_NEWLINE parser                         { if (is_interactive) { yyerrok; yyclearin; } }
@@ -645,6 +653,16 @@ loop: error T_NEWLINE parser                                        { if (is_int
 
 int main(int argc, char** argv) {
     fp = argc > 1 ? fopen (argv[1], "r") : stdin;
+    if (argc > 1) {
+        program_file_path = argv[1];
+
+        program_file_dir = malloc(strlen(program_file_path) + 1);
+        strcpy(program_file_dir, program_file_path);
+        char *ptr = strrchr(program_file_dir, '/');
+        if (ptr) {
+            *ptr = '\0';
+        }
+    }
 
     is_interactive = (fp != stdin) ? false : true;
 
@@ -714,11 +732,13 @@ void freeEverything() {
     free(scopeless);
     freeAllSymbols();
     freeAllFunctions();
+    freeModulesBuffer();
 
     yylex_destroy();
 
     if (!is_interactive) {
         fclose(fp);
+        free(program_file_dir);
     } else {
         #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();

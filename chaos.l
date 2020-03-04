@@ -23,10 +23,11 @@ extern int oerrno;
 #include "chaos.tab.h"
 
 enum Phase phase = INIT_PREPARSE;
+bool module_parsing = false;
 
-void injectCode(char *code) {
+void injectCode(char *code, enum Phase phase_arg) {
+    phase = phase_arg;
     inject_mode = true;
-    phase = INIT_PROGRAM;
 
     YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
     YY_BUFFER_STATE new_buffer = yy_scan_string(code);
@@ -38,8 +39,21 @@ void injectCode(char *code) {
     inject_mode = false;
 }
 
+void parseTheModuleContent(char *module_path) {
+    char *code = fileGetContents(module_path);
+
+    if (code != NULL) {
+        module_parsing = true;
+        injectCode(code, INIT_PREPARSE);
+        module_parsing = false;
+        free(code);
+    } else {
+        throw_error(20, module_path);
+    }
+}
+
 #define YY_SKIP_YYWRAP 1
-int yywrap() { if (phase == PREPARSE) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
+int yywrap() { if (phase == PREPARSE && !module_parsing) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #undef YY_INPUT
@@ -100,6 +114,7 @@ switch (phase)
 "{"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT_CURLY_BRACKET;}
 "}"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT_CURLY_BRACKET;}
 ","                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_COMMA;}
+"."                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DOT;}
 "=="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_EQUAL;}
 "!="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_NOT_EQUAL;}
 ">"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_GREAT;}
@@ -152,5 +167,6 @@ json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_m
 any                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ANY;}
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
+import|include|use              {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
 [a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((loop_mode == NULL && function_mode == NULL) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%

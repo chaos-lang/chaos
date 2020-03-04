@@ -108,7 +108,7 @@ void callFunction(char *name) {
         throw_error(17, NULL);
     }
 
-    injectCode(function->body);
+    injectCode(function->body, INIT_PROGRAM);
 
     executeDecision(function);
 
@@ -256,6 +256,7 @@ void initMainFunction() {
     main_function->type = ANY;
     main_function->parameter_count = 0;
     recursion_depth = 0;
+    modules_buffer_length = 0;
     initScopeless();
 }
 
@@ -348,12 +349,12 @@ void executeDecision(_Function* function) {
         strcat(expression_buffer, function->decision_expressions[i]);
         strcat(expression_buffer, "\n");
 
-        injectCode(expression_buffer);
+        injectCode(expression_buffer, INIT_PROGRAM);
 
         if (symbol->value.b) {
             strcat(function_buffer, function->decision_functions[i]);
             strcat(function_buffer, "\n");
-            injectCode(function_buffer);
+            injectCode(function_buffer, INIT_PROGRAM);
             is_decision_made = true;
             break;
         }
@@ -364,7 +365,7 @@ void executeDecision(_Function* function) {
     if (!is_decision_made && function->decision_default != NULL) {
         strcat(function_buffer, function->decision_default);
         strcat(function_buffer, "\n");
-        injectCode(function_buffer);
+        injectCode(function_buffer, INIT_PROGRAM);
     }
 
     executed_function = executed_function_backup;
@@ -380,5 +381,39 @@ void executeDecision(_Function* function) {
     }
     if (decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
+    }
+}
+
+void addModuleToModuleBuffer(char *module) {
+    modules_buffer[modules_buffer_length] = malloc(1 + strlen(module));
+    strcpy(modules_buffer[modules_buffer_length], module);
+    modules_buffer_length++;
+    free(module);
+}
+
+void handleModuleImport() {
+    char *module_path = "";
+
+    if (strcmp(program_file_path, program_file_dir) != 0) {
+        module_path = strcat_ext(module_path, program_file_dir);
+        module_path = strcat_ext(module_path, "/");
+    }
+
+    for (int i = 0; i < modules_buffer_length; i++) {
+        module_path = strcat_ext(module_path, modules_buffer[i]);
+        if (i + 1 != modules_buffer_length) {
+            module_path = strcat_ext(module_path, "/");
+        }
+    }
+    module_path = strcat_ext(module_path, ".");
+    module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
+
+    parseTheModuleContent(module_path);
+    free(module_path);
+}
+
+void freeModulesBuffer() {
+    for (int i = 0; i < modules_buffer_length; i++) {
+        free(modules_buffer[i]);
     }
 }

@@ -38,7 +38,7 @@ void endLoop() {
     {
         case TIMESDO:
             for (int i = 0; i < iter; i++) {
-                injectCode(body);
+                injectCode(body, INIT_PROGRAM);
             }
             break;
         case FOREACH:
@@ -46,7 +46,7 @@ void endLoop() {
             for (int i = 0; i < array->children_count; i++) {
                 Symbol* child = array->children[i];
                 child->name = element_name;
-                injectCode(body);
+                injectCode(body, INIT_PROGRAM);
                 child->name = NULL;
             }
             break;
@@ -61,7 +61,7 @@ void endLoop() {
 
                 addSymbolString(element_key_copy, key);
                 child->name = element_value;
-                injectCode(body);
+                injectCode(body, INIT_PROGRAM);
                 child->name = NULL;
                 removeSymbolByName(element_key);
             }

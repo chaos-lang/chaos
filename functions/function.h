@@ -30,6 +30,7 @@ typedef struct _Function {
     char *decision_functions[1000];
     char *decision_default;
     int decision_length;
+    char *modules[1000];
     char body[1000];
 } _Function;
 
@@ -54,7 +55,13 @@ _Function* decision_function_mode;
 Symbol* decision_symbol_chain;
 char decision_buffer[1000];
 
+char *modules_buffer[1000];
+int modules_buffer_length;
+
 int recursion_depth;
+
+extern char *program_file_path;
+extern char *program_file_dir;
 
 void startFunction(char *name, enum Type type);
 void endFunction();
@@ -79,5 +86,8 @@ bool block(enum BlockType type);
 void addBooleanDecision();
 void addDefaultDecision();
 void executeDecision(_Function* function);
+void addModuleToModuleBuffer(char *module);
+void handleModuleImport();
+void freeModulesBuffer();
 
 #endif

@@ -15,6 +15,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     then
         echo "OK"
     else
+        echo "$test"
         echo "Fail"
         exit 1
     fi

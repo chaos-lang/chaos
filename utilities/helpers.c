@@ -49,3 +49,38 @@ void handle_end_keyword() {
 
     endFunction();
 }
+
+char *fileGetContents(char *file_path) {
+    char *file_buffer;
+    long length;
+    FILE * f = fopen(file_path, "rb");
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        length = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        file_buffer = malloc(length + 1);
+        file_buffer[length] = '\0';
+        if (file_buffer) {
+            fread(file_buffer, 1, length, f);
+        }
+        fclose(f);
+    }
+    return file_buffer;
+}
+
+char *strcat_ext(char *s1, const char *s2)
+{
+    size_t n = strlen(s1);
+
+    char *p = (char *)malloc(n + strlen(s2) + 1);
+
+    if (p) {
+        strcpy(p, s1);
+        strcpy(p + n, s2);
+    }
+
+    if ((s1 != NULL) && (s1[0] != '\0')) {
+        free(s1);
+    }
+    return p;
+}

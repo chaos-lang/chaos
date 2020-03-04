@@ -3,6 +3,7 @@
 
 #define __LANGUAGE_NAME__ "Chaos"
 #define __LANGUAGE_VERSION__ "0.0.1-alpha"
+#define __LANGUAGE_FILE_EXTENSION__ "kaos"
 #define __LANGUAGE_MOTTO__ "Turn chaos into magic!"
 #define __LANGUAGE_KEYWORD_COUNT__ 33
 #define __MAX_RECURSION_DEPTH__ 3600
