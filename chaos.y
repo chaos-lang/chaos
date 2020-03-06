@@ -654,7 +654,8 @@ loop: error T_NEWLINE parser                                        { if (is_int
 int main(int argc, char** argv) {
     fp = argc > 1 ? fopen (argv[1], "r") : stdin;
     if (argc > 1) {
-        program_file_path = argv[1];
+        program_file_path = malloc(strlen(argv[1]) + 1);
+        strcpy(program_file_path, argv[1]);
 
         program_file_dir = malloc(strlen(program_file_path) + 1);
         strcpy(program_file_dir, program_file_path);

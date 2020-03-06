@@ -1,3 +1,8 @@
+import module1
+import level1.module2
+
 nil def hello()
     print "hello world"
 end
+
+module1()

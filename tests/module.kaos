@@ -1,3 +1,6 @@
 import modules.hello
 
 hello()
+module1()
+module2()
+module3()

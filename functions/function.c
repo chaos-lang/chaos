@@ -393,27 +393,47 @@ void addModuleToModuleBuffer(char *module) {
 
 void handleModuleImport() {
     char *module_path = "";
+    char *old_program_file_dir;
+    char *old_program_file_path;
 
-    if (strcmp(program_file_path, program_file_dir) != 0) {
-        module_path = strcat_ext(module_path, program_file_dir);
-        module_path = strcat_ext(module_path, "/");
-    }
+    old_program_file_dir = malloc(strlen(program_file_dir) + 1);
+    old_program_file_path = malloc(strlen(program_file_path) + 1);
+    strcpy(old_program_file_dir, program_file_dir);
+    strcpy(old_program_file_path, program_file_path);
+
+    module_path = strcat_ext(module_path, program_file_dir);
+    module_path = strcat_ext(module_path, "/");
 
     for (int i = 0; i < modules_buffer_length; i++) {
         module_path = strcat_ext(module_path, modules_buffer[i]);
         if (i + 1 != modules_buffer_length) {
+            program_file_dir = (char *) realloc(program_file_dir, strlen(module_path) + 1);
+            strcpy(program_file_dir, module_path);
             module_path = strcat_ext(module_path, "/");
         }
     }
+
+    program_file_path = (char *) realloc(program_file_path, strlen(module_path) + 1);
+    strcpy(program_file_path, module_path);
+
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
 
+    freeModulesBuffer();
     parseTheModuleContent(module_path);
     free(module_path);
+
+    program_file_dir = (char *) realloc(program_file_dir, strlen(old_program_file_dir) + 1);
+    program_file_path = (char *) realloc(program_file_path, strlen(old_program_file_path) + 1);
+    strcpy(program_file_dir, old_program_file_dir);
+    strcpy(program_file_path, old_program_file_path);
+    free(old_program_file_dir);
+    free(old_program_file_path);
 }
 
 void freeModulesBuffer() {
     for (int i = 0; i < modules_buffer_length; i++) {
         free(modules_buffer[i]);
     }
+    modules_buffer_length = 0;
 }

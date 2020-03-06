@@ -23,7 +23,7 @@ extern int oerrno;
 #include "chaos.tab.h"
 
 enum Phase phase = INIT_PREPARSE;
-bool module_parsing = false;
+int module_parsing = 0;
 
 void injectCode(char *code, enum Phase phase_arg) {
     phase = phase_arg;
@@ -43,9 +43,9 @@ void parseTheModuleContent(char *module_path) {
     char *code = fileGetContents(module_path);
 
     if (code != NULL) {
-        module_parsing = true;
+        module_parsing++;
         injectCode(code, INIT_PREPARSE);
-        module_parsing = false;
+        module_parsing--;
         free(code);
     } else {
         throw_error(20, module_path);
@@ -53,7 +53,7 @@ void parseTheModuleContent(char *module_path) {
 }
 
 #define YY_SKIP_YYWRAP 1
-int yywrap() { if (phase == PREPARSE && !module_parsing) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
+int yywrap() { if (phase == PREPARSE && module_parsing == 0) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #undef YY_INPUT

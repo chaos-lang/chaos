@@ -64,6 +64,8 @@ char *fileGetContents(char *file_path) {
             fread(file_buffer, 1, length, f);
         }
         fclose(f);
+    } else {
+        throw_error(20, file_path);
     }
     return file_buffer;
 }
