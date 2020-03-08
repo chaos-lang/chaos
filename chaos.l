@@ -141,6 +141,7 @@ switch (phase)
 "true"                          {recordToken(strdup(yytext), yyleng); yylval.bval = 1; if (loop_mode == NULL && function_mode == NULL) return T_TRUE;}
 "false"                         {recordToken(strdup(yytext), yyleng); yylval.bval = 0; if (loop_mode == NULL && function_mode == NULL) return T_FALSE;}
 "symbol_table"                  {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_SYMBOL_TABLE;}
+"function_table"                {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_FUNCTION_TABLE;}
 "del"                           {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DEL;}
 "return"                        {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RETURN;}
 "default"                       {if (loop_mode == NULL && function_mode == NULL) return T_DEFAULT;}

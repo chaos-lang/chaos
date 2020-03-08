@@ -1,3 +1,9 @@
+[start] =>
+	{name: module1, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/hello, module: module1} =>
+	{name: module3, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/level1/module2, module: module3} =>
+	{name: module2, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/hello, module: module2} =>
+	{name: hello, type: 6, parameter_count: 0, decision_length: 0, context: tests/module.kaos, module: hello} =>
+[end]
 hello world
 module1
 module2

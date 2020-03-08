@@ -66,3 +66,5 @@ void def loopInside()
 end
 
 loopInside()
+
+function_table

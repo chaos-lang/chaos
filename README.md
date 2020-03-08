@@ -848,6 +848,23 @@ This keyword is only useful for the developers of language's itself:
 [end]
 ```
 
+### function_table
+
+`function_table` command shows all of the functions currently parsed and stored in Function Table.
+This keyword is only useful for the developers of language's itself:
+
+```
+[start] =>
+	{name: a, type: 6, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module: } =>
+	{name: b, type: 6, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module: } =>
+	{name: f1, type: 6, parameter_count: 3, decision_length: 0, context: tests/function.kaos, module: } =>
+	{name: f2, type: 4, parameter_count: 2, decision_length: 0, context: tests/function.kaos, module: } =>
+	{name: f3, type: 5, parameter_count: 2, decision_length: 0, context: tests/function.kaos, module: } =>
+	{name: add, type: 1, parameter_count: 2, decision_length: 0, context: tests/function.kaos, module: } =>
+	{name: loopInside, type: 6, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module: } =>
+[end]
+```
+
 ## Extras
 
 ### Program File Extension

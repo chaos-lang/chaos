@@ -57,7 +57,7 @@ char *program_file_dir;
 %token T_PRINT
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
 %token T_DEL T_RETURN T_VOID T_DEFAULT
-%token T_SYMBOL_TABLE
+%token T_SYMBOL_TABLE T_FUNCTION_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
@@ -204,9 +204,10 @@ line: T_NEWLINE
     }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
+    | T_FUNCTION_TABLE T_NEWLINE                                    { printFunctionTable(); }
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
-    | T_IMPORT module T_NEWLINE                                    { }
+    | T_IMPORT module T_NEWLINE                                     { }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -739,7 +740,9 @@ void freeEverything() {
 
     if (!is_interactive) {
         fclose(fp);
+        free(program_file_path);
         free(program_file_dir);
+        popModuleStack();
     } else {
         #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();

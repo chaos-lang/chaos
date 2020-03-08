@@ -1,5 +1,7 @@
 import modules.hello
 
+function_table
+
 hello()
 module1()
 module2()

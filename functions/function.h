@@ -31,6 +31,8 @@ typedef struct _Function {
     char *decision_default;
     int decision_length;
     char *modules[1000];
+    char *context;
+    char *module;
     char body[1000];
 } _Function;
 
@@ -62,11 +64,18 @@ int recursion_depth;
 
 extern char *program_file_path;
 extern char *program_file_dir;
+char *module_path_stack[1000];
+int module_path_stack_length;
+char *module_stack[1000];
+int module_stack_length;
+
+extern int module_parsing;
 
 void startFunction(char *name, enum Type type);
 void endFunction();
 void freeFunctionMode();
 _Function* getFunction(char *name);
+void printFunctionTable();
 void callFunction(char *name);
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type);
@@ -80,14 +89,16 @@ void returnSymbol(char *name);
 void printFunctionReturn(char *name);
 void initMainFunction();
 void initScopeless();
+void initMainContext();
 void freeFunction(_Function* function);
 void freeAllFunctions();
 bool block(enum BlockType type);
 void addBooleanDecision();
 void addDefaultDecision();
 void executeDecision(_Function* function);
-void addModuleToModuleBuffer(char *module);
+void addModuleToModuleBuffer(char *name);
 void handleModuleImport();
 void freeModulesBuffer();
+void popModuleStack();
 
 #endif

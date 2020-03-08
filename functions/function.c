@@ -22,6 +22,13 @@ void startFunction(char *name, enum Type type) {
     function_mode->parameter_count = 0;
     function_mode->decision_length = 0;
 
+    int parent_context = 1;
+    if (module_path_stack_length > 1) parent_context = 2;
+    function_mode->context = malloc(1 + strlen(module_path_stack[module_path_stack_length - parent_context]));
+    strcpy(function_mode->context, module_path_stack[module_path_stack_length - parent_context]);
+    function_mode->module = malloc(1 + strlen(module_stack[module_stack_length - 1]));
+    strcpy(function_mode->module, module_stack[module_stack_length - 1]);
+
     recordToken(strdup("\n"), 1);
 
     if (start_function == NULL) {
@@ -144,6 +151,24 @@ _Function* getFunction(char *name) {
     return NULL;
 }
 
+void printFunctionTable() {
+    _Function* function = start_function;
+    printf("[start] =>\n");
+    while (function != NULL) {
+        printf(
+            "\t{name: %s, type: %i, parameter_count: %i, decision_length: %i, context: %s, module: %s} =>\n",
+            function->name,
+            function->type,
+            function->parameter_count,
+            function->decision_length,
+            function->context,
+            function->module
+        );
+        function = function->next;
+    }
+    printf("[end]\n");
+}
+
 void startFunctionParameters() {
     function_parameters_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_parameters_mode->parameter_count = 0;
@@ -257,7 +282,10 @@ void initMainFunction() {
     main_function->parameter_count = 0;
     recursion_depth = 0;
     modules_buffer_length = 0;
+    module_path_stack_length = 0;
+    module_stack_length = 0;
     initScopeless();
+    initMainContext();
 }
 
 void initScopeless() {
@@ -265,6 +293,17 @@ void initScopeless() {
     scopeless->name = "N/A";
     scopeless->type = ANY;
     scopeless->parameter_count = 0;
+}
+
+void initMainContext() {
+    if (!is_interactive) {
+        module_path_stack[module_path_stack_length] = malloc(1 + strlen(program_file_path));
+        strcpy(module_path_stack[module_path_stack_length], program_file_path);
+        module_path_stack_length++;
+        module_stack[module_stack_length] = malloc(1 + strlen(""));
+        strcpy(module_stack[module_stack_length], "");
+        module_stack_length++;
+    }
 }
 
 void freeFunction(_Function* function) {
@@ -275,6 +314,8 @@ void freeFunction(_Function* function) {
         free(function->decision_functions[i]);
     }
     free(function->decision_default);
+    free(function->context);
+    free(function->module);
     free(function);
 }
 
@@ -384,51 +425,54 @@ void executeDecision(_Function* function) {
     }
 }
 
-void addModuleToModuleBuffer(char *module) {
-    modules_buffer[modules_buffer_length] = malloc(1 + strlen(module));
-    strcpy(modules_buffer[modules_buffer_length], module);
+void addModuleToModuleBuffer(char *name) {
+    modules_buffer[modules_buffer_length] = malloc(1 + strlen(name));
+    strcpy(modules_buffer[modules_buffer_length], name);
     modules_buffer_length++;
-    free(module);
+    free(name);
 }
 
 void handleModuleImport() {
     char *module_path = "";
-    char *old_program_file_dir;
-    char *old_program_file_path;
+    char *module_dir;
 
-    old_program_file_dir = malloc(strlen(program_file_dir) + 1);
-    old_program_file_path = malloc(strlen(program_file_path) + 1);
-    strcpy(old_program_file_dir, program_file_dir);
-    strcpy(old_program_file_path, program_file_path);
+    module_dir = malloc(strlen(module_path_stack[module_path_stack_length - 1]) + 1);
+    strcpy(module_dir, module_path_stack[module_path_stack_length - 1]);
+    char *ptr = strrchr(module_dir, '/');
+    if (ptr) {
+        *ptr = '\0';
+    }
 
-    module_path = strcat_ext(module_path, program_file_dir);
+    module_path = strcat_ext(module_path, module_dir);
     module_path = strcat_ext(module_path, "/");
 
     for (int i = 0; i < modules_buffer_length; i++) {
         module_path = strcat_ext(module_path, modules_buffer[i]);
         if (i + 1 != modules_buffer_length) {
-            program_file_dir = (char *) realloc(program_file_dir, strlen(module_path) + 1);
-            strcpy(program_file_dir, module_path);
+            module_dir = (char *) realloc(module_dir, strlen(module_path) + 1);
+            strcpy(module_dir, module_path);
             module_path = strcat_ext(module_path, "/");
         }
     }
 
-    program_file_path = (char *) realloc(program_file_path, strlen(module_path) + 1);
-    strcpy(program_file_path, module_path);
+    module_path_stack[module_path_stack_length] = malloc(1 + strlen(module_path));
+    strcpy(module_path_stack[module_path_stack_length], module_path);
+    module_path_stack_length++;
+
+    module_stack[module_stack_length] = malloc(1 + strlen(modules_buffer[modules_buffer_length - 1]));
+    strcpy(module_stack[module_stack_length], modules_buffer[modules_buffer_length - 1]);
+    module_stack_length++;
 
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
 
     freeModulesBuffer();
-    parseTheModuleContent(module_path);
-    free(module_path);
 
-    program_file_dir = (char *) realloc(program_file_dir, strlen(old_program_file_dir) + 1);
-    program_file_path = (char *) realloc(program_file_path, strlen(old_program_file_path) + 1);
-    strcpy(program_file_dir, old_program_file_dir);
-    strcpy(program_file_path, old_program_file_path);
-    free(old_program_file_dir);
-    free(old_program_file_path);
+    parseTheModuleContent(module_path);
+
+    free(module_path);
+    free(module_dir);
+    popModuleStack();
 }
 
 void freeModulesBuffer() {
@@ -436,4 +480,11 @@ void freeModulesBuffer() {
         free(modules_buffer[i]);
     }
     modules_buffer_length = 0;
+}
+
+void popModuleStack() {
+    free(module_path_stack[module_path_stack_length - 1]);
+    module_path_stack_length--;
+    free(module_stack[module_stack_length - 1]);
+    module_stack_length--;
 }

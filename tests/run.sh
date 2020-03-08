@@ -9,7 +9,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     echo "Running test: ${testname}"
 
-    test=$(chaos $DIR/$filename)
+    test=$(chaos tests/$filename)
     if [ "$test" == "$out" ]
     then
         echo "OK"

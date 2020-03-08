@@ -6,7 +6,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
     rm "$DIR/$testname.out"
-    chaos "$DIR/$filename" > "$DIR/$testname.out"
+    chaos "tests/$filename" > "$DIR/$testname.out"
 
     echo "Updated: ${testname}"
 done
