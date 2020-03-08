@@ -660,7 +660,7 @@ int main(int argc, char** argv) {
 
         program_file_dir = malloc(strlen(program_file_path) + 1);
         strcpy(program_file_dir, program_file_path);
-        char *ptr = strrchr(program_file_dir, '/');
+        char *ptr = strrchr(program_file_dir, __PATH_SEPARATOR_ASCII__);
         if (ptr) {
             *ptr = '\0';
         }

@@ -12,9 +12,7 @@ IF [%1]==[] (
     move chaos.exe C:\Windows\System32\
     EXIT /B 0
 ) ELSE IF [%1]==[test] (
-    CD tests
-    CALL run.bat
-    CD ..
+    CALL tests\run.bat
     EXIT /B 0
 ) ELSE IF [%1]==[memcheck] (
     CD tests

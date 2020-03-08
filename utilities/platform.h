@@ -1,3 +1,6 @@
+#ifndef PLATFORM_H
+#define PLATFORM_H
+
 /**
  * Determination a platform of an operation system
  * Fully supported supported only GNU GCC/G++, partially on Clang/LLVM
@@ -35,4 +38,14 @@
     #define __PLATFORM_NAME__ "solaris" // Oracle Solaris, Open Indiana
 #else
     #define __PLATFORM_NAME__ NULL
+#endif
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    #define __PATH_SEPARATOR__ "\\"
+    #define __PATH_SEPARATOR_ASCII__ '\\'
+#else
+    #define __PATH_SEPARATOR__ "/"
+    #define __PATH_SEPARATOR_ASCII__ '/'
+#endif
+
 #endif

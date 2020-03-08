@@ -17,5 +17,6 @@ char *trim_string(char *str);
 void handle_end_keyword();
 char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
+int replace_char(char *str, char orig, char rep);
 
 #endif

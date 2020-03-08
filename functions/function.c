@@ -155,16 +155,22 @@ void printFunctionTable() {
     _Function* function = start_function;
     printf("[start] =>\n");
     while (function != NULL) {
+        char *context_temp = malloc(1 + strlen(function->context));
+        strcpy(context_temp, function->context);
+    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        replace_char(context_temp, '\\', '/');
+    #endif
         printf(
             "\t{name: %s, type: %i, parameter_count: %i, decision_length: %i, context: %s, module: %s} =>\n",
             function->name,
             function->type,
             function->parameter_count,
             function->decision_length,
-            function->context,
+            context_temp,
             function->module
         );
         function = function->next;
+        free(context_temp);
     }
     printf("[end]\n");
 }
@@ -438,20 +444,23 @@ void handleModuleImport() {
 
     module_dir = malloc(strlen(module_path_stack[module_path_stack_length - 1]) + 1);
     strcpy(module_dir, module_path_stack[module_path_stack_length - 1]);
-    char *ptr = strrchr(module_dir, '/');
+    char *ptr = strrchr(module_dir, __PATH_SEPARATOR_ASCII__);
     if (ptr) {
         *ptr = '\0';
+    } else {
+        module_dir = (char *) realloc(module_dir, strlen("") + 1);
+        strcpy(module_dir, "");
     }
 
     module_path = strcat_ext(module_path, module_dir);
-    module_path = strcat_ext(module_path, "/");
+    if (module_path[0] != '\0') module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
 
     for (int i = 0; i < modules_buffer_length; i++) {
         module_path = strcat_ext(module_path, modules_buffer[i]);
         if (i + 1 != modules_buffer_length) {
             module_dir = (char *) realloc(module_dir, strlen(module_path) + 1);
             strcpy(module_dir, module_path);
-            module_path = strcat_ext(module_path, "/");
+            module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
         }
     }
 

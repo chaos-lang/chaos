@@ -50,6 +50,26 @@ void handle_end_keyword() {
     endFunction();
 }
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#define MAXCHAR 1000
+char *fileGetContents(char *file_path) {
+    char *file_content = "";
+    char str[MAXCHAR];
+    FILE * fp = fopen(file_path, "r");
+    if (fp) {
+        while (fgets(str, MAXCHAR, fp) != NULL) {
+            char *line = malloc(1 + strlen(str));
+            strcpy(line, str);
+            file_content = strcat_ext(file_content, line);
+            free(line);
+        }
+        fclose(fp);
+    } else {
+        throw_error(20, file_path);
+    }
+    return file_content;
+}
+#else
 char *fileGetContents(char *file_path) {
     char *file_buffer;
     long length;
@@ -69,6 +89,7 @@ char *fileGetContents(char *file_path) {
     }
     return file_buffer;
 }
+#endif
 
 char *strcat_ext(char *s1, const char *s2)
 {
@@ -85,4 +106,14 @@ char *strcat_ext(char *s1, const char *s2)
         free(s1);
     }
     return p;
+}
+
+int replace_char(char *str, char orig, char rep) {
+    char *ix = str;
+    int n = 0;
+    while((ix = strchr(ix, orig)) != NULL) {
+        *ix++ = rep;
+        n++;
+    }
+    return n;
 }
