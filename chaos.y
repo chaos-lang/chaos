@@ -104,8 +104,10 @@ function:
     | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, ARRAY); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, VOID); }
-    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2); printFunctionReturn($2); } free($2); }
-    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1); } free($1); }
+    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL); } free($2); }
+    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); } free($1); }
+    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2); } free($4); free($2); }
+    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); } free($3); free($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 

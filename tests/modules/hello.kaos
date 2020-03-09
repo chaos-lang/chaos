@@ -3,6 +3,6 @@ import level1.module2
 
 nil def hello()
     print "hello world"
+    module1.module1()
+    module2.module2()
 end
-
-module1()

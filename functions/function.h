@@ -32,6 +32,7 @@ typedef struct _Function {
     int decision_length;
     char *modules[1000];
     char *context;
+    char *module_context;
     char *module;
     char body[1000];
 } _Function;
@@ -74,9 +75,9 @@ extern int module_parsing;
 void startFunction(char *name, enum Type type);
 void endFunction();
 void freeFunctionMode();
-_Function* getFunction(char *name);
+_Function* getFunction(char *name, char *module);
 void printFunctionTable();
-void callFunction(char *name);
+void callFunction(char *name, char *module);
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type);
 void addSymbolToFunctionParameters(Symbol* symbol);
@@ -86,7 +87,7 @@ void addFunctionCallParameterFloat(float f);
 void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);
-void printFunctionReturn(char *name);
+void printFunctionReturn(char *name, char *module);
 void initMainFunction();
 void initScopeless();
 void initMainContext();
@@ -100,5 +101,6 @@ void addModuleToModuleBuffer(char *name);
 void handleModuleImport();
 void freeModulesBuffer();
 void popModuleStack();
+void pushModuleStack(char *module_path, char *module);
 
 #endif

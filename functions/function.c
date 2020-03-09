@@ -5,7 +5,7 @@
 #include "../utilities/injector.h"
 
 void startFunction(char *name, enum Type type) {
-    function_mode = getFunction(name);
+    function_mode = getFunction(name, NULL);
     if (function_mode != NULL) {
         memset(function_mode->body, 0, strlen(function_mode->body));
         free(name);
@@ -26,6 +26,8 @@ void startFunction(char *name, enum Type type) {
     if (module_path_stack_length > 1) parent_context = 2;
     function_mode->context = malloc(1 + strlen(module_path_stack[module_path_stack_length - parent_context]));
     strcpy(function_mode->context, module_path_stack[module_path_stack_length - parent_context]);
+    function_mode->module_context = malloc(1 + strlen(module_path_stack[module_path_stack_length - 1]));
+    strcpy(function_mode->module_context, module_path_stack[module_path_stack_length - 1]);
     function_mode->module = malloc(1 + strlen(module_stack[module_stack_length - 1]));
     strcpy(function_mode->module, module_stack[module_stack_length - 1]);
 
@@ -88,8 +90,8 @@ void freeFunctionMode() {
     function_parameters_mode = NULL;
 }
 
-void callFunction(char *name) {
-    _Function* function = getFunction(name);
+void callFunction(char *name, char *module) {
+    _Function* function = getFunction(name, module);
     scope_override = function;
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
@@ -108,6 +110,8 @@ void callFunction(char *name) {
     _Function* parent_scope = getCurrentScope();
     executed_function = function;
     executed_function->parent_scope = parent_scope;
+
+    pushModuleStack(executed_function->module_context, "");
 
     recursion_depth++;
 
@@ -133,13 +137,22 @@ void callFunction(char *name) {
 
     removeSymbolsByScope(function);
 
+    popModuleStack();
+
     executed_function = NULL;
 }
 
-_Function* getFunction(char *name) {
+_Function* getFunction(char *name, char *module) {
     function_cursor = start_function;
     while (function_cursor != NULL) {
-        if (function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0) {
+        if (module == NULL && strcmp(function_cursor->module, "") != 0) {
+            function_cursor = function_cursor->next;
+            continue;
+        }
+        bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
+        criteria = criteria && strcmp(function_cursor->context, module_path_stack[module_path_stack_length - 1]) == 0;
+        if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
+        if (criteria) {
             _Function* function = function_cursor;
             return function;
         }
@@ -161,12 +174,13 @@ void printFunctionTable() {
         replace_char(context_temp, '\\', '/');
     #endif
         printf(
-            "\t{name: %s, type: %i, parameter_count: %i, decision_length: %i, context: %s, module: %s} =>\n",
+            "\t{name: %s, type: %i, parameter_count: %i, decision_length: %i, context: %s, module_context: %s, module: %s} =>\n",
             function->name,
             function->type,
             function->parameter_count,
             function->decision_length,
             context_temp,
+            function->module_context,
             function->module
         );
         function = function->next;
@@ -272,8 +286,8 @@ void returnSymbol(char *name) {
     free(name);
 }
 
-void printFunctionReturn(char *name) {
-    _Function* function = getFunction(name);
+void printFunctionReturn(char *name, char *module) {
+    _Function* function = getFunction(name, module);
     if (function->symbol == NULL) {
         throw_error(19, name);
         return;
@@ -303,12 +317,12 @@ void initScopeless() {
 
 void initMainContext() {
     if (!is_interactive) {
-        module_path_stack[module_path_stack_length] = malloc(1 + strlen(program_file_path));
-        strcpy(module_path_stack[module_path_stack_length], program_file_path);
-        module_path_stack_length++;
-        module_stack[module_stack_length] = malloc(1 + strlen(""));
-        strcpy(module_stack[module_stack_length], "");
-        module_stack_length++;
+        pushModuleStack(program_file_path, "");
+
+        char *ptr = strrchr(module_path_stack[module_path_stack_length - 1], '.');
+        if (ptr) {
+            *ptr = '\0';
+        }
     }
 }
 
@@ -321,6 +335,7 @@ void freeFunction(_Function* function) {
     }
     free(function->decision_default);
     free(function->context);
+    free(function->module_context);
     free(function->module);
     free(function);
 }
@@ -464,13 +479,7 @@ void handleModuleImport() {
         }
     }
 
-    module_path_stack[module_path_stack_length] = malloc(1 + strlen(module_path));
-    strcpy(module_path_stack[module_path_stack_length], module_path);
-    module_path_stack_length++;
-
-    module_stack[module_stack_length] = malloc(1 + strlen(modules_buffer[modules_buffer_length - 1]));
-    strcpy(module_stack[module_stack_length], modules_buffer[modules_buffer_length - 1]);
-    module_stack_length++;
+    pushModuleStack(module_path, modules_buffer[modules_buffer_length - 1]);
 
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
@@ -479,9 +488,10 @@ void handleModuleImport() {
 
     parseTheModuleContent(module_path);
 
+    popModuleStack();
+
     free(module_path);
     free(module_dir);
-    popModuleStack();
 }
 
 void freeModulesBuffer() {
@@ -489,6 +499,16 @@ void freeModulesBuffer() {
         free(modules_buffer[i]);
     }
     modules_buffer_length = 0;
+}
+
+void pushModuleStack(char *module_path, char *module) {
+    module_path_stack[module_path_stack_length] = malloc(1 + strlen(module_path));
+    strcpy(module_path_stack[module_path_stack_length], module_path);
+    module_path_stack_length++;
+
+    module_stack[module_stack_length] = malloc(1 + strlen(module));
+    strcpy(module_stack[module_stack_length], module);
+    module_stack_length++;
 }
 
 void popModuleStack() {

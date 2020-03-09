@@ -1,8 +1,10 @@
 import modules.hello
 
+null function mainContext()
+    print "in main context"
+end
+
 function_table
 
-hello()
-module1()
-module2()
-module3()
+hello.hello()
+mainContext()
