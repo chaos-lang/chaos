@@ -98,7 +98,7 @@ void addBooleanDecision();
 void addDefaultDecision();
 void executeDecision(_Function* function);
 void addModuleToModuleBuffer(char *name);
-void handleModuleImport();
+void handleModuleImport(char *module_name);
 void freeModulesBuffer();
 void popModuleStack();
 void pushModuleStack(char *module_path, char *module);

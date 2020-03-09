@@ -453,7 +453,7 @@ void addModuleToModuleBuffer(char *name) {
     free(name);
 }
 
-void handleModuleImport() {
+void handleModuleImport(char *module_name) {
     char *module_path = "";
     char *module_dir;
 
@@ -479,7 +479,11 @@ void handleModuleImport() {
         }
     }
 
-    pushModuleStack(module_path, modules_buffer[modules_buffer_length - 1]);
+    char *module = modules_buffer[modules_buffer_length - 1];
+    if (module_name != NULL) {
+        module = module_name;
+    }
+    pushModuleStack(module_path, module);
 
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
@@ -492,6 +496,7 @@ void handleModuleImport() {
 
     free(module_path);
     free(module_dir);
+    free(module_name);
 }
 
 void freeModulesBuffer() {

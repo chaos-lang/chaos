@@ -92,7 +92,8 @@ preparser:
 
 preparser_line: T_NEWLINE
     | function T_NEWLINE                                            { }
-    | T_IMPORT module T_NEWLINE                                     { handleModuleImport(); }
+    | T_IMPORT module T_NEWLINE                                     { handleModuleImport(NULL); }
+    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { handleModuleImport($4); }
     | T_END decisionstart                                           { }
     | error T_NEWLINE                                               { yyerrok; }
 ;
@@ -210,6 +211,7 @@ line: T_NEWLINE
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
     | T_IMPORT module T_NEWLINE                                     { }
+    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 

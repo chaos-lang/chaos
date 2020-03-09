@@ -1,8 +1,10 @@
 import module1
 import level1.module2
+import module4 as differentname
 
 nil def hello()
     print "hello world"
     module1.module1()
     module2.module2()
+    differentname.module4()
 end

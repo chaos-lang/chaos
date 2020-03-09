@@ -2,6 +2,7 @@
 	{name: module1, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/hello, module_context: tests/modules/module1, module: module1} =>
 	{name: module3, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/level1/module2, module_context: tests/modules/level1/level2/module3, module: module3} =>
 	{name: module2, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/hello, module_context: tests/modules/level1/module2, module: module2} =>
+	{name: module4, type: 6, parameter_count: 0, decision_length: 0, context: tests/modules/hello, module_context: tests/modules/module4, module: differentname} =>
 	{name: hello, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/modules/hello, module: hello} =>
 	{name: mainContext, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/module, module: } =>
 [end]
@@ -9,4 +10,5 @@ hello world
 module1
 module2
 module3
+module4
 in main context
