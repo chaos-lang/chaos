@@ -107,6 +107,7 @@ switch (phase)
 "-"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_MINUS;}
 "*"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_MULTIPLY;}
 "/"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DIVIDE;}
+"\\"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BACKSLASH;}
 "("                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT;}
 ")"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT;}
 "["                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT_BRACKET;}

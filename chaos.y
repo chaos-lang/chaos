@@ -58,7 +58,7 @@ char *program_file_dir;
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
 %token T_DEL T_RETURN T_VOID T_DEFAULT
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
-%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM
+%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM T_BACKSLASH
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
@@ -644,6 +644,8 @@ decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start         
 
 module: T_VAR                                                                       { if (phase == PREPARSE) { addModuleToModuleBuffer($1); } else { free($1); } }
     | module T_DOT module                                                           { }
+    | module T_DIVIDE module                                                        { }
+    | module T_BACKSLASH module                                                     { }
 ;
 
 function_name: T_VAR                                                                { if (phase == PREPARSE) { addFunctionNameToFunctionNamesBuffer($1); } else { free($1); } }

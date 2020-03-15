@@ -8,6 +8,8 @@
 	{name: module6Function2, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/modules/module6, module: } =>
 	{name: module6Function3, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/modules/module6, module: } =>
 	{name: module6Function5, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/modules/module6, module: } =>
+	{name: module7, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/modules/module7, module: module7} =>
+	{name: module8, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/modules/module8, module: module8} =>
 	{name: mainContext, type: 6, parameter_count: 0, decision_length: 0, context: tests/module, module_context: tests/module, module: } =>
 [end]
 hello world
@@ -19,4 +21,6 @@ module5
 module6function2
 module6function3
 module6function5
+module7
+module8
 in main context
