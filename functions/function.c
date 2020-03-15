@@ -453,7 +453,7 @@ void addModuleToModuleBuffer(char *name) {
     free(name);
 }
 
-void handleModuleImport(char *module_name) {
+void handleModuleImport(char *module_name, bool directly_import) {
     char *module_path = "";
     char *module_dir;
 
@@ -482,6 +482,9 @@ void handleModuleImport(char *module_name) {
     char *module = modules_buffer[modules_buffer_length - 1];
     if (module_name != NULL) {
         module = module_name;
+    }
+    if (directly_import) {
+        module = "";
     }
     pushModuleStack(module_path, module);
 

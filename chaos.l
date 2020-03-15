@@ -150,6 +150,7 @@ switch (phase)
 "end"                           {recordToken(strdup(yytext), yyleng); return T_END;}
 "foreach"                       {recordToken(strdup(yytext), yyleng); return T_FOREACH;}
 "as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
+"from"                          {recordToken(strdup(yytext), yyleng); return T_FROM;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);

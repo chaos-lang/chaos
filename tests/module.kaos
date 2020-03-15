@@ -1,4 +1,5 @@
 import modules.hello
+from modules.module5 import *
 
 null function mainContext()
     print "in main context"
@@ -7,4 +8,5 @@ end
 function_table
 
 hello.hello()
+module5()
 mainContext()

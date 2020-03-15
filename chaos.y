@@ -58,7 +58,7 @@ char *program_file_dir;
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
 %token T_DEL T_RETURN T_VOID T_DEFAULT
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
-%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT
+%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
@@ -92,8 +92,9 @@ preparser:
 
 preparser_line: T_NEWLINE
     | function T_NEWLINE                                            { }
-    | T_IMPORT module T_NEWLINE                                     { handleModuleImport(NULL); }
-    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { handleModuleImport($4); }
+    | T_IMPORT module T_NEWLINE                                     { handleModuleImport(NULL, false); }
+    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { handleModuleImport($4, false); }
+    | T_FROM module T_IMPORT T_MULTIPLY                             { handleModuleImport(NULL, true); }
     | T_END decisionstart                                           { }
     | error T_NEWLINE                                               { yyerrok; }
 ;
@@ -212,6 +213,7 @@ line: T_NEWLINE
     | T_END decisionstart                                           { }
     | T_IMPORT module T_NEWLINE                                     { }
     | T_IMPORT module T_AS T_VAR T_NEWLINE                          { }
+    | T_FROM module T_IMPORT T_MULTIPLY                             { }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
