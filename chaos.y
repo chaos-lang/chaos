@@ -95,6 +95,7 @@ preparser_line: T_NEWLINE
     | T_IMPORT module T_NEWLINE                                     { handleModuleImport(NULL, false); }
     | T_IMPORT module T_AS T_VAR T_NEWLINE                          { handleModuleImport($4, false); }
     | T_FROM module T_IMPORT T_MULTIPLY                             { handleModuleImport(NULL, true); }
+    | T_FROM module T_IMPORT function_name                          { handleModuleImport(NULL, true); }
     | T_END decisionstart                                           { }
     | error T_NEWLINE                                               { yyerrok; }
 ;
@@ -214,6 +215,7 @@ line: T_NEWLINE
     | T_IMPORT module T_NEWLINE                                     { }
     | T_IMPORT module T_AS T_VAR T_NEWLINE                          { }
     | T_FROM module T_IMPORT T_MULTIPLY                             { }
+    | T_FROM module T_IMPORT function_name                          { }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -642,6 +644,10 @@ decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start         
 
 module: T_VAR                                                                       { if (phase == PREPARSE) { addModuleToModuleBuffer($1); } else { free($1); } }
     | module T_DOT module                                                           { }
+;
+
+function_name: T_VAR                                                                { if (phase == PREPARSE) { addFunctionNameToFunctionNamesBuffer($1); } else { free($1); } }
+    | function_name T_COMMA function_name                                           { }
 ;
 
 function_parameters_start: error T_NEWLINE parser                   { if (is_interactive) { yyerrok; yyclearin; } }

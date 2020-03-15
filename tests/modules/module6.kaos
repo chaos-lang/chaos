@@ -1,0 +1,19 @@
+nil def module6Function1()
+    print "module6function1"
+end
+
+nil def module6Function2()
+    print "module6function2"
+end
+
+nil def module6Function3()
+    print "module6function3"
+end
+
+nil def module6Function4()
+    print "module6function4"
+end
+
+nil def module6Function5()
+    print "module6function5"
+end

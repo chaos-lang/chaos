@@ -5,6 +5,14 @@
 #include "../utilities/injector.h"
 
 void startFunction(char *name, enum Type type) {
+    if (function_names_buffer_length > 0) {
+        if (!isInFunctionNamesBuffer(name)) {
+            free(name);
+            freeFunctionMode();
+            return;
+        }
+    }
+
     function_mode = getFunction(name, NULL);
     if (function_mode != NULL) {
         memset(function_mode->body, 0, strlen(function_mode->body));
@@ -302,6 +310,7 @@ void initMainFunction() {
     main_function->parameter_count = 0;
     recursion_depth = 0;
     modules_buffer_length = 0;
+    function_names_buffer_length = 0;
     module_path_stack_length = 0;
     module_stack_length = 0;
     initScopeless();
@@ -453,6 +462,13 @@ void addModuleToModuleBuffer(char *name) {
     free(name);
 }
 
+void addFunctionNameToFunctionNamesBuffer(char *name) {
+    function_names_buffer[function_names_buffer_length] = malloc(1 + strlen(name));
+    strcpy(function_names_buffer[function_names_buffer_length], name);
+    function_names_buffer_length++;
+    free(name);
+}
+
 void handleModuleImport(char *module_name, bool directly_import) {
     char *module_path = "";
     char *module_dir;
@@ -495,6 +511,8 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     parseTheModuleContent(module_path);
 
+    freeFunctionNamesBuffer();
+
     popModuleStack();
 
     free(module_path);
@@ -507,6 +525,20 @@ void freeModulesBuffer() {
         free(modules_buffer[i]);
     }
     modules_buffer_length = 0;
+}
+
+void freeFunctionNamesBuffer() {
+    for (int i = 0; i < function_names_buffer_length; i++) {
+        free(function_names_buffer[i]);
+    }
+    function_names_buffer_length = 0;
+}
+
+bool isInFunctionNamesBuffer(char *name) {
+    for (int i = 0; i < function_names_buffer_length; i++) {
+        if (strcmp(function_names_buffer[i], name) == 0) return true;
+    }
+    return false;
 }
 
 void pushModuleStack(char *module_path, char *module) {

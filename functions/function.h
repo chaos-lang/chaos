@@ -61,6 +61,9 @@ char decision_buffer[1000];
 char *modules_buffer[1000];
 int modules_buffer_length;
 
+char *function_names_buffer[1000];
+int function_names_buffer_length;
+
 int recursion_depth;
 
 extern char *program_file_path;
@@ -98,8 +101,11 @@ void addBooleanDecision();
 void addDefaultDecision();
 void executeDecision(_Function* function);
 void addModuleToModuleBuffer(char *name);
+void addFunctionNameToFunctionNamesBuffer(char *name);
 void handleModuleImport(char *module_name, bool directly_import);
 void freeModulesBuffer();
+void freeFunctionNamesBuffer();
+bool isInFunctionNamesBuffer(char *name);
 void popModuleStack();
 void pushModuleStack(char *module_path, char *module);
 
