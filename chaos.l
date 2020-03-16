@@ -47,6 +47,10 @@ void parseTheModuleContent(char *module_path) {
         injectCode(code, INIT_PREPARSE);
         module_parsing--;
         free(code);
+
+        if (is_interactive) {
+            phase = PROGRAM;
+        }
     } else {
         throw_error(20, module_path);
     }

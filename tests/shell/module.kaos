@@ -1,0 +1,11 @@
+import tests.shell.modules.module1
+from tests.shell.modules.module2 import f2, f3, f5
+
+asdasd1()
+
+module1.module1()
+f2()
+f3()
+f5()
+
+asdasd2()

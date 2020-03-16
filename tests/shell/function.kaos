@@ -1,0 +1,10 @@
+nil def f1()
+    print "hey"
+end
+
+asdasd1()
+
+f1()
+
+asdasd2()
+

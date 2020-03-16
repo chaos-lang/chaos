@@ -5,12 +5,8 @@
 #include "../utilities/injector.h"
 
 void startFunction(char *name, enum Type type) {
-    if (function_names_buffer_length > 0) {
-        if (!isInFunctionNamesBuffer(name)) {
-            free(name);
-            freeFunctionMode();
-            return;
-        }
+    if (is_interactive) {
+        phase = PREPARSE;
     }
 
     function_mode = getFunction(name, NULL);
@@ -21,8 +17,21 @@ void startFunction(char *name, enum Type type) {
             Symbol* parameter = function_parameters_mode->parameters[i];
             removeSymbol(parameter);
         }
+
+        if (is_interactive) {
+            phase = PROGRAM;
+        }
         return;
     }
+
+    if (function_names_buffer_length > 0) {
+        if (!isInFunctionNamesBuffer(name)) {
+            free(name);
+            freeFunctionMode();
+            return;
+        }
+    }
+
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->name = malloc(1 + strlen(name));
     strcpy(function_mode->name, name);
@@ -80,6 +89,10 @@ void startFunction(char *name, enum Type type) {
 
     free(name);
     freeFunctionMode();
+
+    if (is_interactive) {
+        phase = PROGRAM;
+    }
 }
 
 void endFunction() {
@@ -325,13 +338,11 @@ void initScopeless() {
 }
 
 void initMainContext() {
-    if (!is_interactive) {
-        pushModuleStack(program_file_path, "");
+    pushModuleStack(program_file_path, "");
 
-        char *ptr = strrchr(module_path_stack[module_path_stack_length - 1], '.');
-        if (ptr) {
-            *ptr = '\0';
-        }
+    char *ptr = strrchr(module_path_stack[module_path_stack_length - 1], '.');
+    if (ptr) {
+        *ptr = '\0';
     }
 }
 

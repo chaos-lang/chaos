@@ -19,4 +19,12 @@ char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
 int replace_char(char *str, char orig, char rep);
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+#else
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
+#endif
+
 #endif

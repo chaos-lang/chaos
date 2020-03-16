@@ -212,10 +212,10 @@ line: T_NEWLINE
     | T_FUNCTION_TABLE T_NEWLINE                                    { printFunctionTable(); }
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
-    | T_IMPORT module T_NEWLINE                                     { }
-    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { }
-    | T_FROM module T_IMPORT T_MULTIPLY                             { }
-    | T_FROM module T_IMPORT function_name                          { }
+    | T_IMPORT module T_NEWLINE                                     { if (is_interactive) handleModuleImport(NULL, false); }
+    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { if (is_interactive) handleModuleImport($4, false); }
+    | T_FROM module T_IMPORT T_MULTIPLY                             { if (is_interactive) handleModuleImport(NULL, true); }
+    | T_FROM module T_IMPORT function_name                          { if (is_interactive) handleModuleImport(NULL, true); }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -642,13 +642,13 @@ decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start         
     | decision T_NEWLINE                                                            { }
 ;
 
-module: T_VAR                                                                       { if (phase == PREPARSE) { addModuleToModuleBuffer($1); } else { free($1); } }
+module: T_VAR                                                                       { addModuleToModuleBuffer($1); }
     | module T_DOT module                                                           { }
     | module T_DIVIDE module                                                        { }
     | module T_BACKSLASH module                                                     { }
 ;
 
-function_name: T_VAR                                                                { if (phase == PREPARSE) { addFunctionNameToFunctionNamesBuffer($1); } else { free($1); } }
+function_name: T_VAR                                                                { addFunctionNameToFunctionNamesBuffer($1); }
     | function_name T_COMMA function_name                                           { }
 ;
 
@@ -668,6 +668,7 @@ loop: error T_NEWLINE parser                                        { if (is_int
 
 int main(int argc, char** argv) {
     fp = argc > 1 ? fopen (argv[1], "r") : stdin;
+
     if (argc > 1) {
         program_file_path = malloc(strlen(argv[1]) + 1);
         strcpy(program_file_path, argv[1]);
@@ -678,6 +679,15 @@ int main(int argc, char** argv) {
         if (ptr) {
             *ptr = '\0';
         }
+    } else {
+        char buff[1000];
+        GetCurrentDir(buff, 1000);
+
+        program_file_dir = malloc(strlen(buff) + 1);
+        strcpy(program_file_dir, buff);
+
+        program_file_path = strcat_ext(program_file_dir, "/");
+        program_file_path = strcat_ext(program_file_path, __INTERACTIVE_MODULE_NAME__);
     }
 
     is_interactive = (fp != stdin) ? false : true;
@@ -749,6 +759,7 @@ void freeEverything() {
     freeAllSymbols();
     freeAllFunctions();
     freeModulesBuffer();
+    freeFunctionNamesBuffer();
 
     yylex_destroy();
 
