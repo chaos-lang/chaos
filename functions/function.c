@@ -466,11 +466,18 @@ void executeDecision(_Function* function) {
     }
 }
 
-void addModuleToModuleBuffer(char *name) {
+void appendModuleToModuleBuffer(char *name) {
     modules_buffer[modules_buffer_length] = malloc(1 + strlen(name));
     strcpy(modules_buffer[modules_buffer_length], name);
     modules_buffer_length++;
     free(name);
+}
+
+void prependModuleToModuleBuffer(char *name) {
+    shift_char_array(modules_buffer, modules_buffer_length, 1);
+    modules_buffer[0] = malloc(1 + strlen(name));
+    strcpy(modules_buffer[0], name);
+    modules_buffer_length++;
 }
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
@@ -513,10 +520,12 @@ void handleModuleImport(char *module_name, bool directly_import) {
     if (directly_import) {
         module = "";
     }
-    pushModuleStack(module_path, module);
 
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
+
+    relative_path_to_absolute(module_path);
+    pushModuleStack(module_path, module);
 
     freeModulesBuffer();
 

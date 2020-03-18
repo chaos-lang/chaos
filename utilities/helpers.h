@@ -18,6 +18,8 @@ void handle_end_keyword();
 char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
 int replace_char(char *str, char orig, char rep);
+void shift_char_array(char *array[], int n, int i);
+void relative_path_to_absolute(char *path);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>

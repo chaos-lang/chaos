@@ -642,10 +642,14 @@ decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start         
     | decision T_NEWLINE                                                            { }
 ;
 
-module: T_VAR                                                                       { addModuleToModuleBuffer($1); }
+module: T_VAR                                                                       { appendModuleToModuleBuffer($1); }
     | module T_DOT module                                                           { }
     | module T_DIVIDE module                                                        { }
     | module T_BACKSLASH module                                                     { }
+    | T_DOT T_DOT module                                                            { prependModuleToModuleBuffer(".."); }
+    | module T_DOT T_DOT module                                                     { prependModuleToModuleBuffer(".."); }
+    | T_DOT T_DOT T_DIVIDE module                                                   { prependModuleToModuleBuffer(".."); }
+    | T_DOT T_DOT T_BACKSLASH module                                                { prependModuleToModuleBuffer(".."); }
 ;
 
 function_name: T_VAR                                                                { addFunctionNameToFunctionNamesBuffer($1); }

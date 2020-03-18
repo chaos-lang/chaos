@@ -3,12 +3,11 @@ from modules.module5 import *
 from modules.module6 import module6Function2, module6Function3, module6Function5
 include modules/module7
 use modules\module8
+from modules.level1.level2.module9 import module9
 
 null function mainContext()
     print "in main context"
 end
-
-function_table
 
 hello.hello()
 module5()
@@ -17,4 +16,5 @@ module6Function3()
 module6Function5()
 module7.module7()
 module8.module8()
+module9()
 mainContext()
