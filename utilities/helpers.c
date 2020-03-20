@@ -65,7 +65,7 @@ char *fileGetContents(char *file_path) {
         }
         fclose(fp);
     } else {
-        throw_error(20, file_path);
+        throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, file_path);
     }
     return file_content;
 }
@@ -85,7 +85,7 @@ char *fileGetContents(char *file_path) {
         }
         fclose(f);
     } else {
-        throw_error(20, file_path);
+        throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, file_path);
     }
     return file_buffer;
 }

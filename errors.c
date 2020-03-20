@@ -8,61 +8,61 @@ void throw_error(int code, char *subject) {
     printf(" %s Error - ", __LANGUAGE_NAME__);
     switch (code)
     {
-        case 2:
-            printf("Unkown variable type: %s", subject);
+        case E_UNKNOWN_VARIABLE_TYPE:
+            printf("Unknown variable type: %s", subject);
             break;
-        case 3:
+        case E_VARIABLE_ALREADY_DEFINED:
             printf("The variable name '%s' is already defined!", subject);
             break;
-        case 4:
+        case E_UNDEFINED_VARIABLE:
             printf("Undefined variable: %s", subject);
             break;
-        case 5:
+        case E_MEMORY_ALLOCATION_FOR_ARRAY_FAILED:
             printf("Memory allocation for array '%s' is failed!", subject);
             break;
-        case 6:
+        case E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY:
             printf("Illegal element type for the typed array: %s", subject);
             break;
-        case 7:
+        case E_VARIABLE_IS_NOT_AN_ARRAY:
             printf("Variable '%s' is not an array!", subject);
             break;
-        case 8:
+        case E_UNDEFINED_INDEX:
             printf("Undefined index: %s", subject);
             break;
-        case 9:
+        case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
             printf("Illegal variable type for variable: %s", subject);
             break;
-        case 10:
+        case E_ARRAYS_ARE_NOT_MASS_ASSIGNABLE:
             printf("Arrays are not mass assignable!");
             break;
-        case 11:
+        case E_VARIABLE_IS_NOT_A_DICTIONARY:
             printf("Variable '%s' is not a dictionary!", subject);
             break;
-        case 12:
+        case E_UNDEFINED_KEY:
             printf("Undefined key: %s", subject);
             break;
-        case 13:
+        case E_UNRECOGNIZED_COMPLEX_DATA_TYPE:
             printf("Unrecognized complex data type for: %s", subject);
             break;
-        case 14:
+        case E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION:
             printf("Illegal variable type for function: %s", subject);
             break;
-        case 15:
+        case E_UNDEFINED_FUNCTION:
             printf("Undefined function: %s", subject);
             break;
-        case 16:
+        case E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED:
             printf("Memory allocation for the function is failed!");
             break;
-        case 17:
+        case E_MAXIMUM_RECURSION_DEPTH_EXCEEDED:
             printf("Maximum recursion depth %i exceeded!", __MAX_RECURSION_DEPTH__);
             break;
-        case 18:
+        case E_UNEXPECTED_VALUE_TYPE:
             printf("Unexpected value type: %s", subject);
             break;
-        case 19:
+        case E_FUNCTION_DID_NOT_RETURN_ANYTHING:
             printf("The function '%s' did not return anything!", subject);
             break;
-        case 20:
+        case E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH:
             printf("The module %s is either empty or not exists on the path!", subject);
             break;
         default:

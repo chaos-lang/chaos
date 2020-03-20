@@ -137,7 +137,7 @@ void callFunction(char *name, char *module) {
     recursion_depth++;
 
     if (recursion_depth > __MAX_RECURSION_DEPTH__) {
-        throw_error(17, NULL);
+        throw_error(E_MAXIMUM_RECURSION_DEPTH_EXCEEDED, NULL);
     }
 
     injectCode(function->body, INIT_PROGRAM);
@@ -145,7 +145,7 @@ void callFunction(char *name, char *module) {
     executeDecision(function);
 
     if (function->type != VOID && function->symbol == NULL) {
-        throw_error(19, name);
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
 
@@ -180,7 +180,7 @@ _Function* getFunction(char *name, char *module) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
-        throw_error(15, name);
+        throw_error(E_UNDEFINED_FUNCTION, name);
     }
     return NULL;
 }
@@ -243,7 +243,7 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
     );
 
     if (function_parameters_mode->parameters == NULL) {
-        throw_error(16, NULL);
+        throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
     }
 
     function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = symbol;
@@ -286,7 +286,7 @@ void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != executed_function->type) {
         free(name);
-        throw_error(14, executed_function->name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, executed_function->name);
     }
     scope_override = executed_function->parent_scope;
     executed_function->symbol = createCloneFromSymbol(
@@ -310,7 +310,7 @@ void returnSymbol(char *name) {
 void printFunctionReturn(char *name, char *module) {
     _Function* function = getFunction(name, module);
     if (function->symbol == NULL) {
-        throw_error(19, name);
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
     printSymbolValueEndWithNewLine(function->symbol);

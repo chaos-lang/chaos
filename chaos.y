@@ -205,7 +205,7 @@ line: T_NEWLINE
             YYABORT;
         }
         freeEverything();
-        exit(0);
+        exit(E_SUCCESS);
     }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
@@ -752,7 +752,7 @@ void yyerror(const char* s) {
         #endif
     } else {
         freeEverything();
-        exit(1);
+        exit(E_SYNTAX_ERROR);
     }
 }
 
