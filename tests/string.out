@@ -1,2 +1,11 @@
 string2
 string4
+e
+y
+[start] =>
+	{name: var7, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
+	{name: var8, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
+	{name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
+	{name: b, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
+	{name: c, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
+[end]

@@ -4,3 +4,11 @@ print var7
 string var8 = 'string3'
 var8 = "string4"
 print var8
+
+str a = 'hey'
+str b = a[1]
+str c = 'bom'
+c = a[2]
+print b
+print c
+symbol_table

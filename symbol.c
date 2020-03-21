@@ -451,11 +451,15 @@ Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name
 }
 
 Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *name, int i, char *key, enum Type extra_type) {
+    Symbol* _symbol = getSymbol(name);
     Symbol* symbol = getComplexElement(name, i, key);
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
     free(name);
     free(key);
     free(clone_name);
+    if (_symbol->type == STRING) {
+        removeSymbol(symbol);
+    }
     return clone_symbol;
 }
 
@@ -530,11 +534,15 @@ Symbol* updateSymbolByClonningName(char *clone_name, char *name) {
 }
 
 Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, int i, char *key) {
+    Symbol* _symbol = getSymbol(name);
     Symbol* symbol = getComplexElement(name, i, key);
     updateSymbolByClonning(clone_name, symbol);
     free(clone_name);
     free(name);
     free(key);
+    if (_symbol->type == STRING) {
+        removeSymbol(symbol);
+    }
     return symbol;
 }
 
@@ -567,6 +575,14 @@ void finishComplexMode(char *name, enum Type type) {
 
 Symbol* getArrayElement(char *name, int i) {
     Symbol* symbol = getSymbol(name);
+    if (symbol->type == STRING) {
+        union Value value;
+        value.s = malloc(2 * sizeof(char));
+        value.s[0] = symbol->value.s[i];
+        value.s[1] = '\0';
+        return addSymbol(NULL, STRING, value, V_STRING);
+    }
+
     if (symbol->type != ARRAY) throw_error(E_VARIABLE_IS_NOT_AN_ARRAY, name);
 
     if (i < 0) {
@@ -592,7 +608,7 @@ Symbol* getComplexElement(char *name, int i, char *key) {
     Symbol* complex = getSymbol(name);
 
     Symbol* symbol;
-    if (complex->type == ARRAY) {
+    if (complex->type == ARRAY || complex->type == STRING) {
         symbol = getArrayElement(name, i);
     } else if (complex->type == DICT) {
         symbol = getDictElement(name, key);
