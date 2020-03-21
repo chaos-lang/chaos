@@ -551,6 +551,12 @@ variable: T_VAR_ANY                                                 { }
     | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, ANY, $4, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET             { createCloneFromComplexElement($2, ANY, $4, $6, NULL, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET     { createCloneFromComplexElement($2, ANY, $4, -$7, NULL, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET          { createCloneFromComplexElement($2, ANY, $4, 0, $6, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL boolean_expression                    { addSymbolAnyBool($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL mixed_expression                      { addSymbolAnyFloat($2, $4); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL expression                            { addSymbolAnyFloat($2, $4); $$ = ""; }
 ;
 
 arraystart:                                                         { addSymbolArray(NULL); }

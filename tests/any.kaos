@@ -349,3 +349,14 @@ string c = a
 print a
 print b
 print c
+
+
+del a
+del b
+del c
+any a = 3 + 5
+print a
+any b = 5 > 3
+print b
+any c = 0.14 + 3
+print c
