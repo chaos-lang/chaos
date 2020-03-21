@@ -95,3 +95,15 @@ del arr8[1]
 print arr8
 del arr8[0]
 print arr8
+
+list arr9 = [1, 2, 3]
+num var0 = arr9[0]
+print var0
+num var1 = 0
+var1 = arr9[1]
+print var1
+num var2 = arr9[-1]
+print var2
+num var3 = 0
+var3 = arr9[-2]
+print var3

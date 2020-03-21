@@ -39,3 +39,10 @@ print a
 
 del d['a']
 print d
+
+dict e = {'a': 1, 'b': 2, 'c': 3}
+num var0 = e['a']
+print var0
+num var1 = 0
+var1 = e['b']
+print var1

@@ -450,6 +450,15 @@ Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name
     return clone_symbol;
 }
 
+Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *name, int i, char *key, enum Type extra_type) {
+    Symbol* symbol = getComplexElement(name, i, key);
+    Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
+    free(name);
+    free(key);
+    free(clone_name);
+    return clone_symbol;
+}
+
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
     if (type != ANY &&
         symbol->type != ANY &&
@@ -482,20 +491,17 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
     return clone_symbol;
 }
 
-Symbol* updateSymbolByClonning(char *clone_name, char *name) {
-    Symbol* symbol = getSymbol(name);
+Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol) {
     Symbol* clone_symbol = getSymbol(clone_name);
 
     if (clone_symbol->type != ANY &&
         symbol->type != ANY &&
         clone_symbol->type != symbol->type
     ) {
-        free(name);
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_name);
     }
 
     if (clone_symbol->type == ARRAY) {
-        free(name);
         throw_error(E_ARRAYS_ARE_NOT_MASS_ASSIGNABLE, clone_name);
     }
 
@@ -510,11 +516,26 @@ Symbol* updateSymbolByClonning(char *clone_name, char *name) {
     }
     clone_symbol->name = malloc(1 + strlen(clone_name));
     strcpy(clone_symbol->name, clone_name);
-    free(clone_name);
-    free(name);
 
     removeSymbol(temp_symbol);
     return clone_symbol;
+}
+
+Symbol* updateSymbolByClonningName(char *clone_name, char *name) {
+    Symbol* symbol = getSymbol(name);
+    updateSymbolByClonning(clone_name, symbol);
+    free(clone_name);
+    free(name);
+    return symbol;
+}
+
+Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, int i, char *key) {
+    Symbol* symbol = getComplexElement(name, i, key);
+    updateSymbolByClonning(clone_name, symbol);
+    free(clone_name);
+    free(name);
+    free(key);
+    return symbol;
 }
 
 bool isComplexIllegal(enum Type type) {
@@ -567,12 +588,8 @@ void cloneSymbolToComplex(char *name, char *key) {
     free(name);
 }
 
-void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
+Symbol* getComplexElement(char *name, int i, char *key) {
     Symbol* complex = getSymbol(name);
-    if (complex->secondary_type != ANY && complex->secondary_type != type) {
-        free(name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, complex->name);
-    }
 
     Symbol* symbol;
     if (complex->type == ARRAY) {
@@ -583,6 +600,18 @@ void updateComplexElement(char *name, int i, char *key, enum Type type, union Va
         free(name);
         throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, complex->name);
     }
+
+    return symbol;
+}
+
+void updateComplexElement(char *name, int i, char *key, enum Type type, union Value value) {
+    Symbol* complex = getSymbol(name);
+    if (complex->secondary_type != ANY && complex->secondary_type != type) {
+        free(name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, complex->name);
+    }
+
+    Symbol* symbol = getComplexElement(name, i, key);
     symbol->type = type;
     if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
