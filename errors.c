@@ -65,6 +65,9 @@ void throw_error(int code, char *subject) {
         case E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH:
             printf("The module %s is either empty or not exists on the path!", subject);
             break;
+        case E_NO_VARIABLE_WITH_ID:
+            printf("No variable with given id is found!");
+            break;
         default:
             printf("Unkown error.");
             break;
