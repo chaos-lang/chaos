@@ -187,5 +187,5 @@ print arr13
 
 del arr11[i0]
 print arr11
-//del arr12[-i1]
-//print arr12
+del arr12[-i1]
+print arr12

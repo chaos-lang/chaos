@@ -838,6 +838,10 @@ void removeComplexElement(char *name, unsigned long long int symbol_id) {
 
     free(key);
 
+    if (i < 0) {
+        i = complex->children_count + i;
+    }
+
     Symbol** temp = malloc((complex->children_count - 1) * sizeof(Symbol));
 
     // Copy everything before the index
