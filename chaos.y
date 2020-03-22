@@ -456,36 +456,61 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR                                        { updateSymbolByClonningName($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET               { updateSymbolByClonningComplexElement($1, $3, $5, NULL); $$ = ""; }
+    | variable T_EQUAL T_VAR T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET               { updateSymbolByClonningComplexElement($1, $3, getSymbolValueInt_ZeroIfNotInt($5), getSymbolValueString_NullIfNotString($5)); $$ = ""; free($5); }
     | variable T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET       { updateSymbolByClonningComplexElement($1, $3, -$6, NULL); $$ = ""; }
+    | variable T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET       { updateSymbolByClonningComplexElement($1, $3, -getSymbolValueInt($6), NULL); $$ = ""; }
     | variable T_EQUAL T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET            { updateSymbolByClonningComplexElement($1, $3, 0, $5); $$ = ""; }
+    | variable T_EQUAL T_VAR T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET               { updateSymbolByClonningComplexElement($1, $3, getSymbolValueInt_ZeroIfNotInt($5), getSymbolValueString_NullIfNotString($5)); $$ = ""; free($5); }
     | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
     | T_DEL variable                                                { removeSymbolByName($2); $$ = ""; free($2); }
     | T_DEL variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET           { removeComplexElement($2, $4, NULL); $$ = ""; free($2); }
+    | T_DEL variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET           { char *key = getSymbolValueString_NullIfNotString($4); removeComplexElement($2, getSymbolValueInt_ZeroIfNotInt($4), key); $$ = ""; free($2); free($4); free(key); }
     | T_DEL variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET   { removeComplexElement($2, -$5, NULL); $$ = ""; free($2); }
+    | T_DEL variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET   { char *key = getSymbolValueString_NullIfNotString($5); removeComplexElement($2, -getSymbolValueInt_ZeroIfNotInt($5), key); $$ = ""; free($2); free($5); free(key); }
     | T_DEL variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET        { removeComplexElement($2, 0, $4); $$ = ""; free($2); free($4); }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                 { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, $3)); $$ = ""; free($1); }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                 { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getComplexElement($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3))); $$ = ""; free($1); free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET         { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getArrayElement($1, -$4)); $$ = ""; free($1); }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET         { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getComplexElement($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4))); $$ = ""; free($1); free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE              { updateComplexElementBool($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL T_TRUE              { updateComplexElementBool($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_TRUE      { updateComplexElementBool($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL T_TRUE      { updateComplexElementBool($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_FALSE             { updateComplexElementBool($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL T_FALSE             { updateComplexElementBool($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FALSE     { updateComplexElementBool($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL T_FALSE     { updateComplexElementBool($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_INT               { updateComplexElementInt($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL T_INT               { updateComplexElementInt($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_INT       { updateComplexElementInt($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL T_INT       { updateComplexElementInt($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT             { updateComplexElementFloat($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL T_FLOAT             { updateComplexElementFloat($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_FLOAT     { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL T_FLOAT     { updateComplexElementFloat($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_STRING            { updateComplexElementString($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL T_STRING            { updateComplexElementString($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_STRING    { updateComplexElementString($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL T_STRING    { updateComplexElementString($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL T_VAR               { updateComplexElementSymbol($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL T_VAR               { updateComplexElementSymbol($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL T_VAR       { updateComplexElementSymbol($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL T_VAR       { updateComplexElementSymbol($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL mixed_expression            { updateComplexElementFloat($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL mixed_expression            { updateComplexElementFloat($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL expression                  { updateComplexElementFloat($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL expression                  { updateComplexElementFloat($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_INT T_RIGHT_BRACKET T_EQUAL boolean_expression          { updateComplexElementBool($1, $3, NULL, $6); $$ = ""; }
+    | variable T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET T_EQUAL boolean_expression          { updateComplexElementBool($1, getSymbolValueInt_ZeroIfNotInt($3), getSymbolValueString_NullIfNotString($3), $6); $$ = ""; free($3); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL mixed_expression    { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL mixed_expression    { updateComplexElementFloat($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL expression          { updateComplexElementFloat($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL expression          { updateComplexElementFloat($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET T_EQUAL boolean_expression  { updateComplexElementBool($1, -$4, NULL, $7); $$ = ""; }
+    | variable T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET T_EQUAL boolean_expression  { updateComplexElementBool($1, -getSymbolValueInt_ZeroIfNotInt($4), getSymbolValueString_NullIfNotString($4), $7); $$ = ""; free($4); }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET              { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getDictElement($1, $3)); $$ = ""; free($1); free($3); }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_TRUE           { updateComplexElementBool($1, 0, $3, $6); $$ = ""; }
     | variable T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET T_EQUAL T_FALSE          { updateComplexElementBool($1, 0, $3, $6); $$ = ""; }
@@ -504,7 +529,9 @@ variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, BOOL, $4, ANY); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET             { createCloneFromComplexElement($2, BOOL, $4, $6, NULL, ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET             { createCloneFromComplexElement($2, BOOL, $4, getSymbolValueInt_ZeroIfNotInt($6), getSymbolValueString_NullIfNotString($6), ANY); $$ = ""; free($6); }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET     { createCloneFromComplexElement($2, BOOL, $4, -$7, NULL, ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET     { createCloneFromComplexElement($2, BOOL, $4, -getSymbolValueInt_ZeroIfNotInt($7), getSymbolValueString_NullIfNotString($7), ANY); $$ = ""; free($7); }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET          { createCloneFromComplexElement($2, BOOL, $4, 0, $6, ANY); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, ARRAY, $5, BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, DICT, $5, BOOL); $$ = ""; }
@@ -517,7 +544,9 @@ variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, NUMBER, $4, ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET             { createCloneFromComplexElement($2, NUMBER, $4, $6, NULL, ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET             { createCloneFromComplexElement($2, NUMBER, $4, getSymbolValueInt_ZeroIfNotInt($6), getSymbolValueString_NullIfNotString($6), ANY); $$ = ""; free($6); }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET     { createCloneFromComplexElement($2, NUMBER, $4, -$7, NULL, ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET     { createCloneFromComplexElement($2, NUMBER, $4, -getSymbolValueInt_ZeroIfNotInt($7), getSymbolValueString_NullIfNotString($7), ANY); $$ = ""; free($7); }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET          { createCloneFromComplexElement($2, NUMBER, $4, 0, $6, ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, ARRAY, $5, NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, NUMBER); $$ = ""; }
@@ -531,7 +560,9 @@ variable: T_VAR_STRING                                              { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, STRING, $4, ANY); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET             { createCloneFromComplexElement($2, STRING, $4, $6, NULL, ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET             { createCloneFromComplexElement($2, STRING, $4, getSymbolValueInt_ZeroIfNotInt($6), getSymbolValueString_NullIfNotString($6), ANY); $$ = ""; free($6); }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET     { createCloneFromComplexElement($2, STRING, $4, -$7, NULL, ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET     { createCloneFromComplexElement($2, STRING, $4, -getSymbolValueInt_ZeroIfNotInt($7), getSymbolValueString_NullIfNotString($7), ANY); $$ = ""; free($7); }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET          { createCloneFromComplexElement($2, STRING, $4, 0, $6, ANY); $$ = ""; }
     | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, ARRAY, $5, STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, STRING); $$ = ""; }
@@ -552,7 +583,9 @@ variable: T_VAR_ANY                                                 { }
     | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, ANY, $4, ANY); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET             { createCloneFromComplexElement($2, ANY, $4, $6, NULL, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET             { createCloneFromComplexElement($2, ANY, $4, getSymbolValueInt_ZeroIfNotInt($6), getSymbolValueString_NullIfNotString($6), ANY); $$ = ""; free($6); }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET     { createCloneFromComplexElement($2, ANY, $4, -$7, NULL, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET     { createCloneFromComplexElement($2, ANY, $4, -getSymbolValueInt_ZeroIfNotInt($7), getSymbolValueString_NullIfNotString($7), ANY); $$ = ""; free($7); }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET          { createCloneFromComplexElement($2, ANY, $4, 0, $6, ANY); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL boolean_expression                    { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL mixed_expression                      { addSymbolAnyFloat($2, $4); $$ = ""; }

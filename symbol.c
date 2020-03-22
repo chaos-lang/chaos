@@ -162,6 +162,22 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     return symbol_return;
 }
 
+char* getSymbolValueString(char *name) {
+    Symbol* symbol = getSymbol(name);
+    free(name);
+    char value_type[2] = "\0";
+    char* value;
+    if (symbol->value_type == V_STRING) {
+        value = malloc(1 + strlen(symbol->value.s));
+        strcpy(value, symbol->value.s);
+        return value;
+    } else {
+        value_type[0] = symbol->value_type;
+        throw_error(E_UNKNOWN_VARIABLE_TYPE, value_type);
+    }
+    return "";
+}
+
 float getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
@@ -240,6 +256,28 @@ int getSymbolValueInt(char *name) {
             break;
     }
     return 0;
+}
+
+char* getSymbolValueString_NullIfNotString(char *name) {
+    Symbol* symbol = getSymbol(name);
+    char *_name = malloc(1 + strlen(name));
+    strcpy(_name, name);
+    if (symbol->value_type != V_STRING) {
+        free(_name);
+        return NULL;
+    }
+    return getSymbolValueString(_name);
+}
+
+int getSymbolValueInt_ZeroIfNotInt(char *name) {
+    Symbol* symbol = getSymbol(name);
+    char *_name = malloc(1 + strlen(name));
+    strcpy(_name, name);
+    if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
+        free(_name);
+        return 0;
+    }
+    return getSymbolValueInt(_name);
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex) {

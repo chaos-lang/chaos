@@ -46,3 +46,85 @@ print var0
 num var1 = 0
 var1 = e['b']
 print var1
+
+str s0 = 'a'
+str s1 = 'b'
+
+dict dict11 = {'a': true, 'b': false}
+bool var5 = dict11[s0]
+bool var6 = dict11[s1]
+print var5
+print var6
+
+dict dict12 = {'a': 1, 'b': 2}
+num var7 = dict12[s0]
+num var8 = dict12[s1]
+print var7
+print var8
+
+dict dict13 = {'a': 'a', 'b': 'b'}
+str var9 = dict13[s0]
+str var10 = dict13[s1]
+print var9
+print var10
+
+any var11 = dict11[s0]
+any var12 = dict11[s1]
+any var13 = dict12[s0]
+any var14 = dict12[s1]
+any var15 = dict13[s0]
+any var16 = dict13[s1]
+print var11
+print var12
+print var13
+print var14
+print var15
+print var16
+
+var5 = dict11[s1]
+var6 = dict11[s0]
+print var5
+print var6
+
+var7 = dict12[s1]
+var8 = dict12[s0]
+print var7
+print var8
+
+var9 = dict13[s1]
+var10 = dict13[s0]
+print var9
+print var10
+
+var11 = dict11[s1]
+var12 = dict11[s0]
+var13 = dict12[s1]
+var14 = dict12[s0]
+var15 = dict13[s1]
+var16 = dict13[s0]
+print var11
+print var12
+print var13
+print var14
+print var15
+print var16
+
+dict11[s0] = false
+print dict11
+dict11[s1] = true
+print dict11
+
+dict12[s0] = 5
+print dict12
+dict12[s1] = 6
+print dict12
+
+dict13[s0] = 'd'
+print dict13
+dict13[s1] = 'e'
+print dict13
+
+del dict11[s0]
+print dict11
+del dict12[s1]
+print dict12

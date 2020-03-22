@@ -107,3 +107,85 @@ print var2
 num var3 = 0
 var3 = arr9[-2]
 print var3
+
+num i0 = 0
+num i1 = 1
+
+list arr11 = [true, false, true]
+bool var5 = arr11[i0]
+bool var6 = arr11[-i1]
+print var5
+print var6
+
+list arr12 = [1, 2, 3]
+num var7 = arr12[i0]
+num var8 = arr12[-i1]
+print var7
+print var8
+
+list arr13 = ['a', 'b', 'c']
+str var9 = arr13[i0]
+str var10 = arr13[-i1]
+print var9
+print var10
+
+any var11 = arr11[i0]
+any var12 = arr11[-i1]
+any var13 = arr12[i0]
+any var14 = arr12[-i1]
+any var15 = arr13[i0]
+any var16 = arr13[-i1]
+print var11
+print var12
+print var13
+print var14
+print var15
+print var16
+
+var5 = arr11[-i1]
+var6 = arr11[i0]
+print var5
+print var6
+
+var7 = arr12[-i1]
+var8 = arr12[i0]
+print var7
+print var8
+
+var9 = arr13[-i1]
+var10 = arr13[i0]
+print var9
+print var10
+
+var11 = arr11[-i1]
+var12 = arr11[i0]
+var13 = arr12[-i1]
+var14 = arr12[i0]
+var15 = arr13[-i1]
+var16 = arr13[i0]
+print var11
+print var12
+print var13
+print var14
+print var15
+print var16
+
+arr11[i0] = false
+print arr11
+arr11[-i1] = false
+print arr11
+
+arr12[i0] = 5
+print arr12
+arr12[-i1] = 6
+print arr12
+
+arr13[i0] = 'd'
+print arr13
+arr13[-i1] = 'e'
+print arr13
+
+del arr11[i0]
+print arr11
+//del arr12[-i1]
+//print arr12

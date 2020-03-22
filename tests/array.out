@@ -122,3 +122,34 @@ A
 2
 3
 2
+true
+true
+1
+3
+a
+c
+true
+true
+1
+3
+a
+c
+true
+true
+3
+1
+c
+a
+true
+true
+3
+1
+c
+a
+[false, false, true]
+[false, false, false]
+[5, 2, 3]
+[5, 2, 6]
+['d', 'b', 'c']
+['d', 'b', 'e']
+[false, false]
