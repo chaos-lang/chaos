@@ -65,11 +65,13 @@ void startFunction(char *name, enum Type type) {
         sizeof(Symbol) * function_parameters_mode->parameter_count
     );
 
-    memcpy(
-        function_mode->parameters,
-        function_parameters_mode->parameters,
-        function_parameters_mode->parameter_count * sizeof(Symbol)
-    );
+    if (function_parameters_mode->parameters != NULL) {
+        memcpy(
+            function_mode->parameters,
+            function_parameters_mode->parameters,
+            function_parameters_mode->parameter_count * sizeof(Symbol)
+        );
+    }
     function_mode->parameter_count = function_parameters_mode->parameter_count;
 
 
