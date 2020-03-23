@@ -349,7 +349,7 @@ num c = a ^ b
 print c
 del c
 num c = ~ a
-print c  // Bug: current: -6, actual: 250
+print c
 del c
 num c = b << 1
 print c
