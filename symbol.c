@@ -1,5 +1,23 @@
 #include "symbol.h"
 
+char *type_names[] = {
+    "Boolean",
+    "Number",
+    "String",
+    "Any",
+    "Array",
+    "Dictionary",
+    "Void"
+};
+
+char *value_type_names[] = {
+    "Boolean",
+    "Number",
+    "Number",
+    "String",
+    "Void"
+};
+
 int symbol_counter = 0;
 unsigned long long int symbol_id_counter = 0;
 
@@ -180,15 +198,13 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 char* getSymbolValueString(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
-    char value_type[2] = "\0";
     char* value;
     if (symbol->value_type == V_STRING) {
         value = malloc(1 + strlen(symbol->value.s));
         strcpy(value, symbol->value.s);
         return value;
     } else {
-        value_type[0] = symbol->value_type;
-        throw_error(E_UNKNOWN_VARIABLE_TYPE, value_type);
+        throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
     }
     return "";
 }
@@ -196,7 +212,6 @@ char* getSymbolValueString(char *name) {
 float getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
-    char value_type[2] = "\0";
     float value;
     switch (symbol->value_type)
     {
@@ -213,8 +228,7 @@ float getSymbolValueFloat(char *name) {
             return value;
             break;
         default:
-            value_type[0] = symbol->value_type;
-            throw_error(E_UNKNOWN_VARIABLE_TYPE, value_type);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
             break;
     }
     return 0.0;
@@ -249,7 +263,6 @@ bool getSymbolValueBool(char *name) {
 int getSymbolValueInt(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
-    char value_type[2] = "\0";
     int value;
     switch (symbol->value_type)
     {
@@ -266,8 +279,7 @@ int getSymbolValueInt(char *name) {
             return value;
             break;
         default:
-            value_type[0] = symbol->value_type;
-            throw_error(E_UNKNOWN_VARIABLE_TYPE, value_type);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
             break;
     }
     return 0;
@@ -288,7 +300,6 @@ int getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
     if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         return 0;
     }
-    char value_type[2] = "\0";
     int value;
     switch (symbol->value_type)
     {
@@ -302,16 +313,13 @@ int getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
             value = (int)symbol->value.f;
             break;
         default:
-            value_type[0] = symbol->value_type;
-            throw_error(E_UNKNOWN_VARIABLE_TYPE, value_type);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
             break;
     }
     return value * symbol->sign;
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex) {
-    char type[2] = "\0";
-
     switch (symbol->type)
     {
         case BOOL:
@@ -327,8 +335,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     printf("%g", symbol->value.f);
                     break;
                 default:
-                    type[0] = symbol->value_type;
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, type);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type));
                     break;
             }
             break;
@@ -377,14 +384,12 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     printf("%s", symbol->value.b ? "true" : "false");
                     break;
                 default:
-                    type[0] = symbol->value_type;
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, type);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type));
                     break;
             }
             break;
         default:
-            type[0] = symbol->type;
-            throw_error(E_UNKNOWN_VARIABLE_TYPE, type);
+            throw_error(E_UNKNOWN_VARIABLE_TYPE, getTypeName(symbol->value_type));
             break;
     }
 }
@@ -1120,4 +1125,16 @@ int assignThenIncrement(char *name, int i) {
     int result = getSymbolValueInt(name);
     updateSymbolInt(name2, getSymbolValueInt(name1) + i);
     return result;
+}
+
+char* getTypeName(int i) {
+    char *name = malloc(1 + strlen(type_names[i]));
+    strcpy(name, type_names[i]);
+    return name;
+}
+
+char* getValueTypeName(int i) {
+    char *name = malloc(1 + strlen(value_type_names[i]));
+    strcpy(name, value_type_names[i]);
+    return name;
 }

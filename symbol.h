@@ -112,5 +112,7 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type);
 void removeSymbolsByScope(_Function* scope);
 int incrementThenAssign(char *name, int i);
 int assignThenIncrement(char *name, int i);
+char* getTypeName(int i);
+char* getValueTypeName(int i);
 
 #endif
