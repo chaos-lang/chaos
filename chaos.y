@@ -747,6 +747,9 @@ void yyerror(const char* s) {
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         printf("%s ", __SHELL_INDICATOR__);
         #endif
+        flushLexer();
+        phase = INIT_PROGRAM;
+        yyparse();
     } else {
         freeEverything();
         exit(E_SYNTAX_ERROR);

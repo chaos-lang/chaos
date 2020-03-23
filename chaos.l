@@ -39,6 +39,10 @@ void injectCode(char *code, enum Phase phase_arg) {
     inject_mode = false;
 }
 
+void flushLexer() {
+    yy_flush_buffer(YY_CURRENT_BUFFER);
+}
+
 void parseTheModuleContent(char *module_path) {
     char *code = fileGetContents(module_path);
 
