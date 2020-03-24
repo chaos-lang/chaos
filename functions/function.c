@@ -84,10 +84,11 @@ void startFunction(char *name, enum Type type) {
 
     #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     if (name != NULL) {
-        char suggestion[80];
+        char *suggestion = malloc(1 + strlen(name));
         strcpy(suggestion, name);
-        strcat(suggestion, "()");
+        suggestion = strcat_ext(suggestion, "()");
         add_suggestion(suggestion);
+        free(suggestion);
     }
     #endif
 
@@ -427,23 +428,23 @@ void executeDecision(_Function* function) {
     union Value value;
     value.b = false;
     bool is_decision_made = false;
-    char expression_buffer[1000] = "";
-    char function_buffer[1000] = "";
+    char *expression_buffer = "";
+    char *function_buffer = "";
     char *name = malloc(1 + strlen(__LANGUAGE_NAME__));
     strcpy(name, __LANGUAGE_NAME__);
     Symbol* symbol = addSymbol(name, BOOL, value, V_BOOL);
 
     for (int i = 0; i < function->decision_length; i++) {
-        strcat(expression_buffer, __LANGUAGE_NAME__);
-        strcat(expression_buffer, " = ");
-        strcat(expression_buffer, function->decision_expressions[i]);
-        strcat(expression_buffer, "\n");
+        expression_buffer = strcat_ext(expression_buffer, __LANGUAGE_NAME__);
+        expression_buffer = strcat_ext(expression_buffer, " = ");
+        expression_buffer = strcat_ext(expression_buffer, function->decision_expressions[i]);
+        expression_buffer = strcat_ext(expression_buffer, "\n");
 
         injectCode(expression_buffer, INIT_PROGRAM);
 
         if (symbol->value.b) {
-            strcat(function_buffer, function->decision_functions[i]);
-            strcat(function_buffer, "\n");
+            function_buffer = strcat_ext(function_buffer, function->decision_functions[i]);
+            function_buffer = strcat_ext(function_buffer, "\n");
             injectCode(function_buffer, INIT_PROGRAM);
             is_decision_made = true;
             break;
@@ -453,8 +454,8 @@ void executeDecision(_Function* function) {
     removeSymbol(symbol);
 
     if (!is_decision_made && function->decision_default != NULL) {
-        strcat(function_buffer, function->decision_default);
-        strcat(function_buffer, "\n");
+        function_buffer = strcat_ext(function_buffer, function->decision_default);
+        function_buffer = strcat_ext(function_buffer, "\n");
         injectCode(function_buffer, INIT_PROGRAM);
     }
 
@@ -472,6 +473,9 @@ void executeDecision(_Function* function) {
     if (decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
     }
+
+    free(expression_buffer);
+    free(function_buffer);
 }
 
 void appendModuleToModuleBuffer(char *name) {

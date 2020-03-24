@@ -148,7 +148,7 @@ int add_suggestion(char *suggestion) {
     if (!is_interactive || suggestion == NULL) {
         return 0;
     }
-    suggestions[suggestions_length] = malloc(80 *sizeof(char));
+    suggestions[suggestions_length] = malloc(1 + strlen(suggestion));
     strcpy(suggestions[suggestions_length], suggestion);
     suggestions_length++;
     return 0;
