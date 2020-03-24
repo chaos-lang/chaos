@@ -330,6 +330,7 @@ void initMainFunction() {
     function_names_buffer_length = 0;
     module_path_stack_length = 0;
     module_stack_length = 0;
+    decision_buffer = "";
     initScopeless();
     initMainContext();
 }
@@ -401,7 +402,8 @@ bool block(enum BlockType type) {
 void addBooleanDecision() {
     decision_mode->decision_functions[decision_mode->decision_length] = malloc(1 + strlen(trim_string(decision_buffer)));
     strcpy(decision_mode->decision_functions[decision_mode->decision_length], trim_string(decision_buffer));
-    memset(decision_buffer, 0, strlen(trim_string(decision_buffer)));
+    free(decision_buffer);
+    decision_buffer = "";
     decision_mode->decision_length++;
     decision_expression_mode = NULL;
     decision_function_mode = NULL;
@@ -410,7 +412,8 @@ void addBooleanDecision() {
 void addDefaultDecision() {
     decision_mode->decision_default = realloc(decision_mode->decision_default, 1 + strlen(trim_string(decision_buffer)));
     strcpy(decision_mode->decision_default, trim_string(decision_buffer));
-    memset(decision_buffer, 0, strlen(trim_string(decision_buffer)));
+    free(decision_buffer);
+    decision_buffer = "";
     decision_expression_mode = NULL;
     decision_function_mode = NULL;
 }

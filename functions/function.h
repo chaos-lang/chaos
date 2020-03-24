@@ -30,7 +30,6 @@ typedef struct _Function {
     char *decision_functions[1000];
     char *decision_default;
     int decision_length;
-    char *modules[1000];
     char *context;
     char *module_context;
     char *module;
@@ -56,7 +55,7 @@ _Function* decision_mode;
 _Function* decision_expression_mode;
 _Function* decision_function_mode;
 Symbol* decision_symbol_chain;
-char decision_buffer[1000];
+char *decision_buffer;
 
 char *modules_buffer[1000];
 int modules_buffer_length;

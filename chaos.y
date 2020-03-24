@@ -764,6 +764,7 @@ void freeEverything() {
     freeAllFunctions();
     freeModulesBuffer();
     freeFunctionNamesBuffer();
+    if (strlen(decision_buffer) > 0) free(decision_buffer);
 
     yylex_destroy();
 
