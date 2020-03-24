@@ -19,7 +19,7 @@ void recordToken(char *token, int length) {
             free(token);
             return;
         }
-        strcat(function_mode->body, token);
+        function_mode->body = strcat_ext(function_mode->body, token);
     }
 
     if (decision_mode != NULL) {

@@ -11,7 +11,8 @@ void startFunction(char *name, enum Type type) {
 
     function_mode = getFunction(name, NULL);
     if (function_mode != NULL) {
-        memset(function_mode->body, 0, strlen(function_mode->body));
+        free(function_mode->body);
+        function_mode->body = "";
         free(name);
         for (int i = 0; i < function_parameters_mode->parameter_count; i++) {
             Symbol* parameter = function_parameters_mode->parameters[i];
@@ -33,6 +34,7 @@ void startFunction(char *name, enum Type type) {
     }
 
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
+    function_mode->body = "";
     function_mode->name = malloc(1 + strlen(name));
     strcpy(function_mode->name, name);
     function_mode->type = type;
@@ -349,6 +351,7 @@ void initMainContext() {
 }
 
 void freeFunction(_Function* function) {
+    free(function->body);
     free(function->name);
     free(function->parameters);
     for (int i = 0; i < function->decision_length; i++) {

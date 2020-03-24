@@ -34,7 +34,7 @@ typedef struct _Function {
     char *context;
     char *module_context;
     char *module;
-    char body[1000];
+    char *body;
 } _Function;
 
 _Function* function_cursor;
