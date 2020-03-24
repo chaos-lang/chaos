@@ -19,8 +19,7 @@ void endLoop() {
         return;
     }
 
-    char *body = malloc(1 + strlen(loop_mode->body));
-    strcpy(body, loop_mode->body);
+    char *body = loop_mode->body;
     int iter = loop_mode->iter;
     enum LoopType loop_type = loop_mode->type;
     char *array_name = loop_mode->array;
@@ -85,6 +84,6 @@ void endLoop() {
             break;
     }
 
-    free(body);
+    free(_loop_mode->body);
     free(_loop_mode);
 }

@@ -19,7 +19,7 @@ typedef struct {
     int nested_counter;
     char *array;
     LoopElement element;
-    char body[1000];
+    char *body;
 } Loop;
 
 Loop* loop_mode;

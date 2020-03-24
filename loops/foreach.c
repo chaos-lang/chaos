@@ -14,6 +14,7 @@ void startForeach(char *array, char *element_name) {
     }
 
     loop_mode = (Loop*)calloc(1, sizeof(Loop));
+    loop_mode->body = "";
     loop_mode->type = FOREACH;
     loop_mode->nested_counter = 0;
 
@@ -37,6 +38,7 @@ void startForeachDict(char *array, char *element_key, char *element_value) {
     }
 
     loop_mode = (Loop*)calloc(1, sizeof(Loop));
+    loop_mode->body = "";
     loop_mode->type = FOREACH_DICT;
     loop_mode->nested_counter = 0;
 

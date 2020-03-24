@@ -12,6 +12,7 @@ void startTimesDo(int iter) {
     }
 
     loop_mode = (Loop*)calloc(1, sizeof(Loop));
+    loop_mode->body = "";
     loop_mode->type = TIMESDO;
     loop_mode->iter = iter;
     loop_mode->nested_counter = 0;

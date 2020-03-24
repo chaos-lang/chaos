@@ -11,7 +11,7 @@ void recordToken(char *token, int length) {
             free(token);
             return;
         }
-        strcat(loop_mode->body, token);
+        loop_mode->body = strcat_ext(loop_mode->body, token);
     }
 
     if (function_mode != NULL) {
