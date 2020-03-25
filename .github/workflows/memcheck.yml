@@ -66,7 +66,7 @@ jobs:
     - name: Install dependencies (alpine)
       run: |
         apk update
-        apk add bash which make valgrind
+        apk add linux-headers bash which make valgrind
         make requirements
       if: matrix.target == 'alpine'
 

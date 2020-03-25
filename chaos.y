@@ -4,6 +4,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <setjmp.h>
+
+#if defined(__APPLE__) && defined(__MACH__)
+#include <sys/syslimits.h>
+#else
+#include <linux/limits.h>
+#endif
+
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include <readline/history.h>
 #endif
@@ -681,8 +688,8 @@ int main(int argc, char** argv) {
             *ptr = '\0';
         }
     } else {
-        char buff[1000];
-        GetCurrentDir(buff, 1000);
+        char buff[PATH_MAX];
+        GetCurrentDir(buff, PATH_MAX);
 
         program_file_dir = malloc(strlen(buff) + 1);
         strcpy(program_file_dir, buff);

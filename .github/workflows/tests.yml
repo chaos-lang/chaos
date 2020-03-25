@@ -66,7 +66,7 @@ jobs:
     - name: Install dependencies (alpine)
       run: |
         apk update
-        apk add bash which make
+        apk add linux-headers bash which make
         make requirements
       if: matrix.target == 'alpine'
 
