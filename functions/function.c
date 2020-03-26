@@ -44,6 +44,9 @@ void startFunction(char *name, enum Type type) {
     function_mode->decision_expressions.capacity = 0;
     function_mode->decision_expressions.size = 0;
 
+    function_mode->decision_functions.capacity = 0;
+    function_mode->decision_functions.size = 0;
+
     int parent_context = 1;
     if (module_path_stack_length > 1) parent_context = 2;
     function_mode->context = malloc(1 + strlen(module_path_stack[module_path_stack_length - parent_context]));
@@ -361,9 +364,10 @@ void freeFunction(_Function* function) {
     free(function->parameters);
     for (int i = 0; i < function->decision_length; i++) {
         free(function->decision_expressions.arr[i]);
-        free(function->decision_functions[i]);
+        free(function->decision_functions.arr[i]);
     }
     free(function->decision_expressions.arr);
+    free(function->decision_functions.arr);
     free(function->decision_default);
     free(function->context);
     free(function->module_context);
@@ -405,8 +409,10 @@ bool block(enum BlockType type) {
 }
 
 void addBooleanDecision() {
-    decision_mode->decision_functions[decision_mode->decision_length] = malloc(1 + strlen(trim_string(decision_buffer)));
-    strcpy(decision_mode->decision_functions[decision_mode->decision_length], trim_string(decision_buffer));
+    add_to_array(
+        &decision_mode->decision_functions,
+        trim_string(decision_buffer)
+    );
     free(decision_buffer);
     decision_buffer = "";
     decision_mode->decision_length++;
@@ -447,7 +453,7 @@ void executeDecision(_Function* function) {
         injectCode(expression_buffer, INIT_PROGRAM);
 
         if (symbol->value.b) {
-            function_buffer = strcat_ext(function_buffer, function->decision_functions[i]);
+            function_buffer = strcat_ext(function_buffer, function->decision_functions.arr[i]);
             function_buffer = strcat_ext(function_buffer, "\n");
             injectCode(function_buffer, INIT_PROGRAM);
             is_decision_made = true;

@@ -27,7 +27,7 @@ typedef struct _Function {
     struct _Function* next;
     struct _Function* parent_scope;
     string_array decision_expressions;
-    char *decision_functions[1000];
+    string_array decision_functions;
     char *decision_default;
     int decision_length;
     char *context;
