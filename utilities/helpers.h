@@ -9,6 +9,11 @@
 #include <ctype.h>
 #include <string.h>
 
+typedef struct string_array {
+    char **arr;
+    unsigned capacity, size;
+} string_array;
+
 #include "loop.h"
 #include "function.h"
 
@@ -19,6 +24,7 @@ char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
 int replace_char(char *str, char orig, char rep);
 void shift_char_array(char *array[], int n, int i);
+void add_to_array(string_array *array, char *str);
 void relative_path_to_absolute(char *path);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)

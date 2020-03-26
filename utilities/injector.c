@@ -32,8 +32,10 @@ void recordToken(char *token, int length) {
             if (strlen(trim_string(decision_buffer)) == 0) {
                 return;
             }
-            decision_mode->decision_expressions[decision_mode->decision_length] = malloc(1 + strlen(trim_string(decision_buffer)));
-            strcpy(decision_mode->decision_expressions[decision_mode->decision_length], trim_string(decision_buffer));
+            add_to_array(
+                &decision_mode->decision_expressions,
+                trim_string(decision_buffer)
+            );
             free(decision_buffer);
             decision_buffer = "";
             return;

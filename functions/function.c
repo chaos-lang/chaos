@@ -41,6 +41,9 @@ void startFunction(char *name, enum Type type) {
     function_mode->parameter_count = 0;
     function_mode->decision_length = 0;
 
+    function_mode->decision_expressions.capacity = 0;
+    function_mode->decision_expressions.size = 0;
+
     int parent_context = 1;
     if (module_path_stack_length > 1) parent_context = 2;
     function_mode->context = malloc(1 + strlen(module_path_stack[module_path_stack_length - parent_context]));
@@ -357,9 +360,10 @@ void freeFunction(_Function* function) {
     free(function->name);
     free(function->parameters);
     for (int i = 0; i < function->decision_length; i++) {
-        free(function->decision_expressions[i]);
+        free(function->decision_expressions.arr[i]);
         free(function->decision_functions[i]);
     }
+    free(function->decision_expressions.arr);
     free(function->decision_default);
     free(function->context);
     free(function->module_context);
@@ -437,7 +441,7 @@ void executeDecision(_Function* function) {
     for (int i = 0; i < function->decision_length; i++) {
         expression_buffer = strcat_ext(expression_buffer, __LANGUAGE_NAME__);
         expression_buffer = strcat_ext(expression_buffer, " = ");
-        expression_buffer = strcat_ext(expression_buffer, function->decision_expressions[i]);
+        expression_buffer = strcat_ext(expression_buffer, function->decision_expressions.arr[i]);
         expression_buffer = strcat_ext(expression_buffer, "\n");
 
         injectCode(expression_buffer, INIT_PROGRAM);

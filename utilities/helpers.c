@@ -125,6 +125,18 @@ void shift_char_array(char *array[], int n, int i) {
     array[0] = NULL;
 }
 
+void add_to_array(string_array *array, char *str) {
+    if (array->capacity == 0) {
+        array->arr = (char **)malloc((array->capacity = 2) * sizeof(char *));
+    } else if (array->capacity == array->size) {
+        array->arr = (char **)realloc(array->arr, (array->capacity *= 2) * sizeof(char *));
+    }
+
+    array->arr[array->size] = malloc(1 + strlen(str));
+    strcpy(array->arr[array->size], str);
+    array->size++;
+}
+
 void relative_path_to_absolute(char *path)
 {
     size_t i;
