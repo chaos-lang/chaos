@@ -118,11 +118,16 @@ int replace_char(char *str, char orig, char rep) {
     return n;
 }
 
-void shift_char_array(char *array[], int n, int i) {
-    for (int k = n; k > 0; k--){
-        array[k] = array[k - i];
+void prepend_to_array(string_array *array, char *str) {
+    array->arr = (char **)realloc(array->arr, (array->capacity += 1) * sizeof(char *));
+
+    for (int k = array->size; k > 0; k--) {
+        array->arr[k] = array->arr[k - 1];
     }
-    array[0] = NULL;
+
+    array->arr[0] = malloc(1 + strlen(str));
+    strcpy(array->arr[0], str);
+    array->size++;
 }
 
 void add_to_array(string_array *array, char *str) {

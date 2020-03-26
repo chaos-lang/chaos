@@ -333,7 +333,8 @@ void initMainFunction() {
     main_function->type = ANY;
     main_function->parameter_count = 0;
     recursion_depth = 0;
-    modules_buffer_length = 0;
+    modules_buffer.capacity = 0;
+    modules_buffer.size = 0;
     function_names_buffer_length = 0;
     module_path_stack_length = 0;
     module_stack_length = 0;
@@ -489,17 +490,12 @@ void executeDecision(_Function* function) {
 }
 
 void appendModuleToModuleBuffer(char *name) {
-    modules_buffer[modules_buffer_length] = malloc(1 + strlen(name));
-    strcpy(modules_buffer[modules_buffer_length], name);
-    modules_buffer_length++;
+    add_to_array(&modules_buffer, name);
     free(name);
 }
 
 void prependModuleToModuleBuffer(char *name) {
-    shift_char_array(modules_buffer, modules_buffer_length, 1);
-    modules_buffer[0] = malloc(1 + strlen(name));
-    strcpy(modules_buffer[0], name);
-    modules_buffer_length++;
+    prepend_to_array(&modules_buffer, name);
 }
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
@@ -526,16 +522,16 @@ void handleModuleImport(char *module_name, bool directly_import) {
     module_path = strcat_ext(module_path, module_dir);
     if (module_path[0] != '\0') module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
 
-    for (int i = 0; i < modules_buffer_length; i++) {
-        module_path = strcat_ext(module_path, modules_buffer[i]);
-        if (i + 1 != modules_buffer_length) {
+    for (int i = 0; i < modules_buffer.size; i++) {
+        module_path = strcat_ext(module_path, modules_buffer.arr[i]);
+        if (i + 1 != modules_buffer.size) {
             module_dir = (char *) realloc(module_dir, strlen(module_path) + 1);
             strcpy(module_dir, module_path);
             module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
         }
     }
 
-    char *module = modules_buffer[modules_buffer_length - 1];
+    char *module = modules_buffer.arr[modules_buffer.size - 1];
     if (module_name != NULL) {
         module = module_name;
     }
@@ -563,10 +559,12 @@ void handleModuleImport(char *module_name, bool directly_import) {
 }
 
 void freeModulesBuffer() {
-    for (int i = 0; i < modules_buffer_length; i++) {
-        free(modules_buffer[i]);
+    for (int i = 0; i < modules_buffer.size; i++) {
+        free(modules_buffer.arr[i]);
     }
-    modules_buffer_length = 0;
+    if (modules_buffer.size > 0) free(modules_buffer.arr);
+    modules_buffer.capacity = 0;
+    modules_buffer.size = 0;
 }
 
 void freeFunctionNamesBuffer() {

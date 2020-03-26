@@ -57,8 +57,7 @@ _Function* decision_function_mode;
 Symbol* decision_symbol_chain;
 char *decision_buffer;
 
-char *modules_buffer[1000];
-int modules_buffer_length;
+string_array modules_buffer;
 
 char *function_names_buffer[1000];
 int function_names_buffer_length;
