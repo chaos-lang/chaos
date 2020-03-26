@@ -39,7 +39,6 @@ void startFunction(char *name, enum Type type) {
     strcpy(function_mode->name, name);
     function_mode->type = type;
     function_mode->parameter_count = 0;
-    function_mode->decision_length = 0;
 
     function_mode->decision_expressions.capacity = 0;
     function_mode->decision_expressions.size = 0;
@@ -210,7 +209,7 @@ void printFunctionTable() {
             function->name,
             function->type,
             function->parameter_count,
-            function->decision_length,
+            function->decision_functions.size,
             context_temp,
             function->module_context,
             function->module
@@ -364,7 +363,7 @@ void freeFunction(_Function* function) {
     free(function->body);
     free(function->name);
     free(function->parameters);
-    for (int i = 0; i < function->decision_length; i++) {
+    for (int i = 0; i < function->decision_functions.size; i++) {
         free(function->decision_expressions.arr[i]);
         free(function->decision_functions.arr[i]);
     }
@@ -417,7 +416,6 @@ void addBooleanDecision() {
     );
     free(decision_buffer);
     decision_buffer = "";
-    decision_mode->decision_length++;
     decision_expression_mode = NULL;
     decision_function_mode = NULL;
 }
@@ -432,7 +430,7 @@ void addDefaultDecision() {
 }
 
 void executeDecision(_Function* function) {
-    if (function->decision_length <= 0) {
+    if (function->decision_functions.size <= 0) {
         return;
     }
     _Function* executed_function_backup = executed_function;
@@ -446,7 +444,7 @@ void executeDecision(_Function* function) {
     strcpy(name, __LANGUAGE_NAME__);
     Symbol* symbol = addSymbol(name, BOOL, value, V_BOOL);
 
-    for (int i = 0; i < function->decision_length; i++) {
+    for (int i = 0; i < function->decision_functions.size; i++) {
         expression_buffer = strcat_ext(expression_buffer, __LANGUAGE_NAME__);
         expression_buffer = strcat_ext(expression_buffer, " = ");
         expression_buffer = strcat_ext(expression_buffer, function->decision_expressions.arr[i]);

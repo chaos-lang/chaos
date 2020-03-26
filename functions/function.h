@@ -29,7 +29,6 @@ typedef struct _Function {
     string_array decision_expressions;
     string_array decision_functions;
     char *decision_default;
-    int decision_length;
     char *context;
     char *module_context;
     char *module;
