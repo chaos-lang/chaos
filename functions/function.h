@@ -59,8 +59,7 @@ char *decision_buffer;
 
 string_array modules_buffer;
 
-char *function_names_buffer[1000];
-int function_names_buffer_length;
+string_array function_names_buffer;
 
 int recursion_depth;
 

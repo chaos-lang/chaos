@@ -25,7 +25,7 @@ void startFunction(char *name, enum Type type) {
         return;
     }
 
-    if (function_names_buffer_length > 0) {
+    if (function_names_buffer.size > 0) {
         if (!isInFunctionNamesBuffer(name)) {
             free(name);
             freeFunctionMode();
@@ -335,7 +335,8 @@ void initMainFunction() {
     recursion_depth = 0;
     modules_buffer.capacity = 0;
     modules_buffer.size = 0;
-    function_names_buffer_length = 0;
+    function_names_buffer.capacity = 0;
+    function_names_buffer.size = 0;
     module_path_stack_length = 0;
     module_stack_length = 0;
     decision_buffer = "";
@@ -499,9 +500,7 @@ void prependModuleToModuleBuffer(char *name) {
 }
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
-    function_names_buffer[function_names_buffer_length] = malloc(1 + strlen(name));
-    strcpy(function_names_buffer[function_names_buffer_length], name);
-    function_names_buffer_length++;
+    add_to_array(&function_names_buffer, name);
     free(name);
 }
 
@@ -568,15 +567,15 @@ void freeModulesBuffer() {
 }
 
 void freeFunctionNamesBuffer() {
-    for (int i = 0; i < function_names_buffer_length; i++) {
-        free(function_names_buffer[i]);
+    for (int i = 0; i < function_names_buffer.size; i++) {
+        free(function_names_buffer.arr[i]);
     }
-    function_names_buffer_length = 0;
+    function_names_buffer.size = 0;
 }
 
 bool isInFunctionNamesBuffer(char *name) {
-    for (int i = 0; i < function_names_buffer_length; i++) {
-        if (strcmp(function_names_buffer[i], name) == 0) return true;
+    for (int i = 0; i < function_names_buffer.size; i++) {
+        if (strcmp(function_names_buffer.arr[i], name) == 0) return true;
     }
     return false;
 }
