@@ -410,7 +410,7 @@ bool block(enum BlockType type) {
 }
 
 void addBooleanDecision() {
-    add_to_array(
+    append_to_array(
         &decision_mode->decision_functions,
         trim_string(decision_buffer)
     );
@@ -489,7 +489,7 @@ void executeDecision(_Function* function) {
 }
 
 void appendModuleToModuleBuffer(char *name) {
-    add_to_array(&modules_buffer, name);
+    append_to_array(&modules_buffer, name);
     free(name);
 }
 
@@ -498,7 +498,7 @@ void prependModuleToModuleBuffer(char *name) {
 }
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
-    add_to_array(&function_names_buffer, name);
+    append_to_array(&function_names_buffer, name);
     free(name);
 }
 

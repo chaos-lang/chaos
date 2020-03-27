@@ -130,7 +130,7 @@ void prepend_to_array(string_array *array, char *str) {
     array->size++;
 }
 
-void add_to_array(string_array *array, char *str) {
+void append_to_array(string_array *array, char *str) {
     if (array->capacity == 0) {
         array->arr = (char **)malloc((array->capacity = 2) * sizeof(char *));
     } else if (array->capacity == array->size) {

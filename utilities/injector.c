@@ -32,7 +32,7 @@ void recordToken(char *token, int length) {
             if (strlen(trim_string(decision_buffer)) == 0) {
                 return;
             }
-            add_to_array(
+            append_to_array(
                 &decision_mode->decision_expressions,
                 trim_string(decision_buffer)
             );

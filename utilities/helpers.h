@@ -24,7 +24,7 @@ char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
 int replace_char(char *str, char orig, char rep);
 void prepend_to_array(string_array *array, char *str);
-void add_to_array(string_array *array, char *str);
+void append_to_array(string_array *array, char *str);
 void relative_path_to_absolute(char *path);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
