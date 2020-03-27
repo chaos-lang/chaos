@@ -52,8 +52,8 @@ void startFunction(char *name, enum Type type) {
     strcpy(function_mode->context, module_path_stack.arr[module_path_stack.size - parent_context]);
     function_mode->module_context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(function_mode->module_context, module_path_stack.arr[module_path_stack.size - 1]);
-    function_mode->module = malloc(1 + strlen(module_stack[module_stack_length - 1]));
-    strcpy(function_mode->module, module_stack[module_stack_length - 1]);
+    function_mode->module = malloc(1 + strlen(module_stack.arr[module_stack.size - 1]));
+    strcpy(function_mode->module, module_stack.arr[module_stack.size - 1]);
 
     recordToken(strdup("\n"), 1);
 
@@ -338,7 +338,8 @@ void initMainFunction() {
     function_names_buffer.size = 0;
     module_path_stack.capacity = 0;
     module_path_stack.size = 0;
-    module_stack_length = 0;
+    module_stack.capacity = 0;
+    module_stack.size = 0;
     decision_buffer = "";
     initScopeless();
     initMainContext();
@@ -581,17 +582,14 @@ bool isInFunctionNamesBuffer(char *name) {
 
 void pushModuleStack(char *module_path, char *module) {
     append_to_array(&module_path_stack, module_path);
-
-    module_stack[module_stack_length] = malloc(1 + strlen(module));
-    strcpy(module_stack[module_stack_length], module);
-    module_stack_length++;
+    append_to_array(&module_stack, module);
 }
 
 void popModuleStack() {
     free(module_path_stack.arr[module_path_stack.size - 1]);
     module_path_stack.size--;
-    free(module_stack[module_stack_length - 1]);
-    module_stack_length--;
+    free(module_stack.arr[module_stack.size - 1]);
+    module_stack.size--;
 }
 
 void freeModulePathStack() {
@@ -601,4 +599,13 @@ void freeModulePathStack() {
     module_path_stack.capacity = 0;
     module_path_stack.size = 0;
     free(module_path_stack.arr);
+}
+
+void freeModuleStack() {
+    for (int i = 0; i < module_stack.size; i++) {
+        free(module_stack.arr[i]);
+    }
+    module_stack.capacity = 0;
+    module_stack.size = 0;
+    free(module_stack.arr);
 }

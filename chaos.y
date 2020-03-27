@@ -773,6 +773,8 @@ void freeEverything() {
     freeFunctionNamesBuffer();
     free(function_names_buffer.arr);
     if (strlen(decision_buffer) > 0) free(decision_buffer);
+    freeModulePathStack();
+    freeModuleStack();
 
     yylex_destroy();
 
@@ -780,7 +782,6 @@ void freeEverything() {
         fclose(fp);
         free(program_file_path);
         free(program_file_dir);
-        popModuleStack();
     } else {
         #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();
@@ -789,7 +790,6 @@ void freeEverything() {
         }
         #endif
     }
-    freeModulePathStack();
 
     fclose(stdin);
     fclose(stdout);
