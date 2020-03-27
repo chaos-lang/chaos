@@ -788,6 +788,7 @@ void freeEverything() {
         }
         #endif
     }
+    freeModulePathStack();
 
     fclose(stdin);
     fclose(stdout);

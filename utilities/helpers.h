@@ -26,6 +26,7 @@ int replace_char(char *str, char orig, char rep);
 void prepend_to_array(string_array *array, char *str);
 void append_to_array(string_array *array, char *str);
 void relative_path_to_absolute(char *path);
+char *remove_ext(char* myStr, char extSep, char pathSep);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>

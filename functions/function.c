@@ -47,11 +47,11 @@ void startFunction(char *name, enum Type type) {
     function_mode->decision_functions.size = 0;
 
     int parent_context = 1;
-    if (module_path_stack_length > 1) parent_context = 2;
-    function_mode->context = malloc(1 + strlen(module_path_stack[module_path_stack_length - parent_context]));
-    strcpy(function_mode->context, module_path_stack[module_path_stack_length - parent_context]);
-    function_mode->module_context = malloc(1 + strlen(module_path_stack[module_path_stack_length - 1]));
-    strcpy(function_mode->module_context, module_path_stack[module_path_stack_length - 1]);
+    if (module_path_stack.size > 1) parent_context = 2;
+    function_mode->context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - parent_context]));
+    strcpy(function_mode->context, module_path_stack.arr[module_path_stack.size - parent_context]);
+    function_mode->module_context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+    strcpy(function_mode->module_context, module_path_stack.arr[module_path_stack.size - 1]);
     function_mode->module = malloc(1 + strlen(module_stack[module_stack_length - 1]));
     strcpy(function_mode->module, module_stack[module_stack_length - 1]);
 
@@ -181,7 +181,7 @@ _Function* getFunction(char *name, char *module) {
             continue;
         }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
-        criteria = criteria && strcmp(function_cursor->context, module_path_stack[module_path_stack_length - 1]) == 0;
+        criteria = criteria && strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - 1]) == 0;
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {
             _Function* function = function_cursor;
@@ -336,7 +336,8 @@ void initMainFunction() {
     modules_buffer.size = 0;
     function_names_buffer.capacity = 0;
     function_names_buffer.size = 0;
-    module_path_stack_length = 0;
+    module_path_stack.capacity = 0;
+    module_path_stack.size = 0;
     module_stack_length = 0;
     decision_buffer = "";
     initScopeless();
@@ -351,12 +352,12 @@ void initScopeless() {
 }
 
 void initMainContext() {
-    pushModuleStack(program_file_path, "");
-
-    char *ptr = strrchr(module_path_stack[module_path_stack_length - 1], '.');
-    if (ptr) {
-        *ptr = '\0';
-    }
+    char *module_path_with_extension = malloc(1 + strlen(program_file_path));
+    strcpy(module_path_with_extension, program_file_path);
+    char *module_path_without_extension = remove_ext(module_path_with_extension, '.', __PATH_SEPARATOR_ASCII__);
+    free(module_path_with_extension);
+    pushModuleStack(module_path_without_extension, "");
+    free(module_path_without_extension);
 }
 
 void freeFunction(_Function* function) {
@@ -506,8 +507,8 @@ void handleModuleImport(char *module_name, bool directly_import) {
     char *module_path = "";
     char *module_dir;
 
-    module_dir = malloc(strlen(module_path_stack[module_path_stack_length - 1]) + 1);
-    strcpy(module_dir, module_path_stack[module_path_stack_length - 1]);
+    module_dir = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
+    strcpy(module_dir, module_path_stack.arr[module_path_stack.size - 1]);
     char *ptr = strrchr(module_dir, __PATH_SEPARATOR_ASCII__);
     if (ptr) {
         *ptr = '\0';
@@ -579,9 +580,7 @@ bool isInFunctionNamesBuffer(char *name) {
 }
 
 void pushModuleStack(char *module_path, char *module) {
-    module_path_stack[module_path_stack_length] = malloc(1 + strlen(module_path));
-    strcpy(module_path_stack[module_path_stack_length], module_path);
-    module_path_stack_length++;
+    append_to_array(&module_path_stack, module_path);
 
     module_stack[module_stack_length] = malloc(1 + strlen(module));
     strcpy(module_stack[module_stack_length], module);
@@ -589,8 +588,16 @@ void pushModuleStack(char *module_path, char *module) {
 }
 
 void popModuleStack() {
-    free(module_path_stack[module_path_stack_length - 1]);
-    module_path_stack_length--;
+    free(module_path_stack.arr[module_path_stack.size - 1]);
+    module_path_stack.size--;
     free(module_stack[module_stack_length - 1]);
     module_stack_length--;
+}
+
+void freeModulePathStack() {
+    for (int i = 0; i < module_path_stack.size; i++) {
+        free(module_path_stack.arr[i]);
+    }
+    module_path_stack.size = 0;
+    free(module_path_stack.arr);
 }

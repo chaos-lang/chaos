@@ -271,3 +271,40 @@ void relative_path_to_absolute(char *path)
     //Properly terminate the string with a NULL character
     path[k] = '\0';
 }
+
+char *remove_ext(char* myStr, char extSep, char pathSep) {
+    char *retStr, *lastExt, *lastPath;
+
+    // Error checks and allocate string.
+
+    if (myStr == NULL) return NULL;
+    if ((retStr = malloc (strlen (myStr) + 1)) == NULL) return NULL;
+
+    // Make a copy and find the relevant characters.
+
+    strcpy (retStr, myStr);
+    lastExt = strrchr (retStr, extSep);
+    lastPath = (pathSep == 0) ? NULL : strrchr (retStr, pathSep);
+
+    // If it has an extension separator.
+
+    if (lastExt != NULL) {
+        // and it's to the right of the path separator.
+
+        if (lastPath != NULL) {
+            if (lastPath < lastExt) {
+                // then remove it.
+
+                *lastExt = '\0';
+            }
+        } else {
+            // Has extension separator with no path separator.
+
+            *lastExt = '\0';
+        }
+    }
+
+    // Return the modified string.
+
+    return retStr;
+}

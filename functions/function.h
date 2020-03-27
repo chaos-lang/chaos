@@ -64,8 +64,7 @@ int recursion_depth;
 
 extern char *program_file_path;
 extern char *program_file_dir;
-char *module_path_stack[1000];
-int module_path_stack_length;
+string_array module_path_stack;
 char *module_stack[1000];
 int module_stack_length;
 
@@ -105,5 +104,6 @@ void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
 void popModuleStack();
 void pushModuleStack(char *module_path, char *module);
+void freeModulePathStack();
 
 #endif
