@@ -598,6 +598,7 @@ void freeModulePathStack() {
     for (int i = 0; i < module_path_stack.size; i++) {
         free(module_path_stack.arr[i]);
     }
+    module_path_stack.capacity = 0;
     module_path_stack.size = 0;
     free(module_path_stack.arr);
 }
