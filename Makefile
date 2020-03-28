@@ -33,6 +33,11 @@ clang-dev-sanitizer-address:
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
+clang-dev-sanitizer-undefined_behavior:
+	export CHAOS_COMPILER='clang -fsanitize=undefined'
+	export CHAOS_EXTRA_FLAGS=-ggdb
+	${MAKE} chaos
+
 chaos.tab.c chaos.tab.h: chaos.y
 	bison -Wconflicts-rr -Wno-conflicts-sr --report=all --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d chaos.y
 

@@ -23,10 +23,13 @@
         <img alt="GitHub Workflow Memory Leak Checks" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Memory%20Leak%20Checks?logo=GitHub&label=memcheck&style=flat-square">
     </a>
     <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Memory+Sanitizer%22">
-        <img alt="GitHub Workflow Memory Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Memory%20Sanitizer?logo=GitHub&label=sanitizer_memory&style=flat-square">
+        <img alt="GitHub Workflow Memory Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Memory%20Sanitizer?logo=GitHub&label=memory%20sanitizer&style=flat-square">
     </a>
     <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Address+Sanitizer%22">
-        <img alt="GitHub Workflow Address Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Address%20Sanitizer?logo=GitHub&label=sanitizer_address&style=flat-square">
+        <img alt="GitHub Workflow Address Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Address%20Sanitizer?logo=GitHub&label=address%20sanitizer&style=flat-square">
+    </a>
+    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Undefined+Behavior+Sanitizer%22">
+        <img alt="GitHub Workflow Undefined Behavior Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Undefined%20Behavior%20Sanitizer?logo=GitHub&label=undefined%20behavior%20sanitizer&style=flat-square">
     </a>
 </p>
 <p align="center">
