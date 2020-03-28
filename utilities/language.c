@@ -1,10 +1,11 @@
 #include "language.h"
 
+extern int yylineno;
+
 void greet() {
-    int msg_width = 80;
-    char lang[msg_width];
-    char compiler[msg_width];
-    char motto[msg_width];
+    char lang[__MSG_LINE_LENGTH__];
+    char compiler[__MSG_LINE_LENGTH__];
+    char motto[__MSG_LINE_LENGTH__];
 
     sprintf(lang, "    %s Language %s (%s %s) ", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
     #if defined(__clang__)
@@ -17,7 +18,7 @@ void greet() {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[1;45m");
     #endif
-    printf("%-*s", msg_width, lang);
+    printf("%-*s", __MSG_LINE_LENGTH__, lang);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -25,7 +26,7 @@ void greet() {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[1;45m");
     #endif
-    printf("%-*s", msg_width, compiler);
+    printf("%-*s", __MSG_LINE_LENGTH__, compiler);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -33,9 +34,57 @@ void greet() {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[5;45m");
     #endif
-    printf("%-*s", msg_width, motto);
+    printf("%-*s", __MSG_LINE_LENGTH__, motto);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
     printf("\n\n");
+}
+
+void yyerror_msg(char* error_name, char* current_module, char* cause) {
+    char error_name_msg[__MSG_LINE_LENGTH__];
+    char current_module_msg[__MSG_LINE_LENGTH__];
+    char line_no_msg[__MSG_LINE_LENGTH__];
+    char cause_msg[__MSG_LINE_LENGTH__];
+
+    sprintf(error_name_msg, "  %s:", error_name);
+    sprintf(current_module_msg, "    Module: %s", current_module);
+    sprintf(line_no_msg, "    Line: %d", yylineno);
+    sprintf(cause_msg, "    Cause: %s", cause);
+
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;46m");
+    #endif
+    printf("%-*s", __MSG_LINE_LENGTH__, error_name_msg);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n");
+
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;46m");
+    #endif
+    printf("%-*s", __MSG_LINE_LENGTH__, current_module_msg);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n");
+
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;46m");
+    #endif
+    printf("%-*s", __MSG_LINE_LENGTH__, line_no_msg);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n");
+
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;46m");
+    #endif
+    printf("%-*s", __MSG_LINE_LENGTH__, cause_msg);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n");
 }

@@ -742,11 +742,8 @@ int main(int argc, char** argv) {
 
 void yyerror(const char* s) {
     if (phase == PREPARSE) return;
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        fprintf(stderr, "\033[0;36m%s:\nModule: %s\nLine: %i\nCause: %s\n\033[0m", capitalize(s), getCurrentModule(), yylineno, yytext);
-    #else
-        fprintf(stderr, "%s:\nModule: %s\nLine: %i\nCause: %s\n", capitalize(s), getCurrentModule(), yylineno, yytext);
-    #endif
+
+    yyerror_msg(capitalize(s), getCurrentModule(), yytext);
 
     if (is_interactive) {
         loop_mode = NULL;
