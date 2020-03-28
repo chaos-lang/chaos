@@ -105,5 +105,6 @@ void popModuleStack();
 void pushModuleStack(char *module_path, char *module);
 void freeModulePathStack();
 void freeModuleStack();
+char* getCurrentModule();
 
 #endif

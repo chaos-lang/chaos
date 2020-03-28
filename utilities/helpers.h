@@ -25,6 +25,7 @@ char *strcat_ext(char *s1, const char *s2);
 int replace_char(char *str, char orig, char rep);
 void prepend_to_array(string_array *array, char *str);
 void append_to_array(string_array *array, char *str);
+char *capitalize(const char *str);
 void relative_path_to_absolute(char *path);
 char *remove_ext(char* myStr, char extSep, char pathSep);
 

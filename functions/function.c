@@ -609,3 +609,7 @@ void freeModuleStack() {
     module_stack.size = 0;
     free(module_stack.arr);
 }
+
+char* getCurrentModule() {
+    return module_path_stack.arr[module_path_stack.size - 1];
+}

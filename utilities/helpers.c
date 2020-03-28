@@ -142,6 +142,13 @@ void append_to_array(string_array *array, char *str) {
     array->size++;
 }
 
+char *capitalize(const char *str) {
+    char *_str = malloc(1 + strlen(str));
+    strcpy(_str, str);
+    _str[0] = toupper(_str[0]);
+    return _str;
+}
+
 void relative_path_to_absolute(char *path)
 {
     size_t i;

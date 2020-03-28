@@ -93,10 +93,12 @@ static int custom_input(char *buf, int result, int max_size) {
 switch (phase)
 {
     case INIT_PREPARSE:
+        yylineno = 1;
         phase = PREPARSE;
         return START_PREPARSE;
         break;
     case INIT_PROGRAM:
+        yylineno = 1;
         phase = PROGRAM;
         return START_PROGRAM;
         break;
