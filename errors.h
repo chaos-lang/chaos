@@ -36,6 +36,18 @@ extern void freeEverything();
 extern bool is_interactive;
 extern jmp_buf InteractiveShellErrorAbsorber;
 
-void throw_error(int code, char *subject);
+void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long long int llu1);
+
+typedef struct {
+    int code;
+    char *str1;
+    char *str2;
+    int int1;
+    unsigned long long int llu1;
+} throw_error_args;
+
+void throw_error_var(throw_error_args in);
+
+#define throw_error(...) throw_error_var((throw_error_args){__VA_ARGS__});
 
 #endif

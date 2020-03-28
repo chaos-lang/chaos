@@ -296,7 +296,7 @@ void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != executed_function->type) {
         free(name);
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, executed_function->name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), executed_function->name);
     }
     scope_override = executed_function->parent_scope;
     executed_function->symbol = createCloneFromSymbol(

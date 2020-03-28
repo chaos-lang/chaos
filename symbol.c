@@ -75,7 +75,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
     Symbol* symbol = getSymbol(name);
 
-    if (symbol->type != ANY && symbol->type != type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
+    if (symbol->type != ANY && symbol->type != type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), name);
 
     if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
@@ -156,7 +156,7 @@ Symbol* getSymbolById(unsigned long long int id) {
         }
         symbol_cursor = symbol_cursor->next;
     }
-    throw_error(E_NO_VARIABLE_WITH_ID, "");
+    throw_error(E_NO_VARIABLE_WITH_ID, NULL, NULL, 0, id);
     return NULL;
 }
 
@@ -176,7 +176,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
         addSymbolDict(NULL);
     } else {
         free(name);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, symbol->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), symbol->name);
     }
 
     for (int i = 0; i < symbol->children_count; i++) {
@@ -204,7 +204,7 @@ char* getSymbolValueString(char *name) {
         strcpy(value, symbol->value.s);
         return value;
     } else {
-        throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
+        throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return "";
 }
@@ -228,7 +228,7 @@ float getSymbolValueFloat(char *name) {
             return value;
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
             break;
     }
     return 0.0;
@@ -279,7 +279,7 @@ int getSymbolValueInt(char *name) {
             return value;
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
             break;
     }
     return 0;
@@ -313,7 +313,7 @@ int getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
             value = (int)symbol->value.f;
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type));
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
             break;
     }
     return value * symbol->sign;
@@ -335,7 +335,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     printf("%g", symbol->value.f);
                     break;
                 default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type));
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
                     break;
             }
             break;
@@ -384,12 +384,12 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     printf("%s", symbol->value.b ? "true" : "false");
                     break;
                 default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type));
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type), symbol->name);
                     break;
             }
             break;
         default:
-            throw_error(E_UNKNOWN_VARIABLE_TYPE, getTypeName(symbol->value_type));
+            throw_error(E_UNKNOWN_VARIABLE_TYPE, getTypeName(symbol->type), symbol->name);
             break;
     }
 }
@@ -548,12 +548,12 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         symbol->type != ANY &&
         symbol->type != type
     ) {
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), clone_name);
     }
 
     Symbol* clone_symbol;
     if (symbol->type == ARRAY || symbol->type == DICT) {
-        if (symbol->secondary_type != extra_type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_name);
+        if (symbol->secondary_type != extra_type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(extra_type), clone_name);
         clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
         if (type == ANY) {
@@ -582,7 +582,7 @@ Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol) {
         symbol->type != ANY &&
         clone_symbol->type != symbol->type
     ) {
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_name);
     }
 
     if (clone_symbol->type == ARRAY) {
@@ -654,7 +654,7 @@ void finishComplexMode(char *name, enum Type type) {
     complex_mode->secondary_type = type;
     if (isComplexIllegal(type)) {
         free(name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, complex_mode->name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex_mode->name);
     }
     complex_mode = NULL;
     symbol_counter = 0;
@@ -679,7 +679,7 @@ Symbol* getArrayElement(char *name, int i) {
     if (i < 0 || i > symbol->children_count - 1) {
         free(name);
         char buffer[__ITOA_BUFFER_LENGTH__];
-        throw_error(E_UNDEFINED_INDEX, itoa(i, buffer, 10));
+        throw_error(E_UNDEFINED_INDEX, symbol->name, NULL, i);
     }
 
     return symbol->children[i];
@@ -701,7 +701,7 @@ Symbol* getComplexElement(char *name, int i, char *key) {
         symbol = getDictElement(name, key);
     } else {
         free(name);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, complex->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
     }
 
     return symbol;
@@ -723,7 +723,7 @@ Symbol* getComplexElementBySymbolId(char *name, unsigned long long symbol_id) {
     } else {
         free(name);
         free(key);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, complex->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
     }
     free(key);
 
@@ -740,7 +740,7 @@ void updateComplexElement(char *name, unsigned long long symbol_id, enum Type ty
     if (complex->secondary_type != ANY && complex->secondary_type != type) {
         free(name);
         free(key);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, complex->name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex->name);
     }
 
     Symbol* symbol = getComplexElement(name, i, key);
@@ -790,7 +790,7 @@ void updateComplexElementSymbol(char* name, unsigned long long int symbol_id, ch
         free(name);
         free(key);
         free(source_name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, complex->name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(source->type), complex->name);
     }
 
     Symbol* symbol;
@@ -810,7 +810,7 @@ void updateComplexElementSymbol(char* name, unsigned long long int symbol_id, ch
         free(name);
         free(key);
         free(source_name);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, complex->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
     }
 
     free(name);
@@ -838,7 +838,7 @@ void removeComplexElement(char *name, unsigned long long int symbol_id) {
     } else {
         free(name);
         free(key);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), name);
     }
 
     free(key);
@@ -886,7 +886,7 @@ Symbol* getDictElement(char *name, char *key) {
         }
     }
     free(name);
-    throw_error(E_UNDEFINED_KEY, key);
+    throw_error(E_UNDEFINED_KEY, key, symbol->name);
     return NULL;
 }
 
@@ -987,7 +987,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     }
                     break;
                 default:
-                    throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
                     break;
             }
             break;
@@ -1007,7 +1007,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     clone_symbol->value.i = atoi(symbol->value.s);
                     break;
                 default:
-                    throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
                     break;
             }
             break;
@@ -1027,7 +1027,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     clone_symbol->value.f = atof(symbol->value.s);
                     break;
                 default:
-                    throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
                     break;
             }
             break;
@@ -1059,12 +1059,12 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     strcpy(clone_symbol->value.s, symbol->value.s);
                     break;
                 default:
-                    throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
                     break;
             }
             break;
         default:
-            throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, clone_symbol->name);
+            throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_symbol->name);
             break;
     }
     return deepCopySymbol(clone_symbol, clone_symbol->type, NULL);
