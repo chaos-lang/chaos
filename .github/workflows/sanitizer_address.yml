@@ -1,0 +1,25 @@
+name: Address Sanitizer
+
+on: [push]
+
+jobs:
+  main:
+    name: sanitizer_address
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo make requirements
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang-dev-sanitizer-address
+        sudo make install
+
+    - name: Run the tests (clang)
+      run: |
+        make test

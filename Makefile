@@ -24,7 +24,12 @@ clang-dev:
 	${MAKE} chaos
 
 clang-dev-sanitizer-memory:
-	export CHAOS_COMPILER='clang -fsanitize=memory -fno-omit-frame-pointer'
+	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer'
+	export CHAOS_EXTRA_FLAGS=-ggdb
+	${MAKE} chaos
+
+clang-dev-sanitizer-address:
+	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer'
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
