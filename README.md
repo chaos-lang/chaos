@@ -22,6 +22,9 @@
     <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Memory+Leak+Checks%22">
         <img alt="GitHub Workflow Memory Leak Checks" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Memory%20Leak%20Checks?logo=GitHub&label=memcheck&style=flat-square">
     </a>
+    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Memory+Sanitizer%22">
+        <img alt="GitHub Workflow Memory Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Memory%20Sanitizer?logo=GitHub&label=sanitizer_memory&style=flat-square">
+    </a>
 </p>
 <p align="center">
     Chaos is a purely functional programming language that achieves zero cyclomatic complexity.

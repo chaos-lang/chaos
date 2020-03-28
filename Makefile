@@ -23,6 +23,11 @@ clang-dev:
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
+clang-dev-sanitizer-memory:
+	export CHAOS_COMPILER='clang -fsanitize=memory -fno-omit-frame-pointer'
+	export CHAOS_EXTRA_FLAGS=-ggdb
+	${MAKE} chaos
+
 chaos.tab.c chaos.tab.h: chaos.y
 	bison -Wconflicts-rr -Wno-conflicts-sr --report=all --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d chaos.y
 
