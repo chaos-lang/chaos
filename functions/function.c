@@ -364,10 +364,8 @@ void initScopeless() {
 void initMainContext() {
     char *module_path_with_extension = malloc(1 + strlen(program_file_path));
     strcpy(module_path_with_extension, program_file_path);
-    char *module_path_without_extension = remove_ext(module_path_with_extension, '.', __PATH_SEPARATOR_ASCII__);
+    pushModuleStack(module_path_with_extension, "");
     free(module_path_with_extension);
-    pushModuleStack(module_path_without_extension, "");
-    free(module_path_without_extension);
 }
 
 void freeFunction(_Function* function) {
