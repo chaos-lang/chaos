@@ -19,6 +19,7 @@ enum BlockType { B_EXPRESSION, B_FUNCTION };
 
 typedef struct _Function {
     char *name;
+    int line_no;
     struct Symbol** parameters;
     int parameter_count;
     enum Type type;
@@ -68,6 +69,8 @@ string_array module_path_stack;
 string_array module_stack;
 
 extern int module_parsing;
+
+int reset_line_no_to;
 
 void startFunction(char *name, enum Type type);
 void endFunction();

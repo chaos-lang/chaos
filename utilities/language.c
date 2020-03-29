@@ -1,6 +1,7 @@
 #include "language.h"
 
 extern int yylineno;
+extern char *last_token;
 
 void greet() {
     struct winsize terminal;
@@ -58,6 +59,8 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     char current_module_msg[terminal.ws_col];
     char line_no_msg[terminal.ws_col];
     char cause_msg[terminal.ws_col];
+
+    if (strcmp(last_token, "\n") != 0) yylineno++;
 
     sprintf(error_name_msg, "  %s:", error_name);
     sprintf(current_module_msg, "    Module: %s", current_module);

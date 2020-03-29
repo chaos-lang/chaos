@@ -93,12 +93,12 @@ static int custom_input(char *buf, int result, int max_size) {
 switch (phase)
 {
     case INIT_PREPARSE:
-        yylineno = 1;
+        yylineno = reset_line_no_to;
         phase = PREPARSE;
         return START_PREPARSE;
         break;
     case INIT_PROGRAM:
-        yylineno = 1;
+        yylineno = reset_line_no_to;
         phase = PROGRAM;
         return START_PROGRAM;
         break;
@@ -111,7 +111,7 @@ switch (phase)
 [ \t]                           {recordToken(strdup(yytext), yyleng);}; // ignore all whitespace
 [0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (loop_mode == NULL && function_mode == NULL) return T_FLOAT;}
 [0-9]+                          {recordToken(strdup(yytext), yyleng); yylval.ival = atoi(yytext); return T_INT;}
-\n                              {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
+\n                              {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
 "="                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_EQUAL;}
 "+"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_PLUS;}
 "-"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_MINUS;}
@@ -143,8 +143,8 @@ switch (phase)
 ">>"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_RIGHT_SHIFT;}
 "++"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_INCREMENT;}
 "--"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DECREMENT;}
-"//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
-"#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno = yylineno + 1; return T_NEWLINE;}
+"//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
+"#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
 "exit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_QUIT;}
 "quit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_QUIT;}

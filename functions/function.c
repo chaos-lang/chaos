@@ -4,6 +4,10 @@
 #include "function.h"
 #include "../utilities/injector.h"
 
+extern int yylineno;
+
+int reset_line_no_to = 0;
+
 void startFunction(char *name, enum Type type) {
     if (is_interactive) {
         phase = PREPARSE;
@@ -36,6 +40,7 @@ void startFunction(char *name, enum Type type) {
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->body = "";
     function_mode->name = malloc(1 + strlen(name));
+    function_mode->line_no = yylineno;
     strcpy(function_mode->name, name);
     function_mode->type = type;
     function_mode->parameter_count = 0;
@@ -150,7 +155,11 @@ void callFunction(char *name, char *module) {
         throw_error(E_MAXIMUM_RECURSION_DEPTH_EXCEEDED, NULL);
     }
 
+    reset_line_no_to = function->line_no;
+
     injectCode(function->body, INIT_PROGRAM);
+
+    reset_line_no_to = 0;
 
     executeDecision(function);
 

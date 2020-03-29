@@ -1,6 +1,7 @@
 #include "errors.h"
 
 extern int yylineno;
+extern char *last_token;
 
 void throw_error_var(throw_error_args in) {
     int code = in.code ? in.code : 0;
@@ -20,6 +21,8 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
     char line_no_msg[terminal.ws_col];
     char error_msg[terminal.ws_col];
     char error_msg_out[terminal.ws_col];
+
+    if (strcmp(last_token, "\n") != 0) yylineno++;
 
     sprintf(title_msg, "  %s Error:", __LANGUAGE_NAME__);
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());
