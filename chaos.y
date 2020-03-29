@@ -210,7 +210,7 @@ line: T_NEWLINE
     | loop T_NEWLINE                                                { }
     | T_QUIT T_NEWLINE                                              {
         if (is_interactive) {
-            printf("%s\n", __BYE_BYE__);
+            print_bye_bye();
         } else {
             YYABORT;
         }
@@ -719,9 +719,9 @@ int main(int argc, char** argv) {
                 phase = INIT_PROGRAM;
 
                 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-                    printf("\033[0;44m");
+                    printf("\033[1;44m");
                 #endif
-                printf(" Absorbed by Interactive Shell ");
+                printf("%-*s", __MSG_LINE_LENGTH__, "    Absorbed by Interactive Shell");
                 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
                     printf("\033[0m");
                 #endif

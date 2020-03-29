@@ -66,15 +66,14 @@ int down_arrow_key_pressed(int count, int key) {
 }
 
 int esc_key_pressed(int count, int key) {
-    rl_replace_line("exit", 0);
-    rl_redisplay();
-    printf("\n%s\n", __BYE_BYE__);
-    freeEverything();
-    exit(0);
+    return ctrl_d_key_pressed();
 }
 
 int ctrl_d_key_pressed() {
-    printf("\n%s\n", __BYE_BYE__);
+    rl_replace_line("exit", 0);
+    rl_redisplay();
+    printf("\n");
+    print_bye_bye();
     freeEverything();
     exit(0);
 }
@@ -82,6 +81,20 @@ int ctrl_d_key_pressed() {
 int tab_key_pressed(int count, int key) {
     rl_insert_text("    ");
     return 0;
+}
+
+void print_bye_bye() {
+    char bye_bye_msg[__MSG_LINE_LENGTH__];
+    sprintf(bye_bye_msg, "    %s", __BYE_BYE__);
+
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[5;42m");
+    #endif
+    printf("%-*s", __MSG_LINE_LENGTH__, bye_bye_msg);
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n");
 }
 
 int shell_readline(char *buf) {

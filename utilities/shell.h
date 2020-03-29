@@ -14,6 +14,7 @@ int down_arrow_key_pressed(int count, int key);
 int esc_key_pressed(int count, int key);
 int ctrl_d_key_pressed();
 int tab_key_pressed(int count, int key);
+void print_bye_bye();
 
 int shell_readline(char *buf);
 

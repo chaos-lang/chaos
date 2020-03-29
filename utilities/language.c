@@ -62,7 +62,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     printf("\n");
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;46m");
+        printf("\033[0;46m");
     #endif
     printf("%-*s", __MSG_LINE_LENGTH__, current_module_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -71,7 +71,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     printf("\n");
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;46m");
+        printf("\033[0;46m");
     #endif
     printf("%-*s", __MSG_LINE_LENGTH__, line_no_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -80,7 +80,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     printf("\n");
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;46m");
+        printf("\033[0;46m");
     #endif
     printf("%-*s", __MSG_LINE_LENGTH__, cause_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)

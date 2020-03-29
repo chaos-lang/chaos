@@ -7,6 +7,9 @@
 #include <setjmp.h>
 #include <string.h>
 
+#include "utilities/language.h"
+#include "functions/function.h"
+
 enum ExitCode {
     E_SUCCESS,
     E_SYNTAX_ERROR,
