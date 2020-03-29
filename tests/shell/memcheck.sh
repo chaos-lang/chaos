@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SUB="$( basename $DIR )"
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
+for filepath in $(find $DIR -maxdepth 1 -name '*.kaos' ! -name '*_fail.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
 

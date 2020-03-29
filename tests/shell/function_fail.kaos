@@ -1,0 +1,5 @@
+void def a()
+    print b
+end
+
+a()

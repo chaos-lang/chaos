@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <setjmp.h>
 
 typedef struct _Function _Function;
 
@@ -71,6 +72,9 @@ string_array module_stack;
 extern int module_parsing;
 
 int reset_line_no_to;
+
+jmp_buf InteractiveShellFunctionErrorAbsorber;
+bool interactive_shell_function_error_absorbed;
 
 void startFunction(char *name, enum Type type);
 void endFunction();

@@ -728,6 +728,7 @@ int main(int argc, char** argv) {
                 printf("\n");
 
                 if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
+                if (executed_function) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
             }
         }
 

@@ -5,6 +5,8 @@
 #include "../utilities/injector.h"
 
 extern int yylineno;
+bool interactive_shell_function_error_absorbed = false;
+extern int yyparse();
 
 int reset_line_no_to = 0;
 
@@ -157,11 +159,19 @@ void callFunction(char *name, char *module) {
 
     reset_line_no_to = function->line_no;
 
-    injectCode(function->body, INIT_PROGRAM);
+    if (is_interactive) {
+        if (setjmp(InteractiveShellFunctionErrorAbsorber)) {
+            interactive_shell_function_error_absorbed = true;
+        }
+    }
+
+    if (!interactive_shell_function_error_absorbed)
+        injectCode(function->body, INIT_PROGRAM);
 
     reset_line_no_to = 0;
 
-    executeDecision(function);
+    if (!interactive_shell_function_error_absorbed)
+        executeDecision(function);
 
     if (function->type != VOID && function->symbol == NULL) {
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
@@ -180,6 +190,12 @@ void callFunction(char *name, char *module) {
     popModuleStack();
 
     executed_function = NULL;
+
+    if (is_interactive && interactive_shell_function_error_absorbed) {
+        interactive_shell_function_error_absorbed = false;
+        yyrestart_interactive();
+        yyparse();
+    }
 }
 
 _Function* getFunction(char *name, char *module) {
