@@ -721,7 +721,7 @@ int main(int argc, char** argv) {
                 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
                     printf("\033[1;44m");
                 #endif
-                printf("%-*s", __MSG_LINE_LENGTH__, "    Absorbed by Interactive Shell");
+                printf("%-*s", InteractiveShellErrorAbsorber_ws_col, "    Absorbed by Interactive Shell");
                 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
                     printf("\033[0m");
                 #endif

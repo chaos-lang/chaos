@@ -84,13 +84,14 @@ int tab_key_pressed(int count, int key) {
 }
 
 void print_bye_bye() {
-    char bye_bye_msg[__MSG_LINE_LENGTH__];
-    sprintf(bye_bye_msg, "    %s", __BYE_BYE__);
+    int ws_col = (int) strlen(__BYE_BYE__) + 8;
+    char bye_bye_msg[ws_col];
+    sprintf(bye_bye_msg, "    %s    ", __BYE_BYE__);
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[5;42m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, bye_bye_msg);
+    printf("%-*s", ws_col, bye_bye_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif

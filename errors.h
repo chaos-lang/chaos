@@ -53,4 +53,6 @@ void throw_error_var(throw_error_args in);
 
 #define throw_error(...) throw_error_var((throw_error_args){__VA_ARGS__});
 
+int InteractiveShellErrorAbsorber_ws_col;
+
 #endif

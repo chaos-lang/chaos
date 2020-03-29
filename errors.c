@@ -12,11 +12,14 @@ void throw_error_var(throw_error_args in) {
 }
 
 void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long long int llu1) {
-    char title_msg[__MSG_LINE_LENGTH__];
-    char current_module_msg[__MSG_LINE_LENGTH__];
-    char line_no_msg[__MSG_LINE_LENGTH__];
-    char error_msg[__MSG_LINE_LENGTH__ - 4];
-    char error_msg_out[__MSG_LINE_LENGTH__];
+    struct winsize terminal;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
+
+    char title_msg[terminal.ws_col];
+    char current_module_msg[terminal.ws_col];
+    char line_no_msg[terminal.ws_col];
+    char error_msg[terminal.ws_col];
+    char error_msg_out[terminal.ws_col];
 
     sprintf(title_msg, "  %s Error:", __LANGUAGE_NAME__);
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());
@@ -91,10 +94,18 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
 
     sprintf(error_msg_out, "    %s", error_msg);
 
+    int cols[4];
+    cols[0] = (int) strlen(title_msg);
+    cols[1] = (int) strlen(current_module_msg);
+    cols[2] = (int) strlen(line_no_msg);
+    cols[3] = (int) strlen(error_msg_out);
+    int ws_col = largest(cols, 4) + 4;
+    InteractiveShellErrorAbsorber_ws_col = ws_col;
+
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[1;41m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, title_msg);
+    printf("%-*s", ws_col, title_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -103,7 +114,7 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;41m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, current_module_msg);
+    printf("%-*s", ws_col, current_module_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -112,7 +123,7 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;41m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, line_no_msg);
+    printf("%-*s", ws_col, line_no_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -121,7 +132,7 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;41m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, error_msg_out);
+    printf("%-*s", ws_col, error_msg_out);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif

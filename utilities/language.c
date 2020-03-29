@@ -3,9 +3,12 @@
 extern int yylineno;
 
 void greet() {
-    char lang[__MSG_LINE_LENGTH__];
-    char compiler[__MSG_LINE_LENGTH__];
-    char motto[__MSG_LINE_LENGTH__];
+    struct winsize terminal;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
+
+    char lang[terminal.ws_col];
+    char compiler[terminal.ws_col];
+    char motto[terminal.ws_col];
 
     sprintf(lang, "    %s Language %s (%s %s) ", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
     #if defined(__clang__)
@@ -15,10 +18,16 @@ void greet() {
     #endif
     sprintf(motto, "    %s", __LANGUAGE_MOTTO__);
 
+    int cols[3];
+    cols[0] = (int) strlen(lang);
+    cols[1] = (int) strlen(compiler);
+    cols[2] = (int) strlen(motto);
+    int ws_col = largest(cols, 3) + 4;
+
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[1;45m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, lang);
+    printf("%-*s", ws_col, lang);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -26,7 +35,7 @@ void greet() {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[1;45m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, compiler);
+    printf("%-*s", ws_col, compiler);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -34,7 +43,7 @@ void greet() {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[5;45m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, motto);
+    printf("%-*s", ws_col, motto);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -42,20 +51,30 @@ void greet() {
 }
 
 void yyerror_msg(char* error_name, char* current_module, char* cause) {
-    char error_name_msg[__MSG_LINE_LENGTH__];
-    char current_module_msg[__MSG_LINE_LENGTH__];
-    char line_no_msg[__MSG_LINE_LENGTH__];
-    char cause_msg[__MSG_LINE_LENGTH__];
+    struct winsize terminal;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
+
+    char error_name_msg[terminal.ws_col];
+    char current_module_msg[terminal.ws_col];
+    char line_no_msg[terminal.ws_col];
+    char cause_msg[terminal.ws_col];
 
     sprintf(error_name_msg, "  %s:", error_name);
     sprintf(current_module_msg, "    Module: %s", current_module);
     sprintf(line_no_msg, "    Line: %d", yylineno);
     sprintf(cause_msg, "    Cause: %s", cause);
 
+    int cols[4];
+    cols[0] = (int) strlen(error_name_msg);
+    cols[1] = (int) strlen(current_module_msg);
+    cols[2] = (int) strlen(line_no_msg);
+    cols[3] = (int) strlen(cause_msg);
+    int ws_col = largest(cols, 3) + 4;
+
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[1;46m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, error_name_msg);
+    printf("%-*s", ws_col, error_name_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -64,7 +83,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;46m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, current_module_msg);
+    printf("%-*s", ws_col, current_module_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -73,7 +92,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;46m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, line_no_msg);
+    printf("%-*s", ws_col, line_no_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
@@ -82,7 +101,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;46m");
     #endif
-    printf("%-*s", __MSG_LINE_LENGTH__, cause_msg);
+    printf("%-*s", ws_col, cause_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
