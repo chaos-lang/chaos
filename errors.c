@@ -97,6 +97,8 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
 
     sprintf(error_msg_out, "    %s", error_msg);
 
+    str_replace(error_msg_out, "\n", "\\n");
+
     int cols[4];
     cols[0] = (int) strlen(title_msg);
     cols[1] = (int) strlen(current_module_msg);

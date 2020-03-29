@@ -726,6 +726,8 @@ int main(int argc, char** argv) {
                     printf("\033[0m");
                 #endif
                 printf("\n");
+
+                if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
             }
         }
 

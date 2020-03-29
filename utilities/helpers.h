@@ -31,6 +31,7 @@ char *capitalize(const char *str);
 int largest(int arr[], int n);
 void relative_path_to_absolute(char *path);
 char *remove_ext(char* myStr, char extSep, char pathSep);
+void str_replace(char *target, const char *needle, const char *replacement);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>

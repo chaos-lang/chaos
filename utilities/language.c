@@ -67,6 +67,8 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     sprintf(line_no_msg, "    Line: %d", yylineno);
     sprintf(cause_msg, "    Cause: %s", cause);
 
+    str_replace(cause_msg, "\n", "\\n");
+
     int cols[4];
     cols[0] = (int) strlen(error_name_msg);
     cols[1] = (int) strlen(current_module_msg);

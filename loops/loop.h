@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <setjmp.h>
 
 enum LoopType { TIMESDO, FOREACH, FOREACH_DICT };
 
@@ -24,6 +25,9 @@ typedef struct {
 
 Loop* loop_mode;
 bool loop_execution_mode;
+
+jmp_buf InteractiveShellLoopErrorAbsorber;
+bool interactive_shell_loop_error_absorbed;
 
 void endLoop();
 

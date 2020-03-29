@@ -39,6 +39,16 @@ void injectCode(char *code, enum Phase phase_arg) {
     inject_mode = false;
 }
 
+void yyrestart_interactive() {
+    if (!YY_CURRENT_BUFFER){
+        yyensure_buffer_stack();
+		YY_CURRENT_BUFFER_LVALUE = yy_create_buffer(yyin, YY_BUF_SIZE);
+	}
+
+	yy_init_buffer(YY_CURRENT_BUFFER, yyin);
+    YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = true;
+}
+
 void flushLexer() {
     yy_flush_buffer(YY_CURRENT_BUFFER);
 }

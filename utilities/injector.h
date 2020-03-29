@@ -12,6 +12,7 @@ extern Loop* loop_mode;
 extern bool inject_mode;
 
 void injectCode(char *code, enum Phase phase_arg);
+void yyrestart_interactive();
 void flushLexer();
 void parseTheModuleContent(char *module_path);
 

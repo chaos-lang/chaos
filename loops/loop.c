@@ -5,6 +5,9 @@
 #include "../symbol.h"
 #include "../utilities/injector.h"
 
+bool interactive_shell_loop_error_absorbed = false;
+extern int yyparse();
+
 void endLoop() {
     if (loop_mode == NULL) return;
 
@@ -33,38 +36,46 @@ void endLoop() {
 
     loop_execution_mode = true;
 
-    switch (loop_type)
-    {
-        case TIMESDO:
-            for (int i = 0; i < iter; i++) {
-                injectCode(body, INIT_PROGRAM);
-            }
-            break;
-        case FOREACH:
-            array = getSymbol(array_name);
-            for (int i = 0; i < array->children_count; i++) {
-                Symbol* child = array->children[i];
-                child->name = element_name;
-                injectCode(body, INIT_PROGRAM);
-                child->name = NULL;
-            }
-            break;
-        case FOREACH_DICT:
-            array = getSymbol(array_name);
-            for (int i = 0; i < array->children_count; i++) {
-                Symbol* child = array->children[i];
-                char *key = malloc(1 + strlen(child->key));
-                char *element_key_copy = malloc(1 + strlen(element_key));
-                strcpy(key, child->key);
-                strcpy(element_key_copy, element_key);
+    if (is_interactive) {
+        if (setjmp(InteractiveShellLoopErrorAbsorber)) {
+            interactive_shell_loop_error_absorbed = true;
+        }
+    }
 
-                addSymbolString(element_key_copy, key);
-                child->name = element_value;
-                injectCode(body, INIT_PROGRAM);
-                child->name = NULL;
-                removeSymbolByName(element_key);
-            }
-            break;
+    if (!interactive_shell_loop_error_absorbed) {
+        switch (loop_type)
+        {
+            case TIMESDO:
+                for (int i = 0; i < iter; i++) {
+                    injectCode(body, INIT_PROGRAM);
+                }
+                break;
+            case FOREACH:
+                array = getSymbol(array_name);
+                for (int i = 0; i < array->children_count; i++) {
+                    Symbol* child = array->children[i];
+                    child->name = element_name;
+                    injectCode(body, INIT_PROGRAM);
+                    child->name = NULL;
+                }
+                break;
+            case FOREACH_DICT:
+                array = getSymbol(array_name);
+                for (int i = 0; i < array->children_count; i++) {
+                    Symbol* child = array->children[i];
+                    char *key = malloc(1 + strlen(child->key));
+                    char *element_key_copy = malloc(1 + strlen(element_key));
+                    strcpy(key, child->key);
+                    strcpy(element_key_copy, element_key);
+
+                    addSymbolString(element_key_copy, key);
+                    child->name = element_value;
+                    injectCode(body, INIT_PROGRAM);
+                    child->name = NULL;
+                    removeSymbolByName(element_key);
+                }
+                break;
+        }
     }
 
     loop_execution_mode = false;
@@ -86,4 +97,10 @@ void endLoop() {
 
     free(_loop_mode->body);
     free(_loop_mode);
+
+    if (is_interactive && interactive_shell_loop_error_absorbed) {
+        interactive_shell_loop_error_absorbed = false;
+        yyrestart_interactive();
+        yyparse();
+    }
 }
