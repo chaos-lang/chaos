@@ -756,6 +756,10 @@ void yyerror(const char* s) {
         #endif
         flushLexer();
         phase = INIT_PROGRAM;
+        yyrestart_interactive();
+        freeModulePathStack();
+        initMainFunction();
+        reset_line_no_to = 0;
         yyparse();
     } else {
         freeEverything();
