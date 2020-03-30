@@ -119,53 +119,53 @@ switch (phase)
 %}
 
 [ \t]                           {recordToken(strdup(yytext), yyleng);}; // ignore all whitespace
-[0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (loop_mode == NULL && function_mode == NULL) return T_FLOAT;}
+[0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (isStreamOpen()) return T_FLOAT;}
 [0-9]+                          {recordToken(strdup(yytext), yyleng); yylval.ival = atoi(yytext); return T_INT;}
 \n                              {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
-"="                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_EQUAL;}
-"+"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_PLUS;}
-"-"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_MINUS;}
-"*"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_MULTIPLY;}
-"/"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DIVIDE;}
-"\\"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BACKSLASH;}
-"("                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT;}
-")"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT;}
-"["                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT_BRACKET;}
-"]"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT_BRACKET;}
-"{"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LEFT_CURLY_BRACKET;}
-"}"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RIGHT_CURLY_BRACKET;}
-","                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_COMMA;}
-"."                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DOT;}
-"=="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_EQUAL;}
-"!="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_NOT_EQUAL;}
-">"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_GREAT;}
-"<"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_SMALL;}
-">="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_GREAT_EQUAL;}
-"<="                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_REL_SMALL_EQUAL;}
-\&\&|and                        {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_AND;}
-\|\||or                         {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_OR;}
-\!|not                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_LOGIC_NOT;}
-"&"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_AND;}
-"|"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_OR;}
-"^"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_XOR;}
-"~"                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_NOT;}
-"<<"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_LEFT_SHIFT;}
-">>"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_BITWISE_RIGHT_SHIFT;}
-"++"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_INCREMENT;}
-"--"                            {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DECREMENT;}
+"="                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_EQUAL;}
+"+"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PLUS;}
+"-"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_MINUS;}
+"*"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_MULTIPLY;}
+"/"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DIVIDE;}
+"\\"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BACKSLASH;}
+"("                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LEFT;}
+")"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RIGHT;}
+"["                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LEFT_BRACKET;}
+"]"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RIGHT_BRACKET;}
+"{"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LEFT_CURLY_BRACKET;}
+"}"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RIGHT_CURLY_BRACKET;}
+","                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_COMMA;}
+"."                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DOT;}
+"=="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_EQUAL;}
+"!="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_NOT_EQUAL;}
+">"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_GREAT;}
+"<"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_SMALL;}
+">="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_GREAT_EQUAL;}
+"<="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_SMALL_EQUAL;}
+\&\&|and                        {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LOGIC_AND;}
+\|\||or                         {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LOGIC_OR;}
+\!|not                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LOGIC_NOT;}
+"&"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_AND;}
+"|"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_OR;}
+"^"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_XOR;}
+"~"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_NOT;}
+"<<"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_LEFT_SHIFT;}
+">>"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_RIGHT_SHIFT;}
+"++"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_INCREMENT;}
+"--"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DECREMENT;}
 "//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
 "#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
-"exit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_QUIT;}
-"quit"                          {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_QUIT;}
-"print"                         {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_PRINT;}
-"true"                          {recordToken(strdup(yytext), yyleng); yylval.bval = 1; if (loop_mode == NULL && function_mode == NULL) return T_TRUE;}
-"false"                         {recordToken(strdup(yytext), yyleng); yylval.bval = 0; if (loop_mode == NULL && function_mode == NULL) return T_FALSE;}
-"symbol_table"                  {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_SYMBOL_TABLE;}
-"function_table"                {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_FUNCTION_TABLE;}
-"del"                           {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_DEL;}
-"return"                        {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_RETURN;}
-"default"                       {if (loop_mode == NULL && function_mode == NULL) return T_DEFAULT;}
+"exit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
+"quit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
+"print"                         {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PRINT;}
+"true"                          {recordToken(strdup(yytext), yyleng); yylval.bval = 1; if (isStreamOpen()) return T_TRUE;}
+"false"                         {recordToken(strdup(yytext), yyleng); yylval.bval = 0; if (isStreamOpen()) return T_FALSE;}
+"symbol_table"                  {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_SYMBOL_TABLE;}
+"function_table"                {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_FUNCTION_TABLE;}
+"del"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DEL;}
+"return"                        {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RETURN;}
+"default"                       {if (isStreamOpen()) return T_DEFAULT;}
 
 "times do"                      {recordToken(strdup(yytext), yyleng); return T_TIMES_DO;}
 "end"                           {recordToken(strdup(yytext), yyleng); return T_END;}
@@ -175,21 +175,21 @@ switch (phase)
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);
-    if (loop_mode == NULL && function_mode == NULL) {
+    if (isStreamOpen()) {
         yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
         strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
         return T_STRING;
     }
 }
 
-bool|boolean                    {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_BOOL;}
-num|number                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_NUMBER;}
-str|string                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_STRING;}
-list|array                      {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_ARRAY;}
-json|dict                       {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VAR_DICT;}
+bool|boolean                    {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_BOOL;}
+num|number                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_NUMBER;}
+str|string                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_STRING;}
+list|array                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ARRAY;}
+json|dict                       {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_DICT;}
 any                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ANY;}
-void|null|nil                   {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL && function_mode == NULL) return T_VOID;}
+void|null|nil                   {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 import|include|use              {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
-[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((loop_mode == NULL && function_mode == NULL) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
+[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%

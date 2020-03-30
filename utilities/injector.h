@@ -21,5 +21,6 @@ char *last_token;
 void recordToken(char *token, int length);
 
 bool isForeach();
+bool isStreamOpen();
 
 #endif
