@@ -187,7 +187,7 @@ num|number                      {recordToken(strdup(yytext), yyleng); if (isStre
 str|string                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_STRING;}
 list|array                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ARRAY;}
 json|dict                       {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_DICT;}
-any                             {recordToken(strdup(yytext), yyleng); if (loop_mode == NULL) return T_VAR_ANY;}
+any                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ANY;}
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 import|include|use              {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
