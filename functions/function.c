@@ -173,7 +173,10 @@ void callFunction(char *name, char *module) {
     if (!interactive_shell_function_error_absorbed)
         executeDecision(function);
 
-    if (function->type != VOID && function->symbol == NULL) {
+    if (function->type != VOID &&
+        function->symbol == NULL &&
+        !interactive_shell_function_error_absorbed
+    ) {
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
