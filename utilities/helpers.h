@@ -8,8 +8,6 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
 
 typedef struct string_array {
     char **arr;

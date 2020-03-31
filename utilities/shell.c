@@ -84,7 +84,7 @@ int tab_key_pressed(int count, int key) {
 }
 
 void print_bye_bye() {
-    int ws_col = (int) strlen(__BYE_BYE__) + 8;
+    int ws_col = (int) strlen(__BYE_BYE__) + 8 + 1;
     char bye_bye_msg[ws_col];
     sprintf(bye_bye_msg, "    %s    ", __BYE_BYE__);
 

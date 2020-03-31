@@ -8,6 +8,13 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     rm "$DIR/$testname.out"
     cat "$DIR/$filename" | chaos | tail -n +5 > "$DIR/$testname.out"
+    sed -i "s|.\[1;41m\s*||g" "$DIR/$testname.out"
+    sed -i "s|.\[0;41m\s*||g" "$DIR/$testname.out"
+    sed -i "s|.\[1;44m\s*||g" "$DIR/$testname.out"
+    sed -i "s|\s*.\[0m||g" "$DIR/$testname.out"
+    sed -i "s|.\[5;42m\s*||g" "$DIR/$testname.out"
+    sed -i "s|.\[0;90m.*||g" "$DIR/$testname.out"
+    sed -i "s|.*\/chaos|Module: ~/chaos|g" "$DIR/$testname.out"
 
     echo "Updated: ${SUB}/${testname}"
 done

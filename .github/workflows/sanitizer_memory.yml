@@ -22,4 +22,4 @@ jobs:
 
     - name: Run the tests (clang)
       run: |
-        make test
+        make test-no-shell

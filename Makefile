@@ -24,7 +24,7 @@ clang-dev:
 	${MAKE} chaos
 
 clang-dev-sanitizer-memory:
-	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer'
+	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -O1 -fno-optimize-sibling-calls'
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
@@ -58,6 +58,9 @@ lint:
 
 test:
 	./tests/run.sh
+
+test-no-shell:
+	./tests/run.sh --no-shell
 
 memcheck:
 	./tests/memcheck.sh

@@ -8,6 +8,7 @@
 #define __LANGUAGE_KEYWORD_COUNT__ 34
 #define __INTERACTIVE_MODULE_NAME__ "__interactive__."__LANGUAGE_FILE_EXTENSION__
 #define __MAX_RECURSION_DEPTH__ 1000
+#define __MSG_LINE_LENGTH__ 1000
 #define __BYE_BYE__ "You have chosen the order! "
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)

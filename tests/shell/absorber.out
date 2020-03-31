@@ -1,19 +1,19 @@
-[1;41m  Chaos Error:                                                         [0m
-[0;41m    Module: /home/mertyildiran/Documents/chaos/__interactive__.kaos    [0m
-[0;41m    Line: 1                                                            [0m
-[0;41m    Undefined variable: asdas                                          [0m
-[1;44m    Absorbed by Interactive Shell                                      [0m
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Undefined variable: asdas
+Absorbed by Interactive Shell
 hey
-[1;41m        fined variable: a    [0m
-[0;41m        fined variable: a    [0m
-[0;41m        fined variable: a    [0m
-[0;41m        fined variable: a    [0m
-[1;44m    Absorbed by Interactive Shell[0m
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 2
+Undefined variable: a
+Absorbed by Interactive Shell
 5
-[1;41m  Chaos Error:                                                         [0m
-[0;41m    Module: /home/mertyildiran/Documents/chaos/__interactive__.kaos    [0m
-[0;41m    Line: 3                                                            [0m
-[0;41m    The variable name 'a' is already defined!                          [0m
-[1;44m    Absorbed by Interactive Shell                                      [0m
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 3
+The variable name 'a' is already defined!
+Absorbed by Interactive Shell
 5
-[5;42m    You have chosen the order!     [0m
+You have chosen the order!

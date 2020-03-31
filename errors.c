@@ -13,14 +13,11 @@ void throw_error_var(throw_error_args in) {
 }
 
 void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long long int llu1) {
-    struct winsize terminal;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
-
-    char title_msg[terminal.ws_col];
-    char current_module_msg[terminal.ws_col];
-    char line_no_msg[terminal.ws_col];
-    char error_msg[terminal.ws_col];
-    char error_msg_out[terminal.ws_col];
+    char title_msg[__MSG_LINE_LENGTH__];
+    char current_module_msg[__MSG_LINE_LENGTH__];
+    char line_no_msg[__MSG_LINE_LENGTH__];
+    char error_msg[__MSG_LINE_LENGTH__];
+    char error_msg_out[__MSG_LINE_LENGTH__];
 
     if (strcmp(last_token, "\n") != 0) yylineno++;
 
@@ -100,10 +97,10 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
     str_replace(error_msg_out, "\n", "\\n");
 
     int cols[4];
-    cols[0] = (int) strlen(title_msg);
-    cols[1] = (int) strlen(current_module_msg);
-    cols[2] = (int) strlen(line_no_msg);
-    cols[3] = (int) strlen(error_msg_out);
+    cols[0] = (int) strlen(title_msg) + 1;
+    cols[1] = (int) strlen(current_module_msg) + 1;
+    cols[2] = (int) strlen(line_no_msg) + 1;
+    cols[3] = (int) strlen(error_msg_out) + 1;
     int ws_col = largest(cols, 4) + 4;
     InteractiveShellErrorAbsorber_ws_col = ws_col;
 

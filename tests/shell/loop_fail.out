@@ -1,7 +1,7 @@
-[1;41m        fined variable: b    [0m
-[0;41m        fined variable: b    [0m
-[0;41m        fined variable: b    [0m
-[0;41m        fined variable: b    [0m
-[1;44m    Absorbed by Interactive Shell[0m
-[0;90m###[0m exit
-[5;42m    You have chosen the order!     [0m
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 3
+Undefined variable: b
+Absorbed by Interactive Shell
+
+You have chosen the order!

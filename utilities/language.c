@@ -4,12 +4,9 @@ extern int yylineno;
 extern char *last_token;
 
 void greet() {
-    struct winsize terminal;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
-
-    char lang[terminal.ws_col];
-    char compiler[terminal.ws_col];
-    char motto[terminal.ws_col];
+    char lang[__MSG_LINE_LENGTH__];
+    char compiler[__MSG_LINE_LENGTH__];
+    char motto[__MSG_LINE_LENGTH__];
 
     sprintf(lang, "    %s Language %s (%s %s) ", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
     #if defined(__clang__)
@@ -20,9 +17,9 @@ void greet() {
     sprintf(motto, "    %s", __LANGUAGE_MOTTO__);
 
     int cols[3];
-    cols[0] = (int) strlen(lang);
-    cols[1] = (int) strlen(compiler);
-    cols[2] = (int) strlen(motto);
+    cols[0] = (int) strlen(lang) + 1;
+    cols[1] = (int) strlen(compiler) + 1;
+    cols[2] = (int) strlen(motto) + 1;
     int ws_col = largest(cols, 3) + 4;
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -52,13 +49,10 @@ void greet() {
 }
 
 void yyerror_msg(char* error_name, char* current_module, char* cause) {
-    struct winsize terminal;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
-
-    char error_name_msg[terminal.ws_col];
-    char current_module_msg[terminal.ws_col];
-    char line_no_msg[terminal.ws_col];
-    char cause_msg[terminal.ws_col];
+    char error_name_msg[__MSG_LINE_LENGTH__];
+    char current_module_msg[__MSG_LINE_LENGTH__];
+    char line_no_msg[__MSG_LINE_LENGTH__];
+    char cause_msg[__MSG_LINE_LENGTH__];
 
     if (strcmp(last_token, "\n") != 0) yylineno++;
 
@@ -70,10 +64,10 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     str_replace(cause_msg, "\n", "\\n");
 
     int cols[4];
-    cols[0] = (int) strlen(error_name_msg);
-    cols[1] = (int) strlen(current_module_msg);
-    cols[2] = (int) strlen(line_no_msg);
-    cols[3] = (int) strlen(cause_msg);
+    cols[0] = (int) strlen(error_name_msg) + 1;
+    cols[1] = (int) strlen(current_module_msg) + 1;
+    cols[2] = (int) strlen(line_no_msg) + 1;
+    cols[3] = (int) strlen(cause_msg) + 1;
     int ws_col = largest(cols, 3) + 4;
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
