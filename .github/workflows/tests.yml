@@ -53,7 +53,7 @@ jobs:
 
     - name: Install dependencies (fedora)
       run: |
-        dnf install -y which make
+        dnf install -y which make findutils
         make requirements
       if: matrix.target == 'fedora'
 
