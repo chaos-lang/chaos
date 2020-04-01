@@ -29,4 +29,10 @@ end
 	{name: f3, type: 5, parameter_count: 2, decision_length: 0, context: tests/function.kaos, module_context: tests/function.kaos, module: } =>
 	{name: add, type: 1, parameter_count: 2, decision_length: 0, context: tests/function.kaos, module_context: tests/function.kaos, module: } =>
 	{name: loopInside, type: 6, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module_context: tests/function.kaos, module: } =>
+	{name: anyF1, type: 3, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module_context: tests/function.kaos, module: } =>
+	{name: anyF2, type: 3, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module_context: tests/function.kaos, module: } =>
+	{name: boolF, type: 0, parameter_count: 0, decision_length: 0, context: tests/function.kaos, module_context: tests/function.kaos, module: } =>
 [end]
+false
+5
+false

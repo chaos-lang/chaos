@@ -114,6 +114,7 @@ function:
     | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, BOOL); }
     | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, NUMBER); }
     | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, STRING); }
+    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, ANY); }
     | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, ARRAY); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, VOID); }

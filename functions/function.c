@@ -319,7 +319,10 @@ void addFunctionCallParameterSymbol(char *name) {
 
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != executed_function->type) {
+    if (symbol->type != ANY &&
+        executed_function->type != ANY &&
+        symbol->type != executed_function->type
+    ) {
         free(name);
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), executed_function->name);
     }
