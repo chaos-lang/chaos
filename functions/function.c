@@ -229,9 +229,6 @@ void printFunctionTable() {
     while (function != NULL) {
         char *context_temp = malloc(1 + strlen(function->context));
         strcpy(context_temp, function->context);
-    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        replace_char(context_temp, '\\', '/');
-    #endif
         printf(
             "\t{name: %s, type: %i, parameter_count: %i, decision_length: %i, context: %s, module_context: %s, module: %s} =>\n",
             function->name,
@@ -567,7 +564,14 @@ void handleModuleImport(char *module_name, bool directly_import) {
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
 
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     relative_path_to_absolute(module_path);
+#else
+    char actual_path[PATH_MAX];
+    _fullpath(actual_path, module_path, PATH_MAX);
+    module_path = (char *) realloc(module_path, strlen(actual_path) + 1);
+    strcpy(module_path, actual_path);
+#endif
     pushModuleStack(module_path, module);
 
     freeModulesBuffer();

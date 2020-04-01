@@ -26,5 +26,6 @@
 
 void greet();
 void yyerror_msg(char* error_name, char* current_module, char* cause);
+void print_bye_bye();
 
 #endif

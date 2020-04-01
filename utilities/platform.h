@@ -48,4 +48,10 @@
     #define __PATH_SEPARATOR_ASCII__ '/'
 #endif
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    #if !defined(PATH_MAX)
+        #define PATH_MAX _MAX_PATH
+    #endif
+#endif
+
 #endif

@@ -83,21 +83,6 @@ int tab_key_pressed(int count, int key) {
     return 0;
 }
 
-void print_bye_bye() {
-    int ws_col = (int) strlen(__BYE_BYE__) + 8 + 1;
-    char bye_bye_msg[ws_col];
-    sprintf(bye_bye_msg, "    %s    ", __BYE_BYE__);
-
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[5;42m");
-    #endif
-    printf("%-*s", ws_col, bye_bye_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
-    printf("\n");
-}
-
 int shell_readline(char *buf) {
     rl_command_func_t up_arrow_key_pressed;
     rl_command_func_t down_arrow_key_pressed;

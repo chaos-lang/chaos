@@ -7,7 +7,7 @@
 
 #if defined(__APPLE__) && defined(__MACH__)
 #include <sys/syslimits.h>
-#else
+#elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include <linux/limits.h>
 #endif
 
@@ -694,7 +694,7 @@ int main(int argc, char** argv) {
         program_file_dir = malloc(strlen(buff) + 1);
         strcpy(program_file_dir, buff);
 
-        program_file_path = strcat_ext(program_file_dir, "/");
+        program_file_path = strcat_ext(program_file_dir, __PATH_SEPARATOR__);
         program_file_path = strcat_ext(program_file_path, __INTERACTIVE_MODULE_NAME__);
     }
 

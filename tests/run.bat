@@ -6,6 +6,7 @@ for %%f in (tests\*.kaos) do (
     ECHO.
     chaos %%f > tmpFile
     TYPE tmpFile
+    powershell -Command "(gc tmpFile) -replace '\\', '/' | Out-File -encoding ASCII tmpFile"
     FC tests\%%~nf.out tmpFile
     IF errorlevel 1 (
         ECHO Fail
