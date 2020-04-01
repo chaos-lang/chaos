@@ -1,4 +1,3 @@
-@ECHO OFF
 IF [%1]==[] (
     SET compiler=gcc
 ) ELSE IF [%1]==[clang] (
@@ -23,8 +22,15 @@ IF [%1]==[] (
     DEL chaos.exe chaos.tab.c lex.yy.c chaos.tab.h
     EXIT /B 0
 )
+
 win_flex --wincompat chaos.l
+IF errorlevel 1 (
+    EXIT /B 1
+)
 win_bison -d chaos.y
+IF errorlevel 1 (
+    EXIT /B 1
+)
 %compiler% -Iloops -Ifunctions -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c utilities/*.c symbol.c errors.c
 IF errorlevel 1 (
     EXIT /B 1
