@@ -45,7 +45,7 @@ lex.yy.c: chaos.l chaos.tab.h
 	flex chaos.l
 
 chaos: lex.yy.c chaos.tab.c chaos.tab.h
-	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c -lreadline ${CHAOS_EXTRA_FLAGS}
+	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c -lreadline -Wl,--export-dynamic -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
 	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h
@@ -61,6 +61,10 @@ test:
 
 test-no-shell:
 	./tests/run.sh --no-shell
+
+test-extensions:
+	gcc -shared -fPIC tests/extensions/spells/example.c -o tests/extensions/spells/example.so
+	chaos tests/extensions/test.kaos
 
 memcheck:
 	./tests/memcheck.sh

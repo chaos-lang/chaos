@@ -6,6 +6,7 @@
 #include "../symbol.h"
 #include "../errors.h"
 #include "../utilities/injector.h"
+#include "extension.h"
 
 string_array modules_buffer;
 
@@ -26,5 +27,7 @@ void popModuleStack();
 void freeModulePathStack();
 void freeModuleStack();
 char* getCurrentModule();
+char* getMainModuleDir();
+char* searchSpellsIfNotExits(char* module_path, char* relative_path);
 
 #endif

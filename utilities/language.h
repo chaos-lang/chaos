@@ -10,6 +10,10 @@
 #define __MAX_RECURSION_DEPTH__ 1000
 #define __MSG_LINE_LENGTH__ 1000
 #define __BYE_BYE__ "You have chosen the order! "
+#define __SPELLS__ "spells"
+#define __SHARED_OBJECT_EXTENSION__ "so"
+#define __EXTENSION_REGISTER_FUNCTION__ "KaosRegister"
+#define __EXTENSION_FUNCTION_PREFIX__ "Kaos_"
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     #define __SHELL_INDICATOR__ "\033[0;90m###\033[0m "

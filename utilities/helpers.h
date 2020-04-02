@@ -8,6 +8,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <unistd.h>
 
 typedef struct string_array {
     char **arr;
@@ -30,6 +31,8 @@ int largest(int arr[], int n);
 void relative_path_to_absolute(char *path);
 char *remove_ext(char* myStr, char extSep, char pathSep);
 void str_replace(char *target, const char *needle, const char *replacement);
+bool is_file_exists(char* file_path);
+const char *get_filename_ext(const char *filename);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>

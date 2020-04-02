@@ -166,6 +166,7 @@ int largest(int arr[], int n) {
 
 void relative_path_to_absolute(char *path)
 {
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     size_t i;
     size_t j;
     size_t k;
@@ -292,6 +293,12 @@ void relative_path_to_absolute(char *path)
 
     //Properly terminate the string with a NULL character
     path[k] = '\0';
+#else
+    char actual_path[PATH_MAX];
+    _fullpath(actual_path, module_path, PATH_MAX);
+    module_path = (char *) realloc(module_path, strlen(actual_path) + 1);
+    strcpy(module_path, actual_path);
+#endif
 }
 
 char *remove_ext(char* myStr, char extSep, char pathSep) {
@@ -361,4 +368,14 @@ void str_replace(char *target, const char *needle, const char *replacement) {
 
     // write altered string back to target
     strcpy(target, buffer);
+}
+
+bool is_file_exists(char* file_path) {
+    return access(file_path, F_OK) != -1;
+}
+
+const char *get_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
 }

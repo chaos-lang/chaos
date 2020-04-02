@@ -25,6 +25,7 @@ void prependModuleToModuleBuffer(char *name) {
 
 void handleModuleImport(char *module_name, bool directly_import) {
     char *module_path = "";
+    char *relative_path = "";
     char *module_dir;
 
     module_dir = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
@@ -42,10 +43,10 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     for (int i = 0; i < modules_buffer.size; i++) {
         module_path = strcat_ext(module_path, modules_buffer.arr[i]);
+        relative_path = strcat_ext(relative_path, modules_buffer.arr[i]);
         if (i + 1 != modules_buffer.size) {
-            module_dir = (char *) realloc(module_dir, strlen(module_path) + 1);
-            strcpy(module_dir, module_path);
             module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
+            relative_path = strcat_ext(relative_path, __PATH_SEPARATOR__);
         }
     }
 
@@ -59,26 +60,31 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     module_path = strcat_ext(module_path, ".");
     module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
+    relative_path = strcat_ext(relative_path, ".");
+    relative_path = strcat_ext(relative_path, __LANGUAGE_FILE_EXTENSION__);
 
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-    relative_path_to_absolute(module_path);
-#else
-    char actual_path[PATH_MAX];
-    _fullpath(actual_path, module_path, PATH_MAX);
-    module_path = (char *) realloc(module_path, strlen(actual_path) + 1);
-    strcpy(module_path, actual_path);
-#endif
+    module_path = searchSpellsIfNotExits(module_path, relative_path);
+
     pushModuleStack(module_path, module);
 
     freeModulesBuffer();
 
-    parseTheModuleContent(module_path);
+    if (strcmp(
+        get_filename_ext(module_path),
+        __SHARED_OBJECT_EXTENSION__
+        ) == 0
+    ) {
+        callRegisterInSharedObject(module_path);
+    } else {
+        parseTheModuleContent(module_path);
+    }
 
     freeFunctionNamesBuffer();
 
     popModuleStack();
 
     free(module_path);
+    free(relative_path);
     free(module_dir);
     free(module_name);
 }
@@ -124,4 +130,47 @@ void freeModuleStack() {
 
 char* getCurrentModule() {
     return module_path_stack.arr[module_path_stack.size - 1];
+}
+
+char* getMainModuleDir() {
+    char *module_dir;
+
+    module_dir = malloc(strlen(module_path_stack.arr[0]) + 1);
+    strcpy(module_dir, module_path_stack.arr[0]);
+    char *ptr = strrchr(module_dir, __PATH_SEPARATOR_ASCII__);
+    if (ptr) {
+        *ptr = '\0';
+    } else {
+        module_dir = (char *) realloc(module_dir, strlen("") + 1);
+        strcpy(module_dir, "");
+    }
+
+    return module_dir;
+}
+
+char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
+    relative_path_to_absolute(module_path);
+
+    if (is_file_exists(module_path)) {
+        return module_path;
+    } else {
+        free(module_path);
+        char* spells_dir = strcat_ext(getMainModuleDir(), __PATH_SEPARATOR__);
+        spells_dir = strcat_ext(spells_dir, __SPELLS__);
+        spells_dir = strcat_ext(spells_dir, __PATH_SEPARATOR__);
+        module_path = strcat_ext(spells_dir, relative_path);
+        relative_path_to_absolute(module_path);
+        if (is_file_exists(module_path)) {
+            return module_path;
+        } else {
+            char* so_path = remove_ext(module_path, '.', __PATH_SEPARATOR_ASCII__);
+            so_path = strcat_ext(so_path, ".");
+            so_path = strcat_ext(so_path, __SHARED_OBJECT_EXTENSION__);
+            if (is_file_exists(so_path)) {
+                return so_path;
+            }
+        }
+    }
+    throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, module_path);
+    return NULL;
 }

@@ -1,0 +1,5 @@
+import example
+
+function_table
+
+example.hello()

@@ -126,6 +126,15 @@ void freeFunctionMode() {
 
 void callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
+
+    if (strcmp(
+        get_filename_ext(function->module_context),
+        __SHARED_OBJECT_EXTENSION__
+        ) == 0
+    ) {
+        return callFunctionFromSharedObject(function);
+    }
+
     scope_override = function;
     for (int i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
