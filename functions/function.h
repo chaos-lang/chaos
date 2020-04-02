@@ -14,6 +14,7 @@ typedef struct _Function _Function;
 #endif
 #include "../utilities/language.h"
 #include "../utilities/phase.h"
+#include "../modules/module.h"
 
 extern enum Phase phase;
 enum BlockType { B_EXPRESSION, B_FUNCTION };
@@ -58,18 +59,9 @@ _Function* decision_function_mode;
 Symbol* decision_symbol_chain;
 char *decision_buffer;
 
-string_array modules_buffer;
-
 string_array function_names_buffer;
 
 int recursion_depth;
-
-extern char *program_file_path;
-extern char *program_file_dir;
-string_array module_path_stack;
-string_array module_stack;
-
-extern int module_parsing;
 
 int reset_line_no_to;
 
@@ -94,24 +86,14 @@ void returnSymbol(char *name);
 void printFunctionReturn(char *name, char *module);
 void initMainFunction();
 void initScopeless();
-void initMainContext();
 void freeFunction(_Function* function);
 void freeAllFunctions();
 bool block(enum BlockType type);
 void addBooleanDecision();
 void addDefaultDecision();
 void executeDecision(_Function* function);
-void appendModuleToModuleBuffer(char *name);
-void prependModuleToModuleBuffer(char *name);
 void addFunctionNameToFunctionNamesBuffer(char *name);
-void handleModuleImport(char *module_name, bool directly_import);
-void freeModulesBuffer();
 void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
-void popModuleStack();
-void pushModuleStack(char *module_path, char *module);
-void freeModulePathStack();
-void freeModuleStack();
-char* getCurrentModule();
 
 #endif
