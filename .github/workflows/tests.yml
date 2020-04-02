@@ -100,6 +100,7 @@ jobs:
     - name: Install dependencies
       run: |
         make requirements
+        brew install gnu-sed
 
     - name: Build (gcc)
       run: |
