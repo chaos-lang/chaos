@@ -51,7 +51,6 @@ void handle_end_keyword() {
 }
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#define MAXCHAR 1000
 char *fileGetContents(char *file_path) {
     char *file_content = "";
     char str[MAXCHAR];
@@ -164,7 +163,7 @@ int largest(int arr[], int n) {
     return max;
 }
 
-void relative_path_to_absolute(char *path)
+char *relative_path_to_absolute(char *path)
 {
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     size_t i;
@@ -293,11 +292,16 @@ void relative_path_to_absolute(char *path)
 
     //Properly terminate the string with a NULL character
     path[k] = '\0';
+    return path;
 #else
     char actual_path[PATH_MAX];
-    _fullpath(actual_path, module_path, PATH_MAX);
-    module_path = (char *) realloc(module_path, strlen(actual_path) + 1);
-    strcpy(module_path, actual_path);
+    char *absolute_path;
+    char *filename;
+    GetFullPathName(path, PATH_MAX, actual_path, &filename);
+    free(path);
+    absolute_path = (char *) malloc(strlen(actual_path) + 1);
+    strcpy(absolute_path, actual_path);
+    return absolute_path;
 #endif
 }
 
@@ -371,7 +375,19 @@ void str_replace(char *target, const char *needle, const char *replacement) {
 }
 
 bool is_file_exists(char* file_path) {
+    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    WIN32_FIND_DATA FindFileData;
+    HANDLE handle = FindFirstFile(file_path, &FindFileData) ;
+    int found = handle != INVALID_HANDLE_VALUE;
+    FindClose(handle);
+    if (found) {
+        return true;
+    } else {
+        return false;
+    }
+    #else
     return access(file_path, F_OK) != -1;
+    #endif
 }
 
 const char *get_filename_ext(const char *filename) {

@@ -67,8 +67,6 @@ end
 
 loopInside()
 
-function_table
-
 any def anyF1()
     any a = false
     return a

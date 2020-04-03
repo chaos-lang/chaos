@@ -149,7 +149,7 @@ char* getMainModuleDir() {
 }
 
 char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
-    relative_path_to_absolute(module_path);
+    module_path = relative_path_to_absolute(module_path);
 
     if (is_file_exists(module_path)) {
         return module_path;
@@ -159,7 +159,7 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
         spells_dir = strcat_ext(spells_dir, __SPELLS__);
         spells_dir = strcat_ext(spells_dir, __PATH_SEPARATOR__);
         module_path = strcat_ext(spells_dir, relative_path);
-        relative_path_to_absolute(module_path);
+        module_path = relative_path_to_absolute(module_path);
         if (is_file_exists(module_path)) {
             return module_path;
         } else {

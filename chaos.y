@@ -23,6 +23,7 @@
 #include "symbol.h"
 #include "loop.h"
 #include "function.h"
+#include "module.h"
 
 extern int yylex();
 extern int yyparse();
@@ -111,13 +112,13 @@ preparser_line: T_NEWLINE
 ;
 
 function:
-    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, BOOL); }
-    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, NUMBER); }
-    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, STRING); }
-    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, ANY); }
-    | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, ARRAY); }
-    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, DICT); }
-    | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, VOID); }
+    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_BOOL); }
+    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_NUMBER); }
+    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_STRING); }
+    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, K_ANY); }
+    | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, K_ARRAY); }
+    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT); }
+    | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID); }
     | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL); } free($2); }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); } free($1); }
     | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2); } free($4); free($2); }
@@ -137,27 +138,27 @@ function_parameters:                                                { }
     | T_NEWLINE function_parameters                                 { }
 ;
 
-function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, BOOL); }
+function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, K_BOOL); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_NUMBER T_VAR                             { addFunctionParameter($2, NUMBER); }
+function_parameters: T_VAR_NUMBER T_VAR                             { addFunctionParameter($2, K_NUMBER); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_STRING T_VAR                             { addFunctionParameter($2, STRING); }
+function_parameters: T_VAR_STRING T_VAR                             { addFunctionParameter($2, K_STRING); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_ARRAY T_VAR                              { addFunctionParameter($2, ARRAY); }
+function_parameters: T_VAR_ARRAY T_VAR                              { addFunctionParameter($2, K_ARRAY); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, DICT); }
+function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, K_DICT); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -463,8 +464,8 @@ left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
     | T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                          { Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; }
     | T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET                  { Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; }
     | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; }
-    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { Symbol* symbol = createCloneFromSymbolByName(NULL, ANY, $2, ANY); symbol->sign = 1; $$ = symbol->id; }
-    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { Symbol* symbol = createCloneFromSymbolByName(NULL, ANY, $3, ANY); symbol->sign = -1; $$ = symbol->id; }
+    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; }
+    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; }
 ;
 
 variable: T_VAR                                                     { $$ = $1; }
@@ -497,35 +498,35 @@ variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, BOOL, $4, ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket             { createCloneFromComplexElement($2, BOOL, $4, $5, ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, ARRAY, $5, BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, DICT, $5, BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL arraystart               { finishComplexMode($3, BOOL); $$ = ""; free($3); }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, BOOL); $$ = ""; free($3); }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_BOOL, $4, K_ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket             { createCloneFromComplexElement($2, K_BOOL, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, K_ARRAY, $5, K_BOOL); $$ = ""; }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, K_DICT, $5, K_BOOL); $$ = ""; }
+    | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL arraystart               { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
 ;
 
 variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, NUMBER, $4, ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, NUMBER, $4, $5, ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, ARRAY, $5, NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, NUMBER); $$ = ""; free($3); }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, NUMBER); $$ = ""; free($3); }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_ARRAY, $5, K_NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
     | T_VAR_NUMBER T_VAR T_EQUAL mixed_expression                   { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL expression                         { addSymbolFloat($2, $4); $$ = ""; }
 ;
 
 variable: T_VAR_STRING                                              { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, STRING, $4, ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, STRING, $4, $5, ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, ARRAY, $5, STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, DICT, $5, STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, STRING); $$ = ""; free($3); }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, STRING); $$ = ""; free($3); }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_STRING, $4, K_ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_STRING, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_ARRAY, $5, K_STRING); $$ = ""; }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_STRING); $$ = ""; }
+    | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
 ;
 
 variable: T_VAR_ANY                                                 { }
@@ -534,16 +535,16 @@ variable: T_VAR_ANY                                                 { }
     | T_VAR_ANY T_VAR T_EQUAL T_FLOAT                               { addSymbolAnyFloat($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, ANY, $4, ANY); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR left_right_bracket              { createCloneFromComplexElement($2, ANY, $4, $5, ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, K_ANY, $4, K_ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR left_right_bracket              { createCloneFromComplexElement($2, K_ANY, $4, $5, K_ANY); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL boolean_expression                    { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL mixed_expression                      { addSymbolAnyFloat($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL expression                            { addSymbolAnyFloat($2, $4); $$ = ""; }
 ;
 
 variable: T_VAR_ARRAY                                               { }
-    | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbolByName($2, ARRAY, $4, ANY); $$ = "";}
-    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishComplexMode($2, ANY); $$ = ""; free($2); }
+    | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbolByName($2, K_ARRAY, $4, K_ANY); $$ = "";}
+    | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishComplexMode($2, K_ANY); $$ = ""; free($2); }
 ;
 
 arraystart:                                                         { addSymbolArray(NULL); }
@@ -580,8 +581,8 @@ array: T_VAR                                                        { cloneSymbo
 ;
 
 variable: T_VAR_DICT                                                { }
-    | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, DICT, $4, ANY); $$ = "";}
-    | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishComplexMode($2, ANY); $$ = ""; free($2); }
+    | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_DICT, $4, K_ANY); $$ = "";}
+    | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishComplexMode($2, K_ANY); $$ = ""; free($2); }
 ;
 
 dictionarystart:                                                                { addSymbolDict(NULL); }
@@ -681,6 +682,7 @@ int main(int argc, char** argv) {
     if (argc > 1) {
         program_file_path = malloc(strlen(argv[1]) + 1);
         strcpy(program_file_path, argv[1]);
+        program_file_path = relative_path_to_absolute(program_file_path);
 
         program_file_dir = malloc(strlen(program_file_path) + 1);
         strcpy(program_file_dir, program_file_path);

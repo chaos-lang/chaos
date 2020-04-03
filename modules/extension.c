@@ -18,12 +18,14 @@ lib_func getFunctionFromSharedObject(char* so_path, char* function_name) {
     void     *handle  = NULL;
     lib_func  func    = NULL;
 
-    handle = dlopen(so_path, RTLD_NOW | RTLD_GLOBAL);
+    handle = OPENLIB(so_path);
 
     if (handle == NULL) {
+        #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         fprintf(stderr, "Unable to open lib: %s\n", dlerror());
+        #endif
     }
-    func = dlsym(handle, function_name);
+    func = LIBFUNC(handle, function_name);
 
     if (func == NULL) {
         fprintf(stderr, "Unable to get symbol\n");

@@ -28,7 +28,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     symbol = (struct Symbol*)calloc(1, sizeof(Symbol));
     symbol->id = symbol_id_counter++;
 
-    if (complex_mode != NULL && complex_mode->type == DICT) {
+    if (complex_mode != NULL && complex_mode->type == K_DICT) {
         if (name != NULL) {
             symbol->key = malloc(1 + strlen(name));
             strcpy(symbol->key, name);
@@ -75,7 +75,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
     Symbol* symbol = getSymbol(name);
 
-    if (symbol->type != ANY && symbol->type != type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), name);
+    if (symbol->type != K_ANY && symbol->type != type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), name);
 
     if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
@@ -89,7 +89,7 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
 void removeSymbolByName(char *name) {
     Symbol* symbol = getSymbol(name);
 
-    if (symbol->type == ARRAY || symbol->type == DICT) {
+    if (symbol->type == K_ARRAY || symbol->type == K_DICT) {
         for (int i = 0; i < symbol->children_count; i++) {
             removeSymbol(symbol->children[i]);
         }
@@ -170,9 +170,9 @@ Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
 }
 
 Symbol* deepCopyComplex(char *name, Symbol* symbol) {
-    if (symbol->type == ARRAY) {
+    if (symbol->type == K_ARRAY) {
         addSymbolArray(NULL);
-    } else if (symbol->type == DICT) {
+    } else if (symbol->type == K_DICT) {
         addSymbolDict(NULL);
     } else {
         free(name);
@@ -190,7 +190,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     }
 
     Symbol* symbol_return = complex_mode;
-    finishComplexMode(name, ANY);
+    finishComplexMode(name, K_ANY);
 
     return symbol_return;
 }
@@ -322,10 +322,10 @@ int getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
 void printSymbolValue(Symbol* symbol, bool is_complex) {
     switch (symbol->type)
     {
-        case BOOL:
+        case K_BOOL:
             printf("%s", symbol->value.b ? "true" : "false");
             break;
-        case NUMBER:
+        case K_NUMBER:
             switch (symbol->value_type)
             {
                 case V_INT:
@@ -339,14 +339,14 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     break;
             }
             break;
-        case STRING:
+        case K_STRING:
             if (is_complex) {
                 printf("'%s'", symbol->value.s);
             } else {
                 printf("%s", symbol->value.s);
             }
             break;
-        case ARRAY:
+        case K_ARRAY:
             printf("[");
             for (int i = 0; i < symbol->children_count; i++) {
                 printSymbolValue(symbol->children[i], true);
@@ -356,7 +356,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             }
             printf("]");
             break;
-        case DICT:
+        case K_DICT:
             printf("{");
             for (int i = 0; i < symbol->children_count; i++) {
                 Symbol* child = symbol->children[i];
@@ -368,7 +368,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             }
             printf("}");
             break;
-        case ANY:
+        case K_ANY:
             switch (symbol->value_type)
             {
                 case V_STRING:
@@ -463,37 +463,37 @@ void printSymbolTable() {
 void addSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    addSymbol(name, BOOL, value, V_BOOL);
+    addSymbol(name, K_BOOL, value, V_BOOL);
 }
 
 void updateSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    updateSymbol(name, BOOL, value, V_BOOL);
+    updateSymbol(name, K_BOOL, value, V_BOOL);
 }
 
 Symbol* addSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    return addSymbol(name, NUMBER, value, V_INT);
+    return addSymbol(name, K_NUMBER, value, V_INT);
 }
 
 void updateSymbolInt(char *name, int i) {
     union Value value;
     value.i = i;
-    updateSymbol(name, NUMBER, value, V_INT);
+    updateSymbol(name, K_NUMBER, value, V_INT);
 }
 
 void addSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    addSymbol(name, NUMBER, value, V_FLOAT);
+    addSymbol(name, K_NUMBER, value, V_FLOAT);
 }
 
 void updateSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    updateSymbol(name, NUMBER, value, V_FLOAT);
+    updateSymbol(name, K_NUMBER, value, V_FLOAT);
 }
 
 Symbol* addSymbolString(char *name, char *s) {
@@ -501,18 +501,18 @@ Symbol* addSymbolString(char *name, char *s) {
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
     free(s);
-    return addSymbol(name, STRING, value, V_STRING);
+    return addSymbol(name, K_STRING, value, V_STRING);
 }
 
 void updateSymbolString(char *name, char *s) {
     union Value value;
     value.s = s;
-    updateSymbol(name, STRING, value, V_STRING);
+    updateSymbol(name, K_STRING, value, V_STRING);
 }
 
 void addSymbolArray(char *name) {
     union Value value;
-    complex_mode = addSymbol(name, ARRAY, value, V_VOID);
+    complex_mode = addSymbol(name, K_ARRAY, value, V_VOID);
 }
 
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
@@ -536,7 +536,7 @@ Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *na
     free(name);
     free(key);
     free(clone_name);
-    if (_symbol->type == STRING) {
+    if (_symbol->type == K_STRING) {
         removeSymbol(symbol);
     }
 
@@ -544,21 +544,21 @@ Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *na
 }
 
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type) {
-    if (type != ANY &&
-        symbol->type != ANY &&
+    if (type != K_ANY &&
+        symbol->type != K_ANY &&
         symbol->type != type
     ) {
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), clone_name);
     }
 
     Symbol* clone_symbol;
-    if (symbol->type == ARRAY || symbol->type == DICT) {
+    if (symbol->type == K_ARRAY || symbol->type == K_DICT) {
         if (symbol->secondary_type != extra_type) throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(extra_type), clone_name);
         clone_symbol = deepCopyComplex(clone_name, symbol);
     } else {
-        if (type == ANY) {
-            clone_symbol = deepCopySymbol(symbol, ANY, NULL);
-        } else if (symbol->type == ANY) {
+        if (type == K_ANY) {
+            clone_symbol = deepCopySymbol(symbol, K_ANY, NULL);
+        } else if (symbol->type == K_ANY) {
             char *temp_clone_name = malloc(1 + strlen(clone_name));
             strcpy(temp_clone_name, clone_name);
             Symbol* temp_symbol = createSymbolWithoutValueType(temp_clone_name, type);
@@ -578,22 +578,22 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
 Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol) {
     Symbol* clone_symbol = getSymbol(clone_name);
 
-    if (clone_symbol->type != ANY &&
-        symbol->type != ANY &&
+    if (clone_symbol->type != K_ANY &&
+        symbol->type != K_ANY &&
         clone_symbol->type != symbol->type
     ) {
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_name);
     }
 
-    if (clone_symbol->type == ARRAY) {
+    if (clone_symbol->type == K_ARRAY) {
         throw_error(E_ARRAYS_ARE_NOT_MASS_ASSIGNABLE, clone_name);
     }
 
     Symbol* temp_symbol = clone_symbol;
 
-    if (clone_symbol->type == ANY) {
-        clone_symbol = deepCopySymbol(symbol, ANY, NULL);
-    } else if (symbol->type == ANY) {
+    if (clone_symbol->type == K_ANY) {
+        clone_symbol = deepCopySymbol(symbol, K_ANY, NULL);
+    } else if (symbol->type == K_ANY) {
         clone_symbol = assignByTypeCasting(clone_symbol, symbol);
     } else {
         clone_symbol = deepCopySymbol(symbol, symbol->type, NULL);
@@ -626,7 +626,7 @@ Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, unsig
     free(clone_name);
     free(name);
     free(key);
-    if (_symbol->type == STRING) {
+    if (_symbol->type == K_STRING) {
         removeSymbol(symbol);
     }
 
@@ -634,7 +634,7 @@ Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, unsig
 }
 
 bool isComplexIllegal(enum Type type) {
-    if (complex_mode != NULL && type != ANY) {
+    if (complex_mode != NULL && type != K_ANY) {
         for (int i = 0; i < complex_mode->children_count; i++) {
             Symbol* symbol = complex_mode->children[i];
             if (symbol->type != type) {
@@ -662,15 +662,15 @@ void finishComplexMode(char *name, enum Type type) {
 
 Symbol* getArrayElement(char *name, int i) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type == STRING) {
+    if (symbol->type == K_STRING) {
         union Value value;
         value.s = malloc(2 * sizeof(char));
         value.s[0] = symbol->value.s[i];
         value.s[1] = '\0';
-        return addSymbol(NULL, STRING, value, V_STRING);
+        return addSymbol(NULL, K_STRING, value, V_STRING);
     }
 
-    if (symbol->type != ARRAY) throw_error(E_VARIABLE_IS_NOT_AN_ARRAY, name);
+    if (symbol->type != K_ARRAY) throw_error(E_VARIABLE_IS_NOT_AN_ARRAY, name);
 
     if (i < 0) {
         i = symbol->children_count + i;
@@ -695,9 +695,9 @@ Symbol* getComplexElement(char *name, int i, char *key) {
     Symbol* complex = getSymbol(name);
 
     Symbol* symbol;
-    if (complex->type == ARRAY || complex->type == STRING) {
+    if (complex->type == K_ARRAY || complex->type == K_STRING) {
         symbol = getArrayElement(name, i);
-    } else if (complex->type == DICT) {
+    } else if (complex->type == K_DICT) {
         symbol = getDictElement(name, key);
     } else {
         free(name);
@@ -716,9 +716,9 @@ Symbol* getComplexElementBySymbolId(char *name, unsigned long long symbol_id) {
     Symbol* complex = getSymbol(name);
 
     Symbol* symbol;
-    if (complex->type == ARRAY || complex->type == STRING) {
+    if (complex->type == K_ARRAY || complex->type == K_STRING) {
         symbol = getArrayElement(name, i);
-    } else if (complex->type == DICT) {
+    } else if (complex->type == K_DICT) {
         symbol = getDictElement(name, key);
     } else {
         free(name);
@@ -737,7 +737,7 @@ void updateComplexElement(char *name, unsigned long long symbol_id, enum Type ty
     removeSymbol(access_symbol);
 
     Symbol* complex = getSymbol(name);
-    if (complex->secondary_type != ANY && complex->secondary_type != type) {
+    if (complex->secondary_type != K_ANY && complex->secondary_type != type) {
         free(name);
         free(key);
         throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex->name);
@@ -755,19 +755,19 @@ void updateComplexElement(char *name, unsigned long long symbol_id, enum Type ty
 void updateComplexElementBool(char* name, unsigned long long symbol_id, bool b) {
     union Value value;
     value.b = b;
-    updateComplexElement(name, symbol_id, BOOL, value);
+    updateComplexElement(name, symbol_id, K_BOOL, value);
 }
 
 void updateComplexElementInt(char* name, unsigned long long symbol_id, int i) {
     union Value value;
     value.i = i;
-    updateComplexElement(name, symbol_id, NUMBER, value);
+    updateComplexElement(name, symbol_id, K_NUMBER, value);
 }
 
 void updateComplexElementFloat(char* name, unsigned long long symbol_id, float f) {
     union Value value;
     value.f = f;
-    updateComplexElement(name, symbol_id, NUMBER, value);
+    updateComplexElement(name, symbol_id, K_NUMBER, value);
 }
 
 void updateComplexElementString(char* name, unsigned long long symbol_id, char *s) {
@@ -775,7 +775,7 @@ void updateComplexElementString(char* name, unsigned long long symbol_id, char *
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
     free(s);
-    updateComplexElement(name, symbol_id, STRING, value);
+    updateComplexElement(name, symbol_id, K_STRING, value);
 }
 
 void updateComplexElementSymbol(char* name, unsigned long long int symbol_id, char* source_name) {
@@ -785,7 +785,7 @@ void updateComplexElementSymbol(char* name, unsigned long long int symbol_id, ch
 
     Symbol* complex = getSymbol(name);
     Symbol* source = getSymbol(source_name);
-    if (complex->secondary_type != ANY && complex->secondary_type != source->type) {
+    if (complex->secondary_type != K_ANY && complex->secondary_type != source->type) {
         removeSymbol(access_symbol);
         free(name);
         free(key);
@@ -794,12 +794,12 @@ void updateComplexElementSymbol(char* name, unsigned long long int symbol_id, ch
     }
 
     Symbol* symbol;
-    if (complex->type == ARRAY) {
+    if (complex->type == K_ARRAY) {
         removeSymbol(access_symbol);
         symbol = getArrayElement(name, i);
         removeSymbol(symbol);
         complex->children[i] = deepCopySymbol(source, source->type, NULL);
-    } else if (complex->type == DICT) {
+    } else if (complex->type == K_DICT) {
         removeComplexElement(name, symbol_id);
         complex_mode = complex;
         symbol_counter = complex->children_count;
@@ -825,9 +825,9 @@ void removeComplexElement(char *name, unsigned long long int symbol_id) {
 
     Symbol* complex = getSymbol(name);
     Symbol* symbol;
-    if (complex->type == ARRAY) {
+    if (complex->type == K_ARRAY) {
         symbol = getArrayElement(name, i);
-    } else if (complex->type == DICT) {
+    } else if (complex->type == K_DICT) {
         symbol = getDictElement(name, key);
         for (int j = 0; j < complex->children_count; j++) {
             Symbol* child = complex->children[j];
@@ -869,12 +869,12 @@ void removeComplexElement(char *name, unsigned long long int symbol_id) {
 
 void addSymbolDict(char *name) {
     union Value value;
-    complex_mode = addSymbol(name, DICT, value, V_VOID);
+    complex_mode = addSymbol(name, K_DICT, value, V_VOID);
 }
 
 Symbol* getDictElement(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != DICT) {
+    if (symbol->type != K_DICT) {
         free(key);
         throw_error(E_VARIABLE_IS_NOT_A_DICTIONARY, name);
     }
@@ -893,25 +893,25 @@ Symbol* getDictElement(char *name, char *key) {
 void addSymbolAnyString(char *name, char *s) {
     union Value value;
     value.s = s;
-    addSymbol(name, ANY, value, V_STRING);
+    addSymbol(name, K_ANY, value, V_STRING);
 }
 
 void addSymbolAnyInt(char *name, int i) {
     union Value value;
     value.i = i;
-    addSymbol(name, ANY, value, V_INT);
+    addSymbol(name, K_ANY, value, V_INT);
 }
 
 void addSymbolAnyFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    addSymbol(name, ANY, value, V_FLOAT);
+    addSymbol(name, K_ANY, value, V_FLOAT);
 }
 
 void addSymbolAnyBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    addSymbol(name, ANY, value, V_BOOL);
+    addSymbol(name, K_ANY, value, V_BOOL);
 }
 
 _Function* getCurrentScope() {
@@ -1076,13 +1076,13 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
 
     switch (type)
     {
-        case BOOL:
+        case K_BOOL:
             value_type = V_BOOL;
             break;
-        case NUMBER:
+        case K_NUMBER:
             value_type = V_FLOAT;
             break;
-        case STRING:
+        case K_STRING:
             value.s = malloc(1 + strlen(""));
             strcpy(value.s, "");
             value_type = V_STRING;

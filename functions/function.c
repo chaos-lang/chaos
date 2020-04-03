@@ -178,7 +178,7 @@ void callFunction(char *name, char *module) {
     if (!interactive_shell_function_error_absorbed)
         executeDecision(function);
 
-    if (function->type != VOID &&
+    if (function->type != K_VOID &&
         function->symbol == NULL &&
         !interactive_shell_function_error_absorbed
     ) {
@@ -292,21 +292,21 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
 void addFunctionCallParameterBool(bool b) {
     union Value value;
     value.b = b;
-    Symbol* symbol = addSymbol(NULL, BOOL, value, V_BOOL);
+    Symbol* symbol = addSymbol(NULL, K_BOOL, value, V_BOOL);
     addSymbolToFunctionParameters(symbol);
 }
 
 void addFunctionCallParameterInt(int i) {
     union Value value;
     value.i = i;
-    Symbol* symbol = addSymbol(NULL, NUMBER, value, V_INT);
+    Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_INT);
     addSymbolToFunctionParameters(symbol);
 }
 
 void addFunctionCallParameterFloat(float f) {
     union Value value;
     value.f = f;
-    Symbol* symbol = addSymbol(NULL, NUMBER, value, V_FLOAT);
+    Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_FLOAT);
     addSymbolToFunctionParameters(symbol);
 }
 
@@ -314,7 +314,7 @@ void addFunctionCallParameterString(char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
-    Symbol* symbol = addSymbol(NULL, STRING, value, V_STRING);
+    Symbol* symbol = addSymbol(NULL, K_STRING, value, V_STRING);
     addSymbolToFunctionParameters(symbol);
 }
 
@@ -324,8 +324,8 @@ void addFunctionCallParameterSymbol(char *name) {
 
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
-    if (symbol->type != ANY &&
-        executed_function->type != ANY &&
+    if (symbol->type != K_ANY &&
+        executed_function->type != K_ANY &&
         symbol->type != executed_function->type
     ) {
         free(name);
@@ -362,7 +362,7 @@ void printFunctionReturn(char *name, char *module) {
 void initMainFunction() {
     main_function = (struct _Function*)malloc(sizeof(_Function));
     main_function->name = "main";
-    main_function->type = ANY;
+    main_function->type = K_ANY;
     main_function->parameter_count = 0;
     recursion_depth = 0;
     function_names_buffer.capacity = 0;
@@ -375,7 +375,7 @@ void initMainFunction() {
 void initScopeless() {
     scopeless = (struct _Function*)malloc(sizeof(_Function));
     scopeless->name = "N/A";
-    scopeless->type = ANY;
+    scopeless->type = K_ANY;
     scopeless->parameter_count = 0;
 }
 
@@ -462,7 +462,7 @@ void executeDecision(_Function* function) {
     char *function_buffer = "";
     char *name = malloc(1 + strlen(__LANGUAGE_NAME__));
     strcpy(name, __LANGUAGE_NAME__);
-    Symbol* symbol = addSymbol(name, BOOL, value, V_BOOL);
+    Symbol* symbol = addSymbol(name, K_BOOL, value, V_BOOL);
 
     for (int i = 0; i < function->decision_functions.size; i++) {
         expression_buffer = strcat_ext(expression_buffer, __LANGUAGE_NAME__);
@@ -491,7 +491,7 @@ void executeDecision(_Function* function) {
 
     executed_function = executed_function_backup;
 
-    if (executed_function_backup->type != VOID && executed_function_backup->symbol == NULL) {
+    if (executed_function_backup->type != K_VOID && executed_function_backup->symbol == NULL) {
         executed_function_backup->symbol = createCloneFromSymbol(
             NULL,
             decision_symbol_chain->type,
