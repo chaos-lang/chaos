@@ -99,6 +99,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
         make requirements
 
     - name: Build (gcc)
