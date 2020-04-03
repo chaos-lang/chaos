@@ -11,7 +11,11 @@
 #define __MSG_LINE_LENGTH__ 1000
 #define __BYE_BYE__ "You have chosen the order! "
 #define __SPELLS__ "spells"
-#define __SHARED_OBJECT_EXTENSION__ "so"
+#if defined(__APPLE__) || defined(__MACH__)
+    #define __SHARED_OBJECT_EXTENSION__ "dylib"
+#else
+    #define __SHARED_OBJECT_EXTENSION__ "so"
+#endif
 #define __EXTENSION_REGISTER_FUNCTION__ "KaosRegister"
 #define __EXTENSION_FUNCTION_PREFIX__ "Kaos_"
 

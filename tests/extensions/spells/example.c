@@ -20,5 +20,4 @@ void KaosRegister()
     startFunctionParameters();
     startFunction(name, VOID);
     endFunction();
-    free(name);
 }
