@@ -31,6 +31,9 @@
     <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Undefined+Behavior+Sanitizer%22">
         <img alt="GitHub Workflow Undefined Behavior Sanitizer" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Undefined%20Behavior%20Sanitizer?logo=GitHub&label=undefined%20behavior%20sanitizer&style=flat-square">
     </a>
+    <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Chaos+C+Extension+Feature+Tests%22">
+        <img alt="GitHub Workflow Chaos C Extension Feature Tests Status" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Chaos%20C%20Extension%20Feature%20Tests?logo=GitHub&label=Chaos%20C%20Extension%20Feature&style=flat-square">
+    </a>
 </p>
 <p align="center">
     Chaos is a purely functional programming language that achieves zero cyclomatic complexity.
