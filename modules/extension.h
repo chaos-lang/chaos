@@ -5,7 +5,7 @@
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 #include <windows.h>
 #define LIBTYPE HINSTANCE
-#define OPENLIB(libname) LoadLibraryW(L"libname")
+#define OPENLIB(libname) LoadLibrary(libname)
 #define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
 #else
 #include <dlfcn.h>
@@ -25,5 +25,7 @@ typedef void (*lib_func)();
 void callRegisterInSharedObject(char* so_path);
 void callFunctionFromSharedObject(_Function* function);
 lib_func getFunctionFromSharedObject(char* so_path, char* function_name);
+
+#include "../chaos.h"
 
 #endif

@@ -1,7 +1,14 @@
+@ECHO OFF
 IF [%1]==[] (
     SET compiler=gcc
+) ELSE IF [%1]==[dev] (
+    SET compiler=gcc
+    SET extra_flags=-ggdb
 ) ELSE IF [%1]==[clang] (
     SET compiler=clang-cl
+) ELSE IF [%1]==[clang-dev] (
+    SET compiler=clang-cl
+    SET extra_flags=-ggdb
 ) ELSE IF [%1]==[requirements] (
     choco install winflexbison3 --confirm
     IF errorlevel 1 (
@@ -44,6 +51,14 @@ IF [%1]==[] (
 ) ELSE IF [%1]==[clean] (
     DEL chaos.exe chaos.tab.c lex.yy.c chaos.tab.h
     EXIT /B 0
+) ELSE IF [%1]==[test-extensions-windows-gcc] (
+    CD tests\extensions\spells
+    gcc -shared -fPIC example.c -o example.o
+    gcc -c example.c
+    gcc -shared -o example.dll example.o -Wl,--out-implib,libexample.a
+    CD ..\..\..
+    chaos tests\extensions\test.kaos
+    EXIT /B 0
 )
 
 win_flex --wincompat chaos.l
@@ -54,7 +69,8 @@ win_bison -d chaos.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-%compiler% -Iloops -Ifunctions -Imodules -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c
+SET dynamic_flags=-Wl,--export-all-symbols
+%compiler% -Iloops -Ifunctions -Imodules -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c %dynamic_flags% %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )

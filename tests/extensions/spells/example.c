@@ -1,23 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-enum Type { K_BOOL, K_NUMBER, K_STRING, K_ANY, K_ARRAY, K_DICT, K_VOID };
-void startFunction(char *name, enum Type type);
-void endFunction();
-void startFunctionParameters();
+#include "../../../chaos.h"
 
-int Kaos_hello()
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
+
+int EXPORT Kaos_hello()
 {
     printf("Hello from example extension!\n");
     return 0;
 }
 
-void KaosRegister()
+int EXPORT KaosRegister(struct Kaos kaos)
 {
     char *name = malloc(6);
     strcpy(name, "hello");
-    startFunctionParameters();
-    startFunction(name, K_VOID);
-    endFunction();
+    kaos.startFunctionParameters();
+    kaos.startFunction(name, K_VOID);
+    kaos.endFunction();
+    return 0;
 }

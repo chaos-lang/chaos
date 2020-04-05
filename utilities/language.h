@@ -13,6 +13,8 @@
 #define __SPELLS__ "spells"
 #if defined(__APPLE__) || defined(__MACH__)
     #define __SHARED_OBJECT_EXTENSION__ "dylib"
+#elif defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    #define __SHARED_OBJECT_EXTENSION__ "dll"
 #else
     #define __SHARED_OBJECT_EXTENSION__ "so"
 #endif

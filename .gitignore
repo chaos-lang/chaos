@@ -25,3 +25,6 @@ chaos.dSYM/
 # Ignore the shared objects
 *.so
 *.dylib
+*.o
+*.a
+*.dll

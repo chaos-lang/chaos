@@ -67,3 +67,27 @@ jobs:
     - name: Run the tests (clang)
       run: |
         make test-extensions-macos-clang
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      shell: cmd
+      run: |
+        call make.bat requirements
+
+    - name: Build (gcc)
+      shell: cmd
+      run: |
+        call make.bat clean
+        call make.bat
+        call make.bat install
+
+    - name: Run the tests (gcc)
+      shell: cmd
+      run: |
+        call make.bat test-extensions-windows-gcc
