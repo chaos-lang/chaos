@@ -69,8 +69,7 @@ win_bison -d chaos.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-SET dynamic_flags=-Wl,--export-all-symbols
-%compiler% -Iloops -Ifunctions -Imodules -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c %dynamic_flags% %extra_flags%
+%compiler% -Iloops -Ifunctions -Imodules -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )
