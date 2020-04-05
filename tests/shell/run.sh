@@ -3,6 +3,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SUB="$( basename $DIR )"
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    shopt -s expand_aliases
+    alias sed='gsed'
+fi
+
 for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"

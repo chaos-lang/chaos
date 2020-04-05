@@ -101,6 +101,7 @@ jobs:
       run: |
         mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
         make requirements
+        brew install gnu-sed
 
     - name: Build (gcc)
       run: |
