@@ -6,6 +6,14 @@ void callRegisterInSharedObject(char* so_path) {
     kaos.getVariableInt = getVariableInt;
     kaos.getVariableFloat = getVariableFloat;
     kaos.getVariableString = getVariableString;
+    kaos.getArrayElementBool = getArrayElementBool;
+    kaos.getArrayElementInt = getArrayElementInt;
+    kaos.getArrayElementFloat = getArrayElementFloat;
+    kaos.getArrayElementString = getArrayElementString;
+    kaos.getDictElementBool = getDictElementBool;
+    kaos.getDictElementInt = getDictElementInt;
+    kaos.getDictElementFloat = getDictElementFloat;
+    kaos.getDictElementString = getDictElementString;
     lib_func func = getFunctionFromSharedObject(so_path, __EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
 }

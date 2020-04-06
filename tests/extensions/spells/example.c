@@ -51,12 +51,30 @@ int EXPORT Kaos_log()
     printf("%s\n", var);
 }
 
+char *complex_params_name[] = {
+    "arr1",
+    "dict1"
+};
+int complex_params_type[] = {
+    K_ARRAY,
+    K_DICT
+};
+int complex_params_length = (int) sizeof(complex_params_type)/sizeof(int);
+int EXPORT Kaos_complex()
+{
+    int var1 = (int) kaos.getArrayElementFloat(complex_params_name[0], 0);
+    printf("%i\n", var1);
+    char* var2 = kaos.getDictElementString(complex_params_name[1], "a");
+    printf("%s\n", var2);
+}
+
 int EXPORT KaosRegister(struct Kaos _kaos)
 {
     kaos = _kaos;
     kaos.defineFunction("hello", K_VOID, hello_params_name, hello_params_type, hello_parasm_length);
     kaos.defineFunction("add", K_VOID, add_params_name, add_params_type, add_params_length);
     kaos.defineFunction("log", K_VOID, log_params_name, log_params_type, log_params_length);
+    kaos.defineFunction("complex", K_VOID, complex_params_name, complex_params_type, complex_params_length);
 
     return 0;
 }
