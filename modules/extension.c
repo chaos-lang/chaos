@@ -2,6 +2,10 @@
 
 void callRegisterInSharedObject(char* so_path) {
     kaos.defineFunction = defineFunction;
+    kaos.getVariableBool = getVariableBool;
+    kaos.getVariableInt = getVariableInt;
+    kaos.getVariableFloat = getVariableFloat;
+    kaos.getVariableString = getVariableString;
     lib_func func = getFunctionFromSharedObject(so_path, __EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
 }

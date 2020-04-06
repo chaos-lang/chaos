@@ -1,5 +1,8 @@
 import example
 
 function_table
+symbol_table
 
 example.hello()
+example.add(3, 5)
+example.log("Custom message")
