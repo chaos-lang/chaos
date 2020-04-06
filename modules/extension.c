@@ -1,9 +1,7 @@
 #include "extension.h"
 
 void callRegisterInSharedObject(char* so_path) {
-    kaos.startFunction = startFunction;
-    kaos.endFunction = endFunction;
-    kaos.startFunctionParameters = startFunctionParameters;
+    kaos.defineFunction = defineFunction;
     lib_func func = getFunctionFromSharedObject(so_path, __EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
 }

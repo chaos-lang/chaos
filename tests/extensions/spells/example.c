@@ -19,10 +19,6 @@ int EXPORT Kaos_hello()
 
 int EXPORT KaosRegister(struct Kaos kaos)
 {
-    char *name = malloc(6);
-    strcpy(name, "hello");
-    kaos.startFunctionParameters();
-    kaos.startFunction(name, K_VOID);
-    kaos.endFunction();
+    kaos.defineFunction("hello", K_VOID);
     return 0;
 }

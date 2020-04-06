@@ -15,6 +15,7 @@
 #endif
 
 #include "../functions/function.h"
+#include "../chaos.h"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 typedef long long int (*lib_func)();
@@ -25,7 +26,5 @@ typedef void (*lib_func)();
 void callRegisterInSharedObject(char* so_path);
 void callFunctionFromSharedObject(_Function* function);
 lib_func getFunctionFromSharedObject(char* so_path, char* function_name);
-
-#include "../chaos.h"
 
 #endif

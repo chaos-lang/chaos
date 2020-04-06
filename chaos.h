@@ -3,10 +3,10 @@
 
 #include "enums.h"
 
+int defineFunction(char *name, enum Type type);
+
 struct Kaos {
-    void (*startFunction)(char *name, enum Type type);
-    void (*endFunction)();
-    void (*startFunctionParameters)();
+    int (*defineFunction)(char *name, enum Type type);
 };
 
 struct Kaos kaos;
