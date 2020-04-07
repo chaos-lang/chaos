@@ -13,7 +13,7 @@
 
 char *hello_params_name[] = {};
 int hello_params_type[] = {};
-int hello_parasm_length = 0;
+int hello_params_length = 0;
 int EXPORT Kaos_hello()
 {
     printf("Hello from example extension!\n");
@@ -34,7 +34,7 @@ int EXPORT Kaos_add()
     int x = kaos.getVariableInt(add_params_name[0]);
     int y = kaos.getVariableInt(add_params_name[1]);
     int z = x + y;
-    printf("%i\n", z);
+    kaos.returnVariableInt(z);
     return 0;
 }
 
@@ -68,13 +68,28 @@ int EXPORT Kaos_complex()
     printf("%s\n", var2);
 }
 
+char *mayhem_params_name[] = {};
+int mayhem_params_type[] = {};
+int mayhem_params_length = 0;
+int EXPORT Kaos_mayhem()
+{
+    kaos.startBuildingDict();
+    kaos.createVariableBool("b", true);
+    kaos.createVariableInt("i", 1);
+    kaos.createVariableFloat("f", 3.14);
+    kaos.createVariableString("s", "bar");
+    kaos.returnDict(K_ANY);
+    return 0;
+}
+
 int EXPORT KaosRegister(struct Kaos _kaos)
 {
     kaos = _kaos;
-    kaos.defineFunction("hello", K_VOID, hello_params_name, hello_params_type, hello_parasm_length);
-    kaos.defineFunction("add", K_VOID, add_params_name, add_params_type, add_params_length);
+    kaos.defineFunction("hello", K_VOID, hello_params_name, hello_params_type, hello_params_length);
+    kaos.defineFunction("add", K_NUMBER, add_params_name, add_params_type, add_params_length);
     kaos.defineFunction("log", K_VOID, log_params_name, log_params_type, log_params_length);
     kaos.defineFunction("complex", K_VOID, complex_params_name, complex_params_type, complex_params_length);
+    kaos.defineFunction("mayhem", K_DICT, mayhem_params_name, mayhem_params_type, mayhem_params_length);
 
     return 0;
 }

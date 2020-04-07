@@ -14,6 +14,19 @@ void callRegisterInSharedObject(char* so_path) {
     kaos.getDictElementInt = getDictElementInt;
     kaos.getDictElementFloat = getDictElementFloat;
     kaos.getDictElementString = getDictElementString;
+    kaos.returnVariableBool = returnVariableBool;
+    kaos.returnVariableInt = returnVariableInt;
+    kaos.returnVariableFloat = returnVariableFloat;
+    kaos.returnVariableString = returnVariableString;
+    kaos.createVariableBool = createVariableBool;
+    kaos.createVariableInt = createVariableInt;
+    kaos.createVariableFloat = createVariableFloat;
+    kaos.createVariableString = createVariableString;
+    kaos.startBuildingArray = startBuildingArray;
+    kaos.returnArray = returnArray;
+    kaos.startBuildingDict = startBuildingDict;
+    kaos.returnDict = returnDict;
+    kaos.returnComplex = returnComplex;
     lib_func func = getFunctionFromSharedObject(so_path, __EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
 }
@@ -45,4 +58,22 @@ lib_func getFunctionFromSharedObject(char* so_path, char* function_name) {
     }
 
     return func;
+}
+
+void returnVariable(Symbol* symbol) {
+    scope_override = executed_function->parent_scope;
+    executed_function->symbol = createCloneFromSymbol(
+        NULL,
+        symbol->type,
+        symbol,
+        symbol->secondary_type
+    );
+    decision_symbol_chain = createCloneFromSymbol(
+        NULL,
+        symbol->type,
+        symbol,
+        symbol->secondary_type
+    );
+    scope_override = NULL;
+    removeSymbol(symbol);
 }

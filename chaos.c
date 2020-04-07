@@ -131,3 +131,74 @@ char* getDictElementString(char *name, char *key) {
     strcpy(value, symbol->value.s);
     return value;
 }
+
+void returnVariableBool(bool b) {
+    Symbol* symbol = addSymbolBool(NULL, b);
+    returnVariable(symbol);
+}
+
+void returnVariableInt(int i) {
+    Symbol* symbol = addSymbolInt(NULL, i);
+    returnVariable(symbol);
+}
+
+void returnVariableFloat(float f) {
+    Symbol* symbol = addSymbolFloat(NULL, f);
+    returnVariable(symbol);
+}
+
+void returnVariableString(char *s) {
+    Symbol* symbol = addSymbolString(NULL, s);
+    returnVariable(symbol);
+}
+
+void createVariableBool(char *name, bool b) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    addSymbolBool(symbol_name, b);
+}
+
+void createVariableInt(char *name, int i) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    addSymbolInt(symbol_name, i);
+}
+
+void createVariableFloat(char *name, float f) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    addSymbolFloat(symbol_name, f);
+}
+
+void createVariableString(char *name, char *s) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    char *_s = malloc(strlen(s) + 1);
+    strcpy(_s, s);
+    addSymbolString(symbol_name, _s);
+}
+
+void startBuildingArray() {
+    addSymbolArray(NULL);
+}
+
+void returnArray(enum Type type) {
+    returnComplex(type);
+}
+
+void startBuildingDict() {
+    addSymbolDict(NULL);
+}
+
+void returnDict(enum Type type) {
+    returnComplex(type);
+}
+
+void returnComplex(enum Type type) {
+    complex_mode->children_count = symbol_counter;
+    complex_mode->secondary_type = type;
+    Symbol* symbol = complex_mode;
+    complex_mode = NULL;
+    symbol_counter = 0;
+    returnVariable(symbol);
+}

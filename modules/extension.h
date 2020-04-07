@@ -26,5 +26,6 @@ typedef void (*lib_func)();
 void callRegisterInSharedObject(char* so_path);
 void callFunctionFromSharedObject(_Function* function);
 lib_func getFunctionFromSharedObject(char* so_path, char* function_name);
+void returnVariable(Symbol* symbol);
 
 #endif

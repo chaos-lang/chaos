@@ -16,6 +16,19 @@ bool getDictElementBool(char *name, char *key);
 int getDictElementInt(char *name, char *key);
 float getDictElementFloat(char *name, char *key);
 char* getDictElementString(char *name, char *key);
+void returnVariableBool(bool b);
+void returnVariableInt(int i);
+void returnVariableFloat(float f);
+void returnVariableString(char *s);
+void createVariableBool(char *name, bool b);
+void createVariableInt(char *name, int i);
+void createVariableFloat(char *name, float f);
+void createVariableString(char *name, char *s);
+void startBuildingArray();
+void returnArray(enum Type type);
+void startBuildingDict();
+void returnDict(enum Type type);
+void returnComplex(enum Type type);
 
 struct Kaos {
     int (*defineFunction)(char *name, enum Type type, char *params_name[], int params_type[], int params_length);
@@ -31,6 +44,19 @@ struct Kaos {
     int (*getDictElementInt)(char *name, char *key);
     float (*getDictElementFloat)(char *name, char *key);
     char* (*getDictElementString)(char *name, char *key);
+    void (*returnVariableBool)(bool b);
+    void (*returnVariableInt)(int i);
+    void (*returnVariableFloat)(float f);
+    void (*returnVariableString)(char *s);
+    void (*createVariableBool)(char *name, bool b);
+    void (*createVariableInt)(char *name, int i);
+    void (*createVariableFloat)(char *name, float f);
+    void (*createVariableString)(char *name, char *s);
+    void (*startBuildingArray)();
+    void (*returnArray)(enum Type type);
+    void (*startBuildingDict)();
+    void (*returnDict)(enum Type type);
+    void (*returnComplex)(enum Type type);
 };
 
 struct Kaos kaos;
