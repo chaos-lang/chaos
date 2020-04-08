@@ -71,10 +71,10 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     if (strcmp(
         get_filename_ext(module_path),
-        __SHARED_OBJECT_EXTENSION__
+        __DYNAMIC_LIBRARY_EXTENSION__
         ) == 0
     ) {
-        callRegisterInSharedObject(module_path);
+        callRegisterInDynamicLibrary(module_path);
     } else {
         parseTheModuleContent(module_path);
     }
@@ -163,11 +163,11 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
         if (is_file_exists(module_path)) {
             return module_path;
         } else {
-            char* so_path = remove_ext(module_path, '.', __PATH_SEPARATOR_ASCII__);
-            so_path = strcat_ext(so_path, ".");
-            so_path = strcat_ext(so_path, __SHARED_OBJECT_EXTENSION__);
-            if (is_file_exists(so_path)) {
-                return so_path;
+            char* dynamic_library_path = remove_ext(module_path, '.', __PATH_SEPARATOR_ASCII__);
+            dynamic_library_path = strcat_ext(dynamic_library_path, ".");
+            dynamic_library_path = strcat_ext(dynamic_library_path, __DYNAMIC_LIBRARY_EXTENSION__);
+            if (is_file_exists(dynamic_library_path)) {
+                return dynamic_library_path;
             }
         }
     }

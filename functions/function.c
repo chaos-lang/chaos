@@ -165,10 +165,10 @@ void callFunction(char *name, char *module) {
     if (!interactive_shell_function_error_absorbed) {
         if (strcmp(
         get_filename_ext(function->module_context),
-        __SHARED_OBJECT_EXTENSION__
+        __DYNAMIC_LIBRARY_EXTENSION__
         ) == 0
         ) {
-            callFunctionFromSharedObject(function);
+            callFunctionFromDynamicLibrary(function);
         } else {
             injectCode(function->body, INIT_PROGRAM);
         }

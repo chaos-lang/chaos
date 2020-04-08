@@ -12,11 +12,11 @@
 #define __BYE_BYE__ "You have chosen the order! "
 #define __SPELLS__ "spells"
 #if defined(__APPLE__) || defined(__MACH__)
-    #define __SHARED_OBJECT_EXTENSION__ "dylib"
+    #define __DYNAMIC_LIBRARY_EXTENSION__ "dylib"
 #elif defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    #define __SHARED_OBJECT_EXTENSION__ "dll"
+    #define __DYNAMIC_LIBRARY_EXTENSION__ "dll"
 #else
-    #define __SHARED_OBJECT_EXTENSION__ "so"
+    #define __DYNAMIC_LIBRARY_EXTENSION__ "so"
 #endif
 #define __EXTENSION_REGISTER_FUNCTION__ "KaosRegister"
 #define __EXTENSION_FUNCTION_PREFIX__ "Kaos_"
