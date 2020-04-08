@@ -15,7 +15,7 @@
 #endif
 
 #include "../functions/function.h"
-#include "../chaos.h"
+#include "../Chaos.h"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 typedef long long int (*lib_func)();

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "function.h"
-#include "chaos.h"
+#include "Chaos.h"
 
 int defineFunction(char *name, enum Type type, char *params_name[], int params_type[], int params_length) {
     char *function_name = malloc(strlen(name) + 1);
