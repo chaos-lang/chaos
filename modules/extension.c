@@ -29,6 +29,9 @@ void callRegisterInSharedObject(char* so_path) {
     kaos.returnComplex = returnComplex;
     lib_func func = getFunctionFromSharedObject(so_path, __EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
+    if (is_interactive) {
+        phase = PROGRAM;
+    }
 }
 
 void callFunctionFromSharedObject(_Function* function) {
