@@ -304,7 +304,7 @@ void addFunctionCallParameterInt(long long i) {
     addSymbolToFunctionParameters(symbol);
 }
 
-void addFunctionCallParameterFloat(float f) {
+void addFunctionCallParameterFloat(long double f) {
     union Value value;
     value.f = f;
     Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_FLOAT);

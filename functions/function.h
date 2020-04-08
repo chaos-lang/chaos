@@ -79,7 +79,7 @@ void addFunctionParameter(char *secondary_name, enum Type type);
 void addSymbolToFunctionParameters(Symbol* symbol);
 void addFunctionCallParameterBool(bool b);
 void addFunctionCallParameterInt(long long i);
-void addFunctionCallParameterFloat(float f);
+void addFunctionCallParameterFloat(long double f);
 void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);

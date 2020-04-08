@@ -209,10 +209,10 @@ char* getSymbolValueString(char *name) {
     return "";
 }
 
-float getSymbolValueFloat(char *name) {
+long double getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
-    float value;
+    long double value;
     switch (symbol->value_type)
     {
         case V_BOOL:
@@ -220,7 +220,7 @@ float getSymbolValueFloat(char *name) {
             return value;
             break;
         case V_INT:
-            value = (float)symbol->value.i;
+            value = (long double)symbol->value.i;
             return value;
             break;
         case V_FLOAT:
@@ -332,7 +332,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     printf("%lld", symbol->value.i);
                     break;
                 case V_FLOAT:
-                    printf("%g", symbol->value.f);
+                    printf("%Lg", symbol->value.f);
                     break;
                 default:
                     throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
@@ -378,7 +378,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
                     printf("%lld", symbol->value.i);
                     break;
                 case V_FLOAT:
-                    printf("%g", symbol->value.f);
+                    printf("%Lg", symbol->value.f);
                     break;
                 case V_BOOL:
                     printf("%s", symbol->value.b ? "true" : "false");
@@ -484,13 +484,13 @@ void updateSymbolInt(char *name, long long i) {
     updateSymbol(name, K_NUMBER, value, V_INT);
 }
 
-Symbol* addSymbolFloat(char *name, float f) {
+Symbol* addSymbolFloat(char *name, long double f) {
     union Value value;
     value.f = f;
     return addSymbol(name, K_NUMBER, value, V_FLOAT);
 }
 
-void updateSymbolFloat(char *name, float f) {
+void updateSymbolFloat(char *name, long double f) {
     union Value value;
     value.f = f;
     updateSymbol(name, K_NUMBER, value, V_FLOAT);
@@ -764,7 +764,7 @@ void updateComplexElementInt(char* name, unsigned long long symbol_id, long long
     updateComplexElement(name, symbol_id, K_NUMBER, value);
 }
 
-void updateComplexElementFloat(char* name, unsigned long long symbol_id, float f) {
+void updateComplexElementFloat(char* name, unsigned long long symbol_id, long double f) {
     union Value value;
     value.f = f;
     updateComplexElement(name, symbol_id, K_NUMBER, value);
@@ -902,7 +902,7 @@ void addSymbolAnyInt(char *name, long long i) {
     addSymbol(name, K_ANY, value, V_INT);
 }
 
-void addSymbolAnyFloat(char *name, float f) {
+void addSymbolAnyFloat(char *name, long double f) {
     union Value value;
     value.f = f;
     addSymbol(name, K_ANY, value, V_FLOAT);
@@ -1018,7 +1018,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     clone_symbol->value.f = symbol->value.b ? 1.0 : 0.0;
                     break;
                 case V_INT:
-                    clone_symbol->value.f = (float)symbol->value.i;
+                    clone_symbol->value.f = (long double)symbol->value.i;
                     break;
                 case V_FLOAT:
                     clone_symbol->value.f = symbol->value.f;
@@ -1048,7 +1048,7 @@ Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
                     break;
                 case V_FLOAT:
                     free(clone_symbol->value.s);
-                    sprintf(buffer, "%g", symbol->value.f);
+                    sprintf(buffer, "%Lg", symbol->value.f);
                     val = buffer;
                     clone_symbol->value.s = malloc(1 + strlen(val));
                     strcpy(clone_symbol->value.s, val);

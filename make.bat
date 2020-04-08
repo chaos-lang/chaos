@@ -1,9 +1,10 @@
 @ECHO OFF
 IF [%1]==[] (
     SET compiler=gcc
+    SET extra_flags=-D__USE_MINGW_ANSI_STDIO
 ) ELSE IF [%1]==[dev] (
     SET compiler=gcc
-    SET extra_flags=-ggdb
+    SET extra_flags=-D__USE_MINGW_ANSI_STDIO -ggdb
 ) ELSE IF [%1]==[clang] (
     SET compiler=clang-cl
 ) ELSE IF [%1]==[clang-dev] (

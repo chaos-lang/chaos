@@ -34,7 +34,7 @@ long long getVariableInt(char *name) {
     return getSymbolValueInt(symbol_name);
 }
 
-float getVariableFloat(char *name) {
+long double getVariableFloat(char *name) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     return getSymbolValueFloat(symbol_name);
@@ -66,7 +66,7 @@ long long getArrayElementInt(char *name, long long i) {
     return symbol->value.i;
 }
 
-float getArrayElementFloat(char *name, long long i) {
+long double getArrayElementFloat(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getArrayElement(symbol_name, i);
@@ -109,7 +109,7 @@ long long getDictElementInt(char *name, char *key) {
     return symbol->value.i;
 }
 
-float getDictElementFloat(char *name, char *key) {
+long double getDictElementFloat(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getDictElement(symbol_name, key);
@@ -142,7 +142,7 @@ void returnVariableInt(long long i) {
     returnVariable(symbol);
 }
 
-void returnVariableFloat(float f) {
+void returnVariableFloat(long double f) {
     Symbol* symbol = addSymbolFloat(NULL, f);
     returnVariable(symbol);
 }
@@ -164,7 +164,7 @@ void createVariableInt(char *name, long long i) {
     addSymbolInt(symbol_name, i);
 }
 
-void createVariableFloat(char *name, float f) {
+void createVariableFloat(char *name, long double f) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     addSymbolFloat(symbol_name, f);
