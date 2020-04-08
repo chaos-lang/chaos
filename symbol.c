@@ -460,10 +460,10 @@ void printSymbolTable() {
     printf("[end]\n");
 }
 
-void addSymbolBool(char *name, bool b) {
+Symbol* addSymbolBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    addSymbol(name, K_BOOL, value, V_BOOL);
+    return addSymbol(name, K_BOOL, value, V_BOOL);
 }
 
 void updateSymbolBool(char *name, bool b) {
@@ -484,10 +484,10 @@ void updateSymbolInt(char *name, int i) {
     updateSymbol(name, K_NUMBER, value, V_INT);
 }
 
-void addSymbolFloat(char *name, float f) {
+Symbol* addSymbolFloat(char *name, float f) {
     union Value value;
     value.f = f;
-    addSymbol(name, K_NUMBER, value, V_FLOAT);
+    return addSymbol(name, K_NUMBER, value, V_FLOAT);
 }
 
 void updateSymbolFloat(char *name, float f) {

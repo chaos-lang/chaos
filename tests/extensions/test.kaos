@@ -1,5 +1,17 @@
 import example
 
 function_table
+symbol_table
 
 example.hello()
+print example.add(3, 5)
+example.log("Custom message")
+
+list var1 = [1, 2, 3]
+dict var2 = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+
+symbol_table
+
+example.complex(var1, var2)
+
+print example.mayhem()

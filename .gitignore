@@ -22,7 +22,7 @@ chaos.dSYM/
 # Ignore generate via mac os
 .DS_Store
 
-# Ignore the shared objects
+# Ignore the dynamic library files
 *.so
 *.dylib
 *.o
