@@ -22,7 +22,6 @@ char *trim_string(char *str);
 void handle_end_keyword();
 char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
-int replace_char(char *str, char orig, char rep);
 void prepend_to_array(string_array *array, char *str);
 void append_to_array(string_array *array, char *str);
 char *capitalize(const char *str);

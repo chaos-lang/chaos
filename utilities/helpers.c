@@ -107,16 +107,6 @@ char *strcat_ext(char *s1, const char *s2)
     return p;
 }
 
-int replace_char(char *str, char orig, char rep) {
-    char *ix = str;
-    int n = 0;
-    while((ix = strchr(ix, orig)) != NULL) {
-        *ix++ = rep;
-        n++;
-    }
-    return n;
-}
-
 void prepend_to_array(string_array *array, char *str) {
     array->arr = (char **)realloc(array->arr, (array->capacity += 1) * sizeof(char *));
 
