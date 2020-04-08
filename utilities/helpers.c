@@ -1,10 +1,10 @@
 #include "helpers.h"
 
-char *itoa(int value, char *result, int base) {
+char *longlong_to_string(long long value, char *result, unsigned short base) {
     if (base < 2 || base > 36) { *result = '\0'; return result; }
 
     char* ptr = result, *ptr1 = result, tmp_char;
-    int tmp_value;
+    long long tmp_value;
 
     do {
         tmp_value = value;
@@ -120,7 +120,7 @@ int replace_char(char *str, char orig, char rep) {
 void prepend_to_array(string_array *array, char *str) {
     array->arr = (char **)realloc(array->arr, (array->capacity += 1) * sizeof(char *));
 
-    for (int k = array->size; k > 0; k--) {
+    for (unsigned k = array->size; k > 0; k--) {
         array->arr[k] = array->arr[k - 1];
     }
 

@@ -49,10 +49,10 @@ char *program_file_dir;
 
 %union {
     bool bval;
-    int ival;
+    long long ival;
     float fval;
     char *sval;
-    unsigned long long int lluval;
+    unsigned long long lluval;
 }
 
 %token START_PROGRAM START_PREPARSE
@@ -207,7 +207,7 @@ parser:
 
 line: T_NEWLINE
     | mixed_expression T_NEWLINE                                    { if (is_interactive && isStreamOpen()) printf("%g\n", $1); }
-    | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen()) printf("%i\n", $1); }
+    | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen()) printf("%lld\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getSymbol($1)); free($1); } }
     | loop T_NEWLINE                                                { }
     | T_QUIT T_NEWLINE                                              {
@@ -239,7 +239,7 @@ print: T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                { printSymbo
 ;
 print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); free($1); }
 ;
-print: T_INT                                                        { printf("%i\n", $1); }
+print: T_INT                                                        { printf("%lld\n", $1); }
 ;
 print: T_FLOAT                                                      { printf("%f\n", $1); }
 ;
@@ -792,7 +792,7 @@ void freeEverything() {
     } else {
         #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();
-        for (int i = __LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
+        for (unsigned long long i = __LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
             free(suggestions[i]);
         }
         #endif

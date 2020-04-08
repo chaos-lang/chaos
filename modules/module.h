@@ -15,7 +15,7 @@ extern char *program_file_dir;
 string_array module_path_stack;
 string_array module_stack;
 
-extern int module_parsing;
+extern unsigned short module_parsing;
 
 void initMainContext();
 void appendModuleToModuleBuffer(char *name);

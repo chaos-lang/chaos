@@ -39,14 +39,14 @@ extern void freeEverything();
 extern bool is_interactive;
 extern jmp_buf InteractiveShellErrorAbsorber;
 
-void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long long int llu1);
+void throw_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1);
 
 typedef struct {
-    int code;
+    unsigned short code;
     char *str1;
     char *str2;
-    int int1;
-    unsigned long long int llu1;
+    long long lld1;
+    unsigned long long llu1;
 } throw_error_args;
 
 void throw_error_var(throw_error_args in);

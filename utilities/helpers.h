@@ -17,7 +17,7 @@ typedef struct string_array {
 #include "loop.h"
 #include "function.h"
 
-char *itoa(int value, char *result, int base);
+char *longlong_to_string(long long value, char *result, unsigned short base);
 char *trim_string(char *str);
 void handle_end_keyword();
 char *fileGetContents(char *file_path);

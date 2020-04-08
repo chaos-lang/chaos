@@ -1,7 +1,7 @@
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "shell.h"
 
-int suggestions_length = __LANGUAGE_KEYWORD_COUNT__;
+unsigned long long suggestions_length = __LANGUAGE_KEYWORD_COUNT__;
 char *suggestions[1000] = {
     "exit",
     "quit",

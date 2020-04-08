@@ -12,8 +12,8 @@
 #endif
 
 char *hello_params_name[] = {};
-int hello_params_type[] = {};
-int hello_params_length = 0;
+unsigned hello_params_type[] = {};
+unsigned short hello_params_length = 0;
 int EXPORT Kaos_hello()
 {
     printf("Hello from example extension!\n");
@@ -24,16 +24,16 @@ char *add_params_name[] = {
     "x",
     "y"
 };
-int add_params_type[] = {
+unsigned add_params_type[] = {
     K_NUMBER,
     K_NUMBER
 };
-int add_params_length = (int) sizeof(add_params_type)/sizeof(int);
+unsigned short add_params_length = (unsigned short) sizeof(add_params_type) / sizeof(unsigned);
 int EXPORT Kaos_add()
 {
-    int x = kaos.getVariableInt(add_params_name[0]);
-    int y = kaos.getVariableInt(add_params_name[1]);
-    int z = x + y;
+    long long x = kaos.getVariableInt(add_params_name[0]);
+    long long y = kaos.getVariableInt(add_params_name[1]);
+    long long z = x + y;
     kaos.returnVariableInt(z);
     return 0;
 }
@@ -41,10 +41,10 @@ int EXPORT Kaos_add()
 char *log_params_name[] = {
     "message"
 };
-int log_params_type[] = {
+unsigned log_params_type[] = {
     K_STRING
 };
-int log_params_length = (int) sizeof(log_params_type)/sizeof(int);
+unsigned short log_params_length = (unsigned short) sizeof(log_params_type) / sizeof(unsigned);
 int EXPORT Kaos_log()
 {
     char* var = kaos.getVariableString(log_params_name[0]);
@@ -55,22 +55,22 @@ char *complex_params_name[] = {
     "arr1",
     "dict1"
 };
-int complex_params_type[] = {
+unsigned complex_params_type[] = {
     K_ARRAY,
     K_DICT
 };
-int complex_params_length = (int) sizeof(complex_params_type)/sizeof(int);
+unsigned short complex_params_length = (unsigned short) sizeof(complex_params_type) / sizeof(unsigned);
 int EXPORT Kaos_complex()
 {
-    int var1 = (int) kaos.getArrayElementFloat(complex_params_name[0], 0);
-    printf("%i\n", var1);
+    long long var1 = (long long) kaos.getArrayElementFloat(complex_params_name[0], 0);
+    printf("%lld\n", var1);
     char* var2 = kaos.getDictElementString(complex_params_name[1], "a");
     printf("%s\n", var2);
 }
 
 char *mayhem_params_name[] = {};
-int mayhem_params_type[] = {};
-int mayhem_params_length = 0;
+unsigned mayhem_params_type[] = {};
+unsigned short mayhem_params_length = 0;
 int EXPORT Kaos_mayhem()
 {
     kaos.startBuildingDict();

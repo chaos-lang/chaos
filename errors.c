@@ -4,15 +4,15 @@ extern int yylineno;
 extern char *last_token;
 
 void throw_error_var(throw_error_args in) {
-    int code = in.code ? in.code : 0;
+    unsigned short code = in.code ? in.code : 0;
     char *str1 = in.str1 ? in.str1 : "";
     char *str2 = in.str2 ? in.str2 : "";
-    int int1 = in.int1 ? in.int1 : 0;
-    unsigned long long int llu = in.llu1 ? in.llu1 : 0;
-    throw_error_base(code, str1, str2, int1, llu);
+    long long lld1 = in.lld1 ? in.lld1 : 0;
+    unsigned long long llu = in.llu1 ? in.llu1 : 0;
+    throw_error_base(code, str1, str2, lld1, llu);
 }
 
-void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long long int llu1) {
+void throw_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1) {
     char title_msg[__MSG_LINE_LENGTH__];
     char current_module_msg[__MSG_LINE_LENGTH__];
     char line_no_msg[__MSG_LINE_LENGTH__];
@@ -46,7 +46,7 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
             sprintf(error_msg, "Variable '%s' is not an array!", str1);
             break;
         case E_UNDEFINED_INDEX:
-            sprintf(error_msg, "Undefined index: %i for array: %s", int1, str1);
+            sprintf(error_msg, "Undefined index: %llu for array: %s", lld1, str1);
             break;
         case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
             sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);
@@ -73,7 +73,7 @@ void throw_error_base(int code, char *str1, char *str2, int int1, unsigned long 
             sprintf(error_msg, "Memory allocation for the function is failed!");
             break;
         case E_MAXIMUM_RECURSION_DEPTH_EXCEEDED:
-            sprintf(error_msg, "Maximum recursion depth %i exceeded!", __MAX_RECURSION_DEPTH__);
+            sprintf(error_msg, "Maximum recursion depth %d exceeded!", __MAX_RECURSION_DEPTH__);
             break;
         case E_UNEXPECTED_VALUE_TYPE:
             sprintf(error_msg, "Unexpected value type: %s for variable: %s", str1, str2);

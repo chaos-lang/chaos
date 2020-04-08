@@ -23,7 +23,7 @@ extern int oerrno;
 #include "chaos.tab.h"
 
 enum Phase phase = INIT_PREPARSE;
-int module_parsing = 0;
+unsigned short module_parsing = 0;
 
 void injectCode(char *code, enum Phase phase_arg) {
     phase = phase_arg;

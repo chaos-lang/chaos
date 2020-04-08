@@ -41,7 +41,7 @@ void handleModuleImport(char *module_name, bool directly_import) {
     module_path = strcat_ext(module_path, module_dir);
     if (module_path[0] != '\0') module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
 
-    for (int i = 0; i < modules_buffer.size; i++) {
+    for (unsigned i = 0; i < modules_buffer.size; i++) {
         module_path = strcat_ext(module_path, modules_buffer.arr[i]);
         relative_path = strcat_ext(relative_path, modules_buffer.arr[i]);
         if (i + 1 != modules_buffer.size) {
@@ -90,7 +90,7 @@ void handleModuleImport(char *module_name, bool directly_import) {
 }
 
 void freeModulesBuffer() {
-    for (int i = 0; i < modules_buffer.size; i++) {
+    for (unsigned i = 0; i < modules_buffer.size; i++) {
         free(modules_buffer.arr[i]);
     }
     if (modules_buffer.size > 0) free(modules_buffer.arr);
@@ -111,7 +111,7 @@ void popModuleStack() {
 }
 
 void freeModulePathStack() {
-    for (int i = 0; i < module_path_stack.size; i++) {
+    for (unsigned i = 0; i < module_path_stack.size; i++) {
         free(module_path_stack.arr[i]);
     }
     module_path_stack.capacity = 0;
@@ -120,7 +120,7 @@ void freeModulePathStack() {
 }
 
 void freeModuleStack() {
-    for (int i = 0; i < module_stack.size; i++) {
+    for (unsigned i = 0; i < module_stack.size; i++) {
         free(module_stack.arr[i]);
     }
     module_stack.capacity = 0;

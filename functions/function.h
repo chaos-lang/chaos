@@ -23,7 +23,7 @@ typedef struct _Function {
     char *name;
     int line_no;
     struct Symbol** parameters;
-    int parameter_count;
+    unsigned short parameter_count;
     enum Type type;
     struct Symbol* symbol;
     struct _Function* previous;
@@ -61,7 +61,7 @@ char *decision_buffer;
 
 string_array function_names_buffer;
 
-int recursion_depth;
+unsigned short recursion_depth;
 
 int reset_line_no_to;
 
@@ -78,7 +78,7 @@ void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type);
 void addSymbolToFunctionParameters(Symbol* symbol);
 void addFunctionCallParameterBool(bool b);
-void addFunctionCallParameterInt(int i);
+void addFunctionCallParameterInt(long long i);
 void addFunctionCallParameterFloat(float f);
 void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);

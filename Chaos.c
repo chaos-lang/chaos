@@ -6,12 +6,12 @@
 #include "function.h"
 #include "Chaos.h"
 
-int defineFunction(char *name, enum Type type, char *params_name[], int params_type[], int params_length) {
+int defineFunction(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length) {
     char *function_name = malloc(strlen(name) + 1);
     strcpy(function_name, name);
     startFunctionParameters();
 
-    for (int i = 0; i < params_length; i++) {
+    for (unsigned short i = 0; i < params_length; i++) {
         char *param_name = malloc(strlen(params_name[i]) + 1);
         strcpy(param_name, params_name[i]);
         addFunctionParameter(param_name, params_type[i]);
@@ -28,7 +28,7 @@ bool getVariableBool(char *name) {
     return getSymbolValueBool(symbol_name);
 }
 
-int getVariableInt(char *name) {
+long long getVariableInt(char *name) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     return getSymbolValueInt(symbol_name);
@@ -46,7 +46,7 @@ char* getVariableString(char *name) {
     return getSymbolValueString(symbol_name);
 }
 
-bool getArrayElementBool(char *name, int i) {
+bool getArrayElementBool(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getArrayElement(symbol_name, i);
@@ -56,7 +56,7 @@ bool getArrayElementBool(char *name, int i) {
     return symbol->value.b;
 }
 
-int getArrayElementInt(char *name, int i) {
+long long getArrayElementInt(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getArrayElement(symbol_name, i);
@@ -66,7 +66,7 @@ int getArrayElementInt(char *name, int i) {
     return symbol->value.i;
 }
 
-float getArrayElementFloat(char *name, int i) {
+float getArrayElementFloat(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getArrayElement(symbol_name, i);
@@ -76,7 +76,7 @@ float getArrayElementFloat(char *name, int i) {
     return symbol->value.f;
 }
 
-char* getArrayElementString(char *name, int i) {
+char* getArrayElementString(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getArrayElement(symbol_name, i);
@@ -99,7 +99,7 @@ bool getDictElementBool(char *name, char *key) {
     return symbol->value.b;
 }
 
-int getDictElementInt(char *name, char *key) {
+long long getDictElementInt(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getDictElement(symbol_name, key);
@@ -137,7 +137,7 @@ void returnVariableBool(bool b) {
     returnVariable(symbol);
 }
 
-void returnVariableInt(int i) {
+void returnVariableInt(long long i) {
     Symbol* symbol = addSymbolInt(NULL, i);
     returnVariable(symbol);
 }
@@ -158,7 +158,7 @@ void createVariableBool(char *name, bool b) {
     addSymbolBool(symbol_name, b);
 }
 
-void createVariableInt(char *name, int i) {
+void createVariableInt(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     addSymbolInt(symbol_name, i);

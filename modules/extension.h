@@ -18,7 +18,7 @@
 #include "../Chaos.h"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-typedef long long int (*lib_func)();
+typedef long long (*lib_func)();
 #else
 typedef void (*lib_func)();
 #endif
