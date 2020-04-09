@@ -13,15 +13,15 @@ void throw_error_var(throw_error_args in) {
 }
 
 void throw_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1) {
-    char title_msg[__MSG_LINE_LENGTH__];
-    char current_module_msg[__MSG_LINE_LENGTH__];
-    char line_no_msg[__MSG_LINE_LENGTH__];
-    char error_msg[__MSG_LINE_LENGTH__];
-    char error_msg_out[__MSG_LINE_LENGTH__];
+    char title_msg[__KAOS_MSG_LINE_LENGTH__];
+    char current_module_msg[__KAOS_MSG_LINE_LENGTH__];
+    char line_no_msg[__KAOS_MSG_LINE_LENGTH__];
+    char error_msg[__KAOS_MSG_LINE_LENGTH__];
+    char error_msg_out[__KAOS_MSG_LINE_LENGTH__];
 
     if (strcmp(last_token, "\n") != 0) yylineno++;
 
-    sprintf(title_msg, "  %s Error:", __LANGUAGE_NAME__);
+    sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());
     sprintf(line_no_msg, "    Line: %d", yylineno);
 
@@ -73,7 +73,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
             sprintf(error_msg, "Memory allocation for the function is failed!");
             break;
         case E_MAXIMUM_RECURSION_DEPTH_EXCEEDED:
-            sprintf(error_msg, "Maximum recursion depth %d exceeded!", __MAX_RECURSION_DEPTH__);
+            sprintf(error_msg, "Maximum recursion depth %d exceeded!", __KAOS_MAX_RECURSION_DEPTH__);
             break;
         case E_UNEXPECTED_VALUE_TYPE:
             sprintf(error_msg, "Unexpected value type: %s for variable: %s", str1, str2);

@@ -197,8 +197,8 @@ parser:
     | parser line                                                   {
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         is_interactive ? (
-            loop_mode || function_mode ? printf("%s ", __SHELL_INDICATOR_BLOCK__) : (
-                inject_mode ? : printf("%s ", __SHELL_INDICATOR__)
+            loop_mode || function_mode ? printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__) : (
+                inject_mode ? : printf("%s ", __KAOS_SHELL_INDICATOR__)
             )
         ) : printf("");
         #endif
@@ -684,7 +684,7 @@ int main(int argc, char** argv) {
 
         program_file_dir = malloc(strlen(program_file_path) + 1);
         strcpy(program_file_dir, program_file_path);
-        char *ptr = strrchr(program_file_dir, __PATH_SEPARATOR_ASCII__);
+        char *ptr = strrchr(program_file_dir, __KAOS_PATH_SEPARATOR_ASCII__);
         if (ptr) {
             *ptr = '\0';
         }
@@ -695,8 +695,8 @@ int main(int argc, char** argv) {
         program_file_dir = malloc(strlen(buff) + 1);
         strcpy(program_file_dir, buff);
 
-        program_file_path = strcat_ext(program_file_dir, __PATH_SEPARATOR__);
-        program_file_path = strcat_ext(program_file_path, __INTERACTIVE_MODULE_NAME__);
+        program_file_path = strcat_ext(program_file_dir, __KAOS_PATH_SEPARATOR__);
+        program_file_path = strcat_ext(program_file_path, __KAOS_INTERACTIVE_MODULE_NAME__);
     }
 
     is_interactive = (fp != stdin) ? false : true;
@@ -734,7 +734,7 @@ int main(int argc, char** argv) {
         }
 
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        !is_interactive ?: printf("%s ", __SHELL_INDICATOR__);
+        !is_interactive ?: printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif
         yyparse();
     } while(!feof(yyin));
@@ -753,7 +753,7 @@ void yyerror(const char* s) {
         loop_mode = NULL;
         function_mode = NULL;
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        printf("%s ", __SHELL_INDICATOR__);
+        printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif
         flushLexer();
         phase = INIT_PROGRAM;
@@ -790,7 +790,7 @@ void freeEverything() {
     } else {
         #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();
-        for (unsigned long long i = __LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
+        for (unsigned long long i = __KAOS_LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
             free(suggestions[i]);
         }
         #endif

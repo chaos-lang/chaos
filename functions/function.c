@@ -150,7 +150,7 @@ void callFunction(char *name, char *module) {
 
     recursion_depth++;
 
-    if (recursion_depth > __MAX_RECURSION_DEPTH__) {
+    if (recursion_depth > __KAOS_MAX_RECURSION_DEPTH__) {
         throw_error(E_MAXIMUM_RECURSION_DEPTH_EXCEEDED, NULL);
     }
 
@@ -165,7 +165,7 @@ void callFunction(char *name, char *module) {
     if (!interactive_shell_function_error_absorbed) {
         if (strcmp(
         get_filename_ext(function->module_context),
-        __DYNAMIC_LIBRARY_EXTENSION__
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
         ) == 0
         ) {
             callFunctionFromDynamicLibrary(function);
@@ -461,12 +461,12 @@ void executeDecision(_Function* function) {
     bool is_decision_made = false;
     char *expression_buffer = "";
     char *function_buffer = "";
-    char *name = malloc(1 + strlen(__LANGUAGE_NAME__));
-    strcpy(name, __LANGUAGE_NAME__);
+    char *name = malloc(1 + strlen(__KAOS_LANGUAGE_NAME__));
+    strcpy(name, __KAOS_LANGUAGE_NAME__);
     Symbol* symbol = addSymbol(name, K_BOOL, value, V_BOOL);
 
     for (unsigned i = 0; i < function->decision_functions.size; i++) {
-        expression_buffer = strcat_ext(expression_buffer, __LANGUAGE_NAME__);
+        expression_buffer = strcat_ext(expression_buffer, __KAOS_LANGUAGE_NAME__);
         expression_buffer = strcat_ext(expression_buffer, " = ");
         expression_buffer = strcat_ext(expression_buffer, function->decision_expressions.arr[i]);
         expression_buffer = strcat_ext(expression_buffer, "\n");

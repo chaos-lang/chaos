@@ -27,7 +27,7 @@ void callRegisterInDynamicLibrary(char* dynamic_library_path) {
     kaos.startBuildingDict = startBuildingDict;
     kaos.returnDict = returnDict;
     kaos.returnComplex = returnComplex;
-    lib_func func = getFunctionFromDynamicLibrary(dynamic_library_path, __EXTENSION_REGISTER_FUNCTION__);
+    lib_func func = getFunctionFromDynamicLibrary(dynamic_library_path, __KAOS_EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
     if (is_interactive) {
         phase = PROGRAM;
@@ -36,7 +36,7 @@ void callRegisterInDynamicLibrary(char* dynamic_library_path) {
 
 void callFunctionFromDynamicLibrary(_Function* function) {
     char* function_name = "";
-    function_name = strcat_ext(function_name, __EXTENSION_FUNCTION_PREFIX__);
+    function_name = strcat_ext(function_name, __KAOS_EXTENSION_FUNCTION_PREFIX__);
     function_name = strcat_ext(function_name, function->name);
     lib_func func = getFunctionFromDynamicLibrary(function->module_context, function_name);
     func();

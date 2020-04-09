@@ -1,7 +1,7 @@
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "shell.h"
 
-unsigned long long suggestions_length = __LANGUAGE_KEYWORD_COUNT__;
+unsigned long long suggestions_length = __KAOS_LANGUAGE_KEYWORD_COUNT__;
 char *suggestions[1000] = {
     "exit",
     "quit",
@@ -97,9 +97,9 @@ int shell_readline(char *buf) {
     char *line;
 
     if (loop_mode || function_mode) {
-        line = readline(__SHELL_INDICATOR_BLOCK__);
+        line = readline(__KAOS_SHELL_INDICATOR_BLOCK__);
     } else {
-        line = readline(__SHELL_INDICATOR__);
+        line = readline(__KAOS_SHELL_INDICATOR__);
     }
 
     if (line == NULL) {

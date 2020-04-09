@@ -4,17 +4,17 @@ extern int yylineno;
 extern char *last_token;
 
 void greet() {
-    char lang[__MSG_LINE_LENGTH__];
-    char compiler[__MSG_LINE_LENGTH__];
-    char motto[__MSG_LINE_LENGTH__];
+    char lang[__KAOS_MSG_LINE_LENGTH__];
+    char compiler[__KAOS_MSG_LINE_LENGTH__];
+    char motto[__KAOS_MSG_LINE_LENGTH__];
 
-    sprintf(lang, "    %s Language %s (%s %s) ", __LANGUAGE_NAME__, __LANGUAGE_VERSION__, __DATE__, __TIME__);
+    sprintf(lang, "    %s Language %s (%s %s) ", __KAOS_LANGUAGE_NAME__, __KAOS_LANGUAGE_VERSION__, __DATE__, __TIME__);
     #if defined(__clang__)
-        sprintf(compiler, "    Clang version: %d.%d.%d on %s ", __clang_major__, __clang_minor__, __clang_patchlevel__, __PLATFORM_NAME__);
+        sprintf(compiler, "    Clang version: %d.%d.%d on %s ", __clang_major__, __clang_minor__, __clang_patchlevel__, __KAOS_PLATFORM_NAME__);
     #elif defined(__GNUC__) || defined(__GNUG__)
-        sprintf(compiler, "    GCC version: %d.%d.%d on %s ", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __PLATFORM_NAME__);
+        sprintf(compiler, "    GCC version: %d.%d.%d on %s ", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __KAOS_PLATFORM_NAME__);
     #endif
-    sprintf(motto, "    %s", __LANGUAGE_MOTTO__);
+    sprintf(motto, "    %s", __KAOS_LANGUAGE_MOTTO__);
 
     int cols[3];
     cols[0] = (int) strlen(lang) + 1;
@@ -49,10 +49,10 @@ void greet() {
 }
 
 void yyerror_msg(char* error_name, char* current_module, char* cause) {
-    char error_name_msg[__MSG_LINE_LENGTH__];
-    char current_module_msg[__MSG_LINE_LENGTH__];
-    char line_no_msg[__MSG_LINE_LENGTH__];
-    char cause_msg[__MSG_LINE_LENGTH__];
+    char error_name_msg[__KAOS_MSG_LINE_LENGTH__];
+    char current_module_msg[__KAOS_MSG_LINE_LENGTH__];
+    char line_no_msg[__KAOS_MSG_LINE_LENGTH__];
+    char cause_msg[__KAOS_MSG_LINE_LENGTH__];
 
     if (strcmp(last_token, "\n") != 0) yylineno++;
 
@@ -108,9 +108,9 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
 }
 
 void print_bye_bye() {
-    int ws_col = (int) strlen(__BYE_BYE__) + 8 + 1;
+    int ws_col = (int) strlen(__KAOS_BYE_BYE__) + 8 + 1;
     char bye_bye_msg[ws_col];
-    sprintf(bye_bye_msg, "    %s    ", __BYE_BYE__);
+    sprintf(bye_bye_msg, "    %s    ", __KAOS_BYE_BYE__);
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[5;42m");

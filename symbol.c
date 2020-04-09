@@ -683,7 +683,7 @@ Symbol* getArrayElement(char *name, long long i) {
 
         if (i < 0 || i > strlen(symbol->value.s) - 1) {
             free(value.s);
-            char buffer[__ITOA_BUFFER_LENGTH__];
+            char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
             throw_error(E_INDEX_OUT_OF_RANGE_STRING, name, NULL, orig_i);
         }
 
@@ -699,7 +699,7 @@ Symbol* getArrayElement(char *name, long long i) {
     }
 
     if (i < 0 || i > (long long) symbol->children_count - 1) {
-        char buffer[__ITOA_BUFFER_LENGTH__];
+        char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
         throw_error(E_INDEX_OUT_OF_RANGE, name, NULL, orig_i);
     }
 
@@ -776,7 +776,7 @@ void updateComplexElement(char *name, unsigned long long symbol_id, enum Type ty
         }
 
         if (i < 0 || i > strlen(complex->value.s) - 1) {
-            char buffer[__ITOA_BUFFER_LENGTH__];
+            char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
             throw_error(E_INDEX_OUT_OF_RANGE_STRING, name, NULL, orig_i);
         }
 
@@ -880,7 +880,7 @@ void removeComplexElement(char *name, unsigned long long symbol_id) {
         }
 
         if (i < 0 || i > strlen(complex->value.s) - 1) {
-            char buffer[__ITOA_BUFFER_LENGTH__];
+            char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
             throw_error(E_INDEX_OUT_OF_RANGE_STRING, name, NULL, orig_i);
         }
 
@@ -1015,7 +1015,7 @@ void freeAllSymbols() {
 }
 
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
-    char buffer[__ITOA_BUFFER_LENGTH__];
+    char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
     char *val;
     switch (clone_symbol->value_type)
     {

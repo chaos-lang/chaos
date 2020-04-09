@@ -4,7 +4,7 @@
 #define STRINGIZE(x) #x
 #define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
 
-#define __ITOA_BUFFER_LENGTH__ 64
+#define __KAOS_ITOA_BUFFER_LENGTH__ 64
 
 #include <ctype.h>
 #include <string.h>

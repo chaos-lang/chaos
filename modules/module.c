@@ -30,7 +30,7 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     module_dir = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
     strcpy(module_dir, module_path_stack.arr[module_path_stack.size - 1]);
-    char *ptr = strrchr(module_dir, __PATH_SEPARATOR_ASCII__);
+    char *ptr = strrchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__);
     if (ptr) {
         *ptr = '\0';
     } else {
@@ -39,14 +39,14 @@ void handleModuleImport(char *module_name, bool directly_import) {
     }
 
     module_path = strcat_ext(module_path, module_dir);
-    if (module_path[0] != '\0') module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
+    if (module_path[0] != '\0') module_path = strcat_ext(module_path, __KAOS_PATH_SEPARATOR__);
 
     for (unsigned i = 0; i < modules_buffer.size; i++) {
         module_path = strcat_ext(module_path, modules_buffer.arr[i]);
         relative_path = strcat_ext(relative_path, modules_buffer.arr[i]);
         if (i + 1 != modules_buffer.size) {
-            module_path = strcat_ext(module_path, __PATH_SEPARATOR__);
-            relative_path = strcat_ext(relative_path, __PATH_SEPARATOR__);
+            module_path = strcat_ext(module_path, __KAOS_PATH_SEPARATOR__);
+            relative_path = strcat_ext(relative_path, __KAOS_PATH_SEPARATOR__);
         }
     }
 
@@ -59,9 +59,9 @@ void handleModuleImport(char *module_name, bool directly_import) {
     }
 
     module_path = strcat_ext(module_path, ".");
-    module_path = strcat_ext(module_path, __LANGUAGE_FILE_EXTENSION__);
+    module_path = strcat_ext(module_path, __KAOS_LANGUAGE_FILE_EXTENSION__);
     relative_path = strcat_ext(relative_path, ".");
-    relative_path = strcat_ext(relative_path, __LANGUAGE_FILE_EXTENSION__);
+    relative_path = strcat_ext(relative_path, __KAOS_LANGUAGE_FILE_EXTENSION__);
 
     module_path = searchSpellsIfNotExits(module_path, relative_path);
 
@@ -71,7 +71,7 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     if (strcmp(
         get_filename_ext(module_path),
-        __DYNAMIC_LIBRARY_EXTENSION__
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
         ) == 0
     ) {
         callRegisterInDynamicLibrary(module_path);
@@ -137,7 +137,7 @@ char* getMainModuleDir() {
 
     module_dir = malloc(strlen(module_path_stack.arr[0]) + 1);
     strcpy(module_dir, module_path_stack.arr[0]);
-    char *ptr = strrchr(module_dir, __PATH_SEPARATOR_ASCII__);
+    char *ptr = strrchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__);
     if (ptr) {
         *ptr = '\0';
     } else {
@@ -155,17 +155,17 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
         return module_path;
     } else {
         free(module_path);
-        char* spells_dir = strcat_ext(getMainModuleDir(), __PATH_SEPARATOR__);
-        spells_dir = strcat_ext(spells_dir, __SPELLS__);
-        spells_dir = strcat_ext(spells_dir, __PATH_SEPARATOR__);
+        char* spells_dir = strcat_ext(getMainModuleDir(), __KAOS_PATH_SEPARATOR__);
+        spells_dir = strcat_ext(spells_dir, __KAOS_SPELLS__);
+        spells_dir = strcat_ext(spells_dir, __KAOS_PATH_SEPARATOR__);
         module_path = strcat_ext(spells_dir, relative_path);
         module_path = relative_path_to_absolute(module_path);
         if (is_file_exists(module_path)) {
             return module_path;
         } else {
-            char* dynamic_library_path = remove_ext(module_path, '.', __PATH_SEPARATOR_ASCII__);
+            char* dynamic_library_path = remove_ext(module_path, '.', __KAOS_PATH_SEPARATOR_ASCII__);
             dynamic_library_path = strcat_ext(dynamic_library_path, ".");
-            dynamic_library_path = strcat_ext(dynamic_library_path, __DYNAMIC_LIBRARY_EXTENSION__);
+            dynamic_library_path = strcat_ext(dynamic_library_path, __KAOS_DYNAMIC_LIBRARY_EXTENSION__);
             if (is_file_exists(dynamic_library_path)) {
                 return dynamic_library_path;
             }
