@@ -18,7 +18,7 @@ char *value_type_names[] = {
     "Void"
 };
 
-unsigned long long symbol_counter = 0;
+unsigned long symbol_counter = 0;
 unsigned long long symbol_id_counter = 0;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
@@ -695,10 +695,10 @@ Symbol* getArrayElement(char *name, long long i) {
     if (symbol->type != K_ARRAY) throw_error(E_VARIABLE_IS_NOT_AN_ARRAY, name);
 
     if (i < 0) {
-        i = symbol->children_count + i;
+        i = (long long) symbol->children_count + i;
     }
 
-    if (i < 0 || i > symbol->children_count - 1) {
+    if (i < 0 || i > (long long) symbol->children_count - 1) {
         char buffer[__ITOA_BUFFER_LENGTH__];
         throw_error(E_INDEX_OUT_OF_RANGE, name, NULL, orig_i);
     }
@@ -865,7 +865,7 @@ void removeComplexElement(char *name, unsigned long long symbol_id) {
     free(key);
 
     if (i < 0) {
-        i = complex->children_count + i;
+        i = (long long) complex->children_count + i;
     }
 
     Symbol** temp = malloc((complex->children_count - 1) * sizeof(Symbol));
@@ -875,7 +875,7 @@ void removeComplexElement(char *name, unsigned long long symbol_id) {
         memcpy(temp, complex->children, i * sizeof(Symbol));
 
     // Copy everything after the index
-    if (i != complex->children_count - 1)
+    if (i != (long long) complex->children_count - 1)
         memcpy(temp + i, complex->children + i + 1, (complex->children_count - i - 1) * sizeof(Symbol));
 
     free(complex->children);

@@ -23,3 +23,13 @@ b[-3]
 b[-4]
 b[-5]
 b[-123400]
+
+// Tests related to deleted index
+bool list f = [false]
+del f[0]
+f
+symbol_table
+num f = 5
+f[0] = true
+f
+symbol_table

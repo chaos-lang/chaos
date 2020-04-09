@@ -46,7 +46,7 @@ Symbol* end_symbol;
 unsigned long long symbol_id_counter;
 
 Symbol* complex_mode;
-unsigned long long symbol_counter;
+unsigned long symbol_counter;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
