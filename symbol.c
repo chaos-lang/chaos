@@ -36,6 +36,9 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     } else {
         if (isDefined(name)) {
             free(symbol);
+            if (type == K_STRING) {
+                free(value.s);
+            }
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
         if (name != NULL) {
@@ -88,16 +91,16 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
 
 void removeSymbolByName(char *name) {
     Symbol* symbol = getSymbol(name);
+    removeSymbol(symbol);
+}
 
+void removeSymbol(Symbol* symbol) {
     if (symbol->type == K_ARRAY || symbol->type == K_DICT) {
         for (unsigned long i = 0; i < symbol->children_count; i++) {
             removeSymbol(symbol->children[i]);
         }
     }
-    removeSymbol(symbol);
-}
 
-void removeSymbol(Symbol* symbol) {
     Symbol* previous_symbol = symbol->previous;
     Symbol* next_symbol = symbol->next;
 
@@ -648,6 +651,13 @@ bool isComplexIllegal(enum Type type) {
 void finishComplexMode(char *name, enum Type type) {
     complex_mode->children_count = symbol_counter;
     if (name != NULL) {
+        if (isDefined(name)) {
+            removeSymbol(complex_mode);
+            complex_mode = NULL;
+            symbol_counter = 0;
+            throw_error(E_VARIABLE_ALREADY_DEFINED, name);
+        }
+
         complex_mode->name = malloc(1 + strlen(name));
         strcpy(complex_mode->name, name);
     }

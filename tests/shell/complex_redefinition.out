@@ -1,0 +1,44 @@
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 2
+The variable name 'a' is already defined!
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+The variable name 'a' is already defined!
+Absorbed by Interactive Shell
+[start] =>
+	{id: 0, name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: } =>
+[end]
+5
+[start] =>
+[end]
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 5
+Undefined variable: a
+Absorbed by Interactive Shell
+[start] =>
+[end]
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 2
+Undefined variable: a
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 2
+The variable name 'a' is already defined!
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+The variable name 'a' is already defined!
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+The variable name 'a' is already defined!
+Absorbed by Interactive Shell
+[1]
