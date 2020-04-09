@@ -32,7 +32,6 @@
 #include <stdio.h>
 
 #include "platform.h"
-#include "helpers.h"
 
 void greet();
 void yyerror_msg(char* error_name, char* current_module, char* cause);

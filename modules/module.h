@@ -6,6 +6,7 @@
 #include "../symbol.h"
 #include "../errors.h"
 #include "../utilities/injector.h"
+#include "../utilities/helpers.h"
 #include "extension.h"
 
 string_array modules_buffer;

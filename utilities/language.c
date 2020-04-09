@@ -1,4 +1,5 @@
 #include "language.h"
+#include "helpers.h"
 
 extern int yylineno;
 extern char *last_token;

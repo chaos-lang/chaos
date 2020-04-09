@@ -13,7 +13,7 @@ typedef struct _Function _Function;
 #include "../utilities/shell.h"
 #endif
 #include "../utilities/language.h"
-#include "../utilities/phase.h"
+#include "../utilities/helpers.h"
 #include "../modules/module.h"
 
 extern enum Phase phase;

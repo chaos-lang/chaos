@@ -2,6 +2,7 @@
 #define CHAOS_H
 
 #include "enums.h"
+#include "utilities/language.h"
 
 int defineFunction(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length);
 bool getVariableBool(char *name);

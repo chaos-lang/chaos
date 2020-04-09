@@ -18,7 +18,6 @@
 #include "utilities/platform.h"
 #include "utilities/language.h"
 #include "utilities/helpers.h"
-#include "utilities/phase.h"
 #include "utilities/injector.h"
 #include "symbol.h"
 #include "loop.h"

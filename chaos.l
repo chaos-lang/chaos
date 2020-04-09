@@ -8,7 +8,6 @@
 #endif
 #include "utilities/language.h"
 #include "utilities/injector.h"
-#include "utilities/phase.h"
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "utilities/shell.h"
 #endif
