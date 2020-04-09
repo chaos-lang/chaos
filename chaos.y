@@ -221,6 +221,8 @@ line: T_NEWLINE
     }
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
+    | T_DEL T_VAR T_NEWLINE                                         { removeSymbolByName($2); free($2); }
+    | T_DEL T_VAR left_right_bracket T_NEWLINE                      { removeComplexElement($2, $3); free($2); }
     | T_FUNCTION_TABLE T_NEWLINE                                    { printFunctionTable(); }
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
@@ -477,8 +479,6 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
-    | T_DEL variable                                                { removeSymbolByName($2); $$ = ""; free($2); }
-    | T_DEL variable left_right_bracket                             { removeComplexElement($2, $3); $$ = ""; free($2); }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
     | variable left_right_bracket                                   { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getComplexElementBySymbolId($1, $2)); $$ = ""; free($1); }
     | variable left_right_bracket T_EQUAL T_TRUE                    { updateComplexElementBool($1, $2, $4); $$ = ""; }
