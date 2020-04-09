@@ -44,7 +44,7 @@
  - TypeScript's type safety
  - Python's syntax, modules and integrity
  - JavaScript's availability
- - Ruby's loops
+ - Ruby's loops and blocks
  - PHP's dedication to server-side
  - Haskell's immutability
  - C's speed
@@ -95,13 +95,13 @@ sudo make install
 
 ```
 $ chaos
-    Chaos Language 0.0.1-alpha (Dec 23 2019 04:18:23)
+    Chaos Language 0.0.1-alpha (Apr 10 2020 01:22:17)
     GCC version: 7.4.0 on linux
     Turn chaos into magic!
 
-### print "hello world"
+kaos> print "hello world"
 hello world
-###
+kaos>
 ```
 
 ### Program File as Command-line Argument

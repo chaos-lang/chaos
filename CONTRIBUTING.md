@@ -73,12 +73,12 @@ Type "apropos word" to search for commands related to "word".
 (gdb) file chaos
 Reading symbols from chaos...done.
 (gdb) run
-Starting program: /home/mertyildiran/Documents/chaos/chaos 
-Chaos Language 0.0.1-alpha (Dec 26 2019 02:37:16)
-GCC version: 7.4.0 on linux
-Turn chaos into magic!
+Starting program: /home/mertyildiran/Documents/chaos/chaos
+    Chaos Language 0.0.1-alpha (Dec 26 2019 02:37:16)
+    GCC version: 7.4.0 on linux
+    Turn chaos into magic!
 
-### list a = [1, 2, 3]
+kaos> list a = [1, 2, 3]
 
 Program received signal SIGSEGV, Segmentation fault.
 __strcmp_ssse3 () at ../sysdeps/x86_64/multiarch/../strcmp.S:173
