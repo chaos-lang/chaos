@@ -1,0 +1,8 @@
+str k = 'chaos'
+k[0] = 5
+k[0] = 'asdasdasd'
+k
+
+k[1] = 'k'
+del k[0]
+print k

@@ -758,7 +758,33 @@ void updateComplexElement(char *name, unsigned long long symbol_id, enum Type ty
     removeSymbol(access_symbol);
 
     Symbol* complex = getSymbol(name);
-    if (complex->secondary_type != K_ANY && complex->secondary_type != type) {
+    if (complex->type == K_STRING) {
+        if (type != K_STRING) {
+            free(key);
+            throw_error(E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING, name);
+        }
+
+        if (strlen(value.s) > 1) {
+            free(key);
+            throw_error(E_NOT_A_CHARACTER, name);
+        }
+
+        long long orig_i = i;
+
+        if (i < 0) {
+            i = strlen(complex->value.s) + i;
+        }
+
+        if (i < 0 || i > strlen(complex->value.s) - 1) {
+            char buffer[__ITOA_BUFFER_LENGTH__];
+            throw_error(E_INDEX_OUT_OF_RANGE_STRING, name, NULL, orig_i);
+        }
+
+        complex->value.s[i] = value.s[0];
+        free(name);
+        free(value.s);
+        return;
+    } else if (complex->secondary_type != K_ANY && complex->secondary_type != type) {
         free(name);
         free(key);
         throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex->name);
@@ -846,7 +872,21 @@ void removeComplexElement(char *name, unsigned long long symbol_id) {
 
     Symbol* complex = getSymbol(name);
     Symbol* symbol;
-    if (complex->type == K_ARRAY) {
+    if (complex->type == K_STRING) {
+        long long orig_i = i;
+
+        if (i < 0) {
+            i = strlen(complex->value.s) + i;
+        }
+
+        if (i < 0 || i > strlen(complex->value.s) - 1) {
+            char buffer[__ITOA_BUFFER_LENGTH__];
+            throw_error(E_INDEX_OUT_OF_RANGE_STRING, name, NULL, orig_i);
+        }
+
+        memmove(&complex->value.s[i], &complex->value.s[i + 1], strlen(complex->value.s) - i);
+        return;
+    } else if (complex->type == K_ARRAY) {
         symbol = getArrayElement(name, i);
     } else if (complex->type == K_DICT) {
         symbol = getDictElement(name, key);

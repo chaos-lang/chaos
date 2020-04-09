@@ -90,6 +90,12 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_INDEX_OUT_OF_RANGE_STRING:
             sprintf(error_msg, "Index out of range: %lld for string: %s", lld1, str1);
             break;
+        case E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING:
+            sprintf(error_msg, "Illegal character assignment for string: %s", str1);
+            break;
+        case E_NOT_A_CHARACTER:
+            sprintf(error_msg, "Right hand side of the assignment is not a character for string: %s", str1);
+            break;
         default:
             sprintf(error_msg, "Unkown error.");
             break;

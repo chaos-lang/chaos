@@ -12,3 +12,8 @@ c = a[2]
 print b
 print c
 symbol_table
+
+str k = 'chaos'
+k[1] = 'k'
+del k[0]
+print k
