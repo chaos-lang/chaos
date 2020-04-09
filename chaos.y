@@ -243,6 +243,7 @@ print: T_STRING                                                     { printf("%s
 ;
 
 mixed_expression: T_FLOAT                                           { $$ = $1; }
+    | T_MINUS mixed_expression                                      { $$ = - $2; }
     | mixed_expression T_PLUS mixed_expression                      { $$ = $1 + $3; }
     | mixed_expression T_MINUS mixed_expression                     { $$ = $1 - $3; }
     | mixed_expression T_MULTIPLY mixed_expression                  { $$ = $1 * $3; }
@@ -281,6 +282,7 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
 ;
 
 expression: T_INT                                                   { $$ = $1; }
+    | T_MINUS expression                                            { $$ = - $2; }
     | expression T_PLUS expression                                  { $$ = $1 + $3; }
     | expression T_MINUS expression                                 { $$ = $1 - $3; }
     | expression T_MULTIPLY expression                              { $$ = $1 * $3; }

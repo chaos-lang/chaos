@@ -4,3 +4,9 @@ print var5
 number var6 = 3.2
 var6 = 5.4
 print var6
+
+num a = -123
+num b = 0
+b = b - 1
+print a
+print b
