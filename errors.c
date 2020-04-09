@@ -45,8 +45,8 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_VARIABLE_IS_NOT_AN_ARRAY:
             sprintf(error_msg, "Variable '%s' is not an array!", str1);
             break;
-        case E_UNDEFINED_INDEX:
-            sprintf(error_msg, "Undefined index: %llu for array: %s", lld1, str1);
+        case E_INDEX_OUT_OF_RANGE:
+            sprintf(error_msg, "Index out of range: %lld for array: %s", lld1, str1);
             break;
         case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
             sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);
@@ -86,6 +86,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
             break;
         case E_NO_VARIABLE_WITH_ID:
             sprintf(error_msg, "No variable with given id: %llu is found!", llu1);
+            break;
+        case E_INDEX_OUT_OF_RANGE_STRING:
+            sprintf(error_msg, "Index out of range: %lld for string: %s", lld1, str1);
             break;
         default:
             sprintf(error_msg, "Unkown error.");

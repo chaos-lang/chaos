@@ -1,0 +1,54 @@
+1
+2
+3
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 5
+Index out of range: 3 for array: a
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Index out of range: 123400 for array: a
+Absorbed by Interactive Shell
+3
+2
+1
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 4
+Index out of range: -4 for array: a
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Index out of range: -123400 for array: a
+Absorbed by Interactive Shell
+m
+i
+k
+e
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 7
+Index out of range: 4 for string: b
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Index out of range: 123400 for string: b
+Absorbed by Interactive Shell
+e
+k
+i
+m
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 5
+Index out of range: -5 for string: b
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Index out of range: -123400 for string: b
+Absorbed by Interactive Shell

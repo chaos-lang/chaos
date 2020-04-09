@@ -662,9 +662,21 @@ void finishComplexMode(char *name, enum Type type) {
 
 Symbol* getArrayElement(char *name, long long i) {
     Symbol* symbol = getSymbol(name);
+    long long orig_i = i;
     if (symbol->type == K_STRING) {
         union Value value;
         value.s = malloc(2 * sizeof(char));
+
+        if (i < 0) {
+            i = strlen(symbol->value.s) + i;
+        }
+
+        if (i < 0 || i > strlen(symbol->value.s) - 1) {
+            free(value.s);
+            char buffer[__ITOA_BUFFER_LENGTH__];
+            throw_error(E_INDEX_OUT_OF_RANGE_STRING, name, NULL, orig_i);
+        }
+
         value.s[0] = symbol->value.s[i];
         value.s[1] = '\0';
         return addSymbol(NULL, K_STRING, value, V_STRING);
@@ -677,9 +689,8 @@ Symbol* getArrayElement(char *name, long long i) {
     }
 
     if (i < 0 || i > symbol->children_count - 1) {
-        free(name);
         char buffer[__ITOA_BUFFER_LENGTH__];
-        throw_error(E_UNDEFINED_INDEX, symbol->name, NULL, i);
+        throw_error(E_INDEX_OUT_OF_RANGE, name, NULL, orig_i);
     }
 
     return symbol->children[i];
@@ -885,8 +896,7 @@ Symbol* getDictElement(char *name, char *key) {
             return child;
         }
     }
-    free(name);
-    throw_error(E_UNDEFINED_KEY, key, symbol->name);
+    throw_error(E_UNDEFINED_KEY, key, name);
     return NULL;
 }
 
