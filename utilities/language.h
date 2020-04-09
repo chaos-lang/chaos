@@ -22,8 +22,8 @@
 #define __EXTENSION_FUNCTION_PREFIX__ "Kaos_"
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    #define __SHELL_INDICATOR__ "\001\033[0;90m###\033[0m\002 "
-    #define __SHELL_INDICATOR_BLOCK__ "\001\033[0;90m...\033[0m\002 "
+    #define __SHELL_INDICATOR__ "\001\033[0;90m\002###\001\033[0m\002 "
+    #define __SHELL_INDICATOR_BLOCK__ "\001\033[0;90m\002...\001\033[0m\002 "
 #else
     #define __SHELL_INDICATOR__ "### "
     #define __SHELL_INDICATOR_BLOCK__ "... "
