@@ -231,11 +231,7 @@ line: T_NEWLINE
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-print: T_VAR T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                   { printSymbolValueEndWithNewLine(getArrayElement($1, $3)); free($1); }
-;
-print: T_VAR T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET           { printSymbolValueEndWithNewLine(getArrayElement($1, -$4)); free($1); }
-;
-print: T_VAR T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                { printSymbolValueEndWithNewLine(getDictElement($1, $3)); free($1); free($3); }
+print: T_VAR left_right_bracket                                     { printSymbolValueEndWithNewLine(getComplexElementBySymbolId($1, $2)); free($1); }
 ;
 print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); free($1); }
 ;

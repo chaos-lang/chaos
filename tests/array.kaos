@@ -189,3 +189,9 @@ del arr11[i0]
 print arr11
 del arr12[-i1]
 print arr12
+
+array v = [1,22,333]
+any i = v[0]
+any j = v[i]
+print j
+print v[i]

@@ -54,6 +54,7 @@ void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
 void freeSymbol(Symbol* symbol);
 Symbol* getSymbol(char *name);
+Symbol* getSymbolById(unsigned long long id);
 Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key);
 Symbol* deepCopyComplex(char *name, Symbol* symbol);
 char* getSymbolValueString(char *name);
