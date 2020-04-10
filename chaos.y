@@ -491,7 +491,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable left_right_bracket T_EQUAL boolean_expression        { updateComplexElementBool($1, $2, $4); $$ = ""; }
 ;
 
-variable: T_VAR_BOOL                                                { }
+variable:                                                           { }
     | T_VAR_BOOL T_VAR T_EQUAL T_TRUE                               { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
@@ -503,7 +503,7 @@ variable: T_VAR_BOOL                                                { }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
 ;
 
-variable: T_VAR_NUMBER                                              { }
+variable:                                                           { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
@@ -516,7 +516,7 @@ variable: T_VAR_NUMBER                                              { }
     | T_VAR_NUMBER T_VAR T_EQUAL expression                         { addSymbolFloat($2, $4); $$ = ""; }
 ;
 
-variable: T_VAR_STRING                                              { }
+variable:                                                           { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_STRING, $4, K_ANY); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_STRING, $4, $5, K_ANY); $$ = ""; }
@@ -526,7 +526,7 @@ variable: T_VAR_STRING                                              { }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
 ;
 
-variable: T_VAR_ANY                                                 { }
+variable:                                                           { }
     | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_INT                                 { addSymbolAnyInt($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FLOAT                               { addSymbolAnyFloat($2, $4); $$ = ""; }
@@ -539,7 +539,7 @@ variable: T_VAR_ANY                                                 { }
     | T_VAR_ANY T_VAR T_EQUAL expression                            { addSymbolAnyFloat($2, $4); $$ = ""; }
 ;
 
-variable: T_VAR_ARRAY                                               { }
+variable:                                                           { }
     | T_VAR_ARRAY T_VAR T_EQUAL T_VAR                               { createCloneFromSymbolByName($2, K_ARRAY, $4, K_ANY); $$ = "";}
     | T_VAR_ARRAY T_VAR T_EQUAL arraystart                          { finishComplexMode($2, K_ANY); $$ = ""; free($2); }
 ;
@@ -577,7 +577,7 @@ array: T_VAR                                                        { cloneSymbo
     | array T_NEWLINE                                               { }
 ;
 
-variable: T_VAR_DICT                                                { }
+variable:                                                           { }
     | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_DICT, $4, K_ANY); $$ = "";}
     | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishComplexMode($2, K_ANY); $$ = ""; free($2); }
 ;
