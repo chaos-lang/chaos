@@ -178,8 +178,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     } else if (symbol->type == K_DICT) {
         addSymbolDict(NULL);
     } else {
-        free(name);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), name);
     }
 
     for (unsigned long i = 0; i < symbol->children_count; i++) {
@@ -721,8 +720,7 @@ Symbol* getComplexElement(char *name, long long i, char *key) {
     } else if (complex->type == K_DICT) {
         symbol = getDictElement(name, key);
     } else {
-        free(name);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), name);
     }
 
     return symbol;
@@ -742,9 +740,8 @@ Symbol* getComplexElementBySymbolId(char *name, unsigned long long symbol_id) {
     } else if (complex->type == K_DICT) {
         symbol = getDictElement(name, key);
     } else {
-        free(name);
         free(key);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), name);
     }
     free(key);
 
@@ -834,10 +831,9 @@ void updateComplexElementSymbol(char* name, unsigned long long symbol_id, char* 
     Symbol* source = getSymbol(source_name);
     if (complex->secondary_type != K_ANY && complex->secondary_type != source->type) {
         removeSymbol(access_symbol);
-        free(name);
         free(key);
         free(source_name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(source->type), complex->name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(source->type), name);
     }
 
     Symbol* symbol;
@@ -854,10 +850,9 @@ void updateComplexElementSymbol(char* name, unsigned long long symbol_id, char* 
         finishComplexMode(NULL, complex->secondary_type);
     } else {
         removeSymbol(access_symbol);
-        free(name);
         free(key);
         free(source_name);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), name);
     }
 
     free(name);
@@ -897,7 +892,6 @@ void removeComplexElement(char *name, unsigned long long symbol_id) {
             }
         }
     } else {
-        free(name);
         free(key);
         throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), name);
     }

@@ -1,0 +1,9 @@
+num b = 5
+del b[1]
+b = 4
+print b
+num a = 3
+print a
+del b
+symbol_table
+exit

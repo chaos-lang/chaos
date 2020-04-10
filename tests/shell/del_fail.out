@@ -1,0 +1,11 @@
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 2
+Unrecognized complex data type: Number for variable: b
+Absorbed by Interactive Shell
+4
+3
+[start] =>
+	{id: 2, name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: } =>
+[end]
+You have chosen the order!
