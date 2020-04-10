@@ -751,6 +751,11 @@ void yyerror(const char* s) {
     if (is_interactive) {
         loop_mode = NULL;
         function_mode = NULL;
+        if (complex_mode != NULL) {
+            removeSymbol(complex_mode);
+            complex_mode = NULL;
+            symbol_counter = 0;
+        }
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif
