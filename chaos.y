@@ -196,7 +196,7 @@ parser:
     | parser line                                                   {
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         is_interactive ? (
-            loop_mode || function_mode ? printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__) : (
+            loop_mode || function_mode || complex_mode || decision_mode ? printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__) : (
                 inject_mode ? : printf("%s ", __KAOS_SHELL_INDICATOR__)
             )
         ) : printf("");

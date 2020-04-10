@@ -96,7 +96,7 @@ int shell_readline(char *buf) {
 
     char *line;
 
-    if (loop_mode || function_mode) {
+    if (loop_mode || function_mode || complex_mode || decision_mode) {
         line = readline(__KAOS_SHELL_INDICATOR_BLOCK__);
     } else {
         line = readline(__KAOS_SHELL_INDICATOR__);
