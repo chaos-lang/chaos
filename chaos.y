@@ -763,7 +763,7 @@ void yyerror(const char* s) {
         phase = INIT_PROGRAM;
         yyrestart_interactive();
         freeModulePathStack();
-        initMainFunction();
+        initMainContext();
         reset_line_no_to = 0;
         yyparse();
     } else {
