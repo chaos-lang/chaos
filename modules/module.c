@@ -156,9 +156,13 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
     } else {
         free(module_path);
         char* spells_dir = strcat_ext(getMainModuleDir(), __KAOS_PATH_SEPARATOR__);
+        char* spell_name = remove_ext(relative_path, '.', __KAOS_PATH_SEPARATOR_ASCII__);
         spells_dir = strcat_ext(spells_dir, __KAOS_SPELLS__);
         spells_dir = strcat_ext(spells_dir, __KAOS_PATH_SEPARATOR__);
-        module_path = strcat_ext(spells_dir, relative_path);
+        module_path = strcat_ext(spells_dir, spell_name);
+        free(spell_name);
+        module_path = strcat_ext(module_path, __KAOS_PATH_SEPARATOR__);
+        module_path = strcat_ext(module_path, relative_path);
         module_path = relative_path_to_absolute(module_path);
         if (is_file_exists(module_path)) {
             return module_path;

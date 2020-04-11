@@ -53,11 +53,11 @@ IF [%1]==[] (
     DEL chaos.exe chaos.tab.c lex.yy.c chaos.tab.h
     EXIT /B 0
 ) ELSE IF [%1]==[test-extensions-windows-gcc] (
-    CD tests\extensions\spells
+    CD tests\extensions\spells\example
     gcc -shared -fPIC example.c -o example.o
     gcc -c example.c
     gcc -shared -o example.dll example.o -Wl,--out-implib,libexample.a
-    CD ..\..\..
+    CD ..\..\..\..
     chaos tests\extensions\test.kaos
     EXIT /B 0
 )

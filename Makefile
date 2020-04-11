@@ -63,19 +63,19 @@ test-no-shell:
 	./tests/run.sh --no-shell
 
 test-extensions-linux-gcc:
-	gcc -shared -fPIC tests/extensions/spells/example.c -o tests/extensions/spells/example.so
+	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
 	chaos tests/extensions/test.kaos
 
 test-extensions-linux-clang:
-	clang -shared -fPIC tests/extensions/spells/example.c -o tests/extensions/spells/example.so
+	clang -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
 	chaos tests/extensions/test.kaos
 
 test-extensions-macos-gcc:
-	gcc -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example.c -o tests/extensions/spells/example.dylib
+	gcc -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib
 	chaos tests/extensions/test.kaos
 
 test-extensions-macos-clang:
-	clang -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example.c -o tests/extensions/spells/example.dylib
+	clang -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib
 	chaos tests/extensions/test.kaos
 
 memcheck:

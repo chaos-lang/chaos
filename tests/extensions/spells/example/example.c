@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "../../../Chaos.h"
+#include "../../../../Chaos.h"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 #define EXPORT __declspec(dllexport)
