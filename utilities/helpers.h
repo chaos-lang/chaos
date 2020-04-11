@@ -40,4 +40,8 @@ const char *get_filename_ext(const char *filename);
     #define GetCurrentDir getcwd
 #endif
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    #define strdup _strdup
+#endif
+
 #endif

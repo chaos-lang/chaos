@@ -6,9 +6,9 @@ IF [%1]==[] (
     SET compiler=gcc
     SET extra_flags=-D__USE_MINGW_ANSI_STDIO -ggdb
 ) ELSE IF [%1]==[clang] (
-    SET compiler=clang-cl
+    SET compiler=clang
 ) ELSE IF [%1]==[clang-dev] (
-    SET compiler=clang-cl
+    SET compiler=clang
     SET extra_flags=-ggdb
 ) ELSE IF [%1]==[requirements] (
     CALL :InstallRequirements
