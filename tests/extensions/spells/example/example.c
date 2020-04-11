@@ -1,20 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-
 #include "../../../../Chaos.h"
-
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#define EXPORT __declspec(dllexport)
-#else
-#define EXPORT
-#endif
 
 char *hello_params_name[] = {};
 unsigned hello_params_type[] = {};
 unsigned short hello_params_length = 0;
-int EXPORT Kaos_hello()
+int KAOS_EXPORT Kaos_hello()
 {
     printf("Hello from example extension!\n");
     return 0;
@@ -29,7 +18,7 @@ unsigned add_params_type[] = {
     K_NUMBER
 };
 unsigned short add_params_length = (unsigned short) sizeof(add_params_type) / sizeof(unsigned);
-int EXPORT Kaos_add()
+int KAOS_EXPORT Kaos_add()
 {
     long long x = kaos.getVariableInt(add_params_name[0]);
     long long y = kaos.getVariableInt(add_params_name[1]);
@@ -45,7 +34,7 @@ unsigned log_params_type[] = {
     K_STRING
 };
 unsigned short log_params_length = (unsigned short) sizeof(log_params_type) / sizeof(unsigned);
-int EXPORT Kaos_log()
+int KAOS_EXPORT Kaos_log()
 {
     char* var = kaos.getVariableString(log_params_name[0]);
     printf("%s\n", var);
@@ -60,7 +49,7 @@ unsigned complex_params_type[] = {
     K_DICT
 };
 unsigned short complex_params_length = (unsigned short) sizeof(complex_params_type) / sizeof(unsigned);
-int EXPORT Kaos_complex()
+int KAOS_EXPORT Kaos_complex()
 {
     long long var1 = (long long) kaos.getArrayElementFloat(complex_params_name[0], 0);
     printf("%lld\n", var1);
@@ -71,7 +60,7 @@ int EXPORT Kaos_complex()
 char *mayhem_params_name[] = {};
 unsigned mayhem_params_type[] = {};
 unsigned short mayhem_params_length = 0;
-int EXPORT Kaos_mayhem()
+int KAOS_EXPORT Kaos_mayhem()
 {
     kaos.startBuildingDict();
     kaos.createVariableBool("b", true);
@@ -82,7 +71,7 @@ int EXPORT Kaos_mayhem()
     return 0;
 }
 
-int EXPORT KaosRegister(struct Kaos _kaos)
+int KAOS_EXPORT KaosRegister(struct Kaos _kaos)
 {
     kaos = _kaos;
     kaos.defineFunction("hello", K_VOID, hello_params_name, hello_params_type, hello_params_length);

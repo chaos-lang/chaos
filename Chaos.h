@@ -1,6 +1,8 @@
 #ifndef CHAOS_H
 #define CHAOS_H
 
+#include <stdbool.h>
+
 #include "enums.h"
 #include "utilities/language.h"
 
@@ -61,5 +63,11 @@ struct Kaos {
 };
 
 struct Kaos kaos;
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#define KAOS_EXPORT __declspec(dllexport)
+#else
+#define KAOS_EXPORT
+#endif
 
 #endif
