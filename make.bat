@@ -70,6 +70,14 @@ IF [%1]==[] (
     CD ..\..\..\..
     chaos tests\extensions\test.kaos
     EXIT /B 0
+) ELSE IF [%1]==[test-extensions-windows-clang] (
+    CD tests\extensions\spells\example
+    clang -shared -I..\..\..\.. example.c -o example.o
+    clang -c -I..\..\..\.. example.c
+    clang -shared -o example.dll example.o
+    CD ..\..\..\..
+    chaos tests\extensions\test.kaos
+    EXIT /B 0
 )
 
 win_flex --wincompat chaos.l

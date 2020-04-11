@@ -38,6 +38,7 @@ int KAOS_EXPORT Kaos_log()
 {
     char* var = kaos.getVariableString(log_params_name[0]);
     printf("%s\n", var);
+    return 0;
 }
 
 char *complex_params_name[] = {
@@ -55,6 +56,7 @@ int KAOS_EXPORT Kaos_complex()
     printf("%lld\n", var1);
     char* var2 = kaos.getDictElementString(complex_params_name[1], "a");
     printf("%s\n", var2);
+    return 0;
 }
 
 char *mayhem_params_name[] = {};
