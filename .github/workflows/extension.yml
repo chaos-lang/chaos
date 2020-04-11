@@ -91,7 +91,7 @@ jobs:
       shell: cmd
       run: |
         call make.bat test-extensions-windows-gcc
-    
+
     - name: Build (clang)
       shell: cmd
       run: |
@@ -103,4 +103,5 @@ jobs:
     - name: Run the tests (clang)
       shell: cmd
       run: |
+        call RefreshEnv.cmd
         call make.bat test-extensions-windows-clang
