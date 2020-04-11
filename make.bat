@@ -11,19 +11,29 @@ IF [%1]==[] (
     SET compiler=clang-cl
     SET extra_flags=-ggdb
 ) ELSE IF [%1]==[requirements] (
-    choco install winflexbison3 --confirm
+    CALL :InstallRequirements
     IF errorlevel 1 (
         EXIT /B 1
     )
-    choco install mingw --confirm
-    IF errorlevel 1 (
-        EXIT /B 1
-    )
-    choco install llvm --confirm
+    EXIT /B 0
+) ELSE IF [%1]==[requirements-dev] (
+    CALL :InstallRequirements
     IF errorlevel 1 (
         EXIT /B 1
     )
 
+    gcc -dumpversion > tmpFile
+    SET /p GCC_VERSION= < tmpFile
+    del tmpFile
+
+    IF not exist %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities mkdir %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities
+    COPY utilities\language.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities\
+    COPY utilities\platform.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities\
+    COPY enums.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\
+    COPY Chaos.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\
+    IF errorlevel 1 (
+        EXIT /B 1
+    )
     EXIT /B 0
 ) ELSE IF [%1]==[install] (
     move chaos.exe %windir%\System32\
@@ -75,4 +85,19 @@ IF errorlevel 1 (
     EXIT /B 1
 )
 
+EXIT /B 0
+
+:InstallRequirements
+choco install winflexbison3 --confirm
+IF errorlevel 1 (
+    EXIT /B 1
+)
+choco install mingw --confirm
+IF errorlevel 1 (
+    EXIT /B 1
+)
+choco install llvm --confirm
+IF errorlevel 1 (
+    EXIT /B 1
+)
 EXIT /B 0
