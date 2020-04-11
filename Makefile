@@ -9,6 +9,13 @@ default:
 requirements:
 	./requirements.sh
 
+requirements-dev: requirements
+	mkdir -p /usr/local/include/utilities
+	cp utilities/language.h /usr/local/include/utilities/
+	cp utilities/platform.h /usr/local/include/utilities/
+	cp enums.h /usr/local/include/
+	cp Chaos.h /usr/local/include/
+
 clang:
 	export CHAOS_COMPILER=clang
 	${MAKE} chaos
