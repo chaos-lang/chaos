@@ -155,7 +155,8 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
         return module_path;
     } else {
         free(module_path);
-        char* spells_dir = strcat_ext(getMainModuleDir(), __KAOS_PATH_SEPARATOR__);
+        char* spells_dir = getMainModuleDir();
+        if (strlen(spells_dir) > 0) spells_dir = strcat_ext(spells_dir, __KAOS_PATH_SEPARATOR__);
         char* spell_name = remove_ext(relative_path, '.', __KAOS_PATH_SEPARATOR_ASCII__);
         spells_dir = strcat_ext(spells_dir, __KAOS_SPELLS__);
         spells_dir = strcat_ext(spells_dir, __KAOS_PATH_SEPARATOR__);
