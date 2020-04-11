@@ -1,6 +1,6 @@
 #include "extension.h"
 
-void callRegisterInDynamicLibrary(char* dynamic_library_path) {
+void initKaosApi() {
     kaos.defineFunction = defineFunction;
     kaos.getVariableBool = getVariableBool;
     kaos.getVariableInt = getVariableInt;
@@ -27,6 +27,9 @@ void callRegisterInDynamicLibrary(char* dynamic_library_path) {
     kaos.startBuildingDict = startBuildingDict;
     kaos.returnDict = returnDict;
     kaos.returnComplex = returnComplex;
+}
+
+void callRegisterInDynamicLibrary(char* dynamic_library_path) {
     lib_func func = getFunctionFromDynamicLibrary(dynamic_library_path, __KAOS_EXTENSION_REGISTER_FUNCTION__);
     func(kaos);
     if (is_interactive) {

@@ -371,6 +371,7 @@ void initMainFunction() {
     decision_buffer = "";
     initScopeless();
     initMainContext();
+    initKaosApi();
 }
 
 void initScopeless() {

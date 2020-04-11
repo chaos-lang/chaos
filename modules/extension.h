@@ -23,6 +23,7 @@ typedef long long (*lib_func)();
 typedef void (*lib_func)();
 #endif
 
+void initKaosApi();
 void callRegisterInDynamicLibrary(char* dynamic_library_path);
 void callFunctionFromDynamicLibrary(_Function* function);
 lib_func getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name);
