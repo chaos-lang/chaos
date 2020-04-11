@@ -54,8 +54,8 @@ IF [%1]==[] (
     EXIT /B 0
 ) ELSE IF [%1]==[test-extensions-windows-gcc] (
     CD tests\extensions\spells\example
-    gcc -shared -fPIC example.c -o example.o
-    gcc -c example.c
+    gcc -shared -fPIC -I..\..\..\.. example.c -o example.o
+    gcc -c -I..\..\..\.. example.c
     gcc -shared -o example.dll example.o -Wl,--out-implib,libexample.a
     CD ..\..\..\..
     chaos tests\extensions\test.kaos
