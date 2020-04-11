@@ -26,7 +26,7 @@ IF [%1]==[] (
 
     EXIT /B 0
 ) ELSE IF [%1]==[install] (
-    move chaos.exe C:\Windows\System32\
+    move chaos.exe %windir%\System32\
     IF errorlevel 1 (
         EXIT /B 1
     ) ELSE (

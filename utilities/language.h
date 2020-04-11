@@ -25,8 +25,8 @@
     #define __KAOS_SHELL_INDICATOR__ "\001\033[0;90m\002kaos>\001\033[0m\002 "
     #define __KAOS_SHELL_INDICATOR_BLOCK__ "\001\033[0;90m\002....\001\033[0m\002  "
 #else
-    #define __KAOS_SHELL_INDICATOR__ "kaos> "
-    #define __KAOS_SHELL_INDICATOR_BLOCK__ "....  "
+    #define __KAOS_SHELL_INDICATOR__ "kaos>"
+    #define __KAOS_SHELL_INDICATOR_BLOCK__ ".... "
 #endif
 
 #include <stdio.h>
