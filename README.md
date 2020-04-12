@@ -74,7 +74,7 @@
 Install the requirements:
 
 ```
-sudo make requirements
+make requirements
 ```
 
 Compile the interpreter:
@@ -86,7 +86,7 @@ make
 Install the `chaos` binary system-wide:
 
 ```
-sudo make install
+make install
 ```
 
 ## Usage
@@ -116,6 +116,10 @@ hello world
 [**Language Reference**](https://chaos-lang.org/docs/04_primitive-data-types)
 
 [**Developing Chaos C Extensions**](https://chaos-lang.org/docs/16_chaos_c_extensions_development)
+
+[**API Reference**](https://chaos-lang.org/docs/api)
+
+[**Template for Chaos C Extension Developers**](https://github.com/chaos-lang/template)
 
 [**Documentation Repository**](https://github.com/chaos-lang/chaos-lang.org)
 
