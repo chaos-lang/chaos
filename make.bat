@@ -1,4 +1,6 @@
 @ECHO OFF
+setlocal EnableDelayedExpansion
+
 IF [%1]==[] (
     SET compiler=gcc
     SET extra_flags=-D__USE_MINGW_ANSI_STDIO
@@ -22,6 +24,8 @@ IF [%1]==[] (
         EXIT /B 1
     )
 
+    CALL RefreshEnv.cmd
+    
     gcc -dumpversion > tmpFile
     SET /p GCC_VERSION= < tmpFile
     DEL tmpFile
@@ -30,20 +34,22 @@ IF [%1]==[] (
     SET /p CLANG_VERSION= < tmpFile
     DEL tmpFile
 
-    IF not exist %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities mkdir %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities
-    COPY utilities\language.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities\
-    COPY utilities\platform.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\utilities\
-    COPY enums.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\
-    COPY Chaos.h %programdata%\chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\%GCC_VERSION%\include\
+    ECHO "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+    IF not exist "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities" mkdir "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities"
+    COPY utilities\language.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
+    COPY utilities\platform.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
+    COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+    COPY Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
     IF errorlevel 1 (
         EXIT /B 1
     )
 
-    IF not exist "%programfiles%\LLVM\lib\clang\%CLANG_VERSION%\include\utilities" mkdir "%programfiles%\LLVM\lib\clang\%CLANG_VERSION%\include\utilities"
-    COPY utilities\language.h "%programfiles%\LLVM\lib\clang\%CLANG_VERSION%\include\utilities\""
-    COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\%CLANG_VERSION%\include\utilities\"
-    COPY enums.h "%programfiles%\LLVM\lib\clang\%CLANG_VERSION%\include\"
-    COPY Chaos.h "%programfiles%\LLVM\lib\clang\%CLANG_VERSION%\include\"
+    ECHO "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+    IF not exist "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities" mkdir "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities"
+    COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\""
+    COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\"
+    COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+    COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
     IF errorlevel 1 (
         EXIT /B 1
     )
@@ -77,19 +83,25 @@ IF [%1]==[] (
     EXIT /B 0
 ) ELSE IF [%1]==[test-extensions-windows-gcc] (
     CD tests\extensions\spells\example
-    gcc -shared -fPIC -I..\..\..\.. example.c -o example.o
-    gcc -c -I..\..\..\.. example.c
+    gcc -shared -fPIC example.c -o example.o
+    gcc -c example.c
     gcc -shared -o example.dll example.o -Wl,--out-implib,libexample.a
     CD ..\..\..\..
     chaos tests\extensions\test.kaos
+    IF errorlevel 1 (
+        EXIT /B 1
+    )
     EXIT /B 0
 ) ELSE IF [%1]==[test-extensions-windows-clang] (
     CD tests\extensions\spells\example
-    clang -shared -I..\..\..\.. example.c -o example.o
-    clang -c -I..\..\..\.. example.c
+    clang -shared example.c -o example.o
+    clang -c example.c
     clang -shared -o example.dll example.o
     CD ..\..\..\..
     chaos tests\extensions\test.kaos
+    IF errorlevel 1 (
+        EXIT /B 1
+    )
     EXIT /B 0
 )
 

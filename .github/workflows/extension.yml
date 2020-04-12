@@ -12,7 +12,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo make requirements
+        sudo make requirements-dev
 
     - name: Build (gcc)
       run: |
@@ -23,6 +23,7 @@ jobs:
     - name: Run the tests (gcc)
       run: |
         make test-extensions-linux-gcc
+        rm tests/extensions/spells/example/example.so
 
     - name: Build (clang)
       run: |
@@ -33,6 +34,7 @@ jobs:
     - name: Run the tests (clang)
       run: |
         make test-extensions-linux-clang
+        rm tests/extensions/spells/example/example.so
 
   macos:
     name: macos
@@ -44,7 +46,7 @@ jobs:
     - name: Install dependencies
       run: |
         mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
-        make requirements
+        make requirements-dev
 
     - name: Build (gcc)
       run: |
@@ -56,6 +58,7 @@ jobs:
     - name: Run the tests (gcc)
       run: |
         make test-extensions-macos-gcc
+        rm tests/extensions/spells/example/example.dylib
 
     - name: Build (clang)
       run: |
@@ -67,6 +70,7 @@ jobs:
     - name: Run the tests (clang)
       run: |
         make test-extensions-macos-clang
+        rm tests/extensions/spells/example/example.dylib
 
   windows:
     name: windows
@@ -78,7 +82,7 @@ jobs:
     - name: Install dependencies
       shell: cmd
       run: |
-        call make.bat requirements
+        call make.bat requirements-dev
 
     - name: Build (gcc)
       shell: cmd
@@ -91,6 +95,7 @@ jobs:
       shell: cmd
       run: |
         call make.bat test-extensions-windows-gcc
+        del tests\extensions\spells\example\example.dll
 
     - name: Build (clang)
       shell: cmd
@@ -105,3 +110,4 @@ jobs:
       run: |
         call RefreshEnv.cmd
         call make.bat test-extensions-windows-clang
+        del tests\extensions\spells\example\example.dll

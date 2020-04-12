@@ -2,6 +2,8 @@ SHELL=/bin/bash
 
 .ONESHELL:
 
+UNAME_S := $(shell uname -s)
+
 default:
 	export CHAOS_COMPILER=gcc
 	${MAKE} chaos
@@ -15,6 +17,15 @@ requirements-dev: requirements
 	cp utilities/platform.h /usr/local/include/utilities/
 	cp enums.h /usr/local/include/
 	cp Chaos.h /usr/local/include/
+ifeq ($(UNAME_S), Darwin)
+	$(eval GCC_VERSION=$(shell gcc -dumpversion))
+	$(eval GCC_MAJOR_VERSION=$(shell gcc -dumpversion | cut -d. -f1))
+	mkdir -p /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/utilities
+	cp utilities/language.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/utilities
+	cp utilities/platform.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/utilities
+	cp enums.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include
+	cp Chaos.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include
+endif
 
 clang:
 	export CHAOS_COMPILER=clang
@@ -70,19 +81,19 @@ test-no-shell:
 	./tests/run.sh --no-shell
 
 test-extensions-linux-gcc:
-	gcc -shared -fPIC -I./ tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
+	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
 	chaos tests/extensions/test.kaos
 
 test-extensions-linux-clang:
-	clang -shared -fPIC -I./ tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
+	clang -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
 	chaos tests/extensions/test.kaos
 
 test-extensions-macos-gcc:
-	gcc -shared -fPIC -I./ -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib
+	gcc -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib
 	chaos tests/extensions/test.kaos
 
 test-extensions-macos-clang:
-	clang -shared -fPIC -I./ -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib
+	clang -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib
 	chaos tests/extensions/test.kaos
 
 memcheck:
