@@ -1,5 +1,6 @@
 @ECHO OFF
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
+
 for %%f in (tests\*.kaos) do (
     ECHO.
     ECHO.
@@ -9,10 +10,12 @@ for %%f in (tests\*.kaos) do (
     powershell -Command "(gc tmpFile) -replace '\\', '/' | Out-File -encoding ASCII tmpFile"
     FC tests\%%~nf.out tmpFile
     IF errorlevel 1 (
+        DEL tmpFile
         ECHO Fail
         EXIT /B 1
     ) ELSE (
+        DEL tmpFile
         ECHO OK
     )
-    DEL tmpFile
 )
+EXIT /B 0

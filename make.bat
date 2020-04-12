@@ -25,7 +25,7 @@ IF [%1]==[] (
     )
 
     CALL RefreshEnv.cmd
-    
+
     gcc -dumpversion > tmpFile
     SET /p GCC_VERSION= < tmpFile
     DEL tmpFile

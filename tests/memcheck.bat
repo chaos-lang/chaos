@@ -1,5 +1,6 @@
 @ECHO OFF
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
+
 for %%f in (*.kaos) do (
     ECHO.
     ECHO.
@@ -9,3 +10,4 @@ for %%f in (*.kaos) do (
         EXIT /B 1
     )
 )
+EXIT /B 0
