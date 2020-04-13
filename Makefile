@@ -83,10 +83,12 @@ test-no-shell:
 test-extensions-linux-gcc:
 	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
 	chaos tests/extensions/test.kaos
+	valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos tests/extensions/test.kaos || exit 1
 
 test-extensions-linux-clang:
 	clang -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so
 	chaos tests/extensions/test.kaos
+	valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos tests/extensions/test.kaos || exit 1
 
 test-extensions-macos-gcc:
 	gcc -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib

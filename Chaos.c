@@ -70,6 +70,7 @@ long double getArrayElementFloat(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getArrayElement(symbol_name, i);
+    free(symbol_name);
     if (symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -123,6 +124,7 @@ char* getDictElementString(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
     Symbol* symbol = getDictElement(symbol_name, key);
+    free(symbol_name);
     if (symbol->value_type != V_STRING) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }

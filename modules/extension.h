@@ -6,11 +6,13 @@
 #include <windows.h>
 #define LIBTYPE HINSTANCE
 #define OPENLIB(libname) LoadLibrary(libname)
+#define CLOSELIB(handle) FreeLibrary(handle)
 #define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
 #else
 #include <dlfcn.h>
 #define LIBTYPE void*
-#define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_GLOBAL)
+#define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_NODELETE)
+#define CLOSELIB(handle) dlclose(handle)
 #define LIBFUNC(lib, fn) dlsym((lib), (fn))
 #endif
 
@@ -23,10 +25,15 @@ typedef long long (*lib_func)();
 typedef void (*lib_func)();
 #endif
 
+typedef struct dynamic_library {
+    void     *handle;
+    lib_func  func;
+} dynamic_library;
+
 void initKaosApi();
 void callRegisterInDynamicLibrary(char* dynamic_library_path);
 void callFunctionFromDynamicLibrary(_Function* function);
-lib_func getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name);
+dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name);
 void returnVariable(Symbol* symbol);
 
 #endif

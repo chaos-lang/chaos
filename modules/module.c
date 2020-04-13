@@ -24,21 +24,21 @@ void prependModuleToModuleBuffer(char *name) {
 }
 
 void handleModuleImport(char *module_name, bool directly_import) {
-    char *module_path = "";
+    char *module_path;
     char *relative_path = "";
-    char *module_dir;
 
-    module_dir = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
-    strcpy(module_dir, module_path_stack.arr[module_path_stack.size - 1]);
-    char *ptr = strrchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__);
-    if (ptr) {
-        *ptr = '\0';
+    module_path = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
+    strcpy(module_path, module_path_stack.arr[module_path_stack.size - 1]);
+    if (strchr(module_path, __KAOS_PATH_SEPARATOR_ASCII__) == NULL) {
+        free(module_path);
+        module_path = "";
     } else {
-        module_dir = (char *) realloc(module_dir, strlen("") + 1);
-        strcpy(module_dir, "");
+        char *ptr = strrchr(module_path, __KAOS_PATH_SEPARATOR_ASCII__);
+        if (ptr) {
+            *ptr = '\0';
+        }
     }
 
-    module_path = strcat_ext(module_path, module_dir);
     if (module_path[0] != '\0') module_path = strcat_ext(module_path, __KAOS_PATH_SEPARATOR__);
 
     for (unsigned i = 0; i < modules_buffer.size; i++) {
@@ -85,7 +85,6 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     free(module_path);
     free(relative_path);
-    free(module_dir);
     free(module_name);
 }
 
@@ -137,12 +136,13 @@ char* getMainModuleDir() {
 
     module_dir = malloc(strlen(module_path_stack.arr[0]) + 1);
     strcpy(module_dir, module_path_stack.arr[0]);
+    if (strchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__) == NULL) {
+        free(module_dir);
+        return "";
+    }
     char *ptr = strrchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__);
     if (ptr) {
         *ptr = '\0';
-    } else {
-        module_dir = (char *) realloc(module_dir, strlen("") + 1);
-        strcpy(module_dir, "");
     }
 
     return module_dir;
@@ -169,6 +169,7 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
             return module_path;
         } else {
             char* dynamic_library_path = remove_ext(module_path, '.', __KAOS_PATH_SEPARATOR_ASCII__);
+            free(module_path);
             dynamic_library_path = strcat_ext(dynamic_library_path, ".");
             dynamic_library_path = strcat_ext(dynamic_library_path, __KAOS_DYNAMIC_LIBRARY_EXTENSION__);
             if (is_file_exists(dynamic_library_path)) {

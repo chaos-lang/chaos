@@ -30,8 +30,8 @@ void initKaosApi() {
 }
 
 void callRegisterInDynamicLibrary(char* dynamic_library_path) {
-    lib_func func = getFunctionFromDynamicLibrary(dynamic_library_path, __KAOS_EXTENSION_REGISTER_FUNCTION__);
-    func(kaos);
+    dynamic_library dylib = getFunctionFromDynamicLibrary(dynamic_library_path, __KAOS_EXTENSION_REGISTER_FUNCTION__);
+    dylib.func(kaos);
     if (is_interactive) {
         phase = PROGRAM;
     }
@@ -41,29 +41,28 @@ void callFunctionFromDynamicLibrary(_Function* function) {
     char* function_name = "";
     function_name = strcat_ext(function_name, __KAOS_EXTENSION_FUNCTION_PREFIX__);
     function_name = strcat_ext(function_name, function->name);
-    lib_func func = getFunctionFromDynamicLibrary(function->module_context, function_name);
-    func();
+    dynamic_library dylib = getFunctionFromDynamicLibrary(function->module_context, function_name);
+    dylib.func();
     free(function_name);
 }
 
-lib_func getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name) {
-    void     *handle  = NULL;
-    lib_func  func    = NULL;
+dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name) {
+    dynamic_library dylib;
 
-    handle = OPENLIB(dynamic_library_path);
+    dylib.handle = OPENLIB(dynamic_library_path);
 
-    if (handle == NULL) {
+    if (dylib.handle == NULL) {
         #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         fprintf(stderr, "Unable to open lib: %s\n", dlerror());
         #endif
     }
-    func = LIBFUNC(handle, function_name);
+    dylib.func = LIBFUNC(dylib.handle, function_name);
 
-    if (func == NULL) {
+    if (dylib.func == NULL) {
         fprintf(stderr, "Unable to get symbol\n");
     }
 
-    return func;
+    return dylib;
 }
 
 void returnVariable(Symbol* symbol) {
