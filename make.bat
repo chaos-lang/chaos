@@ -19,42 +19,16 @@ IF [%1]==[] (
     )
     EXIT /B 0
 ) ELSE IF [%1]==[requirements-dev] (
-    CALL :InstallRequirements
-    IF errorlevel 1 (
-        EXIT /B 1
-    )
-
-    CALL RefreshEnv.cmd
-
-    gcc -dumpversion > tmpFile
-    SET /p GCC_VERSION= < tmpFile
-    DEL tmpFile
-
-    clang -dumpversion > tmpFile
-    SET /p CLANG_VERSION= < tmpFile
-    DEL tmpFile
-
-    ECHO "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
-    IF not exist "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities" mkdir "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities"
-    COPY utilities\language.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
-    COPY utilities\platform.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
-    COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
-    COPY Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
-    IF errorlevel 1 (
-        EXIT /B 1
-    )
-
-    ECHO "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
-    IF not exist "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities" mkdir "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities"
-    COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\""
-    COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\"
-    COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
-    COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+    CALL :InstallRequirementsDev
     IF errorlevel 1 (
         EXIT /B 1
     )
     EXIT /B 0
 ) ELSE IF [%1]==[install] (
+    CALL :InstallRequirementsDev
+    IF errorlevel 1 (
+        EXIT /B 1
+    )
     MOVE chaos.exe %windir%\System32\
     IF errorlevel 1 (
         EXIT /B 1
@@ -130,6 +104,38 @@ IF errorlevel 1 (
     EXIT /B 1
 )
 choco install llvm --confirm
+IF errorlevel 1 (
+    EXIT /B 1
+)
+EXIT /B 0
+
+:InstallRequirementsDev
+CALL RefreshEnv.cmd
+
+gcc -dumpversion > tmpFile
+SET /p GCC_VERSION= < tmpFile
+DEL tmpFile
+
+clang -dumpversion > tmpFile
+SET /p CLANG_VERSION= < tmpFile
+DEL tmpFile
+
+ECHO "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+IF not exist "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities" mkdir "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities"
+COPY utilities\language.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
+COPY utilities\platform.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
+COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+COPY Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+IF errorlevel 1 (
+    EXIT /B 1
+)
+
+ECHO "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+IF not exist "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities" mkdir "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities"
+COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\""
+COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\"
+COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
 IF errorlevel 1 (
     EXIT /B 1
 )

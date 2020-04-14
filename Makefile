@@ -11,7 +11,7 @@ default:
 requirements:
 	./requirements.sh
 
-requirements-dev: requirements
+requirements-dev:
 	mkdir -p /usr/local/include/utilities
 	cp utilities/language.h /usr/local/include/utilities/
 	cp utilities/platform.h /usr/local/include/utilities/
@@ -68,7 +68,7 @@ chaos: lex.yy.c chaos.tab.c chaos.tab.h
 clean:
 	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h
 
-install:
+install: requirements-dev
 	mv chaos /usr/local/bin/
 
 lint:
