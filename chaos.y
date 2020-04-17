@@ -196,7 +196,7 @@ parser:
     | parser line                                                   {
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         is_interactive ? (
-            loop_mode || function_mode || complex_mode || decision_mode ? printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__) : (
+            loop_mode || function_mode || isComplexMode() || decision_mode ? printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__) : (
                 inject_mode ? : printf("%s ", __KAOS_SHELL_INDICATOR__)
             )
         ) : printf("");
@@ -717,6 +717,7 @@ int main(int argc, char** argv) {
         if (is_interactive) {
             if (setjmp(InteractiveShellErrorAbsorber)) {
                 phase = INIT_PROGRAM;
+                freeComplexModeStack();
 
                 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
                     printf("\033[1;44m");
@@ -751,10 +752,8 @@ void yyerror(const char* s) {
     if (is_interactive) {
         loop_mode = NULL;
         function_mode = NULL;
-        if (complex_mode != NULL) {
-            removeSymbol(complex_mode);
-            complex_mode = NULL;
-            symbol_counter = 0;
+        if (isComplexMode()) {
+            freeComplexModeStack();
         }
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         printf("%s ", __KAOS_SHELL_INDICATOR__);
@@ -784,6 +783,7 @@ void freeEverything() {
     if (strlen(decision_buffer) > 0) free(decision_buffer);
     freeModulePathStack();
     freeModuleStack();
+    freeComplexModeStack();
 
     yylex_destroy();
 

@@ -45,8 +45,13 @@ Symbol* start_symbol;
 Symbol* end_symbol;
 unsigned long long symbol_id_counter;
 
-Symbol* complex_mode;
-unsigned long symbol_counter;
+typedef struct symbol_array {
+    Symbol** arr;
+    unsigned long* child_counter;
+    unsigned capacity, size;
+} symbol_array;
+
+symbol_array complex_mode_stack;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
@@ -113,5 +118,9 @@ long long incrementThenAssign(char *name, long long i);
 long long assignThenIncrement(char *name, long long i);
 char* getTypeName(unsigned i);
 char* getValueTypeName(unsigned i);
+void pushComplexModeStack(Symbol* complex_mode);
+void popComplexModeStack();
+void freeComplexModeStack();
+bool isComplexMode();
 
 #endif

@@ -197,10 +197,9 @@ void returnDict(enum Type type) {
 }
 
 void returnComplex(enum Type type) {
-    complex_mode->children_count = symbol_counter;
-    complex_mode->secondary_type = type;
-    Symbol* symbol = complex_mode;
-    complex_mode = NULL;
-    symbol_counter = 0;
+    complex_mode_stack.arr[complex_mode_stack.size - 1]->children_count = complex_mode_stack.child_counter[complex_mode_stack.size - 1];
+    complex_mode_stack.arr[complex_mode_stack.size - 1]->secondary_type = type;
+    Symbol* symbol = complex_mode_stack.arr[complex_mode_stack.size - 1];
+    popComplexModeStack();
     returnVariable(symbol);
 }

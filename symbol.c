@@ -18,7 +18,6 @@ char *value_type_names[] = {
     "Void"
 };
 
-unsigned long symbol_counter = 0;
 unsigned long long symbol_id_counter = 0;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
@@ -28,7 +27,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     symbol = (struct Symbol*)calloc(1, sizeof(Symbol));
     symbol->id = symbol_id_counter++;
 
-    if (complex_mode != NULL && complex_mode->type == K_DICT) {
+    if (isComplexMode() && complex_mode_stack.arr[complex_mode_stack.size - 1]->type == K_DICT) {
         if (name != NULL) {
             symbol->key = malloc(1 + strlen(name));
             strcpy(symbol->key, name);
@@ -164,7 +163,12 @@ Symbol* getSymbolById(unsigned long long id) {
 }
 
 Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
-    Symbol* clone_symbol = addSymbol(key, type, symbol->value, symbol->value_type);
+    Symbol* clone_symbol;
+    if (type == K_ARRAY || type == K_DICT) {
+        clone_symbol = deepCopyComplex(NULL, symbol);
+    } else {
+        clone_symbol = addSymbol(key, type, symbol->value, symbol->value_type);
+    }
     if (symbol->value_type == V_STRING) {
         clone_symbol->value.s = malloc(1 + strlen(symbol->value.s));
         strcpy(clone_symbol->value.s, symbol->value.s);
@@ -191,7 +195,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
         deepCopySymbol(child, child->type, key);
     }
 
-    Symbol* symbol_return = complex_mode;
+    Symbol* symbol_return = complex_mode_stack.arr[complex_mode_stack.size - 1];
     finishComplexMode(name, K_ANY);
 
     return symbol_return;
@@ -424,18 +428,20 @@ bool isDefined(char *name) {
 }
 
 void addSymbolToComplex(Symbol* symbol) {
-    if (complex_mode == NULL) return;
+    if (!isComplexMode()) return;
 
-    complex_mode->children = realloc(
-        complex_mode->children,
-        sizeof(Symbol) * ++symbol_counter
+    complex_mode_stack.arr[complex_mode_stack.size - 1]->children = realloc(
+        complex_mode_stack.arr[complex_mode_stack.size - 1]->children,
+        sizeof(Symbol) * ++complex_mode_stack.child_counter[complex_mode_stack.size - 1]
     );
 
-    if (complex_mode->children == NULL) {
-        throw_error(E_MEMORY_ALLOCATION_FOR_ARRAY_FAILED, complex_mode->name);
+    if (complex_mode_stack.arr[complex_mode_stack.size - 1]->children == NULL) {
+        throw_error(E_MEMORY_ALLOCATION_FOR_ARRAY_FAILED, complex_mode_stack.arr[complex_mode_stack.size - 1]->name);
     }
 
-    complex_mode->children[symbol_counter - 1] = symbol;
+    complex_mode_stack.arr[complex_mode_stack.size - 1]->children[
+        complex_mode_stack.child_counter[complex_mode_stack.size - 1] - 1
+    ] = symbol;
 }
 
 void printSymbolTable() {
@@ -514,7 +520,8 @@ void updateSymbolString(char *name, char *s) {
 
 void addSymbolArray(char *name) {
     union Value value;
-    complex_mode = addSymbol(name, K_ARRAY, value, V_VOID);
+    Symbol* complex_mode = addSymbol(name, K_ARRAY, value, V_VOID);
+    pushComplexModeStack(complex_mode);
 }
 
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
@@ -636,9 +643,9 @@ Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, unsig
 }
 
 bool isComplexIllegal(enum Type type) {
-    if (complex_mode != NULL && type != K_ANY) {
-        for (unsigned long i = 0; i < complex_mode->children_count; i++) {
-            Symbol* symbol = complex_mode->children[i];
+    if (isComplexMode() && type != K_ANY) {
+        for (unsigned long i = 0; i < complex_mode_stack.arr[complex_mode_stack.size - 1]->children_count; i++) {
+            Symbol* symbol = complex_mode_stack.arr[complex_mode_stack.size - 1]->children[i];
             if (symbol->type != type) {
                 return true;
             }
@@ -648,25 +655,23 @@ bool isComplexIllegal(enum Type type) {
 }
 
 void finishComplexMode(char *name, enum Type type) {
-    complex_mode->children_count = symbol_counter;
+    complex_mode_stack.arr[complex_mode_stack.size - 1]->children_count = complex_mode_stack.child_counter[complex_mode_stack.size - 1];
     if (name != NULL) {
         if (isDefined(name)) {
-            removeSymbol(complex_mode);
-            complex_mode = NULL;
-            symbol_counter = 0;
+            removeSymbol(complex_mode_stack.arr[complex_mode_stack.size - 1]);
+            popComplexModeStack();
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
 
-        complex_mode->name = malloc(1 + strlen(name));
-        strcpy(complex_mode->name, name);
+        complex_mode_stack.arr[complex_mode_stack.size - 1]->name = malloc(1 + strlen(name));
+        strcpy(complex_mode_stack.arr[complex_mode_stack.size - 1]->name, name);
     }
-    complex_mode->secondary_type = type;
+    complex_mode_stack.arr[complex_mode_stack.size - 1]->secondary_type = type;
     if (isComplexIllegal(type)) {
         free(name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex_mode->name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex_mode_stack.arr[complex_mode_stack.size - 1]->name);
     }
-    complex_mode = NULL;
-    symbol_counter = 0;
+    popComplexModeStack();
 }
 
 Symbol* getArrayElement(char *name, long long i) {
@@ -707,7 +712,7 @@ Symbol* getArrayElement(char *name, long long i) {
 
 void cloneSymbolToComplex(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
-    deepCopySymbol(symbol, symbol->type, key);
+    Symbol* cloned_symbol = deepCopySymbol(symbol, symbol->type, key);
     free(name);
 }
 
@@ -844,8 +849,8 @@ void updateComplexElementSymbol(char* name, unsigned long long symbol_id, char* 
         complex->children[i] = deepCopySymbol(source, source->type, NULL);
     } else if (complex->type == K_DICT) {
         removeComplexElement(name, symbol_id);
-        complex_mode = complex;
-        symbol_counter = complex->children_count;
+        pushComplexModeStack(complex);
+        complex_mode_stack.child_counter[complex_mode_stack.size - 1] = complex->children_count;
         deepCopySymbol(source, source->type, key);
         finishComplexMode(NULL, complex->secondary_type);
     } else {
@@ -924,7 +929,8 @@ void removeComplexElement(char *name, unsigned long long symbol_id) {
 
 void addSymbolDict(char *name) {
     union Value value;
-    complex_mode = addSymbol(name, K_DICT, value, V_VOID);
+    Symbol* complex_mode = addSymbol(name, K_DICT, value, V_VOID);
+    pushComplexModeStack(complex_mode);
 }
 
 Symbol* getDictElement(char *name, char *key) {
@@ -1191,4 +1197,44 @@ char* getValueTypeName(unsigned i) {
     char *name = malloc(1 + strlen(value_type_names[i]));
     strcpy(name, value_type_names[i]);
     return name;
+}
+
+void pushComplexModeStack(Symbol* complex_mode) {
+    if (complex_mode_stack.capacity == 0) {
+        complex_mode_stack.arr = (Symbol**)malloc((complex_mode_stack.capacity = 2) * sizeof(Symbol));
+        complex_mode_stack.child_counter = (unsigned long*)malloc((complex_mode_stack.capacity = 2) * sizeof(unsigned long*));
+    } else if (complex_mode_stack.capacity == complex_mode_stack.size) {
+        complex_mode_stack.arr = (Symbol**)realloc(complex_mode_stack.arr, (complex_mode_stack.capacity *= 2) * sizeof(Symbol));
+        complex_mode_stack.child_counter = (unsigned long*)realloc(complex_mode_stack.child_counter, (complex_mode_stack.capacity *= 2) * sizeof(unsigned long*));
+    }
+
+    complex_mode_stack.arr[complex_mode_stack.size] = complex_mode;
+    complex_mode_stack.child_counter[complex_mode_stack.size] = 0;
+    complex_mode_stack.size++;
+}
+
+void popComplexModeStack() {
+    complex_mode_stack.arr[complex_mode_stack.size - 1] = NULL;
+    complex_mode_stack.child_counter[complex_mode_stack.size - 1] = 0;
+    complex_mode_stack.size--;
+}
+
+void freeComplexModeStack() {
+    for (unsigned i = 0; i < complex_mode_stack.size; i++) {
+        if (complex_mode_stack.arr[i] != NULL)
+            freeSymbol(complex_mode_stack.arr[i]);
+            complex_mode_stack.child_counter[i] = 0;
+    }
+
+    if (complex_mode_stack.capacity > 0) {
+        free(complex_mode_stack.arr);
+        free(complex_mode_stack.child_counter);
+    }
+
+    complex_mode_stack.capacity = 0;
+    complex_mode_stack.size = 0;
+}
+
+bool isComplexMode() {
+    return complex_mode_stack.size > 0;
 }
