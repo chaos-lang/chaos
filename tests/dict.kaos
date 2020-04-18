@@ -143,3 +143,16 @@ print c
 del a
 dict a = {'a': {'a': 1, 'b': 2}, 'b': 3}
 print a
+
+
+// Nested cross-complex
+del a
+del b
+dict a = {'a': 1, 'b': 2}
+list b = [1, 2, 3]
+a['a'] = b
+print a
+
+del a
+dict a = {'a': [1, 2, 3], 'b': 2}
+print a

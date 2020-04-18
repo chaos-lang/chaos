@@ -545,7 +545,7 @@ variable:                                                           { }
 ;
 
 arraystart:                                                         { addSymbolArray(NULL); }
-    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { if (isNestedComplexMode()) finishComplexMode(NULL, K_ANY); }
+    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { if (isNestedComplexMode()) { last_nested_complex = getComplexMode(); finishComplexMode(NULL, K_ANY); } }
 ;
 
 array:                                                              { }
@@ -553,6 +553,9 @@ array:                                                              { }
     | arraystart T_COMMA array                                      { }
     | array T_COMMA arraystart                                      { }
     | arraystart T_COMMA arraystart                                 { }
+    | dictionarystart T_COMMA array                                 { }
+    | array T_COMMA dictionarystart                                 { }
+    | dictionarystart T_COMMA dictionarystart                       { }
 ;
 
 array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
@@ -591,11 +594,10 @@ dictionarystart:                                                                
 
 dictionary:                                                         { }
     | T_NEWLINE dictionary                                          { }
-;
-
-dictionary:                                                         { }
     | T_STRING T_COLON dictionarystart T_COMMA dictionary           { last_nested_complex->key = $1; }
     | dictionary T_COMMA T_STRING T_COLON dictionarystart           { last_nested_complex->key = $3; }
+    | T_STRING T_COLON arraystart T_COMMA dictionary                { last_nested_complex->key = $1; }
+    | dictionary T_COMMA T_STRING T_COLON arraystart                { last_nested_complex->key = $3; }
 ;
 
 dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }

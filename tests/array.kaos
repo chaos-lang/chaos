@@ -211,3 +211,16 @@ print c
 del a
 list a = [['a', 'b'], 3]
 print a
+
+
+// Nested cross-complex
+del a
+del b
+list a = [0, 3]
+dict b = {'a': 1, 'b': 2}
+a[0] = b
+print a
+
+del a
+list a = [{'a': 1, 'b': 2}, 3]
+print a
