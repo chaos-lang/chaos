@@ -221,7 +221,7 @@ line: T_NEWLINE
     | T_PRINT print T_NEWLINE                                       { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | T_DEL T_VAR T_NEWLINE                                         { removeSymbolByName($2); free($2); }
-    | T_DEL T_VAR left_right_bracket T_NEWLINE                      { removeComplexElement($2, $3); free($2); }
+    | T_DEL T_VAR left_right_bracket T_NEWLINE                      { removeComplexElementByLeftRightBracketStack($2); }
     | T_FUNCTION_TABLE T_NEWLINE                                    { printFunctionTable(); }
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
@@ -232,7 +232,7 @@ line: T_NEWLINE
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-print: T_VAR left_right_bracket                                     { printSymbolValueEndWithNewLine(getComplexElementBySymbolId($1, $2)); free($1); }
+print: T_VAR left_right_bracket                                     { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0)); }
 ;
 print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1)); free($1); }
 ;
@@ -460,11 +460,12 @@ boolean_expression: T_FALSE                                         { }
 ;
 
 left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
-    | T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                          { Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; }
-    | T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET                  { Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; }
-    | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; }
-    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; }
-    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; }
+    | T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                          { Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
+    | T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET                  { Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
+    | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
+    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
+    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
+    | left_right_bracket left_right_bracket                         { }
 ;
 
 variable: T_VAR                                                     { $$ = $1; }
@@ -474,21 +475,21 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR                                        { updateSymbolByClonningName($1, $3); $$ = ""; }
-    | variable T_EQUAL T_VAR left_right_bracket                     { updateSymbolByClonningComplexElement($1, $3, $4); $$ = ""; }
+    | variable T_EQUAL T_VAR left_right_bracket                     { updateSymbolByClonningComplexElement($1, $3); $$ = ""; }
     | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
-    | variable left_right_bracket                                   { if ($1[0] != '\0' && is_interactive) printSymbolValueEndWithNewLine(getComplexElementBySymbolId($1, $2)); $$ = ""; free($1); }
-    | variable left_right_bracket T_EQUAL T_TRUE                    { updateComplexElementBool($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL T_FALSE                   { updateComplexElementBool($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL T_INT                     { updateComplexElementInt($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL T_FLOAT                   { updateComplexElementFloat($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL T_STRING                  { updateComplexElementString($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL T_VAR                     { updateComplexElementSymbol($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL mixed_expression          { updateComplexElementFloat($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL expression                { updateComplexElementFloat($1, $2, $4); $$ = ""; }
-    | variable left_right_bracket T_EQUAL boolean_expression        { updateComplexElementBool($1, $2, $4); $$ = ""; }
+    | variable left_right_bracket                                   { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0)); $$ = ""; } else { free($1); yyerror("Syntax error"); } }
+    | variable left_right_bracket T_EQUAL T_TRUE                    { updateComplexElementBool($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL T_FALSE                   { updateComplexElementBool($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL T_INT                     { updateComplexElementInt($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL T_FLOAT                   { updateComplexElementFloat($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL T_STRING                  { updateComplexElementString($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL T_VAR                     { updateComplexElementSymbol($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL mixed_expression          { updateComplexElementFloat($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL expression                { updateComplexElementFloat($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL boolean_expression        { updateComplexElementBool($1, $4); $$ = ""; }
 ;
 
 variable:                                                           { }
@@ -496,7 +497,7 @@ variable:                                                           { }
     | T_VAR_BOOL T_VAR T_EQUAL T_FALSE                              { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_BOOL, $4, K_ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket             { createCloneFromComplexElement($2, K_BOOL, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket             { createCloneFromComplexElement($2, K_BOOL, $4, K_ANY); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, K_ARRAY, $5, K_BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, K_DICT, $5, K_BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_ARRAY T_VAR T_EQUAL arraystart               { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
@@ -507,7 +508,7 @@ variable:                                                           { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, K_ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_ARRAY, $5, K_NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
@@ -519,7 +520,7 @@ variable:                                                           { }
 variable:                                                           { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_STRING, $4, K_ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_STRING, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_STRING, $4, K_ANY); $$ = ""; }
     | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_ARRAY, $5, K_STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_ARRAY T_VAR T_EQUAL arraystart             { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
@@ -533,7 +534,7 @@ variable:                                                           { }
     | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, K_ANY, $4, K_ANY); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR left_right_bracket              { createCloneFromComplexElement($2, K_ANY, $4, $5, K_ANY); $$ = ""; }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR left_right_bracket              { createCloneFromComplexElement($2, K_ANY, $4, K_ANY); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL boolean_expression                    { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL mixed_expression                      { addSymbolAnyFloat($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL expression                            { addSymbolAnyFloat($2, $4); $$ = ""; }
@@ -728,6 +729,7 @@ int main(int argc, char** argv) {
             if (setjmp(InteractiveShellErrorAbsorber)) {
                 phase = INIT_PROGRAM;
                 freeComplexModeStack();
+                //freeLeftRightBracketStack();
 
                 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
                     printf("\033[1;44m");
@@ -765,6 +767,7 @@ void yyerror(const char* s) {
         if (isComplexMode()) {
             freeComplexModeStack();
         }
+        //freeLeftRightBracketStack();
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif
@@ -794,6 +797,8 @@ void freeEverything() {
     freeModulePathStack();
     freeModuleStack();
     freeComplexModeStack();
+    freeLeftRightBracketStack();
+    freeFreeStringStack();
 
     yylex_destroy();
 

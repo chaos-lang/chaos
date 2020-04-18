@@ -64,6 +64,7 @@ char *fileGetContents(char *file_path) {
         }
         fclose(fp);
     } else {
+        append_to_array_without_malloc(&free_string_stack, file_path);
         throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, file_path);
     }
     return file_content;
@@ -84,6 +85,7 @@ char *fileGetContents(char *file_path) {
         }
         fclose(f);
     } else {
+        append_to_array_without_malloc(&free_string_stack, file_path);
         throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, file_path);
     }
     return file_buffer;
@@ -128,6 +130,17 @@ void append_to_array(string_array *array, char *str) {
 
     array->arr[array->size] = malloc(1 + strlen(str));
     strcpy(array->arr[array->size], str);
+    array->size++;
+}
+
+void append_to_array_without_malloc(string_array *array, char *str) {
+    if (array->capacity == 0) {
+        array->arr = (char **)malloc((array->capacity = 2) * sizeof(char *));
+    } else if (array->capacity == array->size) {
+        array->arr = (char **)realloc(array->arr, (array->capacity *= 2) * sizeof(char *));
+    }
+
+    array->arr[array->size] = str;
     array->size++;
 }
 
@@ -384,4 +397,13 @@ const char *get_filename_ext(const char *filename) {
     const char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot + 1;
+}
+
+void freeFreeStringStack() {
+    for (unsigned i = 0; i < free_string_stack.size; i++) {
+        free(free_string_stack.arr[i]);
+    }
+    free_string_stack.capacity = 0;
+    free_string_stack.size = 0;
+    free(free_string_stack.arr);
 }

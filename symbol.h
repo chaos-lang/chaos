@@ -54,6 +54,13 @@ typedef struct symbol_array {
 symbol_array complex_mode_stack;
 Symbol* last_nested_complex;
 
+typedef struct symbol_id_array {
+    unsigned long long* arr;
+    unsigned capacity, size;
+} symbol_id_array;
+
+symbol_id_array left_right_bracket_stack;
+
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 void removeSymbolByName(char *name);
@@ -85,30 +92,32 @@ Symbol* addSymbolString(char *name, char *s);
 void updateSymbolString(char *name, char *s);
 void addSymbolArray(char *name);
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type);
-Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *name, unsigned long long symbol_id, enum Type extra_type);
+Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *name, enum Type extra_type);
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type);
 Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol);
 Symbol* updateSymbolByClonningName(char *clone_name, char *name);
-Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, unsigned long long symbol_id);
+Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name);
 enum Type isComplexIllegal(enum Type type);
 void finishComplexMode(char *name, enum Type type);
-Symbol* getArrayElement(char *name, long long i);
+Symbol* getArrayElement(Symbol* symbol, long long i);
 void cloneSymbolToComplex(char *name, char *key);
-Symbol* getComplexElement(char *name, long long i, char *key);
-Symbol* getComplexElementBySymbolId(char *name, unsigned long long symbol_id);
-void updateComplexElement(char *name, unsigned long long symbol_id, enum Type type, union Value value);
-void updateComplexElementBool(char* name, unsigned long long symbol_id, bool b);
-void updateComplexElementInt(char* name, unsigned long long symbol_id, long long i);
-void updateComplexElementFloat(char* name, unsigned long long symbol_id, long double f);
-void updateComplexElementString(char* name, unsigned long long symbol_id, char *s);
-void updateComplexElementSymbol(char* name, unsigned long long symbol_id, char* source_name);
-void removeComplexElement(char *name, unsigned long long symbol_id);
+Symbol* getComplexElement(Symbol* complex, long long i, char *key);
+Symbol* getComplexElementBySymbolId(Symbol* complex, unsigned long long symbol_id);
+void updateComplexElementWrapper(char *name, enum Type type, union Value value);
+void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value);
+void updateComplexElementBool(char* name, bool b);
+void updateComplexElementInt(char* name, long long i);
+void updateComplexElementFloat(char* name, long double f);
+void updateComplexElementString(char* name, char *s);
+void updateComplexElementSymbol(char *name, char* source_name);
+void removeComplexElementByLeftRightBracketStack(char *name);
+void removeComplexElement(Symbol* complex, unsigned long long symbol_id);
 void addSymbolDict(char *name);
 void addSymbolAnyString(char *name, char *s);
 void addSymbolAnyInt(char *name, long long i);
 void addSymbolAnyFloat(char *name, long double f);
 void addSymbolAnyBool(char *name, bool b);
-Symbol* getDictElement(char *name, char *key);
+Symbol* getDictElement(Symbol* symbol, char *key);
 _Function* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);
 void freeAllSymbols();
@@ -125,5 +134,9 @@ void freeComplexModeStack();
 bool isComplexMode();
 bool isNestedComplexMode();
 Symbol* getComplexMode();
+void pushLeftRightBracketStack(unsigned long long symbol_id);
+unsigned long long popLeftRightBracketStack();
+void freeLeftRightBracketStack();
+Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested);
 
 #endif

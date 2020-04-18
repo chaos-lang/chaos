@@ -31,13 +31,6 @@ symbol_table
 del f
 symbol_table
 
-a[2]
-a[1]
-a[0]
-a[-1]
-a[-2]
-a[-3]
-
 print a[2]
 print a[1]
 print a[0]
@@ -224,3 +217,14 @@ print a
 del a
 list a = [{'a': 1, 'b': 2}, 3]
 print a
+
+
+// Nested array access
+del a
+list a = [[1, 2], 3]
+print a[0][1]
+
+// Nested cross-complex access
+del a
+list a = [{'a': 1, 'b': 2}, 3]
+print a[0]['b']

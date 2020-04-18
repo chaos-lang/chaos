@@ -149,8 +149,6 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     #endif
     printf("\n");
 
-    if (strlen(str1) > 0) free(str1);
-    if (strlen(str2) > 0) free(str2);
     if (!is_interactive) {
         freeEverything();
         exit(code);

@@ -65,6 +65,7 @@ void parseTheModuleContent(char *module_path) {
             phase = PROGRAM;
         }
     } else {
+        append_to_array_without_malloc(&free_string_stack, module_path);
         throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, module_path);
     }
 }

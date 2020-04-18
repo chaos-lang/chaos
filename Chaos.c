@@ -49,7 +49,7 @@ char* getVariableString(char *name) {
 bool getArrayElementBool(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(symbol_name, i);
+    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
     if (symbol->value_type != V_BOOL) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -59,7 +59,7 @@ bool getArrayElementBool(char *name, long long i) {
 long long getArrayElementInt(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(symbol_name, i);
+    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
     if (symbol->value_type != V_INT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -69,7 +69,7 @@ long long getArrayElementInt(char *name, long long i) {
 long double getArrayElementFloat(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(symbol_name, i);
+    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
     free(symbol_name);
     if (symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
@@ -80,7 +80,7 @@ long double getArrayElementFloat(char *name, long long i) {
 char* getArrayElementString(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(symbol_name, i);
+    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
     if (symbol->value_type != V_STRING) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -93,7 +93,7 @@ char* getArrayElementString(char *name, long long i) {
 bool getDictElementBool(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(symbol_name, key);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
     if (symbol->value_type != V_BOOL) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -103,7 +103,7 @@ bool getDictElementBool(char *name, char *key) {
 long long getDictElementInt(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(symbol_name, key);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
     if (symbol->value_type != V_INT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -113,7 +113,7 @@ long long getDictElementInt(char *name, char *key) {
 long double getDictElementFloat(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(symbol_name, key);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
     if (symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -123,7 +123,7 @@ long double getDictElementFloat(char *name, char *key) {
 char* getDictElementString(char *name, char *key) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(symbol_name, key);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
     free(symbol_name);
     if (symbol->value_type != V_STRING) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);

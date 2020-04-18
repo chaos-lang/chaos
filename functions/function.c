@@ -183,6 +183,7 @@ void callFunction(char *name, char *module) {
         function->symbol == NULL &&
         !interactive_shell_function_error_absorbed
     ) {
+        append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
@@ -224,6 +225,7 @@ _Function* getFunction(char *name, char *module) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
+        append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_UNDEFINED_FUNCTION, name);
     }
     return NULL;
@@ -354,6 +356,7 @@ void returnSymbol(char *name) {
 void printFunctionReturn(char *name, char *module) {
     _Function* function = getFunction(name, module);
     if (function->symbol == NULL) {
+        append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
