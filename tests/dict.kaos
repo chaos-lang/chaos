@@ -128,3 +128,14 @@ del dict11[s0]
 print dict11
 del dict12[s1]
 print dict12
+
+
+// Nested dictionaries
+del a
+del c
+
+dict a = {'a': 1, 'b': 2}
+json b = {"a": 1, "b": 2}
+json c = {"a": a, "b": b}
+
+print c

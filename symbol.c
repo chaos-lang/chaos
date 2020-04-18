@@ -166,6 +166,7 @@ Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
     Symbol* clone_symbol;
     if (type == K_ARRAY || type == K_DICT) {
         clone_symbol = deepCopyComplex(NULL, symbol);
+        clone_symbol->key = key;
     } else {
         clone_symbol = addSymbol(key, type, symbol->value, symbol->value_type);
     }
