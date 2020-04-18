@@ -479,6 +479,8 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
+    | variable T_EQUAL arraystart                                   { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
+    | variable T_EQUAL dictionarystart                              { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
     | variable left_right_bracket                                   { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0)); $$ = ""; } else { free($1); yyerror("Syntax error"); } }
     | variable left_right_bracket T_EQUAL T_TRUE                    { updateComplexElementBool($1, $4); $$ = ""; }
@@ -490,6 +492,8 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable left_right_bracket T_EQUAL mixed_expression          { updateComplexElementFloat($1, $4); $$ = ""; }
     | variable left_right_bracket T_EQUAL expression                { updateComplexElementFloat($1, $4); $$ = ""; }
     | variable left_right_bracket T_EQUAL boolean_expression        { updateComplexElementBool($1, $4); $$ = ""; }
+    | variable left_right_bracket T_EQUAL arraystart                { updateComplexElementComplex($1); $$ = ""; }
+    | variable left_right_bracket T_EQUAL dictionarystart           { updateComplexElementComplex($1); $$ = ""; }
 ;
 
 variable:                                                           { }

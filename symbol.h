@@ -98,13 +98,16 @@ Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol);
 Symbol* updateSymbolByClonningName(char *clone_name, char *name);
 Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name);
 enum Type isComplexIllegal(enum Type type);
-void finishComplexMode(char *name, enum Type type);
+Symbol* finishComplexMode(char *name, enum Type type);
+void finishComplexModeWithUpdate(char *name);
+void _finishComplexModeWithUpdate(Symbol* symbol);
 Symbol* getArrayElement(Symbol* symbol, long long i);
 void cloneSymbolToComplex(char *name, char *key);
 Symbol* getComplexElement(Symbol* complex, long long i, char *key);
 Symbol* getComplexElementBySymbolId(Symbol* complex, unsigned long long symbol_id);
-void updateComplexElementWrapper(char *name, enum Type type, union Value value);
-void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value);
+void updateComplexElementComplex(char *name);
+void updateComplexElementWrapper(char *name, enum Type type, union Value value, enum ValueType value_type);
+void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value, enum ValueType value_type);
 void updateComplexElementBool(char* name, bool b);
 void updateComplexElementInt(char* name, long long i);
 void updateComplexElementFloat(char* name, long double f);
@@ -138,5 +141,7 @@ void pushLeftRightBracketStack(unsigned long long symbol_id);
 unsigned long long popLeftRightBracketStack();
 void freeLeftRightBracketStack();
 Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested);
+void removeChildrenOfComplex(Symbol* symbol);
+bool isComplex(Symbol* symbol);
 
 #endif

@@ -98,11 +98,7 @@ void removeSymbolByName(char *name) {
 }
 
 void removeSymbol(Symbol* symbol) {
-    if (symbol->type == K_ARRAY || symbol->type == K_DICT) {
-        for (unsigned long i = 0; i < symbol->children_count; i++) {
-            removeSymbol(symbol->children[i]);
-        }
-    }
+    removeChildrenOfComplex(symbol);
 
     Symbol* previous_symbol = symbol->previous;
     Symbol* next_symbol = symbol->next;
@@ -669,26 +665,67 @@ enum Type isComplexIllegal(enum Type type) {
     return -1;
 }
 
-void finishComplexMode(char *name, enum Type type) {
-    complex_mode_stack.arr[complex_mode_stack.size - 1]->children_count = complex_mode_stack.child_counter[complex_mode_stack.size - 1];
+Symbol* finishComplexMode(char *name, enum Type type) {
+    Symbol* complex_mode = getComplexMode();
+    complex_mode->children_count = complex_mode_stack.child_counter[complex_mode_stack.size - 1];
     if (name != NULL) {
         if (isDefined(name)) {
-            removeSymbol(complex_mode_stack.arr[complex_mode_stack.size - 1]);
+            removeSymbol(complex_mode);
             popComplexModeStack();
             append_to_array_without_malloc(&free_string_stack, name);
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
 
-        complex_mode_stack.arr[complex_mode_stack.size - 1]->name = malloc(1 + strlen(name));
-        strcpy(complex_mode_stack.arr[complex_mode_stack.size - 1]->name, name);
+        complex_mode->name = malloc(1 + strlen(name));
+        strcpy(complex_mode->name, name);
     }
-    complex_mode_stack.arr[complex_mode_stack.size - 1]->secondary_type = type;
+    complex_mode->secondary_type = type;
     enum Type illegal_type = isComplexIllegal(type);
     if (illegal_type != -1) {
-        free(name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(illegal_type), complex_mode_stack.arr[complex_mode_stack.size - 1]->name);
+        if (name != NULL)
+            free(name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(illegal_type), complex_mode->name);
     }
     popComplexModeStack();
+    return complex_mode;
+}
+
+void finishComplexModeWithUpdate(char *name) {
+    Symbol* symbol = getSymbol(name);
+    _finishComplexModeWithUpdate(symbol);
+}
+
+void _finishComplexModeWithUpdate(Symbol* symbol) {
+    enum Type type;
+    if (isComplex(symbol)) {
+        type = symbol->secondary_type;
+    } else {
+        type = K_ANY;
+    }
+
+    Symbol* complex_mode = finishComplexMode(NULL, type);
+
+    if (isComplex(symbol)) {
+        removeChildrenOfComplex(symbol);
+    }
+
+    symbol->children = realloc(
+        symbol->children,
+        sizeof(Symbol) * complex_mode->children_count
+    );
+    memcpy(symbol->children, complex_mode->children, complex_mode->children_count * sizeof(Symbol));
+
+    symbol->children_count = complex_mode->children_count;
+    symbol->type = complex_mode->type;
+    symbol->secondary_type = complex_mode->secondary_type;
+    if (symbol->value_type == V_STRING) free(symbol->value.s);
+    symbol->value_type = complex_mode->value_type;
+    symbol->value = complex_mode->value;
+
+    free(complex_mode->children);
+    complex_mode->children = NULL;
+    complex_mode->children_count = 0;
+    removeSymbol(complex_mode);
 }
 
 Symbol* getArrayElement(Symbol* symbol, long long i) {
@@ -764,12 +801,17 @@ Symbol* getComplexElementBySymbolId(Symbol* complex, unsigned long long symbol_i
     return symbol;
 }
 
-void updateComplexElementWrapper(char *name, enum Type type, union Value value) {
-    Symbol* complex = getComplexElementThroughLeftRightBracketStack(name, 1);
-    updateComplexElement(complex, popLeftRightBracketStack(), type, value);
+void updateComplexElementComplex(char *name) {
+    Symbol* complex = getComplexElementThroughLeftRightBracketStack(name, 0);
+    _finishComplexModeWithUpdate(complex);
 }
 
-void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value) {
+void updateComplexElementWrapper(char *name, enum Type type, union Value value, enum ValueType value_type) {
+    Symbol* complex = getComplexElementThroughLeftRightBracketStack(name, 1);
+    updateComplexElement(complex, popLeftRightBracketStack(), type, value, value_type);
+}
+
+void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value, enum ValueType value_type) {
     Symbol* access_symbol = getSymbolById(symbol_id);
     long long i = getSymbolValueInt_ZeroIfNotInt(access_symbol);
     char *key = getSymbolValueString_NullIfNotString(access_symbol);
@@ -806,8 +848,10 @@ void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Ty
     }
 
     Symbol* symbol = getComplexElement(complex, i, key);
+    removeChildrenOfComplex(symbol);
     symbol->type = type;
     if (symbol->value_type == V_STRING) free(symbol->value.s);
+    symbol->value_type = value_type;
     symbol->value = value;
 
     free(key);
@@ -816,19 +860,19 @@ void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Ty
 void updateComplexElementBool(char* name, bool b) {
     union Value value;
     value.b = b;
-    updateComplexElementWrapper(name, K_BOOL, value);
+    updateComplexElementWrapper(name, K_BOOL, value, V_BOOL);
 }
 
 void updateComplexElementInt(char* name, long long i) {
     union Value value;
     value.i = i;
-    updateComplexElementWrapper(name, K_NUMBER, value);
+    updateComplexElementWrapper(name, K_NUMBER, value, V_INT);
 }
 
 void updateComplexElementFloat(char* name, long double f) {
     union Value value;
     value.f = f;
-    updateComplexElementWrapper(name, K_NUMBER, value);
+    updateComplexElementWrapper(name, K_NUMBER, value, V_FLOAT);
 }
 
 void updateComplexElementString(char* name, char *s) {
@@ -836,7 +880,7 @@ void updateComplexElementString(char* name, char *s) {
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
     free(s);
-    updateComplexElementWrapper(name, K_STRING, value);
+    updateComplexElementWrapper(name, K_STRING, value, V_STRING);
 }
 
 void updateComplexElementSymbol(char *name, char* source_name) {
@@ -1314,4 +1358,16 @@ Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long 
         symbol = getComplexElementBySymbolId(symbol, symbol_id);
     }
     return symbol;
+}
+
+void removeChildrenOfComplex(Symbol* symbol) {
+    if (symbol->type == K_ARRAY || symbol->type == K_DICT) {
+        for (unsigned long i = 0; i < symbol->children_count; i++) {
+            removeSymbol(symbol->children[i]);
+        }
+    }
+}
+
+bool isComplex(Symbol* symbol) {
+    return symbol->type == K_ARRAY || symbol->type == K_DICT;
 }
