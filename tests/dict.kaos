@@ -139,3 +139,7 @@ json b = {"a": 1, "b": 2}
 json c = {"a": a, "b": b}
 
 print c
+
+del a
+dict a = {'a': {'a': 1, 'b': 2}, 'b': 3}
+print a

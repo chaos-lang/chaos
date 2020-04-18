@@ -643,16 +643,16 @@ Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, unsig
     return symbol;
 }
 
-bool isComplexIllegal(enum Type type) {
+enum Type isComplexIllegal(enum Type type) {
     if (isComplexMode() && type != K_ANY) {
         for (unsigned long i = 0; i < complex_mode_stack.arr[complex_mode_stack.size - 1]->children_count; i++) {
             Symbol* symbol = complex_mode_stack.arr[complex_mode_stack.size - 1]->children[i];
             if (symbol->type != type) {
-                return true;
+                return symbol->type;
             }
         }
     }
-    return false;
+    return -1;
 }
 
 void finishComplexMode(char *name, enum Type type) {
@@ -668,9 +668,10 @@ void finishComplexMode(char *name, enum Type type) {
         strcpy(complex_mode_stack.arr[complex_mode_stack.size - 1]->name, name);
     }
     complex_mode_stack.arr[complex_mode_stack.size - 1]->secondary_type = type;
-    if (isComplexIllegal(type)) {
+    enum Type illegal_type = isComplexIllegal(type);
+    if (illegal_type != -1) {
         free(name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(type), complex_mode_stack.arr[complex_mode_stack.size - 1]->name);
+        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(illegal_type), complex_mode_stack.arr[complex_mode_stack.size - 1]->name);
     }
     popComplexModeStack();
 }
@@ -1238,4 +1239,12 @@ void freeComplexModeStack() {
 
 bool isComplexMode() {
     return complex_mode_stack.size > 0;
+}
+
+bool isNestedComplexMode() {
+    return complex_mode_stack.size > 1;
+}
+
+Symbol* getComplexMode() {
+    return complex_mode_stack.arr[complex_mode_stack.size - 1];
 }

@@ -52,6 +52,7 @@ typedef struct symbol_array {
 } symbol_array;
 
 symbol_array complex_mode_stack;
+Symbol* last_nested_complex;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
@@ -89,7 +90,7 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
 Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol);
 Symbol* updateSymbolByClonningName(char *clone_name, char *name);
 Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name, unsigned long long symbol_id);
-bool isComplexIllegal(enum Type type);
+enum Type isComplexIllegal(enum Type type);
 void finishComplexMode(char *name, enum Type type);
 Symbol* getArrayElement(char *name, long long i);
 void cloneSymbolToComplex(char *name, char *key);
@@ -122,5 +123,7 @@ void pushComplexModeStack(Symbol* complex_mode);
 void popComplexModeStack();
 void freeComplexModeStack();
 bool isComplexMode();
+bool isNestedComplexMode();
+Symbol* getComplexMode();
 
 #endif

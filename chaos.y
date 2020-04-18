@@ -545,11 +545,14 @@ variable:                                                           { }
 ;
 
 arraystart:                                                         { addSymbolArray(NULL); }
-    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { }
+    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { if (isNestedComplexMode()) finishComplexMode(NULL, K_ANY); }
 ;
 
 array:                                                              { }
     | T_NEWLINE array                                               { }
+    | arraystart T_COMMA array                                      { }
+    | array T_COMMA arraystart                                      { }
+    | arraystart T_COMMA arraystart                                 { }
 ;
 
 array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
@@ -583,11 +586,16 @@ variable:                                                           { }
 ;
 
 dictionarystart:                                                                { addSymbolDict(NULL); }
-    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { }
+    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { if (isNestedComplexMode()) { last_nested_complex = getComplexMode(); finishComplexMode(NULL, K_ANY); } }
 ;
 
 dictionary:                                                         { }
     | T_NEWLINE dictionary                                          { }
+;
+
+dictionary:                                                         { }
+    | T_STRING T_COLON dictionarystart T_COMMA dictionary           { last_nested_complex->key = $1; }
+    | dictionary T_COMMA T_STRING T_COLON dictionarystart           { last_nested_complex->key = $3; }
 ;
 
 dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }
