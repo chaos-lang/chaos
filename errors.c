@@ -19,7 +19,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     char error_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg_out[__KAOS_MSG_LINE_LENGTH__];
 
-    if (strcmp(last_token, "\n") != 0) yylineno++;
+    if (last_token != NULL && strcmp(last_token, "\n") != 0) yylineno++;
 
     sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());
@@ -95,6 +95,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
             break;
         case E_NOT_A_CHARACTER:
             sprintf(error_msg, "Right hand side of the assignment is not a character for string: %s", str1);
+            break;
+        case E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH:
+            sprintf(error_msg, "Program file does not exists on the given path: %s", str1);
             break;
         default:
             sprintf(error_msg, "Unkown error.");

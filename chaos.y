@@ -42,6 +42,7 @@ bool inject_mode = false;
 jmp_buf InteractiveShellErrorAbsorber;
 
 FILE *fp;
+bool fp_opened;
 char *program_file_path;
 char *program_file_dir;
 %}
@@ -695,11 +696,18 @@ loop: error T_NEWLINE parser                                        { if (is_int
 
 int main(int argc, char** argv) {
     fp = argc > 1 ? fopen (argv[1], "r") : stdin;
+    fp_opened = true;
 
     if (argc > 1) {
         program_file_path = malloc(strlen(argv[1]) + 1);
         strcpy(program_file_path, argv[1]);
-        program_file_path = relative_path_to_absolute(program_file_path);
+
+        if (!is_file_exists(program_file_path)) {
+            initMainFunction();
+            is_interactive = false;
+            fp_opened = false;
+            throw_error(E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH, program_file_path);
+        }
 
         program_file_dir = malloc(strlen(program_file_path) + 1);
         strcpy(program_file_dir, program_file_path);
@@ -812,7 +820,8 @@ void freeEverything() {
     yylex_destroy();
 
     if (!is_interactive) {
-        fclose(fp);
+        if (fp_opened)
+            fclose(fp);
         free(program_file_path);
         free(program_file_dir);
     } else {
