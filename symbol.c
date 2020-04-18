@@ -801,14 +801,16 @@ Symbol* getComplexElementBySymbolId(Symbol* complex, unsigned long long symbol_i
     return symbol;
 }
 
-void updateComplexElementComplex(char *name) {
-    Symbol* complex = getComplexElementThroughLeftRightBracketStack(name, 0);
+void updateComplexElementComplex() {
+    Symbol* complex = variable_complex_element;
+    complex = getComplexElementBySymbolId(complex, variable_complex_element_symbol_id);
     _finishComplexModeWithUpdate(complex);
 }
 
-void updateComplexElementWrapper(char *name, enum Type type, union Value value, enum ValueType value_type) {
-    Symbol* complex = getComplexElementThroughLeftRightBracketStack(name, 1);
-    updateComplexElement(complex, popLeftRightBracketStack(), type, value, value_type);
+void updateComplexElementWrapper(enum Type type, union Value value, enum ValueType value_type) {
+    Symbol* complex = variable_complex_element;
+    unsigned long long symbol_id = variable_complex_element_symbol_id;
+    updateComplexElement(complex, symbol_id, type, value, value_type);
 }
 
 void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value, enum ValueType value_type) {
@@ -857,45 +859,47 @@ void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Ty
     free(key);
 }
 
-void updateComplexElementBool(char* name, bool b) {
+void updateComplexElementBool(bool b) {
     union Value value;
     value.b = b;
-    updateComplexElementWrapper(name, K_BOOL, value, V_BOOL);
+    updateComplexElementWrapper(K_BOOL, value, V_BOOL);
 }
 
-void updateComplexElementInt(char* name, long long i) {
+void updateComplexElementInt(long long i) {
     union Value value;
     value.i = i;
-    updateComplexElementWrapper(name, K_NUMBER, value, V_INT);
+    updateComplexElementWrapper(K_NUMBER, value, V_INT);
 }
 
-void updateComplexElementFloat(char* name, long double f) {
+void updateComplexElementFloat(long double f) {
     union Value value;
     value.f = f;
-    updateComplexElementWrapper(name, K_NUMBER, value, V_FLOAT);
+    updateComplexElementWrapper(K_NUMBER, value, V_FLOAT);
 }
 
-void updateComplexElementString(char* name, char *s) {
+void updateComplexElementString(char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
     free(s);
-    updateComplexElementWrapper(name, K_STRING, value, V_STRING);
+    updateComplexElementWrapper(K_STRING, value, V_STRING);
 }
 
-void updateComplexElementSymbol(char *name, char* source_name) {
-    Symbol* complex = getComplexElementThroughLeftRightBracketStack(name, 1);
-    unsigned long long symbol_id = popLeftRightBracketStack();
+void updateComplexElementSymbol(Symbol* source) {
+    Symbol* complex = variable_complex_element;
+    unsigned long long symbol_id = variable_complex_element_symbol_id;
 
+    _updateComplexElementSymbol(complex, symbol_id, source);
+}
+
+void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, Symbol* source) {
     Symbol* access_symbol = getSymbolById(symbol_id);
     long long i = getSymbolValueInt_ZeroIfNotInt(access_symbol);
     char *key = getSymbolValueString_NullIfNotString(access_symbol);
 
-    Symbol* source = getSymbol(source_name);
     if (complex->secondary_type != K_ANY && complex->secondary_type != source->type) {
         removeSymbol(access_symbol);
         free(key);
-        free(source_name);
         throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY, getTypeName(source->type), complex->name);
     }
 
@@ -914,11 +918,8 @@ void updateComplexElementSymbol(char *name, char* source_name) {
     } else {
         removeSymbol(access_symbol);
         free(key);
-        free(source_name);
         throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
     }
-
-    free(source_name);
 }
 
 void removeComplexElement(Symbol* complex, unsigned long long symbol_id) {
@@ -1370,4 +1371,9 @@ void removeChildrenOfComplex(Symbol* symbol) {
 
 bool isComplex(Symbol* symbol) {
     return symbol->type == K_ARRAY || symbol->type == K_DICT;
+}
+
+void buildVariableComplexElement(char *name) {
+    variable_complex_element = getComplexElementThroughLeftRightBracketStack(name, 1);
+    variable_complex_element_symbol_id = popLeftRightBracketStack();
 }

@@ -275,3 +275,18 @@ c[0] = 123
 print c
 c[1] = 'foo'
 print c
+
+
+// Complex element to complex element assignment
+del a
+del b
+list a = [1, 2]
+list b = [3, 4]
+a[0] = b[1]
+print a
+
+// Assignment on itself
+del a
+list a = [1, 2]
+a[0] = a[1]
+print a

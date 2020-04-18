@@ -60,6 +60,8 @@ typedef struct symbol_id_array {
 } symbol_id_array;
 
 symbol_id_array left_right_bracket_stack;
+Symbol* variable_complex_element;
+unsigned long long variable_complex_element_symbol_id;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
@@ -105,14 +107,15 @@ Symbol* getArrayElement(Symbol* symbol, long long i);
 void cloneSymbolToComplex(char *name, char *key);
 Symbol* getComplexElement(Symbol* complex, long long i, char *key);
 Symbol* getComplexElementBySymbolId(Symbol* complex, unsigned long long symbol_id);
-void updateComplexElementComplex(char *name);
-void updateComplexElementWrapper(char *name, enum Type type, union Value value, enum ValueType value_type);
+void updateComplexElementComplex();
+void updateComplexElementWrapper(enum Type type, union Value value, enum ValueType value_type);
 void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value, enum ValueType value_type);
-void updateComplexElementBool(char* name, bool b);
-void updateComplexElementInt(char* name, long long i);
-void updateComplexElementFloat(char* name, long double f);
-void updateComplexElementString(char* name, char *s);
-void updateComplexElementSymbol(char *name, char* source_name);
+void updateComplexElementBool(bool b);
+void updateComplexElementInt(long long i);
+void updateComplexElementFloat(long double f);
+void updateComplexElementString(char *s);
+void updateComplexElementSymbol(Symbol* source);
+void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, Symbol* source);
 void removeComplexElementByLeftRightBracketStack(char *name);
 void removeComplexElement(Symbol* complex, unsigned long long symbol_id);
 void addSymbolDict(char *name);
@@ -143,5 +146,6 @@ void freeLeftRightBracketStack();
 Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested);
 void removeChildrenOfComplex(Symbol* symbol);
 bool isComplex(Symbol* symbol);
+void buildVariableComplexElement(char *name);
 
 #endif
