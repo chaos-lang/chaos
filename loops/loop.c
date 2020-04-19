@@ -24,6 +24,7 @@ void endLoop() {
 
     char *body = loop_mode->body;
     unsigned long long iter = loop_mode->iter;
+    bool is_infinite = loop_mode->is_infinite;
     enum LoopType loop_type = loop_mode->type;
     char *array_name = loop_mode->array;
     char *element_name = loop_mode->element.name;
@@ -46,8 +47,14 @@ void endLoop() {
         switch (loop_type)
         {
             case TIMESDO:
-                for (unsigned long long i = 0; i < iter; i++) {
-                    injectCode(body, INIT_PROGRAM);
+                if (is_infinite) {
+                    while (true) {
+                        injectCode(body, INIT_PROGRAM);
+                    }
+                } else {
+                    for (unsigned long long i = 0; i < iter; i++) {
+                        injectCode(body, INIT_PROGRAM);
+                    }
                 }
                 break;
             case FOREACH:

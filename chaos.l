@@ -172,6 +172,7 @@ switch (phase)
 "foreach"                       {recordToken(strdup(yytext), yyleng); return T_FOREACH;}
 "as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
 "from"                          {recordToken(strdup(yytext), yyleng); return T_FROM;}
+"INFINITE"                      {recordToken(strdup(yytext), yyleng); return T_INFINITE;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);

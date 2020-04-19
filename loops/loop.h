@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     enum LoopType type;
     unsigned long long iter;
+    bool is_infinite;
     unsigned nested_counter;
     char *array;
     LoopElement element;
