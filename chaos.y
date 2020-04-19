@@ -461,11 +461,11 @@ boolean_expression: T_FALSE                                         { }
 ;
 
 left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
-    | T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                          { Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
-    | T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET                  { Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
-    | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
-    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
-    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); }
+    | T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                          { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
+    | T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET                  { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
+    | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { disable_complex_mode = true; Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
+    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { disable_complex_mode = true; Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
+    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { disable_complex_mode = true; Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
     | left_right_bracket left_right_bracket                         { }
 ;
 
@@ -499,7 +499,7 @@ variable: T_VAR                                                     { $$ = $1; }
 ;
 
 variable_complex_element:                                           { }
-    | T_VAR left_right_bracket                                      { buildVariableComplexElement($1); }
+    | T_VAR left_right_bracket                                      { buildVariableComplexElement($1, NULL); }
 ;
 
 variable:                                                           { }
@@ -593,6 +593,10 @@ array: T_VAR                                                        { cloneSymbo
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
+array: T_VAR left_right_bracket                                     { buildVariableComplexElement($1, NULL); }
+    | array T_COMMA array                                           { }
+    | array T_NEWLINE                                               { }
+;
 
 variable:                                                           { }
     | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_DICT, $4, K_ANY); $$ = "";}
@@ -615,28 +619,27 @@ dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolB
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-
 dictionary: T_STRING T_COLON T_FALSE                                { addSymbolBool($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-
 dictionary: T_STRING T_COLON T_INT                                  { addSymbolFloat($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-
 dictionary: T_STRING T_COLON T_FLOAT                                { addSymbolFloat($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-
 dictionary: T_STRING T_COLON T_STRING                               { addSymbolString($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-
 dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbolToComplex($3, $1); }
+    | dictionary T_COMMA dictionary                                 { }
+    | dictionary T_NEWLINE                                          { }
+;
+dictionary: T_STRING T_COLON T_VAR left_right_bracket               { buildVariableComplexElement($3, $1); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;

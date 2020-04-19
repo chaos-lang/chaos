@@ -19,6 +19,7 @@ char *value_type_names[] = {
 };
 
 unsigned long long symbol_id_counter = 0;
+bool disable_complex_mode = false;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
     symbol_cursor = start_symbol;
@@ -1286,7 +1287,7 @@ void popComplexModeStack() {
 void freeComplexModeStack() {
     for (unsigned i = 0; i < complex_mode_stack.size; i++) {
         if (complex_mode_stack.arr[i] != NULL)
-            freeSymbol(complex_mode_stack.arr[i]);
+            removeSymbol(complex_mode_stack.arr[i]);
             complex_mode_stack.child_counter[i] = 0;
     }
 
@@ -1300,6 +1301,9 @@ void freeComplexModeStack() {
 }
 
 bool isComplexMode() {
+    if (disable_complex_mode) {
+        return false;
+    }
     return complex_mode_stack.size > 0;
 }
 
@@ -1373,7 +1377,20 @@ bool isComplex(Symbol* symbol) {
     return symbol->type == K_ARRAY || symbol->type == K_DICT;
 }
 
-void buildVariableComplexElement(char *name) {
+void buildVariableComplexElement(char *name, char *key) {
     variable_complex_element = getComplexElementThroughLeftRightBracketStack(name, 1);
     variable_complex_element_symbol_id = popLeftRightBracketStack();
+
+    if (isComplexMode()) {
+        Symbol* symbol = variable_complex_element;
+        symbol = getComplexElementBySymbolId(symbol, variable_complex_element_symbol_id);
+
+        Symbol* clone_symbol = createCloneFromSymbol(
+            NULL,
+            symbol->type,
+            symbol,
+            symbol->secondary_type
+        );
+        clone_symbol->key = key;
+    }
 }

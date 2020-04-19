@@ -290,3 +290,23 @@ del a
 list a = [1, 2]
 a[0] = a[1]
 print a
+
+
+// Use multidimensional access to build an array
+del a
+del b
+list a = [[4, 5, 6], 3]
+list b = [a[1], a[0][1], a[0][0]]
+print b
+
+del a
+del b
+list a = [{'a': 4, 'b': 5, 'c': 6}, 3]
+list b = [a[1], a[0]['b'], a[0]['a']]
+print b
+
+del a
+del b
+dict a = {'a': [4, 5, 6], 'b': 3}
+list b = [a['b'], a['a'][1], a['a'][0]]
+print b

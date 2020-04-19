@@ -230,3 +230,22 @@ del a
 dict a = {'a': 1, 'b': 2}
 a['a'] = a['b']
 print a
+
+// Use multidimensional access to build a dictionary
+del a
+del b
+dict a = {'a': {'c': 2, 'd': 3}, 'b': 1}
+dict b = {'a': a['b'], 'b': a['a']['d'], 'c': a['a']['c']}
+print b
+
+del a
+del b
+dict a = {'a': [1, 2, 3], 'b': 1}
+dict b = {'a': a['b'], 'b': a['a'][2], 'c': a['a'][1]}
+print b
+
+del a
+del b
+list a = [{'c': 2, 'd': 3}, 1]
+dict b = {'a': a[1], 'b': a[0]['d'], 'c': a[0]['c']}
+print b
