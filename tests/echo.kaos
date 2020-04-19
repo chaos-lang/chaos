@@ -1,0 +1,5 @@
+echo 77
+echo "hello world"
+echo 'hello world'
+str hello = "world"
+echo hello

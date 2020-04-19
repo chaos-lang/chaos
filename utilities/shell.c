@@ -37,7 +37,8 @@ char *suggestions[1000] = {
     "not",
     "default",
     "function_table",
-    "INFINITE"
+    "INFINITE",
+    "echo"
 };
 
 int up_arrow_key_pressed(int count, int key) {

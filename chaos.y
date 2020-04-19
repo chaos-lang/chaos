@@ -64,7 +64,7 @@ char *program_file_dir;
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
 %token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_DOT T_COLON
 %token T_NEWLINE T_QUIT
-%token T_PRINT
+%token T_PRINT T_ECHO
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_ARRAY T_VAR_DICT T_VAR_ANY
 %token T_DEL T_RETURN T_VOID T_DEFAULT
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
@@ -119,9 +119,11 @@ function:
     | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, K_ARRAY); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID); }
-    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL); } free($2); }
+    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "\n"); } free($2); }
+    | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, ""); } free($2); }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); } free($1); }
-    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2); } free($4); free($2); }
+    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "\n"); } free($4); free($2); }
+    | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, ""); } free($4); free($2); }
     | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); } free($3); free($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
@@ -220,6 +222,7 @@ line: T_NEWLINE
         exit(E_SUCCESS);
     }
     | T_PRINT print T_NEWLINE                                       { }
+    | T_ECHO echo T_NEWLINE                                         { }
     | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
     | T_DEL T_VAR T_NEWLINE                                         { removeSymbolByName($2); free($2); }
     | T_DEL T_VAR left_right_bracket T_NEWLINE                      { removeComplexElementByLeftRightBracketStack($2); }
@@ -242,6 +245,17 @@ print: T_INT                                                        { printf("%l
 print: T_FLOAT                                                      { printf("%Lg\n", $1); }
 ;
 print: T_STRING                                                     { printf("%s\n", $1); free($1); }
+;
+
+echo: T_VAR left_right_bracket                                      { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), ""); }
+;
+echo: T_VAR                                                         { printSymbolValueEndWith(getSymbol($1), ""); free($1); }
+;
+echo: T_INT                                                         { printf("%lld", $1); }
+;
+echo: T_FLOAT                                                       { printf("%Lg", $1); }
+;
+echo: T_STRING                                                      { printf("%s", $1); free($1); }
 ;
 
 mixed_expression: T_FLOAT                                           { $$ = $1; }
@@ -702,6 +716,7 @@ function_parameters_start: error T_NEWLINE parser                   { if (is_int
 function_call_parameters_start: error T_NEWLINE parser              { if (is_interactive) { yyerrok; yyclearin; } }
 function_parameters: error T_NEWLINE parser                         { if (is_interactive) { yyerrok; yyclearin; } }
 print: error T_NEWLINE parser                                       { if (is_interactive) { yyerrok; yyclearin; } }
+echo: error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 mixed_expression: error T_NEWLINE parser                            { if (is_interactive) { yyerrok; yyclearin; } }
 expression: error T_NEWLINE parser                                  { if (is_interactive) { yyerrok; yyclearin; } }
 variable: error T_NEWLINE parser                                    { if (is_interactive) { yyerrok; yyclearin; } }
