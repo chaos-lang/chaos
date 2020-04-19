@@ -129,3 +129,16 @@ foreach a as key1 : val1
         end
     end
 end
+
+del a
+dict a = {'C': [{'h': 'a', 'o': 's'}, {' ': 'L', 'a': 'n'}], 'g': [{'u': 'a', 'g': 'e'}]}
+foreach a as key1 : val1
+    print key1
+    foreach val1 as i
+        foreach i as key2 : val2
+            print key2
+            print val2
+        end
+    end
+end
+

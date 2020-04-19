@@ -573,6 +573,7 @@ array:                                                              { }
     | array T_COMMA T_NEWLINE dictionarystart                       { }
     | dictionarystart T_COMMA dictionarystart                       { }
     | dictionarystart T_COMMA T_NEWLINE dictionarystart             { }
+    | dictionarystart                                               { }
 ;
 
 array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
