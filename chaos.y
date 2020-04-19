@@ -649,6 +649,7 @@ dictionary: T_STRING T_COLON T_VAR left_right_bracket               { buildVaria
 loop:
     | T_INT T_TIMES_DO                                              { startTimesDo($1, false); }
     | T_INFINITE T_TIMES_DO                                         { startTimesDo(0, true); }
+    | T_VAR T_TIMES_DO                                              { startTimesDo((unsigned) getSymbolValueInt($1), false); }
     | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
     | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                      { startForeachDict($2, $4, $6); }
 ;
