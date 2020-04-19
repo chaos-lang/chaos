@@ -1,7 +1,7 @@
 # Chaos
 
 <p align="center">
-  <img src="https://i.ibb.co/dp6T65X/chaos-logo.png" alt="Logo" height="300px"/>
+  <img src="https://chaos-lang.org/img/chaos_logo.png" alt="Logo" height="300px"/>
 </p>
 
 <p align="center">
@@ -42,7 +42,7 @@
 ### Influenced by
 
  - TypeScript's type safety
- - Python's syntax, modules and integrity
+ - Python's syntax, modules and extensibility
  - JavaScript's availability
  - Ruby's loops and blocks
  - PHP's dedication to server-side
@@ -66,8 +66,9 @@
  - No `while` or `when` keywords. Loops are predetermined. There is also `INFINITE` keyword to achieve infinite loops if it's necessary.
  - Single source of errors and unique exit codes for each one of them. So the errors are catchable by other programs.
  - Language's itself forces you to write less error-prone code.
+ - Say goodbye to dependency conflicts with [Occultist](https://occultist.io/) dependency manager.
  - Eliminated segmentation fault possibility using strict memory management and predictions.
- - Integrity via Chaos C extensions.
+ - Simplest [C extension development](https://chaos-lang.org/docs/16_chaos_c_extensions_development) framework so far.
 
 ## Installation
 
@@ -124,3 +125,5 @@ hello world
 [**Documentation Repository**](https://github.com/chaos-lang/chaos-lang.org)
 
 [**Bug Tracker**](https://github.com/chaos-lang/chaos/issues)
+
+[**Occultist Dependency Manager**](https://github.com/chaos-lang/occultist)
