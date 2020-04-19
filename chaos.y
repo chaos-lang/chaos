@@ -562,11 +562,17 @@ arraystart:                                                         { addSymbolA
 array:                                                              { }
     | T_NEWLINE array                                               { }
     | arraystart T_COMMA array                                      { }
+    | arraystart T_COMMA T_NEWLINE array                            { }
     | array T_COMMA arraystart                                      { }
+    | array T_COMMA T_NEWLINE arraystart                            { }
     | arraystart T_COMMA arraystart                                 { }
+    | arraystart T_COMMA T_NEWLINE arraystart                       { }
     | dictionarystart T_COMMA array                                 { }
+    | dictionarystart T_COMMA T_NEWLINE array                       { }
     | array T_COMMA dictionarystart                                 { }
+    | array T_COMMA T_NEWLINE dictionarystart                       { }
     | dictionarystart T_COMMA dictionarystart                       { }
+    | dictionarystart T_COMMA T_NEWLINE dictionarystart             { }
 ;
 
 array: T_TRUE                                                       { addSymbolBool(NULL, $1); }
@@ -607,14 +613,18 @@ dictionarystart:                                                                
     | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); finishComplexMode(NULL, K_ANY); } }
 ;
 
-dictionary:                                                         { }
-    | T_NEWLINE dictionary                                          { }
-    | T_STRING T_COLON dictionarystart T_COMMA dictionary           { popNestedComplexModeStack($1); }
-    | T_STRING T_COLON dictionarystart                              { popNestedComplexModeStack($1); }
-    | dictionary T_COMMA T_STRING T_COLON dictionarystart           { popNestedComplexModeStack($3); }
-    | T_STRING T_COLON arraystart T_COMMA dictionary                { popNestedComplexModeStack($1); }
-    | T_STRING T_COLON arraystart                                   { popNestedComplexModeStack($1); }
-    | dictionary T_COMMA T_STRING T_COLON arraystart                { popNestedComplexModeStack($3); }
+dictionary:                                                             { }
+    | T_NEWLINE dictionary                                              { }
+    | T_STRING T_COLON dictionarystart T_COMMA dictionary               { popNestedComplexModeStack($1); }
+    | T_STRING T_COLON dictionarystart T_COMMA T_NEWLINE dictionary     { popNestedComplexModeStack($1); }
+    | T_STRING T_COLON dictionarystart                                  { popNestedComplexModeStack($1); }
+    | dictionary T_COMMA T_STRING T_COLON dictionarystart               { popNestedComplexModeStack($3); }
+    | dictionary T_COMMA T_NEWLINE T_STRING T_COLON dictionarystart     { popNestedComplexModeStack($4); }
+    | T_STRING T_COLON arraystart T_COMMA dictionary                    { popNestedComplexModeStack($1); }
+    | T_STRING T_COLON arraystart T_COMMA T_NEWLINE dictionary          { popNestedComplexModeStack($1); }
+    | T_STRING T_COLON arraystart                                       { popNestedComplexModeStack($1); }
+    | dictionary T_COMMA T_STRING T_COLON arraystart                    { popNestedComplexModeStack($3); }
+    | dictionary T_COMMA T_NEWLINE T_STRING T_COLON arraystart          { popNestedComplexModeStack($4); }
 ;
 
 dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }
