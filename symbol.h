@@ -52,7 +52,7 @@ typedef struct symbol_array {
 } symbol_array;
 
 symbol_array complex_mode_stack;
-Symbol* last_nested_complex;
+symbol_array nested_complex_mode_stack;
 bool disable_complex_mode;
 
 typedef struct symbol_id_array {
@@ -148,5 +148,8 @@ Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long 
 void removeChildrenOfComplex(Symbol* symbol);
 bool isComplex(Symbol* symbol);
 void buildVariableComplexElement(char *name, char *key);
+void pushNestedComplexModeStack(Symbol* complex_mode);
+void popNestedComplexModeStack(char *key);
+void freeNestedComplexModeStack();
 
 #endif

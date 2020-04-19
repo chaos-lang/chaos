@@ -556,7 +556,7 @@ variable:                                                           { }
 ;
 
 arraystart:                                                         { addSymbolArray(NULL); }
-    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { if (isNestedComplexMode()) { last_nested_complex = getComplexMode(); finishComplexMode(NULL, K_ANY); } }
+    | arraystart T_LEFT_BRACKET array T_RIGHT_BRACKET               { if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); finishComplexMode(NULL, K_ANY); } }
 ;
 
 array:                                                              { }
@@ -604,15 +604,17 @@ variable:                                                           { }
 ;
 
 dictionarystart:                                                                { addSymbolDict(NULL); }
-    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { if (isNestedComplexMode()) { last_nested_complex = getComplexMode(); finishComplexMode(NULL, K_ANY); } }
+    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); finishComplexMode(NULL, K_ANY); } }
 ;
 
 dictionary:                                                         { }
     | T_NEWLINE dictionary                                          { }
-    | T_STRING T_COLON dictionarystart T_COMMA dictionary           { last_nested_complex->key = $1; }
-    | dictionary T_COMMA T_STRING T_COLON dictionarystart           { last_nested_complex->key = $3; }
-    | T_STRING T_COLON arraystart T_COMMA dictionary                { last_nested_complex->key = $1; }
-    | dictionary T_COMMA T_STRING T_COLON arraystart                { last_nested_complex->key = $3; }
+    | T_STRING T_COLON dictionarystart T_COMMA dictionary           { popNestedComplexModeStack($1); }
+    | T_STRING T_COLON dictionarystart                              { popNestedComplexModeStack($1); }
+    | dictionary T_COMMA T_STRING T_COLON dictionarystart           { popNestedComplexModeStack($3); }
+    | T_STRING T_COLON arraystart T_COMMA dictionary                { popNestedComplexModeStack($1); }
+    | T_STRING T_COLON arraystart                                   { popNestedComplexModeStack($1); }
+    | dictionary T_COMMA T_STRING T_COLON arraystart                { popNestedComplexModeStack($3); }
 ;
 
 dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }
@@ -820,6 +822,7 @@ void freeEverything() {
     freeComplexModeStack();
     freeLeftRightBracketStack();
     freeFreeStringStack();
+    freeNestedComplexModeStack();
 
     yylex_destroy();
 

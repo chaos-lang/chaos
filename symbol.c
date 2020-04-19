@@ -1317,7 +1317,6 @@ Symbol* getComplexMode() {
 
 void pushLeftRightBracketStack(unsigned long long symbol_id) {
     // This function rather prepends the stack
-    //printf("push symbol_id: %llu\n", symbol_id);
     if (left_right_bracket_stack.capacity == 0) {
         left_right_bracket_stack.arr = (unsigned long long*)malloc((left_right_bracket_stack.capacity += 1) * sizeof(unsigned long long*));
         left_right_bracket_stack.arr[0] = symbol_id;
@@ -1393,4 +1392,37 @@ void buildVariableComplexElement(char *name, char *key) {
         );
         clone_symbol->key = key;
     }
+}
+
+void pushNestedComplexModeStack(Symbol* complex_mode) {
+    if (complex_mode_stack.arr[complex_mode_stack.size - 2]->type != K_DICT)
+        return;
+    if (nested_complex_mode_stack.capacity == 0) {
+        nested_complex_mode_stack.arr = (Symbol**)malloc((nested_complex_mode_stack.capacity = 2) * sizeof(Symbol));
+    } else if (nested_complex_mode_stack.capacity == nested_complex_mode_stack.size) {
+        nested_complex_mode_stack.arr = (Symbol**)realloc(nested_complex_mode_stack.arr, (nested_complex_mode_stack.capacity *= 2) * sizeof(Symbol));
+    }
+
+    nested_complex_mode_stack.arr[nested_complex_mode_stack.size] = complex_mode;
+    nested_complex_mode_stack.size++;
+}
+
+void popNestedComplexModeStack(char *key) {
+    nested_complex_mode_stack.arr[nested_complex_mode_stack.size - 1]->key = key;
+    nested_complex_mode_stack.arr[nested_complex_mode_stack.size - 1] = NULL;
+    nested_complex_mode_stack.size--;
+}
+
+void freeNestedComplexModeStack() {
+    for (unsigned i = 0; i < nested_complex_mode_stack.size; i++) {
+        if (nested_complex_mode_stack.arr[i] != NULL)
+            removeSymbol(nested_complex_mode_stack.arr[i]);
+    }
+
+    if (nested_complex_mode_stack.capacity > 0) {
+        free(nested_complex_mode_stack.arr);
+    }
+
+    nested_complex_mode_stack.capacity = 0;
+    nested_complex_mode_stack.size = 0;
 }

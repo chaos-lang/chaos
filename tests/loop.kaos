@@ -54,3 +54,72 @@ end
 
 string d = "after all the loops"
 print d
+
+
+// Tests related to multidimensional complex data structures
+del a
+list a = [[1, 2], [3, 4], [5, 6]]
+foreach a as i
+    print i
+    foreach i as j
+        print j
+    end
+end
+
+del a
+list a = [{'a': 1, 'b': 2}, {'c': 3, 'd': 4}, {'e': 5, 'f': 6}]
+foreach a as i
+    print i
+    foreach i as key : val
+        print key
+        print val
+    end
+end
+
+del a
+list a = [{'a': [1, 2], 'b': [3, 4]}, {'c': [5, 6], 'd': [7, 8]}, {'e': [9, 10], 'f': [11, 12]}]
+foreach a as i
+    print i
+    foreach i as key : val
+        print key
+        print val
+        foreach val as j
+            print j
+        end
+    end
+end
+
+del a
+dict a = {'a': {'a': 1, 'b': 2}, 'b': {'c': 3, 'd': 4}, 'c': {'e': 5, 'f': 6}}
+foreach a as key1 : val1
+    print key1
+    print val1
+    foreach val1 as key2 : val2
+        print key2
+        print val2
+    end
+end
+
+del a
+dict a = {'a': [1, 2], 'b': [3, 4], 'c': [5, 6]}
+foreach a as key : val
+    print key
+    print val
+    foreach val as i
+        print i
+    end
+end
+
+del a
+dict a = {'a': [{'a': 1, 'b': 2}, {'c': 3, 'd': 4}], 'b': [{'e': 5, 'f': 6}, {'g': 7, 'h': 8}], 'c': [{'x': 9, 'y': 10}, {'t': 11, 'v': 12}]}
+foreach a as key1 : val1
+    print key1
+    print val1
+    foreach val1 as i
+        print i
+        foreach i as key2 : val2
+            print key2
+            print val2
+        end
+    end
+end
