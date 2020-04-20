@@ -385,7 +385,8 @@ void initScopeless() {
 }
 
 void freeFunction(_Function* function) {
-    free(function->body);
+    if (strlen(function->body) > 0)
+        free(function->body);
     free(function->name);
     free(function->parameters);
     for (unsigned i = 0; i < function->decision_functions.size; i++) {
