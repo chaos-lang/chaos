@@ -763,6 +763,26 @@ quit:                                                               { }
 %%
 
 int main(int argc, char** argv) {
+#if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+    char ch;
+    while ((ch = getopt_long(argc, argv, "hv", long_options, NULL)) != -1)
+    {
+        switch (ch)
+        {
+            case 'h':
+                print_help();
+                exit(0);
+            case 'v':
+                printf("%s\n", __KAOS_LANGUAGE_VERSION__);
+                exit(0);
+            case '?':
+                printf("Unknown option `-%c'.\n", optopt);
+                print_help();
+                break;
+        }
+    }
+#endif
+
     fp = argc > 1 ? fopen (argv[1], "r") : stdin;
     fp_opened = true;
 

@@ -32,11 +32,24 @@
 #define __KAOS_TAB__ "    "
 
 #include <stdio.h>
+#if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+#include <getopt.h>
+#endif
 
 #include "platform.h"
 
 void greet();
 void yyerror_msg(char* error_name, char* current_module, char* cause);
 void print_bye_bye();
+void print_help();
+
+#if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+static struct option long_options[] =
+{
+    {"help", no_argument, NULL, 'h'},
+    {"version", no_argument, NULL, 'v'},
+    {NULL, 0, NULL, 0}
+};
+#endif
 
 #endif

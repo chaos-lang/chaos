@@ -1,0 +1,5 @@
+Usage: chaos [options] <file> [--] [args...]
+
+    -h, --help          Print this help text.
+    -v, --version       Version number.
+
