@@ -120,7 +120,7 @@ switch (phase)
 
 [ \t]                           {recordToken(strdup(yytext), yyleng);}; // ignore all whitespace
 [0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (isStreamOpen()) return T_FLOAT;}
-[0-9]+                          {recordToken(strdup(yytext), yyleng); yylval.ival = atoi(yytext); return T_INT;}
+[0-9]+                          {recordToken(strdup(yytext), yyleng); yylval.ival = atoi(yytext); if (isStreamOpen()) { return T_INT; } else { return T_TIMES_DO_INT; }}
 \n                              {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
 "="                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_EQUAL;}
 "+"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PLUS;}

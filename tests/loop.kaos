@@ -142,3 +142,17 @@ foreach a as key1 : val1
     end
 end
 
+
+// T_INT in N times do
+del a
+list a = []
+3 times do
+    a = [1, 2, 3]
+    print a
+end
+
+
+// N times do (N as a mathematical expression)
+3 + 5 times do
+    print "eight times"
+end

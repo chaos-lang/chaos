@@ -87,3 +87,12 @@ bool def boolF()
 end
 
 print boolF()
+
+// T_INT inside function
+nil def tokenIntInsideFunction()
+    list a = [1, 2, 3]
+    print a
+end
+
+tokenIntInsideFunction()
+

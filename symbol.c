@@ -1265,6 +1265,7 @@ void removeSymbolsByScope(_Function* scope) {
         symbol_cursor = symbol_cursor->next;
         if (strcmp(symbol->scope->name, scope->name) == 0) {
             removeSymbol(symbol);
+            return removeSymbolsByScope(scope);
         }
     }
 }

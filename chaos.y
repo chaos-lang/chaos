@@ -57,7 +57,7 @@ char *program_file_dir;
 
 %token START_PROGRAM START_PREPARSE
 %token<bval> T_TRUE T_FALSE
-%token<ival> T_INT
+%token<ival> T_INT T_TIMES_DO_INT
 %token<fval> T_FLOAT
 %token<sval> T_STRING T_VAR
 %token<lluval> T_UNSIGNED_LONG_LONG_INT
@@ -179,7 +179,7 @@ function_parameters: T_FALSE                                        { if (!block
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_INT                                          { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterInt($1); }
+function_parameters: expression                                     { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterInt($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -246,7 +246,7 @@ print: T_VAR left_right_bracket                                     { printSymbo
 ;
 print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1), false); free($1); }
 ;
-print: T_INT                                                        { printf("%lld\n", $1); }
+print: expression                                                   { printf("%lld\n", $1); }
 ;
 print: T_FLOAT                                                      { printf("%Lg\n", $1); }
 ;
@@ -257,7 +257,7 @@ echo: T_VAR left_right_bracket                                      { printSymbo
 ;
 echo: T_VAR                                                         { printSymbolValueEndWith(getSymbol($1), "", false); free($1); }
 ;
-echo: T_INT                                                         { printf("%lld", $1); }
+echo: expression                                                    { printf("%lld", $1); }
 ;
 echo: T_FLOAT                                                       { printf("%Lg", $1); }
 ;
@@ -312,7 +312,7 @@ mixed_expression: T_FLOAT                                           { $$ = $1; }
     | T_LEFT mixed_expression T_RIGHT                               { $$ = $2; }
 ;
 
-expression: T_INT                                                   { $$ = $1; }
+expression: T_INT                                                   { $$ = (long long) $1; }
     | T_MINUS expression                                            { $$ = - $2; }
     | expression T_PLUS expression                                  { $$ = $1 + $3; }
     | expression T_MINUS expression                                 { $$ = $1 - $3; }
@@ -490,8 +490,8 @@ boolean_expression: T_FALSE                                         { }
 ;
 
 left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
-    | T_LEFT_BRACKET T_INT T_RIGHT_BRACKET                          { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
-    | T_LEFT_BRACKET T_MINUS T_INT T_RIGHT_BRACKET                  { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
+    | T_LEFT_BRACKET expression T_RIGHT_BRACKET                     { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
+    | T_LEFT_BRACKET T_MINUS expression T_RIGHT_BRACKET             { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
     | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { disable_complex_mode = true; Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
     | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { disable_complex_mode = true; Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
     | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { disable_complex_mode = true; Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
@@ -501,7 +501,6 @@ left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
 variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_TRUE                                       { updateSymbolBool($1, $3); $$ = ""; }
     | variable T_EQUAL T_FALSE                                      { updateSymbolBool($1, $3); $$ = ""; }
-    | variable T_EQUAL T_INT                                        { updateSymbolInt($1, $3); $$ = ""; }
     | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR                                        { updateSymbolByClonningName($1, $3); $$ = ""; }
@@ -515,7 +514,6 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable_complex_element                                      { if (is_interactive) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false); $$ = ""; } else { yyerror("Syntax error"); } }
     | variable_complex_element T_EQUAL T_TRUE                       { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_FALSE                      { updateComplexElementBool($3); $$ = ""; }
-    | variable_complex_element T_EQUAL T_INT                        { updateComplexElementInt($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_FLOAT                      { updateComplexElementFloat($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_STRING                     { updateComplexElementString($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_VAR                        { updateComplexElementSymbol(getSymbol($3)); free($3); $$ = ""; }
@@ -544,7 +542,6 @@ variable:                                                           { }
 ;
 
 variable:                                                           { }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_INT                              { addSymbolInt($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, K_ANY); $$ = ""; }
@@ -568,7 +565,6 @@ variable:                                                           { }
 
 variable:                                                           { }
     | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_INT                                 { addSymbolAnyInt($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FLOAT                               { addSymbolAnyFloat($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
@@ -613,7 +609,7 @@ array: T_FALSE                                                      { addSymbolB
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
-array: T_INT                                                        { addSymbolFloat(NULL, $1); }
+array: expression                                                   { addSymbolFloat(NULL, $1); }
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
@@ -665,7 +661,7 @@ dictionary: T_STRING T_COLON T_FALSE                                { addSymbolB
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-dictionary: T_STRING T_COLON T_INT                                  { addSymbolFloat($1, $3); }
+dictionary: T_STRING T_COLON expression                             { addSymbolFloat($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
@@ -687,7 +683,8 @@ dictionary: T_STRING T_COLON T_VAR left_right_bracket               { buildVaria
 ;
 
 loop:
-    | T_INT T_TIMES_DO                                              { startTimesDo($1, false); }
+    | expression T_TIMES_DO                                         { startTimesDo($1, false); }
+    | T_TIMES_DO_INT T_TIMES_DO                                     { startTimesDo($1, false); }
     | T_INFINITE T_TIMES_DO                                         { startTimesDo(0, true); }
     | T_VAR T_TIMES_DO                                              { startTimesDo((unsigned) getSymbolValueInt($1), false); }
     | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
@@ -739,6 +736,10 @@ arraystart: error T_NEWLINE parser                                  { if (is_int
 dictionarystart: error T_NEWLINE parser                             { if (is_interactive) { yyerrok; yyclearin; } }
 dictionary: error T_NEWLINE parser                                  { if (is_interactive) { yyerrok; yyclearin; } }
 loop: error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+
+expression:                                                         { }
+    | T_TIMES_DO_INT expression                                     { }
+;
 
 %%
 
