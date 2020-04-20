@@ -17,6 +17,7 @@
 
 extern void recordToken(char *token, int length);
 extern int oerrno;
+extern void yyerror(const char* s);
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
 #include "chaos.tab.h"
@@ -96,6 +97,8 @@ static int custom_input(char *buf, int result, int max_size) {
 #endif
 %}
 
+%x COMMENT
+
 %%
 
 %{
@@ -153,8 +156,8 @@ switch (phase)
 ">>"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_RIGHT_SHIFT;}
 "++"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_INCREMENT;}
 "--"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DECREMENT;}
-"//".*"\n"                      {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
-"#".*"\n"                       {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
+"//".*"\n"                      {yylineno++; return T_NEWLINE;}
+"#".*"\n"                       {yylineno++; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
 "exit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
 "quit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
@@ -175,6 +178,10 @@ switch (phase)
 "as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
 "from"                          {recordToken(strdup(yytext), yyleng); return T_FROM;}
 "INFINITE"                      {recordToken(strdup(yytext), yyleng); return T_INFINITE;}
+
+"/*"                            {BEGIN(COMMENT);}
+<COMMENT>"*/"                   {BEGIN(INITIAL);}
+<COMMENT>.|"\n"                 {yylineno++;}
 
 (\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
     recordToken(strdup(yytext), yyleng);

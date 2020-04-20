@@ -3,6 +3,15 @@ print "hey" // End of Line(EOL) comment
 // This is a comment
 #print "hey"
 # This is a comment too
+/*
+This is a
+multiline comment
+*/
+/* Inline multiline comment */
+num x = 1 /* End of Line(EOL)
+multine comment
+*/
+num y = 1 /* End of Line(EOL) inline multiline comment */
 
 void def a(num b)
     //print b
@@ -10,6 +19,15 @@ void def a(num b)
     print b # End of Line(EOL) comment
     #print b
     # This is a comment too
+    /*
+    This is a
+    multiline comment
+    */
+    /* Inline multiline comment */
+    num x = 1 /* End of Line(EOL)
+    multine comment
+    */
+    num y = 1 /* End of Line(EOL) inline multiline comment */
 end
 
 a(5)
