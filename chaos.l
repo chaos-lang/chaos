@@ -194,5 +194,5 @@ any                             {recordToken(strdup(yytext), yyleng); if (isStre
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 import|include|use              {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
-[a-zA-Z][a-zA-Z0-9]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
+[a-zA-Z_][a-zA-Z0-9_]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%
