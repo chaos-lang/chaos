@@ -1,0 +1,3 @@
+print "hello world"
+num a = 1
+exit a

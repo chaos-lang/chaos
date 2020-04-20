@@ -216,15 +216,7 @@ line: T_NEWLINE
     | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen()) printf("%lld\n", $1); }
     | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getSymbol($1), false); free($1); } }
     | loop T_NEWLINE                                                { }
-    | T_QUIT T_NEWLINE                                              {
-        if (is_interactive) {
-            print_bye_bye();
-        } else {
-            YYABORT;
-        }
-        freeEverything();
-        exit(E_SUCCESS);
-    }
+    | quit T_NEWLINE                                              { }
     | T_PRINT print T_NEWLINE                                       { }
     | T_ECHO echo T_NEWLINE                                         { }
     | T_PRETTY T_PRINT pretty_print T_NEWLINE                       { }
@@ -735,6 +727,37 @@ loop: error T_NEWLINE parser                                        { if (is_int
 
 expression:                                                         { }
     | T_TIMES_DO_INT expression                                     { }
+;
+
+quit:                                                               { }
+    | T_QUIT T_NEWLINE                                              {
+        if (is_interactive) {
+            print_bye_bye();
+        } else {
+            YYABORT;
+        }
+        freeEverything();
+        exit(E_SUCCESS);
+    }
+    | T_QUIT expression T_NEWLINE                                              {
+        if (is_interactive) {
+            print_bye_bye();
+        } else {
+            YYABORT;
+        }
+        freeEverything();
+        exit($2);
+    }
+    | T_QUIT T_VAR T_NEWLINE                                              {
+        if (is_interactive) {
+            print_bye_bye();
+        } else {
+            YYABORT;
+        }
+        long long code = getSymbolValueInt($2);
+        freeEverything();
+        exit(code);
+    }
 ;
 
 %%
