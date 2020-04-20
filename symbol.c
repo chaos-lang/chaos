@@ -329,7 +329,7 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
     return value * symbol->sign;
 }
 
-void printSymbolValue(Symbol* symbol, bool is_complex) {
+void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, unsigned long iter) {
     switch (symbol->type)
     {
         case K_BOOL:
@@ -357,23 +357,65 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
             }
             break;
         case K_ARRAY:
+            iter++;
             printf("[");
+            if (pretty) {
+                printf("\n");
+            }
             for (unsigned long i = 0; i < symbol->children_count; i++) {
-                printSymbolValue(symbol->children[i], true);
+                if (pretty) {
+                    for (unsigned long j = 0; j < iter; j++) {
+                        printf(__KAOS_TAB__);
+                    }
+                }
+                printSymbolValue(symbol->children[i], true, pretty, iter);
                 if (i + 1 != symbol->children_count) {
-                    printf(", ");
+                    if (pretty) {
+                        printf(",\n");
+                    } else {
+                        printf(", ");
+                    }
+                }
+            }
+            if (pretty) {
+                printf("\n");
+            }
+            if (pretty) {
+                for (unsigned long j = 0; j < (iter - 1); j++) {
+                    printf(__KAOS_TAB__);
                 }
             }
             printf("]");
             break;
         case K_DICT:
+            iter++;
             printf("{");
+            if (pretty) {
+                printf("\n");
+            }
             for (unsigned long i = 0; i < symbol->children_count; i++) {
+                if (pretty) {
+                    for (unsigned long j = 0; j < iter; j++) {
+                        printf(__KAOS_TAB__);
+                    }
+                }
                 Symbol* child = symbol->children[i];
                 printf("'%s': ", child->key);
-                printSymbolValue(child, true);
+                printSymbolValue(child, true, pretty, iter);
                 if (i + 1 != symbol->children_count) {
-                    printf(", ");
+                    if (pretty) {
+                        printf(",\n");
+                    } else {
+                        printf(", ");
+                    }
+                }
+            }
+            if (pretty) {
+                printf("\n");
+            }
+            if (pretty) {
+                for (unsigned long j = 0; j < (iter - 1); j++) {
+                    printf(__KAOS_TAB__);
                 }
             }
             printf("}");
@@ -404,15 +446,13 @@ void printSymbolValue(Symbol* symbol, bool is_complex) {
     }
 }
 
-void printSymbolValueEndWith(Symbol* symbol, char *end)
-{
-    printSymbolValue(symbol, false);
+void printSymbolValueEndWith(Symbol* symbol, char *end, bool pretty) {
+    printSymbolValue(symbol, false, pretty, 0);
     printf("%s", end);
 }
 
-void printSymbolValueEndWithNewLine(Symbol* symbol)
-{
-    printSymbolValueEndWith(symbol, "\n");
+void printSymbolValueEndWithNewLine(Symbol* symbol, bool pretty) {
+    printSymbolValueEndWith(symbol, "\n", pretty);
 }
 
 bool isDefined(char *name) {

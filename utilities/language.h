@@ -29,6 +29,8 @@
     #define __KAOS_SHELL_INDICATOR_BLOCK__ ".... "
 #endif
 
+#define __KAOS_TAB__ "    "
+
 #include <stdio.h>
 
 #include "platform.h"

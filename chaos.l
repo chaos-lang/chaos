@@ -160,6 +160,7 @@ switch (phase)
 "quit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
 "print"                         {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PRINT;}
 "echo"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_ECHO;}
+"pretty"                        {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PRETTY;}
 "true"                          {recordToken(strdup(yytext), yyleng); yylval.bval = 1; if (isStreamOpen()) return T_TRUE;}
 "false"                         {recordToken(strdup(yytext), yyleng); yylval.bval = 0; if (isStreamOpen()) return T_FALSE;}
 "symbol_table"                  {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_SYMBOL_TABLE;}
