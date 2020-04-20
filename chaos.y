@@ -184,7 +184,7 @@ function_parameters: expression                                     { if (!block
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_FLOAT                                        { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterFloat($1); }
+function_parameters: mixed_expression                               { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterFloat($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -248,7 +248,7 @@ print: T_VAR                                                        { printSymbo
 ;
 print: expression                                                   { printf("%lld\n", $1); }
 ;
-print: T_FLOAT                                                      { printf("%Lg\n", $1); }
+print: mixed_expression                                             { printf("%Lg\n", $1); }
 ;
 print: T_STRING                                                     { printf("%s\n", $1); free($1); }
 ;
@@ -259,7 +259,7 @@ echo: T_VAR                                                         { printSymbo
 ;
 echo: expression                                                    { printf("%lld", $1); }
 ;
-echo: T_FLOAT                                                       { printf("%Lg", $1); }
+echo: mixed_expression                                              { printf("%Lg", $1); }
 ;
 echo: T_STRING                                                      { printf("%s", $1); free($1); }
 ;
@@ -273,7 +273,7 @@ pretty_echo: T_VAR left_right_bracket                               { printSymbo
 pretty_echo: T_VAR                                                  { printSymbolValueEndWith(getSymbol($1), "", true); free($1); }
 ;
 
-mixed_expression: T_FLOAT                                           { $$ = $1; }
+mixed_expression: T_FLOAT                                           { $$ = (long double) $1; }
     | T_MINUS mixed_expression                                      { $$ = - $2; }
     | mixed_expression T_PLUS mixed_expression                      { $$ = $1 + $3; }
     | mixed_expression T_MINUS mixed_expression                     { $$ = $1 - $3; }
@@ -501,7 +501,6 @@ left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
 variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL T_TRUE                                       { updateSymbolBool($1, $3); $$ = ""; }
     | variable T_EQUAL T_FALSE                                      { updateSymbolBool($1, $3); $$ = ""; }
-    | variable T_EQUAL T_FLOAT                                      { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR                                        { updateSymbolByClonningName($1, $3); $$ = ""; }
     | variable T_EQUAL T_VAR left_right_bracket                     { updateSymbolByClonningComplexElement($1, $3); $$ = ""; }
@@ -514,7 +513,6 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable_complex_element                                      { if (is_interactive) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false); $$ = ""; } else { yyerror("Syntax error"); } }
     | variable_complex_element T_EQUAL T_TRUE                       { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_FALSE                      { updateComplexElementBool($3); $$ = ""; }
-    | variable_complex_element T_EQUAL T_FLOAT                      { updateComplexElementFloat($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_STRING                     { updateComplexElementString($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_VAR                        { updateComplexElementSymbol(getSymbol($3)); free($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_VAR left_right_bracket     { updateComplexElementSymbol(getComplexElementThroughLeftRightBracketStack($3, 0)); $$ = ""; }
@@ -542,7 +540,6 @@ variable:                                                           { }
 ;
 
 variable:                                                           { }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_FLOAT                            { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, K_ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR_ARRAY T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_ARRAY, $5, K_NUMBER); $$ = ""; }
@@ -565,7 +562,6 @@ variable:                                                           { }
 
 variable:                                                           { }
     | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_FLOAT                               { addSymbolAnyFloat($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_TRUE                                { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_FALSE                               { addSymbolAnyBool($2, $4); $$ = ""; }
     | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, K_ANY, $4, K_ANY); $$ = ""; }
@@ -613,7 +609,7 @@ array: expression                                                   { addSymbolF
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
-array: T_FLOAT                                                      { addSymbolFloat(NULL, $1); }
+array: mixed_expression                                             { addSymbolFloat(NULL, $1); }
     | array T_COMMA array                                           { }
     | array T_NEWLINE                                               { }
 ;
@@ -665,7 +661,7 @@ dictionary: T_STRING T_COLON expression                             { addSymbolF
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
-dictionary: T_STRING T_COLON T_FLOAT                                { addSymbolFloat($1, $3); }
+dictionary: T_STRING T_COLON mixed_expression                       { addSymbolFloat($1, $3); }
     | dictionary T_COMMA dictionary                                 { }
     | dictionary T_NEWLINE                                          { }
 ;
