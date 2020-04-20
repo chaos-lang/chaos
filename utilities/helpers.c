@@ -407,3 +407,59 @@ void freeFreeStringStack() {
     free_string_stack.size = 0;
     free(free_string_stack.arr);
 }
+
+char* escape_the_sequences_in_string_literal(char* string) {
+    char* new_string = malloc(strlen(string) + 1);
+    strcpy(new_string, string);
+
+    for (long long i = 0; i < strlen(new_string); i++){
+        if (new_string[i] == '\\') {
+            switch (new_string[i+1])
+            {
+                case '\\':
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'a':
+                    new_string[i+1] = '\a';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'b':
+                    new_string[i+1] = '\b';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'e':
+                    new_string[i+1] = '\e';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'f':
+                    new_string[i+1] = '\f';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'n':
+                    new_string[i+1] = '\n';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'r':
+                    new_string[i+1] = '\r';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 't':
+                    new_string[i+1] = '\t';
+                    remove_nth_char(new_string, i);
+                    break;
+                case 'v':
+                    new_string[i+1] = '\v';
+                    remove_nth_char(new_string, i);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    return new_string;
+}
+
+void remove_nth_char(char* string, long long n) {
+    memmove(&string[n], &string[n + 1], strlen(string) - n);
+}

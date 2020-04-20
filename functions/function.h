@@ -83,7 +83,7 @@ void addFunctionCallParameterFloat(long double f);
 void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);
-void printFunctionReturn(char *name, char *module, char *end, bool pretty);
+void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped);
 void initMainFunction();
 void initScopeless();
 void freeFunction(_Function* function);

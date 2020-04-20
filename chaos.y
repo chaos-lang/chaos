@@ -119,15 +119,15 @@ function:
     | T_VAR_ARRAY T_FUNCTION T_VAR function_parameters_start        { startFunction($3, K_ARRAY); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID); }
-    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "\n", false); } free($2); }
-    | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "", false); } free($2); }
-    | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "\n", true); } free($3); }
-    | T_PRETTY T_ECHO T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "", true); } free($3); }
+    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "\n", false, true); } free($2); }
+    | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "", false, true); } free($2); }
+    | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "\n", true, true); } free($3); }
+    | T_PRETTY T_ECHO T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "", true, true); } free($3); }
     | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); } free($1); }
-    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "\n", false); } free($4); free($2); }
-    | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "", false); } free($4); free($2); }
-    | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start      { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "\n", true); } free($5); free($3); }
-    | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "", true); } free($5); free($3); }
+    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "\n", false, true); } free($4); free($2); }
+    | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "", false, true); } free($4); free($2); }
+    | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start      { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "\n", true, true); } free($5); free($3); }
+    | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "", true, true); } free($5); free($3); }
     | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); } free($3); free($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
@@ -214,9 +214,9 @@ parser:
 line: T_NEWLINE
     | mixed_expression T_NEWLINE                                    { if (is_interactive && isStreamOpen()) printf("%Lg\n", $1); }
     | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen()) printf("%lld\n", $1); }
-    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getSymbol($1), false); free($1); } }
+    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getSymbol($1), false, false); free($1); } }
     | loop T_NEWLINE                                                { }
-    | quit T_NEWLINE                                              { }
+    | quit T_NEWLINE                                                { }
     | T_PRINT print T_NEWLINE                                       { }
     | T_ECHO echo T_NEWLINE                                         { }
     | T_PRETTY T_PRINT pretty_print T_NEWLINE                       { }
@@ -234,9 +234,9 @@ line: T_NEWLINE
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-print: T_VAR left_right_bracket                                     { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0), false); }
+print: T_VAR left_right_bracket                                     { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0), false, true); }
 ;
-print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1), false); free($1); }
+print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1), false, true); free($1); }
 ;
 print: expression                                                   { printf("%lld\n", $1); }
 ;
@@ -245,9 +245,9 @@ print: mixed_expression                                             { printf("%L
 print: T_STRING                                                     { printf("%s\n", $1); free($1); }
 ;
 
-echo: T_VAR left_right_bracket                                      { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), "", false); }
+echo: T_VAR left_right_bracket                                      { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), "", false, true); }
 ;
-echo: T_VAR                                                         { printSymbolValueEndWith(getSymbol($1), "", false); free($1); }
+echo: T_VAR                                                         { printSymbolValueEndWith(getSymbol($1), "", false, true); free($1); }
 ;
 echo: expression                                                    { printf("%lld", $1); }
 ;
@@ -256,13 +256,13 @@ echo: mixed_expression                                              { printf("%L
 echo: T_STRING                                                      { printf("%s", $1); free($1); }
 ;
 
-pretty_print: T_VAR left_right_bracket                              { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0), true); }
+pretty_print: T_VAR left_right_bracket                              { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0), true, true); }
 ;
-pretty_print: T_VAR                                                 { printSymbolValueEndWithNewLine(getSymbol($1), true); free($1); }
+pretty_print: T_VAR                                                 { printSymbolValueEndWithNewLine(getSymbol($1), true, true); free($1); }
 ;
-pretty_echo: T_VAR left_right_bracket                               { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), "", true); }
+pretty_echo: T_VAR left_right_bracket                               { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), "", true, true); }
 ;
-pretty_echo: T_VAR                                                  { printSymbolValueEndWith(getSymbol($1), "", true); free($1); }
+pretty_echo: T_VAR                                                  { printSymbolValueEndWith(getSymbol($1), "", true, true); free($1); }
 ;
 
 mixed_expression: T_FLOAT                                           { $$ = (long double) $1; }
@@ -502,7 +502,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL arraystart                                   { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
     | variable T_EQUAL dictionarystart                              { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
-    | variable_complex_element                                      { if (is_interactive) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false); $$ = ""; } else { yyerror("Syntax error"); } }
+    | variable_complex_element                                      { if (is_interactive) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false); $$ = ""; } else { yyerror("Syntax error"); } }
     | variable_complex_element T_EQUAL T_TRUE                       { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_FALSE                      { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_STRING                     { updateComplexElementString($3); $$ = ""; }

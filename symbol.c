@@ -329,7 +329,7 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
     return value * symbol->sign;
 }
 
-void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, unsigned long iter) {
+void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter) {
     switch (symbol->type)
     {
         case K_BOOL:
@@ -353,7 +353,13 @@ void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, unsigned lon
             if (is_complex) {
                 printf("'%s'", symbol->value.s);
             } else {
-                printf("%s", symbol->value.s);
+                if (escaped) {
+                    char* out = escape_the_sequences_in_string_literal(symbol->value.s);
+                    printf("%s", out);
+                    free(out);
+                } else {
+                    printf("%s", symbol->value.s);
+                }
             }
             break;
         case K_ARRAY:
@@ -368,7 +374,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, unsigned lon
                         printf(__KAOS_TAB__);
                     }
                 }
-                printSymbolValue(symbol->children[i], true, pretty, iter);
+                printSymbolValue(symbol->children[i], true, pretty, escaped, iter);
                 if (i + 1 != symbol->children_count) {
                     if (pretty) {
                         printf(",\n");
@@ -401,7 +407,7 @@ void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, unsigned lon
                 }
                 Symbol* child = symbol->children[i];
                 printf("'%s': ", child->key);
-                printSymbolValue(child, true, pretty, iter);
+                printSymbolValue(child, true, pretty, escaped, iter);
                 if (i + 1 != symbol->children_count) {
                     if (pretty) {
                         printf(",\n");
@@ -446,13 +452,13 @@ void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, unsigned lon
     }
 }
 
-void printSymbolValueEndWith(Symbol* symbol, char *end, bool pretty) {
-    printSymbolValue(symbol, false, pretty, 0);
+void printSymbolValueEndWith(Symbol* symbol, char *end, bool pretty, bool escaped) {
+    printSymbolValue(symbol, false, pretty, escaped, 0);
     printf("%s", end);
 }
 
-void printSymbolValueEndWithNewLine(Symbol* symbol, bool pretty) {
-    printSymbolValueEndWith(symbol, "\n", pretty);
+void printSymbolValueEndWithNewLine(Symbol* symbol, bool pretty, bool escaped) {
+    printSymbolValueEndWith(symbol, "\n", pretty, escaped);
 }
 
 bool isDefined(char *name) {
@@ -981,7 +987,7 @@ void removeComplexElement(Symbol* complex, unsigned long long symbol_id) {
             throw_error(E_INDEX_OUT_OF_RANGE_STRING, complex->name, NULL, orig_i);
         }
 
-        memmove(&complex->value.s[i], &complex->value.s[i + 1], strlen(complex->value.s) - i);
+        remove_nth_char(complex->value.s, i);
         return;
     } else if (complex->type == K_ARRAY) {
         symbol = getArrayElement(complex, i);

@@ -35,6 +35,8 @@ void str_replace(char *target, const char *needle, const char *replacement);
 bool is_file_exists(char* file_path);
 const char *get_filename_ext(const char *filename);
 void freeFreeStringStack();
+char* escape_the_sequences_in_string_literal(char* string);
+void remove_nth_char(char* string, long long n);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>

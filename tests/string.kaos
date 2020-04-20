@@ -17,3 +17,59 @@ str k = 'chaos'
 k[1] = 'k'
 del k[0]
 print k
+
+
+// Multiline string literals
+del a
+str a = "hello
+world"
+print a
+
+del a
+str a = '
+hello
+world
+'
+print a
+
+del a
+str a = "
+
+hello
+
+world
+
+"
+print a
+
+
+// String literals with escape sequences
+del a
+str a = 'hello\nworld'
+print a
+
+del a
+str a = "
+hello\n
+world
+"
+print a
+
+del a
+str a = "hello
+\n
+\n\n
+world\n"
+print a
+
+del a
+str a = "hello world\n"
+echo a
+
+del a
+str a = 'hello\tworld'
+print a
+
+del a
+str a = "hello\t\tworld"
+print a

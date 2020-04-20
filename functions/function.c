@@ -353,14 +353,14 @@ void returnSymbol(char *name) {
     free(name);
 }
 
-void printFunctionReturn(char *name, char *module, char *end, bool pretty) {
+void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped) {
     _Function* function = getFunction(name, module);
     if (function->symbol == NULL) {
         append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
-    printSymbolValueEndWith(function->symbol, end, pretty);
+    printSymbolValueEndWith(function->symbol, end, pretty, escaped);
 }
 
 void initMainFunction() {
