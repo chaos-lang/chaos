@@ -123,7 +123,7 @@ function:
     | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "", false, true); } free($2); }
     | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "\n", true, true); } free($3); }
     | T_PRETTY T_ECHO T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "", true, true); } free($3); }
-    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); } free($1); }
+    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); if (is_interactive && !isFunctionType($1, NULL, K_VOID)) printFunctionReturn($1, NULL, "\n", false, false); } free($1); }
     | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "\n", false, true); } free($4); free($2); }
     | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "", false, true); } free($4); free($2); }
     | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start      { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "\n", true, true); } free($5); free($3); }

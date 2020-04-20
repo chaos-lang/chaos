@@ -95,5 +95,6 @@ void executeDecision(_Function* function);
 void addFunctionNameToFunctionNamesBuffer(char *name);
 void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
+bool isFunctionType(char *name, char *module, enum Type type);
 
 #endif

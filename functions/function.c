@@ -532,3 +532,8 @@ bool isInFunctionNamesBuffer(char *name) {
     }
     return false;
 }
+
+bool isFunctionType(char *name, char *module, enum Type type) {
+    _Function* function = getFunction(name, module);
+    return function->type == type;
+}

@@ -8,3 +8,8 @@ f1()
 
 asdasd2()
 
+num def f2()
+    num a = 5
+    return a
+end
+f2()
