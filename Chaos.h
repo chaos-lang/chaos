@@ -3,8 +3,13 @@
 
 #include <stdbool.h>
 
+#if defined(CHAOS_INTERPRETER)
 #include "enums.h"
 #include "utilities/language.h"
+#else
+#include "chaos/enums.h"
+#include "chaos/language.h"
+#endif
 
 int defineFunction(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length);
 bool getVariableBool(char *name);

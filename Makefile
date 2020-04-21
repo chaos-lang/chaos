@@ -12,19 +12,19 @@ requirements:
 	./requirements.sh
 
 requirements-dev:
-	mkdir -p /usr/local/include/utilities
-	cp utilities/language.h /usr/local/include/utilities/
-	cp utilities/platform.h /usr/local/include/utilities/
-	cp enums.h /usr/local/include/
+	mkdir -p /usr/local/include/chaos
+	cp utilities/language.h /usr/local/include/chaos/
+	cp utilities/platform.h /usr/local/include/chaos/
+	cp enums.h /usr/local/include/chaos/
 	cp Chaos.h /usr/local/include/
 ifeq ($(UNAME_S), Darwin)
 	$(eval GCC_VERSION=$(shell gcc -dumpversion))
 	$(eval GCC_MAJOR_VERSION=$(shell gcc -dumpversion | cut -d. -f1))
-	mkdir -p /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/utilities
-	cp utilities/language.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/utilities
-	cp utilities/platform.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/utilities
-	cp enums.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include
-	cp Chaos.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include
+	mkdir -p /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos
+	cp utilities/language.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
+	cp utilities/platform.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
+	cp enums.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
+	cp Chaos.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/
 endif
 
 clang:
@@ -63,7 +63,7 @@ lex.yy.c: chaos.l chaos.tab.h
 	flex chaos.l
 
 chaos: lex.yy.c chaos.tab.c chaos.tab.h
-	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
+	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
 	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h

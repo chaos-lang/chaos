@@ -87,7 +87,7 @@ win_bison -d chaos.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-%compiler% -Iloops -Ifunctions -Imodules -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c %extra_flags%
+%compiler% -Iloops -Ifunctions -Imodules -DCHAOS_INTERPRETER -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )
@@ -121,20 +121,20 @@ SET /p CLANG_VERSION= < tmpFile
 DEL tmpFile
 
 ECHO "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
-IF not exist "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities" mkdir "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities"
-COPY utilities\language.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
-COPY utilities\platform.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\utilities\"
-COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+IF not exist "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos" mkdir "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos"
+COPY utilities\language.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
+COPY utilities\platform.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
+COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
 COPY Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
 IF errorlevel 1 (
     EXIT /B 1
 )
 
 ECHO "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
-IF not exist "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities" mkdir "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities"
-COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\""
-COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\utilities\"
-COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+IF not exist "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos" mkdir "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos"
+COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
+COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
+COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
 IF errorlevel 1 (
     EXIT /B 1
