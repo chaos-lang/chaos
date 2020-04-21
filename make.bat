@@ -35,6 +35,13 @@ IF [%1]==[] (
     ) ELSE (
         EXIT /B 0
     )
+) ELSE IF [%1]==[uninstall] (
+    CALL :Uninstall
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
 ) ELSE IF [%1]==[test] (
     CALL tests\run.bat
     IF errorlevel 1 (
@@ -136,6 +143,33 @@ COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include
 COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+IF errorlevel 1 (
+    EXIT /B 1
+)
+EXIT /B 0
+
+:Uninstall
+DEL %windir%\System32\chaos.exe
+CALL RefreshEnv.cmd
+
+gcc -dumpversion > tmpFile
+SET /p GCC_VERSION= < tmpFile
+DEL tmpFile
+
+clang -dumpversion > tmpFile
+SET /p CLANG_VERSION= < tmpFile
+DEL tmpFile
+
+ECHO "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+DEL Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\Chaos.h"
+RMDIR /s /q "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
+IF errorlevel 1 (
+    EXIT /B 1
+)
+
+ECHO "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+DEL "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\Chaos.h"
+RMDIR /s /q "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 IF errorlevel 1 (
     EXIT /B 1
 )

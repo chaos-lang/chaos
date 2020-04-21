@@ -112,6 +112,14 @@ $ chaos dev.kaos
 hello world
 ```
 
+## Uninstallation
+
+You can uninstall the `chaos` binary and its C headers with:
+
+```
+make uninstall
+```
+
 ## Useful Links
 
 [**Language Reference**](https://chaos-lang.org/docs/04_primitive-data-types)

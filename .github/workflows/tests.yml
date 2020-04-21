@@ -90,6 +90,10 @@ jobs:
       run: |
         make test
 
+    - name: Uninstall
+      run: |
+        make uninstall
+
   macos:
     name: macos
     runs-on: macos-latest
@@ -124,6 +128,11 @@ jobs:
     - name: Run the tests (clang)
       run: |
         make test
+
+    - name: Uninstall
+      run: |
+        source ~/.bash_profile
+        make uninstall
 
   windows:
     name: windows
@@ -161,3 +170,8 @@ jobs:
       shell: cmd
       run: |
         call make.bat test
+
+    - name: Uninstall
+      shell: cmd
+      run: |
+        call make.bat uninstall

@@ -71,6 +71,17 @@ clean:
 install: requirements-dev
 	mv chaos /usr/local/bin/
 
+uninstall:
+	rm /usr/local/bin/chaos
+	rm /usr/local/include/Chaos.h
+	rm -rf /usr/local/include/chaos/
+ifeq ($(UNAME_S), Darwin)
+	$(eval GCC_VERSION=$(shell gcc -dumpversion))
+	$(eval GCC_MAJOR_VERSION=$(shell gcc -dumpversion | cut -d. -f1))
+	rm /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/Chaos.h
+	rm -rf /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
+endif
+
 lint:
 	cppcheck --force .
 
