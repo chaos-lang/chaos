@@ -363,6 +363,19 @@ void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool 
     printSymbolValueEndWith(function->symbol, end, pretty, escaped);
 }
 
+void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name, char *module, enum Type extra_type) {
+    _Function* function = getFunction(name, module);
+    if (function->symbol == NULL) {
+        append_to_array_without_malloc(&free_string_stack, name);
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+        return;
+    }
+    Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
+    free(name);
+    free(clone_name);
+    free(module);
+}
+
 void initMainFunction() {
     main_function = (struct _Function*)malloc(sizeof(_Function));
     main_function->name = "main";

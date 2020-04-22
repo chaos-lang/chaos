@@ -96,3 +96,82 @@ end
 
 tokenIntInsideFunction()
 
+// Tests related to assignments from function returns
+
+import modules.lib
+
+
+bool def bool_f1()
+    bool a = true
+    return a
+end
+
+bool a = bool_f1()
+print a
+bool b = lib.bool_f1()
+print b
+
+
+num def num_f1()
+    num a = 5
+    return a
+end
+
+del a
+del b
+num a = num_f1()
+print a
+num b = lib.num_f1()
+print b
+
+
+str def str_f1()
+    str a = "foo"
+    return a
+end
+
+del a
+del b
+str a = str_f1()
+print a
+str b = lib.str_f1()
+print b
+
+
+any def any_f1()
+    any a = 7
+    return a
+end
+
+del a
+del b
+any a = any_f1()
+print a
+any b = lib.any_f1()
+print b
+
+
+list def list_f1()
+    list a = [1, 2, 3]
+    return a
+end
+
+del a
+del b
+list a = list_f1()
+print a
+list b = lib.list_f1()
+print b
+
+
+dict def dict_f1()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    return a
+end
+
+del a
+del b
+dict a = dict_f1()
+print a
+dict b = lib.dict_f1()
+print b

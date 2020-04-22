@@ -1,0 +1,29 @@
+bool def bool_f1()
+    bool a = true
+    return a
+end
+
+num def num_f1()
+    num a = 5
+    return a
+end
+
+str def str_f1()
+    str a = "foo"
+    return a
+end
+
+any def any_f1()
+    any a = 7
+    return a
+end
+
+list def list_f1()
+    list a = [1, 2, 3]
+    return a
+end
+
+dict def dict_f1()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    return a
+end

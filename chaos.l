@@ -158,7 +158,7 @@ switch (phase)
 "--"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DECREMENT;}
 "//".*"\n"                      {yylineno++; return T_NEWLINE;}
 "#".*"\n"                       {yylineno++; return T_NEWLINE;}
-":"                             {recordToken(strdup(yytext), yyleng); return T_COLON;}
+":"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) { return T_COLON; } else { return T_FOREACH_AS_COLON; }}
 "exit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
 "quit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
 "print"                         {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PRINT;}
@@ -201,5 +201,5 @@ any                             {recordToken(strdup(yytext), yyleng); if (isStre
 void|null|nil                   {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
 func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 import|include|use              {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
-[a-zA-Z_][a-zA-Z0-9_]*            {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
+[a-zA-Z_][a-zA-Z0-9_]*          {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%

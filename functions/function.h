@@ -84,6 +84,7 @@ void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);
 void returnSymbol(char *name);
 void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped);
+void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name, char *module, enum Type extra_type);
 void initMainFunction();
 void initScopeless();
 void freeFunction(_Function* function);
