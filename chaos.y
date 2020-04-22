@@ -771,12 +771,12 @@ quit:                                                               { }
         exit($2);
     }
     | T_QUIT T_VAR T_NEWLINE                                              {
+        long long code = getSymbolValueInt($2);
         if (is_interactive) {
             print_bye_bye();
         } else {
             YYABORT;
         }
-        long long code = getSymbolValueInt($2);
         freeEverything();
         exit(code);
     }
