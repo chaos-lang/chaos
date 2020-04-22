@@ -128,7 +128,7 @@ function:
     | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "", false, true); } free($4); free($2); }
     | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start      { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "\n", true, true); } free($5); free($3); }
     | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "", true, true); } free($5); free($3); }
-    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); } free($3); free($1); }
+    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); if (is_interactive && !isFunctionType($3, $1, K_VOID)) printFunctionReturn($3, $1, "\n", false, false); } free($3); free($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 

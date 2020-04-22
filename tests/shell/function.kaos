@@ -1,3 +1,5 @@
+import tests.shell.modules.module1
+
 nil def f1()
     print "hey"
 end
@@ -13,3 +15,6 @@ num def f2()
     return a
 end
 f2()
+
+// Print the function return on function calls from modules
+module1.sub(7, 3)

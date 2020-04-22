@@ -1,3 +1,8 @@
 nil def module1()
     print "module1"
 end
+
+num def sub(num x, num y)
+    num z = x - y
+    return z
+end
