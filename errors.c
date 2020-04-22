@@ -51,9 +51,6 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
             sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);
             break;
-        case E_ARRAYS_ARE_NOT_MASS_ASSIGNABLE:
-            sprintf(error_msg, "Arrays are not mass assignable! Target variable: %s", str1);
-            break;
         case E_VARIABLE_IS_NOT_A_DICTIONARY:
             sprintf(error_msg, "Variable '%s' is not a dictionary!", str1);
             break;

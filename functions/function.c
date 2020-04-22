@@ -376,6 +376,31 @@ void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name,
     free(module);
 }
 
+void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module) {
+    _Function* function = getFunction(name, module);
+    if (function->symbol == NULL) {
+        append_to_array_without_malloc(&free_string_stack, name);
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+        return;
+    }
+    updateSymbolByClonning(clone_name, function->symbol);
+    free(clone_name);
+    free(name);
+    free(module);
+}
+
+void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
+    _Function* function = getFunction(name, module);
+    if (function->symbol == NULL) {
+        append_to_array_without_malloc(&free_string_stack, name);
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+        return;
+    }
+    updateComplexElementSymbol(function->symbol);
+    free(name);
+    free(module);
+}
+
 void initMainFunction() {
     main_function = (struct _Function*)malloc(sizeof(_Function));
     main_function->name = "main";

@@ -650,11 +650,6 @@ Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol) {
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_name);
     }
 
-    if (clone_symbol->type == K_ARRAY) {
-        append_to_array_without_malloc(&free_string_stack, clone_name);
-        throw_error(E_ARRAYS_ARE_NOT_MASS_ASSIGNABLE, clone_name);
-    }
-
     Symbol* temp_symbol = clone_symbol;
 
     if (clone_symbol->type == K_ANY) {

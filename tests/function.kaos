@@ -175,3 +175,109 @@ dict a = dict_f1()
 print a
 dict b = lib.dict_f1()
 print b
+
+
+// Variable update from function returns
+
+del a
+bool a = false
+a = bool_f1()
+print a
+a = lib.bool_f1()
+print a
+
+del a
+num a = 0
+a = num_f1()
+print a
+a = lib.num_f1()
+print a
+
+del a
+str a = ''
+a = str_f1()
+print a
+a = lib.str_f1()
+print a
+
+del a
+any a = 0
+a = any_f1()
+print a
+a = lib.any_f1()
+print a
+
+del a
+list a = []
+a = list_f1()
+print a
+a = lib.list_f1()
+print a
+
+del a
+dict a = {}
+a = dict_f1()
+print a
+a = lib.dict_f1()
+print a
+
+
+// Complex element update from function returns
+
+del a
+del b
+list a = [1, 2, 3, 4, 5, 6]
+dict b = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6}
+
+a[0] = bool_f1()
+print a
+a[0] = lib.bool_f1()
+print a
+b['a'] = bool_f1()
+print b
+b['a'] = lib.bool_f1()
+print b
+
+a[1] = num_f1()
+print a
+a[1] = lib.num_f1()
+print a
+b['b'] = num_f1()
+print b
+b['b'] = lib.num_f1()
+print b
+
+a[2] = str_f1()
+print a
+a[2] = lib.str_f1()
+print a
+b['c'] = str_f1()
+print b
+b['c'] = lib.str_f1()
+print b
+
+a[3] = any_f1()
+print a
+a[3] = lib.any_f1()
+print a
+b['d'] = any_f1()
+print b
+b['d'] = lib.any_f1()
+print b
+
+a[4] = list_f1()
+print a
+a[4] = lib.list_f1()
+print a
+b['e'] = list_f1()
+print b
+b['e'] = lib.list_f1()
+print b
+
+a[5] = dict_f1()
+print a
+a[5] = lib.dict_f1()
+print a
+b['f'] = dict_f1()
+print b
+b['f'] = lib.dict_f1()

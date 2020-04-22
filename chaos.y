@@ -501,6 +501,8 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
     | variable T_EQUAL arraystart                                   { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
     | variable T_EQUAL dictionarystart                              { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
+    | variable T_EQUAL T_VAR T_LEFT function_call_parameters_start                                      { if (phase == PROGRAM) { callFunction($3, NULL); updateSymbolByClonningFunctionReturn($1, $3, NULL); } else { free($1); free($3); } $$ = ""; }
+    | variable T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                          { if (phase == PROGRAM) { callFunction($5, $3); updateSymbolByClonningFunctionReturn($1, $5, $3); } else { free($1); free($3); free($5); } $$ = ""; }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
     | variable_complex_element                                      { if (is_interactive) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false); $$ = ""; } else { yyerror("Syntax error"); } }
     | variable_complex_element T_EQUAL T_TRUE                       { updateComplexElementBool($3); $$ = ""; }
@@ -513,6 +515,8 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable_complex_element T_EQUAL boolean_expression           { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL arraystart                   { updateComplexElementComplex(); $$ = ""; }
     | variable_complex_element T_EQUAL dictionarystart              { updateComplexElementComplex(); $$ = ""; }
+    | variable_complex_element T_EQUAL T_VAR T_LEFT function_call_parameters_start                      { if (phase == PROGRAM) { callFunction($3, NULL); updateComplexSymbolByClonningFunctionReturn($3, NULL); } else { free($3); } $$ = ""; }
+    | variable_complex_element T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($5, $3); updateComplexSymbolByClonningFunctionReturn($5, $3); } else { free($3); free($5); } $$ = ""; }
 ;
 
 variable_complex_element:                                           { }

@@ -1,29 +1,29 @@
 bool def bool_f1()
-    bool a = true
+    bool a = false
     return a
 end
 
 num def num_f1()
-    num a = 5
+    num a = 6
     return a
 end
 
 str def str_f1()
-    str a = "foo"
+    str a = "bar"
     return a
 end
 
 any def any_f1()
-    any a = 7
+    any a = 8
     return a
 end
 
 list def list_f1()
-    list a = [1, 2, 3]
+    list a = [4, 5, 6]
     return a
 end
 
 dict def dict_f1()
-    dict a = {'a': 1, 'b': 2, 'c': 3}
+    dict a = {'d': 4, 'e': 5, 'f': 6}
     return a
 end
