@@ -61,6 +61,7 @@ jobs:
 
     - name: Run the tests (gcc)
       run: |
+        source ~/.bash_profile
         make test-extensions-macos-gcc
         rm tests/extensions/spells/example/example.dylib
 

@@ -18,13 +18,9 @@ requirements-dev:
 	cp enums.h /usr/local/include/chaos/
 	cp Chaos.h /usr/local/include/
 ifeq ($(UNAME_S), Darwin)
-	$(eval GCC_VERSION=$(shell gcc -dumpversion))
-	$(eval GCC_MAJOR_VERSION=$(shell gcc -dumpversion | cut -d. -f1))
-	mkdir -p /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos
-	cp utilities/language.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
-	cp utilities/platform.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
-	cp enums.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/chaos/
-	cp Chaos.h /usr/local/Cellar/gcc@$(GCC_MAJOR_VERSION)/$(GCC_VERSION)/lib/gcc/$(GCC_MAJOR_VERSION)/gcc/x86_64-apple-darwin19/$(GCC_VERSION)/include/
+	echo 'export C_INCLUDE_PATH="/usr/local/include"' >> ~/.bash_profile
+	source ~/.bash_profile
+	gcc -xc -E -v -
 endif
 
 clang:
