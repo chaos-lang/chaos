@@ -19,7 +19,7 @@ typedef struct {
     unsigned long long iter;
     bool is_infinite;
     unsigned nested_counter;
-    char *array;
+    char *list;
     LoopElement element;
     char *body;
 } Loop;

@@ -195,7 +195,7 @@ switch (phase)
 "bool"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_BOOL;}
 "num"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_NUMBER;}
 "str"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_STRING;}
-"list"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ARRAY;}
+"list"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_LIST;}
 "dict"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_DICT;}
 "any"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ANY;}
 "null"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_NULL;}

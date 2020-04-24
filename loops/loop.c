@@ -26,14 +26,14 @@ void endLoop() {
     unsigned long long iter = loop_mode->iter;
     bool is_infinite = loop_mode->is_infinite;
     enum LoopType loop_type = loop_mode->type;
-    char *array_name = loop_mode->array;
+    char *list_name = loop_mode->list;
     char *element_name = loop_mode->element.name;
     char *element_key = loop_mode->element.key;
     char *element_value = loop_mode->element.value;
     Loop* _loop_mode = loop_mode;
     loop_mode = NULL;
 
-    Symbol* array;
+    Symbol* list;
 
     loop_execution_mode = true;
 
@@ -58,18 +58,18 @@ void endLoop() {
                 }
                 break;
             case FOREACH:
-                array = getSymbol(array_name);
-                for (unsigned long long i = 0; i < array->children_count; i++) {
-                    Symbol* child = array->children[i];
+                list = getSymbol(list_name);
+                for (unsigned long long i = 0; i < list->children_count; i++) {
+                    Symbol* child = list->children[i];
                     child->name = element_name;
                     injectCode(body, INIT_PROGRAM);
                     child->name = NULL;
                 }
                 break;
             case FOREACH_DICT:
-                array = getSymbol(array_name);
-                for (unsigned long long i = 0; i < array->children_count; i++) {
-                    Symbol* child = array->children[i];
+                list = getSymbol(list_name);
+                for (unsigned long long i = 0; i < list->children_count; i++) {
+                    Symbol* child = list->children[i];
                     char *key = malloc(1 + strlen(child->key));
                     char *element_key_copy = malloc(1 + strlen(element_key));
                     strcpy(key, child->key);
@@ -92,11 +92,11 @@ void endLoop() {
         case TIMESDO:
             break;
         case FOREACH:
-            free(_loop_mode->array);
+            free(_loop_mode->list);
             free(_loop_mode->element.name);
             break;
         case FOREACH_DICT:
-            free(_loop_mode->array);
+            free(_loop_mode->list);
             free(_loop_mode->element.key);
             free(_loop_mode->element.value);
             break;

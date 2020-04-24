@@ -11,7 +11,7 @@ false
 OMG!
 hello world
 3.14
-Array function parameter:
+List function parameter:
 [1, 2, 3]
 Dictionary function parameter:
 {'a': 'foo', 'b': 'bar', 'c': 'baz'}

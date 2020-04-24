@@ -46,30 +46,30 @@ char* getVariableString(char *name) {
     return getSymbolValueString(symbol_name);
 }
 
-bool getArrayElementBool(char *name, long long i) {
+bool getListElementBool(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
     if (symbol->value_type != V_BOOL) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return symbol->value.b;
 }
 
-long long getArrayElementInt(char *name, long long i) {
+long long getListElementInt(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
     if (symbol->value_type != V_INT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return symbol->value.i;
 }
 
-long double getArrayElementFloat(char *name, long long i) {
+long double getListElementFloat(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
     free(symbol_name);
     if (symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
@@ -77,10 +77,10 @@ long double getArrayElementFloat(char *name, long long i) {
     return symbol->value.f;
 }
 
-char* getArrayElementString(char *name, long long i) {
+char* getListElementString(char *name, long long i) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
-    Symbol* symbol = getArrayElement(getSymbol(symbol_name), i);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
     if (symbol->value_type != V_STRING) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -180,11 +180,11 @@ void createVariableString(char *name, char *s) {
     addSymbolString(symbol_name, _s);
 }
 
-void startBuildingArray() {
-    addSymbolArray(NULL);
+void startBuildingList() {
+    addSymbolList(NULL);
 }
 
-void returnArray(enum Type type) {
+void returnList(enum Type type) {
     returnComplex(type);
 }
 

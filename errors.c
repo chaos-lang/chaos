@@ -36,17 +36,17 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_UNDEFINED_VARIABLE:
             sprintf(error_msg, "Undefined variable: %s", str1);
             break;
-        case E_MEMORY_ALLOCATION_FOR_ARRAY_FAILED:
-            sprintf(error_msg, "Memory allocation for array '%s' is failed!", str1);
+        case E_MEMORY_ALLOCATION_FOR_LIST_FAILED:
+            sprintf(error_msg, "Memory allocation for list '%s' is failed!", str1);
             break;
-        case E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_ARRAY:
-            sprintf(error_msg, "Illegal element type: %s for the typed array: %s", str1, str2);
+        case E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST:
+            sprintf(error_msg, "Illegal element type: %s for the typed list: %s", str1, str2);
             break;
-        case E_VARIABLE_IS_NOT_AN_ARRAY:
-            sprintf(error_msg, "Variable '%s' is not an array!", str1);
+        case E_VARIABLE_IS_NOT_AN_LIST:
+            sprintf(error_msg, "Variable '%s' is not an list!", str1);
             break;
         case E_INDEX_OUT_OF_RANGE:
-            sprintf(error_msg, "Index out of range: %lld for array: %s", lld1, str1);
+            sprintf(error_msg, "Index out of range: %lld for list: %s", lld1, str1);
             break;
         case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
             sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);

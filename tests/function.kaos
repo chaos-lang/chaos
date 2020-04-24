@@ -39,7 +39,7 @@ list def f2(str param1, list param2)
     return param2
 end
 
-print f2('Array function parameter:', c)
+print f2('List function parameter:', c)
 
 dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
 

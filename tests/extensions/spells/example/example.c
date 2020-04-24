@@ -49,13 +49,13 @@ char *complex_params_name[] = {
     "dict1"
 };
 unsigned complex_params_type[] = {
-    K_ARRAY,
+    K_LIST,
     K_DICT
 };
 unsigned short complex_params_length = (unsigned short) sizeof(complex_params_type) / sizeof(unsigned);
 int KAOS_EXPORT Kaos_complex()
 {
-    long long var1 = (long long) kaos.getArrayElementFloat(complex_params_name[0], 0);
+    long long var1 = (long long) kaos.getListElementFloat(complex_params_name[0], 0);
     printf("%lld\n", var1);
     char* var2 = kaos.getDictElementString(complex_params_name[1], "a");
     printf("%s\n", var2);
