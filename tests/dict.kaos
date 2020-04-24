@@ -3,16 +3,16 @@ print a
 dict b = {'a': 1, 'b': 2, 'c': 3}
 print b
 
-json c = {"a": 1, "b": 2}
+dict c = {"a": 1, "b": 2}
 print c
-json d = {"a": 1, "b": 2, "c": 3}
+dict d = {"a": 1, "b": 2, "c": 3}
 print d
 
 bool dict dict1 = {'a': true, 'b': false}
 print dict1
-number dict dict2 = {'a': 1, "b": 2, 'c': 63.3, 'd': 12321.1515}
+num dict dict2 = {'a': 1, "b": 2, 'c': 63.3, 'd': 12321.1515}
 print dict2
-string json dict3 = {
+str dict dict3 = {
     'a': 'A',
     'b': "asdasdaqs",
     'c': 'asdasd123123',
@@ -135,8 +135,8 @@ del a
 del c
 
 dict a = {'a': 1, 'b': 2}
-json b = {"a": 1, "b": 2}
-json c = {"a": a, "b": b}
+dict b = {"a": 1, "b": 2}
+dict c = {"a": a, "b": b}
 
 print c
 

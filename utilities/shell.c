@@ -16,21 +16,13 @@ char *suggestions[1000] = {
     "foreach",
     "as",
     "bool",
-    "boolean",
     "num",
-    "number",
     "str",
-    "string",
     "list",
-    "array",
-    "json",
     "dict",
     "any",
     "void",
     "null",
-    "nil",
-    "func",
-    "function",
     "def",
     "and",
     "or",
@@ -38,7 +30,10 @@ char *suggestions[1000] = {
     "default",
     "function_table",
     "INFINITE",
-    "echo"
+    "echo",
+    "pretty",
+    "import",
+    "from"
 };
 
 int up_arrow_key_pressed(int count, int key) {

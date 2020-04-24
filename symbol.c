@@ -5,7 +5,7 @@ char *type_names[] = {
     "Number",
     "String",
     "Any",
-    "Array",
+    "List",
     "Dictionary",
     "Void"
 };

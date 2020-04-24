@@ -1,3 +1,3 @@
-nil def module1()
+void def module1()
     print "module1"
 end

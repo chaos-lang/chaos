@@ -1,4 +1,4 @@
-void func a()
+void def a()
     print "inside function a"
     num val1 = 5
     print val1
@@ -9,18 +9,18 @@ print "first print this"
 a()
 b()
 
-null function b()
+void def b()
     print "inside function b"
     num val2 = 8
     print val2
 end
 
 str hello = 'hello world'
-number pi = 3.14
+num pi = 3.14
 
 str param1 = 'testing'
 
-nil def f1(bool param1, num param2, str param3)
+void def f1(bool param1, num param2, str param3)
     print param1
     print param2
     print param3
@@ -32,9 +32,9 @@ f1(false, pi, "OMG!")
 print hello
 print pi
 
-array c = [1, 2, 3]
+list c = [1, 2, 3]
 
-array def f2(string param1, array param2)
+list def f2(str param1, list param2)
     print param1
     return param2
 end
@@ -43,7 +43,7 @@ print f2('Array function parameter:', c)
 
 dict d = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
 
-dict func f3(string param1, dict param2)
+dict def f3(str param1, dict param2)
     print param1
     return param2
 end
@@ -89,7 +89,7 @@ end
 print boolF()
 
 // T_INT inside function
-nil def tokenIntInsideFunction()
+void def tokenIntInsideFunction()
     list a = [1, 2, 3]
     print a
 end

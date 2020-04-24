@@ -3,7 +3,7 @@ import ../../module1
 import ..\..\module4
 import ....module5
 
-nil def module9()
+void def module9()
     module2.module2()
     module1.module1()
     module4.module4()

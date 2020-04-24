@@ -1,11 +1,11 @@
 import modules.hello
 from modules.module5 import *
 from modules.module6 import module6Function2, module6Function3, module6Function5
-include modules/module7
-use modules\module8
+import modules/module7
+import modules\module8
 from modules.level1.level2.module9 import module9
 
-null function mainContext()
+void def mainContext()
     print "in main context"
 end
 

@@ -10,25 +10,25 @@ print a_2019_b__c
 num _ = 4
 print _
 
-nil def a_b()
+void def a_b()
     print 5
 end
 
 a_b()
 
-nil def _a()
+void def _a()
     print 6
 end
 
 _a()
 
-nil def a_2019_b__c()
+void def a_2019_b__c()
     print 7
 end
 
 a_2019_b__c()
 
-nil def _()
+void def _()
     print 8
 end
 

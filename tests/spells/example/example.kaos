@@ -1,3 +1,3 @@
-nil def hello()
+void def hello()
     print "hello kaos file"
 end

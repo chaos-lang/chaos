@@ -1,6 +1,6 @@
 import tests.shell.modules.module1
 
-nil def f1()
+void def f1()
     print "hey"
 end
 

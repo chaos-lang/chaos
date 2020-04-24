@@ -1,6 +1,6 @@
 import level2.module3
 
-nil def module2()
+void def module2()
     print "module2"
     module3.module3()
 end

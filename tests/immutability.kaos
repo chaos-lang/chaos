@@ -77,7 +77,7 @@ print b8
 
 
 num x = 5
-array y = [x, 2, 3]
+list y = [x, 2, 3]
 print y
 x = 32
 print x

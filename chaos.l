@@ -192,14 +192,15 @@ switch (phase)
     }
 }
 
-bool|boolean                    {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_BOOL;}
-num|number                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_NUMBER;}
-str|string                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_STRING;}
-list|array                      {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ARRAY;}
-json|dict                       {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_DICT;}
-any                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ANY;}
-void|null|nil                   {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
-func|function|def               {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
-import|include|use              {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
+"bool"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_BOOL;}
+"num"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_NUMBER;}
+"str"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_STRING;}
+"list"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ARRAY;}
+"dict"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_DICT;}
+"any"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ANY;}
+"null"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_NULL;}
+"void"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
+"def"                           {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
+"import"                        {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
 [a-zA-Z_][a-zA-Z0-9_]*          {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
 %%

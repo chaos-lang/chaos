@@ -1,4 +1,4 @@
-array a = [1, 2, 3]
+list a = [1, 2, 3]
 print a
 list b = [true, false]
 print b
@@ -6,7 +6,7 @@ list c = [3.2, 345.1665]
 print c
 list d = ['a', 'b', 'c']
 print d
-array e = ["A", "B", "C"]
+list e = ["A", "B", "C"]
 print e
 list f = [
     'A',
@@ -22,9 +22,9 @@ print g
 
 bool list arr1 = [true, false, true]
 print arr1
-number list arr2 = [1, 2, 63.3, 12321.1515]
+num list arr2 = [1, 2, 63.3, 12321.1515]
 print arr2
-string array arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
+str list arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
 print arr3
 
 symbol_table
@@ -46,7 +46,7 @@ print arr2[2]
 print arr3[3]
 
 num x = 5
-array y = [x, 2, 3]
+list y = [x, 2, 3]
 print y
 x = 32
 print x
@@ -64,15 +64,15 @@ list arr4 = [1, 2, 3]
 arr4[0] = 5
 print arr4
 
-bool array arr5 = [true, false]
+bool list arr5 = [true, false]
 arr5[0] = false
 print arr5
 
-number list arr6 = [1, 2, 3]
+num list arr6 = [1, 2, 3]
 arr6[0] = 5
 print arr6
 
-string array arr7 = ['a', 'b', 'c']
+str list arr7 = ['a', 'b', 'c']
 arr7[0] = 'd'
 print arr7
 
@@ -183,7 +183,7 @@ print arr11
 del arr12[-i1]
 print arr12
 
-array v = [1,22,333]
+list v = [1,22,333]
 any i = v[0]
 any j = v[i]
 print j

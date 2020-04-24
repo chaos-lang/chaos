@@ -1,8 +1,8 @@
-nil def hey()
+void def hey()
     print "hey"
 end
 
-nil def hoy()
+void def hoy()
     print "hoy"
 end
 

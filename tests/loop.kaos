@@ -58,7 +58,7 @@ end
     end
 end
 
-string d = "after all the loops"
+str d = "after all the loops"
 print d
 
 
