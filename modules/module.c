@@ -174,10 +174,12 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
             dynamic_library_path = strcat_ext(dynamic_library_path, __KAOS_DYNAMIC_LIBRARY_EXTENSION__);
             if (is_file_exists(dynamic_library_path)) {
                 return dynamic_library_path;
+            } else {
+                free(dynamic_library_path);
             }
         }
     }
-    append_to_array_without_malloc(&free_string_stack, module_path);
-    throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, module_path);
+    append_to_array_without_malloc(&free_string_stack, relative_path);
+    throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, relative_path);
     return NULL;
 }
