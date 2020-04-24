@@ -59,7 +59,7 @@ char *program_file_dir;
 %token<bval> T_TRUE T_FALSE
 %token<ival> T_INT T_TIMES_DO_INT
 %token<fval> T_FLOAT
-%token<sval> T_STRING T_VAR
+%token<sval> T_STRING T_VAR T_FOREACH_VAR
 %token<lluval> T_UNSIGNED_LONG_LONG_INT
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
 %token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_DOT T_COLON
@@ -228,7 +228,7 @@ line: T_NEWLINE
     | function T_NEWLINE                                            { }
     | T_END decisionstart                                           { }
     | T_IMPORT module T_NEWLINE                                     { if (is_interactive) handleModuleImport(NULL, false); }
-    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { if (is_interactive) handleModuleImport($4, false); }
+    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { if (is_interactive) { handleModuleImport($4, false); } else { free($4); } }
     | T_FROM module T_IMPORT T_MULTIPLY                             { if (is_interactive) handleModuleImport(NULL, true); }
     | T_FROM module T_IMPORT function_name                          { if (is_interactive) handleModuleImport(NULL, true); }
     | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
@@ -694,6 +694,9 @@ loop:
     | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
     | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                      { startForeachDict($2, $4, $6); }
     | T_FOREACH T_VAR T_AS T_VAR T_FOREACH_AS_COLON T_VAR           { startForeachDict($2, $4, $6); }
+    | T_FOREACH T_FOREACH_VAR T_AS T_FOREACH_VAR                                            { startForeach($2, $4); }
+    | T_FOREACH T_FOREACH_VAR T_AS T_FOREACH_VAR T_COLON T_FOREACH_VAR                      { startForeachDict($2, $4, $6); }
+    | T_FOREACH T_FOREACH_VAR T_AS T_FOREACH_VAR T_FOREACH_AS_COLON T_FOREACH_VAR           { startForeachDict($2, $4, $6); }
 ;
 
 decisionstart:                                                                      { decision_mode = function_mode; handle_end_keyword(); }
@@ -753,6 +756,7 @@ preparser_line:                                                     { }
 function:
     | T_FOREACH_AS_COLON function                                   { }
     | T_TIMES_DO_INT function                                       { }
+    | T_FOREACH_VAR function                                        { free($1); }
 ;
 
 quit:                                                               { }

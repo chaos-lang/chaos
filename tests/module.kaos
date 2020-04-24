@@ -2,7 +2,7 @@ import modules.hello
 from modules.module5 import *
 from modules.module6 import module6Function2, module6Function3, module6Function5
 import modules/module7
-import modules\module8
+import modules\module8 as module_x
 from modules.level1.level2.module9 import module9
 
 void def mainContext()
@@ -15,6 +15,6 @@ module6Function2()
 module6Function3()
 module6Function5()
 module7.module7()
-module8.module8()
+module_x.module8()
 module9()
 mainContext()

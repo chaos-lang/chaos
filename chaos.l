@@ -202,5 +202,5 @@ switch (phase)
 "void"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
 "def"                           {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
 "import"                        {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
-[a-zA-Z_][a-zA-Z0-9_]*          {bool was_foreach = isForeach(); recordToken(strdup(yytext), yyleng); if ((isStreamOpen()) || was_foreach) { yylval.sval=strdup(yytext); return T_VAR; } }
+[a-zA-Z_][a-zA-Z0-9_]*          {recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (isStreamOpen()) { return T_VAR; } else { return T_FOREACH_VAR; }}
 %%

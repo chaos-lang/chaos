@@ -46,12 +46,6 @@ void recordToken(char *token, int length) {
     free(token);
 }
 
-bool isForeach() {
-    if (last_token == NULL) return false;
-    if (strcmp(last_token, "foreach") == 0 || strcmp(last_token, "as") == 0 || strcmp(last_token, ":") == 0) return true;
-    return false;
-}
-
 bool isStreamOpen() {
     return loop_mode == NULL && function_mode == NULL;
 }

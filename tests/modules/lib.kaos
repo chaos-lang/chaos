@@ -27,3 +27,19 @@ dict def dict_f1()
     dict a = {'d': 4, 'e': 5, 'f': 6}
     return a
 end
+
+num def everything_f1(num x)
+    x = x / 2
+    return x
+end
+
+num def everything_f2(num x)
+    x = x * 2
+    return x
+end
+
+num def everything_f3(num x, num y)
+    x = (x + y) * 3
+    return x
+end
+
