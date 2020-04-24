@@ -17,6 +17,8 @@ void def a(num b)
     //print b
     // This is a comment
     print b # End of Line(EOL) comment
+    num z = 5
+    del z
     #print b
     # This is a comment too
     /*

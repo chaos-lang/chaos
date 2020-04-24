@@ -156,8 +156,8 @@ switch (phase)
 ">>"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_RIGHT_SHIFT;}
 "++"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_INCREMENT;}
 "--"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DECREMENT;}
-"//".*"\n"                      {yylineno++; return T_NEWLINE;}
-"#".*"\n"                       {yylineno++; return T_NEWLINE;}
+"//".*"\n"                      {recordToken(strdup("\n"), 1); yylineno++; return T_NEWLINE;}
+"#".*"\n"                       {recordToken(strdup("\n"), 1); yylineno++; return T_NEWLINE;}
 ":"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) { return T_COLON; } else { return T_FOREACH_AS_COLON; }}
 "exit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
 "quit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
