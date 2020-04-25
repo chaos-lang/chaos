@@ -6,10 +6,13 @@ void initKaosApi() {
     kaos.getVariableInt = getVariableInt;
     kaos.getVariableFloat = getVariableFloat;
     kaos.getVariableString = getVariableString;
+    kaos.getListLength = getListLength;
     kaos.getListElementBool = getListElementBool;
     kaos.getListElementInt = getListElementInt;
     kaos.getListElementFloat = getListElementFloat;
     kaos.getListElementString = getListElementString;
+    kaos.getDictLength = getDictLength;
+    kaos.getDictKeyByIndex = getDictKeyByIndex;
     kaos.getDictElementBool = getDictElementBool;
     kaos.getDictElementInt = getDictElementInt;
     kaos.getDictElementFloat = getDictElementFloat;

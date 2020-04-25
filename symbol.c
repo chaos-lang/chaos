@@ -208,6 +208,10 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 char* getSymbolValueString(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
+    return _getSymbolValueString(symbol);
+}
+
+char* _getSymbolValueString(Symbol* symbol) {
     char* value;
     if (symbol->value_type == V_STRING) {
         value = malloc(1 + strlen(symbol->value.s));
@@ -222,6 +226,10 @@ char* getSymbolValueString(char *name) {
 long double getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
+    return _getSymbolValueFloat(symbol);
+}
+
+long double _getSymbolValueFloat(Symbol* symbol) {
     long double value;
     switch (symbol->value_type)
     {
@@ -247,6 +255,10 @@ long double getSymbolValueFloat(char *name) {
 bool getSymbolValueBool(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
+    return _getSymbolValueBool(symbol);
+}
+
+bool _getSymbolValueBool(Symbol* symbol) {
     bool value;
     switch (symbol->value_type)
     {
@@ -273,6 +285,10 @@ bool getSymbolValueBool(char *name) {
 long long getSymbolValueInt(char *name) {
     Symbol* symbol = getSymbol(name);
     free(name);
+    return _getSymbolValueInt(symbol);
+}
+
+long long _getSymbolValueInt(Symbol* symbol) {
     long long value;
     switch (symbol->value_type)
     {
