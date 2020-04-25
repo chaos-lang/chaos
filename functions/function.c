@@ -127,6 +127,12 @@ void freeFunctionMode() {
 void callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
 
+    if (function_parameters_mode != NULL && function->parameter_count != function_parameters_mode->parameter_count)
+        throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+
+    if (function->parameter_count > 0 && function_parameters_mode == NULL)
+        throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+
     scope_override = function;
     for (unsigned short i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];

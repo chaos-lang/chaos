@@ -96,6 +96,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH:
             sprintf(error_msg, "Program file does not exists on the given path: %s", str1);
             break;
+        case E_INCORRECT_FUNCTION_ARGUMENT_COUNT:
+            sprintf(error_msg, "Incorrect argument count for function: %s", str1);
+            break;
         default:
             sprintf(error_msg, "Unkown error.");
             break;
