@@ -63,10 +63,24 @@ int KAOS_EXPORT Kaos_complex()
     return 0;
 }
 
-char *mayhem_params_name[] = {};
-unsigned mayhem_params_type[] = {};
-unsigned short mayhem_params_length = 0;
-int KAOS_EXPORT Kaos_mayhem()
+char *array_params_name[] = {};
+unsigned array_params_type[] = {};
+unsigned short array_params_length = 0;
+int KAOS_EXPORT Kaos_array()
+{
+    kaos.startBuildingList();
+    kaos.createVariableBool(NULL, true);
+    kaos.createVariableInt(NULL, 1);
+    kaos.createVariableFloat(NULL, 3.14);
+    kaos.createVariableString(NULL, "bar");
+    kaos.returnList(K_ANY);
+    return 0;
+}
+
+char *dictionary_params_name[] = {};
+unsigned dictionary_params_type[] = {};
+unsigned short dictionary_params_length = 0;
+int KAOS_EXPORT Kaos_dictionary()
 {
     kaos.startBuildingDict();
     kaos.createVariableBool("b", true);
@@ -84,7 +98,8 @@ int KAOS_EXPORT KaosRegister(struct Kaos _kaos)
     kaos.defineFunction("add", K_NUMBER, add_params_name, add_params_type, add_params_length);
     kaos.defineFunction("log", K_VOID, log_params_name, log_params_type, log_params_length);
     kaos.defineFunction("complex", K_VOID, complex_params_name, complex_params_type, complex_params_length);
-    kaos.defineFunction("mayhem", K_DICT, mayhem_params_name, mayhem_params_type, mayhem_params_length);
+    kaos.defineFunction("array", K_LIST, array_params_name, array_params_type, array_params_length);
+    kaos.defineFunction("dictionary", K_DICT, dictionary_params_name, dictionary_params_type, dictionary_params_length);
 
     return 0;
 }

@@ -14,4 +14,5 @@ symbol_table
 
 example.complex(var1, var2)
 
-print example.mayhem()
+print example.array()
+print example.dictionary()

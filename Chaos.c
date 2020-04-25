@@ -155,26 +155,38 @@ void returnVariableString(char *s) {
 }
 
 void createVariableBool(char *name, bool b) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
+    char *symbol_name = NULL;
+    if (name != NULL) {
+        symbol_name = malloc(strlen(name) + 1);
+        strcpy(symbol_name, name);
+    }
     addSymbolBool(symbol_name, b);
 }
 
 void createVariableInt(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
+    char *symbol_name = NULL;
+    if (name != NULL) {
+        symbol_name = malloc(strlen(name) + 1);
+        strcpy(symbol_name, name);
+    }
     addSymbolInt(symbol_name, i);
 }
 
 void createVariableFloat(char *name, long double f) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
+    char *symbol_name = NULL;
+    if (name != NULL) {
+        symbol_name = malloc(strlen(name) + 1);
+        strcpy(symbol_name, name);
+    }
     addSymbolFloat(symbol_name, f);
 }
 
 void createVariableString(char *name, char *s) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
+    char *symbol_name = NULL;
+    if (name != NULL) {
+        symbol_name = malloc(strlen(name) + 1);
+        strcpy(symbol_name, name);
+    }
     char *_s = malloc(strlen(s) + 1);
     strcpy(_s, s);
     addSymbolString(symbol_name, _s);
