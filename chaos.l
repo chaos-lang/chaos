@@ -39,6 +39,15 @@ void injectCode(char *code, enum Phase phase_arg) {
     inject_mode = false;
 }
 
+void switchBuffer(char *code, enum Phase phase_arg) {
+    phase = phase_arg;
+
+    YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
+    YY_BUFFER_STATE new_buffer = yy_scan_string(code);
+    yy_switch_to_buffer(new_buffer);
+    yy_delete_buffer(old_buffer);
+}
+
 void yyrestart_interactive() {
     if (!YY_CURRENT_BUFFER){
         yyensure_buffer_stack();
@@ -55,6 +64,10 @@ void flushLexer() {
 
 void parseTheModuleContent(char *module_path) {
     char *code = fileGetContents(module_path);
+    size_t code_length = strlen(code);
+    code = (char*)realloc(code, code_length + 2);
+    code[code_length] = '\n';
+    code[code_length + 1] = '\0';
 
     if (code != NULL) {
         module_parsing++;
@@ -72,7 +85,7 @@ void parseTheModuleContent(char *module_path) {
 }
 
 #define YY_SKIP_YYWRAP 1
-int yywrap() { if (phase == PREPARSE && module_parsing == 0) { phase = INIT_PROGRAM; rewind(yyin); } return 1; }
+int yywrap() { if (phase == PREPARSE && module_parsing == 0) { switchBuffer(program_code, INIT_PROGRAM); yyparse(); } return 1; }
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #undef YY_INPUT

@@ -45,6 +45,7 @@ FILE *fp;
 bool fp_opened;
 char *program_file_path;
 char *program_file_dir;
+char *program_code;
 %}
 
 %union {
@@ -855,6 +856,13 @@ int main(int argc, char** argv) {
         #endif
         greet();
         phase = INIT_PROGRAM;
+    } else {
+        program_code = fileGetContents(program_file_path);
+        size_t program_length = strlen(program_code);
+        program_code = (char*)realloc(program_code, program_length + 2);
+        program_code[program_length] = '\n';
+        program_code[program_length + 1] = '\0';
+        switchBuffer(program_code, INIT_PREPARSE);
     }
 
     initMainFunction();
@@ -884,6 +892,7 @@ int main(int argc, char** argv) {
         !is_interactive ?: printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif
         yyparse();
+        if (!is_interactive) break;
     } while(!feof(yyin));
 
     freeEverything();
@@ -939,6 +948,7 @@ void freeEverything() {
     yylex_destroy();
 
     if (!is_interactive) {
+        free(program_code);
         if (fp_opened)
             fclose(fp);
         free(program_file_path);

@@ -1,0 +1,7 @@
+void def a()
+  print "inside function a"
+end
+
+print "hey"
+
+a()
