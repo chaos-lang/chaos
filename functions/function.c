@@ -5,6 +5,7 @@ bool interactive_shell_function_error_absorbed = false;
 extern int yyparse();
 
 int reset_line_no_to = 0;
+bool decision_execution_mode = false;
 
 void startFunction(char *name, enum Type type) {
     if (is_interactive) {
@@ -525,7 +526,9 @@ void executeDecision(_Function* function) {
         if (symbol->value.b) {
             function_buffer = strcat_ext(function_buffer, function->decision_functions.arr[i]);
             function_buffer = strcat_ext(function_buffer, "\n");
+            decision_execution_mode = true;
             injectCode(function_buffer, INIT_PROGRAM);
+            decision_execution_mode = false;
             is_decision_made = true;
             break;
         }

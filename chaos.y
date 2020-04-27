@@ -117,19 +117,19 @@ function:
     | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_NUMBER); }
     | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_STRING); }
     | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, K_ANY); }
-    | T_VAR_LIST T_FUNCTION T_VAR function_parameters_start        { startFunction($3, K_LIST); }
+    | T_VAR_LIST T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_LIST); }
     | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT); }
     | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID); }
     | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "\n", false, true); } free($2); }
     | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "", false, true); } free($2); }
     | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "\n", true, true); } free($3); }
     | T_PRETTY T_ECHO T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "", true, true); } free($3); }
-    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); if (is_interactive && !isFunctionType($1, NULL, K_VOID)) printFunctionReturn($1, NULL, "\n", false, false); } free($1); }
+    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); if (is_interactive && !isFunctionType($1, NULL, K_VOID) && !inject_mode && !decision_execution_mode) printFunctionReturn($1, NULL, "\n", false, false); } free($1); }
     | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "\n", false, true); } free($4); free($2); }
     | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "", false, true); } free($4); free($2); }
     | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start      { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "\n", true, true); } free($5); free($3); }
     | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "", true, true); } free($5); free($3); }
-    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); if (is_interactive && !isFunctionType($3, $1, K_VOID)) printFunctionReturn($3, $1, "\n", false, false); } free($3); free($1); }
+    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); if (is_interactive && !isFunctionType($3, $1, K_VOID) && !inject_mode && !decision_execution_mode) printFunctionReturn($3, $1, "\n", false, false); } free($3); free($1); }
     | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
@@ -160,7 +160,7 @@ function_parameters: T_VAR_STRING T_VAR                             { addFunctio
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_LIST T_VAR                              { addFunctionParameter($2, K_LIST); }
+function_parameters: T_VAR_LIST T_VAR                               { addFunctionParameter($2, K_LIST); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -213,9 +213,9 @@ parser:
 ;
 
 line: T_NEWLINE
-    | mixed_expression T_NEWLINE                                    { if (is_interactive && isStreamOpen()) printf("%Lg\n", $1); }
-    | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen()) printf("%lld\n", $1); }
-    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive) { printSymbolValueEndWithNewLine(getSymbol($1), false, false); free($1); } }
+    | mixed_expression T_NEWLINE                                    { if (is_interactive && isStreamOpen() && !inject_mode) printf("%Lg\n", $1); }
+    | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen() && !inject_mode) printf("%lld\n", $1); }
+    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive && !inject_mode) { printSymbolValueEndWithNewLine(getSymbol($1), false, false); free($1); } }
     | loop T_NEWLINE                                                { }
     | quit T_NEWLINE                                                { }
     | T_PRINT print T_NEWLINE                                       { }
@@ -500,12 +500,12 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
     | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
-    | variable T_EQUAL liststart                                   { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
+    | variable T_EQUAL liststart                                    { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
     | variable T_EQUAL dictionarystart                              { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
     | variable T_EQUAL T_VAR T_LEFT function_call_parameters_start                                      { if (phase == PROGRAM) { callFunction($3, NULL); updateSymbolByClonningFunctionReturn($1, $3, NULL); } else { free($1); free($3); } $$ = ""; }
     | variable T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                          { if (phase == PROGRAM) { callFunction($5, $3); updateSymbolByClonningFunctionReturn($1, $5, $3); } else { free($1); free($3); free($5); } $$ = ""; }
     | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
-    | variable_complex_element                                      { if (is_interactive) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false); $$ = ""; } else { yyerror("Syntax error"); } }
+    | variable_complex_element                                      { if (is_interactive && !inject_mode) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false); $$ = ""; } else { yyerror("Syntax error"); } }
     | variable_complex_element T_EQUAL T_TRUE                       { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_FALSE                      { updateComplexElementBool($3); $$ = ""; }
     | variable_complex_element T_EQUAL T_STRING                     { updateComplexElementString($3); $$ = ""; }
@@ -514,7 +514,7 @@ variable: T_VAR                                                     { $$ = $1; }
     | variable_complex_element T_EQUAL mixed_expression             { updateComplexElementFloat($3); $$ = ""; }
     | variable_complex_element T_EQUAL expression                   { updateComplexElementFloat($3); $$ = ""; }
     | variable_complex_element T_EQUAL boolean_expression           { updateComplexElementBool($3); $$ = ""; }
-    | variable_complex_element T_EQUAL liststart                   { updateComplexElementComplex(); $$ = ""; }
+    | variable_complex_element T_EQUAL liststart                    { updateComplexElementComplex(); $$ = ""; }
     | variable_complex_element T_EQUAL dictionarystart              { updateComplexElementComplex(); $$ = ""; }
     | variable_complex_element T_EQUAL T_VAR T_LEFT function_call_parameters_start                      { if (phase == PROGRAM) { callFunction($3, NULL); updateComplexSymbolByClonningFunctionReturn($3, NULL); } else { free($3); } $$ = ""; }
     | variable_complex_element T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($5, $3); updateComplexSymbolByClonningFunctionReturn($5, $3); } else { free($3); free($5); } $$ = ""; }
@@ -530,9 +530,9 @@ variable:                                                           { }
     | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_BOOL, $4, K_ANY); $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket             { createCloneFromComplexElement($2, K_BOOL, $4, K_ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR                    { createCloneFromSymbolByName($3, K_LIST, $5, K_BOOL); $$ = ""; }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, K_LIST, $5, K_BOOL); $$ = ""; }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, K_DICT, $5, K_BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart               { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart                 { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_BOOL, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_BOOL, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
@@ -541,9 +541,9 @@ variable:                                                           { }
 variable:                                                           { }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, K_ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_LIST, $5, K_NUMBER); $$ = ""; }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_LIST, $5, K_NUMBER); $$ = ""; }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart             { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart               { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
     | T_VAR_NUMBER T_VAR T_EQUAL mixed_expression                   { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL expression                         { addSymbolFloat($2, $4); $$ = ""; }
@@ -555,9 +555,9 @@ variable:                                                           { }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_STRING, $4, K_ANY); $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_STRING, $4, K_ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR                  { createCloneFromSymbolByName($3, K_LIST, $5, K_STRING); $$ = ""; }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_LIST, $5, K_STRING); $$ = ""; }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart             { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart               { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_STRING, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_STRING, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
@@ -770,7 +770,7 @@ quit:                                                               { }
         freeEverything();
         exit(E_SUCCESS);
     }
-    | T_QUIT expression T_NEWLINE                                              {
+    | T_QUIT expression T_NEWLINE                                   {
         if (is_interactive) {
             print_bye_bye();
         } else {
@@ -779,7 +779,7 @@ quit:                                                               { }
         freeEverything();
         exit($2);
     }
-    | T_QUIT T_VAR T_NEWLINE                                              {
+    | T_QUIT T_VAR T_NEWLINE                                        {
         long long code = getSymbolValueInt($2);
         if (is_interactive) {
             print_bye_bye();

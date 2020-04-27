@@ -1,20 +1,47 @@
 import tests.shell.modules.module1
 
-void def f1()
+void def fa()
     print "hey"
 end
 
 asdasd1()
 
-f1()
+fa()
 
 asdasd2()
 
-num def f2()
+num def fb()
     num a = 5
     return a
 end
-f2()
+fb()
 
 // Print the function return on function calls from modules
 module1.sub(7, 3)
+
+// Test for not printing function returns on function decision execution mode
+num def f1()
+    num a = 101
+    return a
+end
+
+num def f2()
+    num b = 102
+    return b
+end
+
+num def f3()
+    num c = 103
+    return c
+end
+
+num def add(num x, num y)
+    num z = x + y
+end {
+    z == 8  : f1(),
+    z > 10  : f2(),
+    default : f3()
+}
+
+add(3, 5)
+print add(3, 5)
