@@ -99,6 +99,12 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_INCORRECT_FUNCTION_ARGUMENT_COUNT:
             sprintf(error_msg, "Incorrect argument count for function: %s", str1);
             break;
+        case E_NOT_A_LIST:
+            sprintf(error_msg, "'%s' is not a list!", str1);
+            break;
+        case E_NOT_A_DICT:
+            sprintf(error_msg, "'%s' is not a dictionary!", str1);
+            break;
         default:
             sprintf(error_msg, "Unkown error.");
             break;

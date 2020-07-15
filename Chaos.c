@@ -285,3 +285,27 @@ void returnComplex(enum Type type) {
     popComplexModeStack();
     returnVariable(symbol);
 }
+
+enum Type getListType(char *name) {
+    Symbol* symbol = getSymbol(name);
+    if (symbol->type != K_LIST)
+        throw_error(E_NOT_A_LIST, name);
+    return symbol->secondary_type;
+}
+
+enum Type getDictType(char *name) {
+    Symbol* symbol = getSymbol(name);
+    if (symbol->type != K_DICT)
+        throw_error(E_NOT_A_DICT, name);
+    return symbol->secondary_type;
+}
+
+enum ValueType getValueType(char *name) {
+    Symbol* symbol = getSymbol(name);
+    return symbol->value_type;
+}
+
+enum Role getRole(char *name) {
+    Symbol* symbol = getSymbol(name);
+    return symbol->role;
+}
