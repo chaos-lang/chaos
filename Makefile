@@ -59,7 +59,7 @@ lex.yy.c: chaos.l chaos.tab.h
 	flex chaos.l
 
 chaos: lex.yy.c chaos.tab.c chaos.tab.h
-	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
+	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -fcommon -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
 	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h
