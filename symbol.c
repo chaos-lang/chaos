@@ -200,7 +200,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
     }
 
     Symbol* symbol_return = complex_mode_stack.arr[complex_mode_stack.size - 1];
-    finishComplexMode(name, K_ANY);
+    finishComplexMode(name, symbol->secondary_type);
 
     return symbol_return;
 }
