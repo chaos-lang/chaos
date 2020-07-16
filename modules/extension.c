@@ -38,6 +38,7 @@ void initKaosApi() {
     kaos.getDictType = getDictType;
     kaos.getValueType = getValueType;
     kaos.getRole = getRole;
+    kaos.raiseError = raiseError;
 }
 
 void callRegisterInDynamicLibrary(char* dynamic_library_path) {

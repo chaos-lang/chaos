@@ -309,3 +309,7 @@ enum Role getRole(char *name) {
     Symbol* symbol = getSymbol(name);
     return symbol->role;
 }
+
+void raiseError(char *msg) {
+    throw_error(E_RAISED_FROM_AN_EXTENSION, msg, NULL, 0, 0);
+}

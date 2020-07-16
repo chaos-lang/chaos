@@ -48,6 +48,7 @@ enum Type getListType(char *name);
 enum Type getDictType(char *name);
 enum ValueType getValueType(char *name);
 enum Role getRole(char *name);
+void raiseError(char *msg);
 
 struct Kaos {
     int (*defineFunction)(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length);
@@ -87,6 +88,7 @@ struct Kaos {
     enum Type (*getDictType)(char *name);
     enum ValueType (*getValueType) (char *name);
     enum Role (*getRole) (char *name);
+    void (*raiseError) (char *msg);
 };
 
 struct Kaos kaos;

@@ -38,7 +38,8 @@ enum ExitCode {
     E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH,
     E_INCORRECT_FUNCTION_ARGUMENT_COUNT,
     E_NOT_A_LIST,
-    E_NOT_A_DICT
+    E_NOT_A_DICT,
+    E_RAISED_FROM_AN_EXTENSION
 };
 
 extern void freeEverything();
