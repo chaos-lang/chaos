@@ -13,6 +13,7 @@ void initKaosApi() {
     kaos.getListElementString = getListElementString;
     kaos.copyListElement = copyListElement;
     kaos.getListElementType = getListElementType;
+    kaos.getListElementValueType = getListElementValueType;
     kaos.getDictLength = getDictLength;
     kaos.getDictKeyByIndex = getDictKeyByIndex;
     kaos.getDictElementBool = getDictElementBool;
@@ -34,6 +35,9 @@ void initKaosApi() {
     kaos.startBuildingDict = startBuildingDict;
     kaos.returnDict = returnDict;
     kaos.returnComplex = returnComplex;
+    kaos.finishList = finishList;
+    kaos.finishDict = finishDict;
+    kaos.finishComplex = finishComplex;
     kaos.getListType = getListType;
     kaos.getDictType = getDictType;
     kaos.getValueType = getValueType;
