@@ -46,6 +46,38 @@ char* getVariableString(char *name) {
     return getSymbolValueString(symbol_name);
 }
 
+bool getVariableBoolByTypeCasting(char *name) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getSymbol(symbol_name);
+    free(symbol_name);
+    return symbolValueByTypeCastingToBool(symbol);
+}
+
+long long getVariableIntByTypeCasting(char *name) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getSymbol(symbol_name);
+    free(symbol_name);
+    return symbolValueByTypeCastingToInt(symbol);
+}
+
+long double getVariableFloatByTypeCasting(char *name) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getSymbol(symbol_name);
+    free(symbol_name);
+    return symbolValueByTypeCastingToFloat(symbol);
+}
+
+char* getVariableStringByTypeCasting(char *name) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getSymbol(symbol_name);
+    free(symbol_name);
+    return symbolValueByTypeCastingToString(symbol);
+}
+
 unsigned long getListLength(char *name) {
     char *symbol_name = malloc(strlen(name) + 1);
     strcpy(symbol_name, name);
@@ -96,6 +128,38 @@ char* getListElementString(char *name, long long i) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return _getSymbolValueString(symbol);
+}
+
+bool getListElementBoolByTypeCasting(char *name, long long i) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
+    free(symbol_name);
+    return symbolValueByTypeCastingToBool(symbol);
+}
+
+long long getListElementIntByTypeCasting(char *name, long long i) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
+    free(symbol_name);
+    return symbolValueByTypeCastingToInt(symbol);
+}
+
+long double getListElementFloatByTypeCasting(char *name, long long i) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
+    free(symbol_name);
+    return symbolValueByTypeCastingToFloat(symbol);
+}
+
+char* getListElementStringByTypeCasting(char *name, long long i) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
+    free(symbol_name);
+    return symbolValueByTypeCastingToString(symbol);
 }
 
 void copyListElement(char *name, long long i) {
@@ -189,6 +253,38 @@ char* getDictElementString(char *name, char *key) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return _getSymbolValueString(symbol);
+}
+
+bool getDictElementBoolByTypeCasting(char *name, char *key) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
+    free(symbol_name);
+    return symbolValueByTypeCastingToBool(symbol);
+}
+
+long long getDictElementIntByTypeCasting(char *name, char *key) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
+    free(symbol_name);
+    return symbolValueByTypeCastingToInt(symbol);
+}
+
+long double getDictElementFloatByTypeCasting(char *name, char *key) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
+    free(symbol_name);
+    return symbolValueByTypeCastingToFloat(symbol);
+}
+
+char* getDictElementStringByTypeCasting(char *name, char *key) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
+    free(symbol_name);
+    return symbolValueByTypeCastingToString(symbol);
 }
 
 void copyDictElement(char *name, char *key) {
