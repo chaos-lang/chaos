@@ -32,6 +32,7 @@ long double getDictElementFloat(char *name, char *key);
 char* getDictElementString(char *name, char *key);
 void copyDictElement(char *name, char *key);
 enum Type getDictElementType(char *name, char *key);
+enum ValueType getDictElementValueType(char *name, char *key);
 void returnVariableBool(bool b);
 void returnVariableInt(long long i);
 void returnVariableFloat(long double f);
@@ -76,6 +77,7 @@ struct Kaos {
     char* (*getDictElementString)(char *name, char *key);
     void (*copyDictElement)(char *name, char *key);
     enum Type (*getDictElementType)(char *name, char *key);
+    enum ValueType (*getDictElementValueType)(char *name, char *key);
     void (*returnVariableBool)(bool b);
     void (*returnVariableInt)(long long i);
     void (*returnVariableFloat)(long double f);

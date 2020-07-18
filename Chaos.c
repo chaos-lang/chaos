@@ -212,6 +212,14 @@ enum Type getDictElementType(char *name, char *key) {
     return symbol->type;
 }
 
+enum ValueType getDictElementValueType(char *name, char *key) {
+    char *symbol_name = malloc(strlen(name) + 1);
+    strcpy(symbol_name, name);
+    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
+    free(symbol_name);
+    return symbol->value_type;
+}
+
 void returnVariableBool(bool b) {
     Symbol* symbol = addSymbolBool(NULL, b);
     returnVariable(symbol);
