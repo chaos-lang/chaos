@@ -128,6 +128,9 @@ switch (phase)
         phase = PROGRAM;
         return START_PROGRAM;
         break;
+    case INIT_JSON_PARSE:
+        phase = JSON_PARSE;
+        return START_JSON_PARSE;
     default:
         break;
 }
@@ -196,7 +199,16 @@ switch (phase)
 <COMMENT>"*/"                   {BEGIN(INITIAL);}
 <COMMENT>.|"\n"                 {yylineno++;}
 
-(\"|\')([^\\(\"|\')]|\\.)*(\"|\') {
+(\")([^\\(\")]|\\.)*(\") {
+    recordToken(strdup(yytext), yyleng);
+    if (isStreamOpen()) {
+        yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
+        strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
+        return T_STRING;
+    }
+}
+
+(\')([^\\(\')]|\\.)*(\') {
     recordToken(strdup(yytext), yyleng);
     if (isStreamOpen()) {
         yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));

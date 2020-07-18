@@ -56,7 +56,7 @@ char *program_code;
     unsigned long long lluval;
 }
 
-%token START_PROGRAM START_PREPARSE
+%token START_PROGRAM START_PREPARSE START_JSON_PARSE
 %token<bval> T_TRUE T_FALSE
 %token<ival> T_INT T_TIMES_DO_INT
 %token<fval> T_FLOAT
@@ -96,6 +96,7 @@ char *program_code;
 meta_start:
     | START_PROGRAM parser                                          { }
     | START_PREPARSE preparser                                      { }
+    | START_JSON_PARSE json_parser                                  { }
 ;
 
 preparser:
@@ -789,6 +790,10 @@ quit:                                                               { }
         freeEverything();
         exit(code);
     }
+;
+
+json_parser:
+    | dictionarystart                                               { Symbol* symbol = finishComplexMode(NULL, K_ANY); returnVariable(symbol); }
 ;
 
 %%

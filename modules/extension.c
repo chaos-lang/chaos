@@ -57,6 +57,7 @@ void initKaosApi() {
     kaos.getValueType = getValueType;
     kaos.getRole = getRole;
     kaos.raiseError = raiseError;
+    kaos.parseJson = parseJson;
 }
 
 void callRegisterInDynamicLibrary(char* dynamic_library_path) {

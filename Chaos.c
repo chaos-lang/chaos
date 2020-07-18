@@ -452,3 +452,8 @@ enum Role getRole(char *name) {
 void raiseError(char *msg) {
     throw_error(E_RAISED_FROM_AN_EXTENSION, msg, NULL, 0, 0);
 }
+
+void parseJson(char *json) {
+    injectCode(json, INIT_JSON_PARSE);
+    phase = PROGRAM;
+}
