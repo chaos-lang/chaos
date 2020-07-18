@@ -1134,119 +1134,122 @@ void freeAllSymbols() {
 }
 
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
-    char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
-    char *val;
     switch (clone_symbol->value_type)
     {
         case V_BOOL:
-            switch (symbol->value_type)
-            {
-                case V_BOOL:
-                    clone_symbol->value.b = symbol->value.b;
-                    break;
-                case V_INT:
-                    if (symbol->value.i != 0) {
-                        clone_symbol->value.b = true;
-                    } else {
-                        clone_symbol->value.b = false;
-                    }
-                    break;
-                case V_FLOAT:
-                    if (symbol->value.f != 0.0) {
-                        clone_symbol->value.b = true;
-                    } else {
-                        clone_symbol->value.b = false;
-                    }
-                    break;
-                case V_STRING:
-                    if (symbol->value.s[0] != '\0') {
-                        clone_symbol->value.b = true;
-                    } else {
-                        clone_symbol->value.b = false;
-                    }
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
-                    break;
-            }
+            clone_symbol->value.b = symbolValueByTypeCastingToBool(symbol);
             break;
         case V_INT:
-            switch (symbol->value_type)
-            {
-                case V_BOOL:
-                    clone_symbol->value.i = symbol->value.b ? 1 : 0;
-                    break;
-                case V_INT:
-                    clone_symbol->value.i = symbol->value.i;
-                    break;
-                case V_FLOAT:
-                    clone_symbol->value.i = (long long)symbol->value.f;
-                    break;
-                case V_STRING:
-                    clone_symbol->value.i = atoi(symbol->value.s);
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
-                    break;
-            }
+            clone_symbol->value.i = symbolValueByTypeCastingToInt(symbol);
             break;
         case V_FLOAT:
-            switch (symbol->value_type)
-            {
-                case V_BOOL:
-                    clone_symbol->value.f = symbol->value.b ? 1.0 : 0.0;
-                    break;
-                case V_INT:
-                    clone_symbol->value.f = (long double)symbol->value.i;
-                    break;
-                case V_FLOAT:
-                    clone_symbol->value.f = symbol->value.f;
-                    break;
-                case V_STRING:
-                    clone_symbol->value.f = atof(symbol->value.s);
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
-                    break;
-            }
+            clone_symbol->value.f = symbolValueByTypeCastingToFloat(symbol);
             break;
         case V_STRING:
-            switch (symbol->value_type)
-            {
-                case V_BOOL:
-                    free(clone_symbol->value.s);
-                    val = symbol->value.b ? "true" : "false";
-                    clone_symbol->value.s = malloc(1 + strlen(val));
-                    strcpy(clone_symbol->value.s, val);
-                    break;
-                case V_INT:
-                    free(clone_symbol->value.s);
-                    val = longlong_to_string(symbol->value.i, buffer, 10);
-                    clone_symbol->value.s = malloc(1 + strlen(val));
-                    strcpy(clone_symbol->value.s, val);
-                    break;
-                case V_FLOAT:
-                    free(clone_symbol->value.s);
-                    sprintf(buffer, "%Lg", symbol->value.f);
-                    val = buffer;
-                    clone_symbol->value.s = malloc(1 + strlen(val));
-                    strcpy(clone_symbol->value.s, val);
-                    break;
-                case V_STRING:
-                    free(clone_symbol->value.s);
-                    clone_symbol->value.s = malloc(1 + strlen(symbol->value.s));
-                    strcpy(clone_symbol->value.s, symbol->value.s);
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), clone_symbol->name);
-                    break;
-            }
+            free(clone_symbol->value.s);
+            clone_symbol->value.s = symbolValueByTypeCastingToString(symbol);
             break;
         default:
             throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_symbol->name);
             break;
     }
     return deepCopySymbol(clone_symbol, clone_symbol->type, NULL);
+}
+
+bool symbolValueByTypeCastingToBool(Symbol* symbol) {
+    switch (symbol->value_type)
+    {
+        case V_BOOL:
+            return symbol->value.b;
+        case V_INT:
+            if (symbol->value.i != 0) {
+                return true;
+            } else {
+                return false;
+            }
+        case V_FLOAT:
+            if (symbol->value.f != 0.0) {
+                return true;
+            } else {
+                return false;
+            }
+        case V_STRING:
+            if (symbol->value.s[0] != '\0') {
+                return true;
+            } else {
+                return false;
+            }
+        default:
+            return false;
+    }
+}
+
+long long symbolValueByTypeCastingToInt(Symbol* symbol) {
+    switch (symbol->value_type)
+    {
+        case V_BOOL:
+            return symbol->value.b ? 1 : 0;
+        case V_INT:
+            return symbol->value.i;
+        case V_FLOAT:
+            return (long long)symbol->value.f;
+        case V_STRING:
+            return atoi(symbol->value.s);
+        default:
+            return 0;
+    }
+}
+
+long double symbolValueByTypeCastingToFloat(Symbol* symbol) {
+    switch (symbol->value_type)
+    {
+        case V_BOOL:
+            return symbol->value.b ? 1.0 : 0.0;
+        case V_INT:
+            return (long double) symbol->value.i;
+        case V_FLOAT:
+            return symbol->value.f;
+        case V_STRING:
+            return atof(symbol->value.s);
+        default:
+            return 0.0;
+    }
+}
+
+char* symbolValueByTypeCastingToString(Symbol* symbol) {
+    char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
+    char *val;
+    char *result;
+    switch (symbol->value_type)
+    {
+        case V_BOOL:
+            val = symbol->value.b ? "true" : "false";
+            result = malloc(1 + strlen(val));
+            strcpy(result, val);
+            return result;
+        case V_INT:
+            val = longlong_to_string(symbol->value.i, buffer, 10);
+            result = malloc(1 + strlen(val));
+            strcpy(result, val);
+            return result;
+        case V_FLOAT:
+            sprintf(buffer, "%Lg", symbol->value.f);
+            val = buffer;
+            result = malloc(1 + strlen(val));
+            strcpy(result, val);
+            return result;
+        case V_STRING:
+            val = symbol->value.s;
+            result = malloc(1 + strlen(val));
+            strcpy(result, val);
+            return result;
+        default:
+            val = "";
+            result = malloc(1 + strlen(val));
+            strcpy(result, val);
+            return result;
+            break;
+    }
 }
 
 Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
