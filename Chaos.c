@@ -316,14 +316,14 @@ enum ValueType getDictElementValueType(char *name, char *key) {
     return symbol->value_type;
 }
 
-char* dumpVariableToString(char *name, bool pretty, bool escaped) {
+char* dumpVariableToString(char *name, bool pretty, bool escaped, bool double_quotes) {
     Symbol* symbol = getSymbol(name);
     bool is_complex = false;
     if (symbol->type == K_LIST || symbol->type == K_DICT)
         is_complex = true;
     char *encoded = malloc(2);
     strcpy(encoded, " ");
-    encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, 0, encoded);
+    encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, 0, encoded, double_quotes);
     memmove(encoded, encoded + 1, strlen(encoded));
     return encoded;
 }

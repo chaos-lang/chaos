@@ -348,13 +348,13 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
 void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter) {
     char *encoded = malloc(2);
     strcpy(encoded, " ");
-    encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, iter, encoded);
+    encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, iter, encoded, false);
     memmove(encoded, encoded + 1, strlen(encoded));
     printf("%s", encoded);
     free(encoded);
 }
 
-char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded) {
+char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded, bool double_quotes) {
     switch (symbol->type)
     {
         case K_BOOL:
@@ -376,7 +376,11 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
             return encoded;
         case K_STRING:
             if (is_complex) {
-                encoded = snprintf_concat_string(encoded, "'%s'", symbol->value.s);
+                if (double_quotes) {
+                    encoded = snprintf_concat_string(encoded, "\"%s\"", symbol->value.s);
+                } else {
+                    encoded = snprintf_concat_string(encoded, "'%s'", symbol->value.s);
+                }
             } else {
                 if (escaped) {
                     char* out = escape_the_sequences_in_string_literal(symbol->value.s);
@@ -399,7 +403,7 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                         encoded = strcat_ext(encoded, __KAOS_TAB__);
                     }
                 }
-                encoded = encodeSymbolValueToString(symbol->children[i], true, pretty, escaped, iter, encoded);
+                encoded = encodeSymbolValueToString(symbol->children[i], true, pretty, escaped, iter, encoded, double_quotes);
                 if (i + 1 != symbol->children_count) {
                     if (pretty) {
                         encoded = strcat_ext(encoded, ",\n");
@@ -431,8 +435,12 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                     }
                 }
                 Symbol* child = symbol->children[i];
-                encoded = snprintf_concat_string(encoded, "'%s': ", child->key);
-                encoded = encodeSymbolValueToString(child, true, pretty, escaped, iter, encoded);
+                if (double_quotes) {
+                    encoded = snprintf_concat_string(encoded, "\"%s\": ", child->key);
+                } else {
+                    encoded = snprintf_concat_string(encoded, "'%s': ", child->key);
+                }
+                encoded = encodeSymbolValueToString(child, true, pretty, escaped, iter, encoded, double_quotes);
                 if (i + 1 != symbol->children_count) {
                     if (pretty) {
                         encoded = strcat_ext(encoded, ",\n");

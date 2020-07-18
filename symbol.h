@@ -86,7 +86,7 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol);
 void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter);
 void printSymbolValueEndWith(Symbol* symbol, char *end, bool pretty, bool escaped);
 void printSymbolValueEndWithNewLine(Symbol* symbol, bool pretty, bool escaped);
-char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded);
+char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded, bool double_quotes);
 bool isDefined(char *name);
 void addSymbolToComplex(Symbol* symbol);
 void printSymbolTable();
