@@ -109,6 +109,57 @@ char *strcat_ext(char *s1, const char *s2)
     return p;
 }
 
+char *snprintf_concat_int(char *s1, char *format, long long i)
+{
+    char *tmp;
+    size_t len;
+
+    // 1st pass gets needed size
+    len = (size_t) snprintf(NULL, 0, format, i) + 1;
+    tmp = malloc(len);
+
+    // Safely write to tmp with known length 'len'
+    snprintf(tmp, len, format, i);
+
+    s1 = strcat_ext(s1, tmp);
+    free(tmp);
+    return s1;
+}
+
+char *snprintf_concat_float(char *s1, char *format, long double f)
+{
+    char *tmp;
+    size_t len;
+
+    // 1st pass gets needed size
+    len = (size_t) snprintf(NULL, 0, format, f) + 1;
+    tmp = malloc(len);
+
+    // Safely write to tmp with known length 'len'
+    snprintf(tmp, len, format, f);
+
+    s1 = strcat_ext(s1, tmp);
+    free(tmp);
+    return s1;
+}
+
+char *snprintf_concat_string(char *s1, char *format, char *s2)
+{
+    char *tmp;
+    size_t len;
+
+    // 1st pass gets needed size
+    len = (size_t) snprintf(NULL, 0, format, s2) + 1;
+    tmp = malloc(len);
+
+    // Safely write to tmp with known length 'len'
+    snprintf(tmp, len, format, s2);
+
+    s1 = strcat_ext(s1, tmp);
+    free(tmp);
+    return s1;
+}
+
 void prepend_to_array(string_array *array, char *str) {
     array->arr = (char **)realloc(array->arr, (array->capacity += 1) * sizeof(char *));
 

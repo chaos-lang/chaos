@@ -346,126 +346,136 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter) {
+    char *encoded = malloc(2);
+    strcpy(encoded, " ");
+    encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, iter, encoded);
+    memmove(encoded, encoded + 1, strlen(encoded));
+    printf("%s", encoded);
+    free(encoded);
+}
+
+char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded) {
     switch (symbol->type)
     {
         case K_BOOL:
-            printf("%s", symbol->value.b ? "true" : "false");
-            break;
+            encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
+            return encoded;
         case K_NUMBER:
             switch (symbol->value_type)
             {
                 case V_INT:
-                    printf("%lld", symbol->value.i);
+                    encoded = snprintf_concat_int(encoded, "%lld", symbol->value.i);
                     break;
                 case V_FLOAT:
-                    printf("%Lg", symbol->value.f);
+                    encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
                     break;
                 default:
                     throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
                     break;
             }
-            break;
+            return encoded;
         case K_STRING:
             if (is_complex) {
-                printf("'%s'", symbol->value.s);
+                encoded = snprintf_concat_string(encoded, "'%s'", symbol->value.s);
             } else {
                 if (escaped) {
                     char* out = escape_the_sequences_in_string_literal(symbol->value.s);
-                    printf("%s", out);
+                    encoded = strcat_ext(encoded, out);
                     free(out);
                 } else {
-                    printf("%s", symbol->value.s);
+                    encoded = strcat_ext(encoded, symbol->value.s);
                 }
             }
-            break;
+            return encoded;
         case K_LIST:
             iter++;
-            printf("[");
+            encoded = strcat_ext(encoded, "[");
             if (pretty) {
-                printf("\n");
+                encoded = strcat_ext(encoded, "\n");
             }
             for (unsigned long i = 0; i < symbol->children_count; i++) {
                 if (pretty) {
                     for (unsigned long j = 0; j < iter; j++) {
-                        printf(__KAOS_TAB__);
+                        encoded = strcat_ext(encoded, __KAOS_TAB__);
                     }
                 }
-                printSymbolValue(symbol->children[i], true, pretty, escaped, iter);
+                encoded = encodeSymbolValueToString(symbol->children[i], true, pretty, escaped, iter, encoded);
                 if (i + 1 != symbol->children_count) {
                     if (pretty) {
-                        printf(",\n");
+                        encoded = strcat_ext(encoded, ",\n");
                     } else {
-                        printf(", ");
+                        encoded = strcat_ext(encoded, ", ");
                     }
                 }
             }
             if (pretty) {
-                printf("\n");
+                encoded = strcat_ext(encoded, "\n");
             }
             if (pretty) {
                 for (unsigned long j = 0; j < (iter - 1); j++) {
-                    printf(__KAOS_TAB__);
+                    encoded = strcat_ext(encoded, __KAOS_TAB__);
                 }
             }
-            printf("]");
-            break;
+            encoded = strcat_ext(encoded, "]");
+            return encoded;
         case K_DICT:
             iter++;
-            printf("{");
+            encoded = strcat_ext(encoded, "{");
             if (pretty) {
-                printf("\n");
+                encoded = strcat_ext(encoded, "\n");
             }
             for (unsigned long i = 0; i < symbol->children_count; i++) {
                 if (pretty) {
                     for (unsigned long j = 0; j < iter; j++) {
-                        printf(__KAOS_TAB__);
+                        encoded = strcat_ext(encoded, __KAOS_TAB__);
                     }
                 }
                 Symbol* child = symbol->children[i];
-                printf("'%s': ", child->key);
-                printSymbolValue(child, true, pretty, escaped, iter);
+                encoded = snprintf_concat_string(encoded, "'%s': ", child->key);
+                encoded = encodeSymbolValueToString(child, true, pretty, escaped, iter, encoded);
                 if (i + 1 != symbol->children_count) {
                     if (pretty) {
-                        printf(",\n");
+                        encoded = strcat_ext(encoded, ",\n");
                     } else {
-                        printf(", ");
+                        encoded = strcat_ext(encoded, ", ");
                     }
                 }
             }
             if (pretty) {
-                printf("\n");
+                encoded = strcat_ext(encoded, "\n");
             }
             if (pretty) {
                 for (unsigned long j = 0; j < (iter - 1); j++) {
-                    printf(__KAOS_TAB__);
+                    encoded = strcat_ext(encoded, __KAOS_TAB__);
                 }
             }
-            printf("}");
-            break;
+            encoded = strcat_ext(encoded, "}");
+            return encoded;
         case K_ANY:
             switch (symbol->value_type)
             {
                 case V_STRING:
-                    printf("%s", symbol->value.s);
+                    encoded = strcat_ext(encoded, symbol->value.s);
                     break;
                 case V_INT:
-                    printf("%lld", symbol->value.i);
+                    encoded = snprintf_concat_int(encoded, "%lld", symbol->value.i);
                     break;
                 case V_FLOAT:
-                    printf("%Lg", symbol->value.f);
+                    encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
                     break;
                 case V_BOOL:
-                    printf("%s", symbol->value.b ? "true" : "false");
+                    encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
                     break;
                 default:
                     throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type), symbol->name);
                     break;
             }
-            break;
+            return encoded;
         default:
             throw_error(E_UNKNOWN_VARIABLE_TYPE, getTypeName(symbol->type), symbol->name);
             break;
     }
+    return encoded;
 }
 
 void printSymbolValueEndWith(Symbol* symbol, char *end, bool pretty, bool escaped) {

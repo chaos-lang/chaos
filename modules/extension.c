@@ -35,6 +35,7 @@ void initKaosApi() {
     kaos.copyDictElement = copyDictElement;
     kaos.getDictElementType = getDictElementType;
     kaos.getDictElementValueType = getDictElementValueType;
+    kaos.dumpVariableToString = dumpVariableToString;
     kaos.returnVariableBool = returnVariableBool;
     kaos.returnVariableInt = returnVariableInt;
     kaos.returnVariableFloat = returnVariableFloat;
