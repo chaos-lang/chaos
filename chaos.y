@@ -114,13 +114,19 @@ preparser_line: T_NEWLINE
 ;
 
 function:
-    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_BOOL); }
-    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_NUMBER); }
-    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_STRING); }
-    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, K_ANY); }
-    | T_VAR_LIST T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_LIST); }
-    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT); }
-    | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID); }
+    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_BOOL, K_ANY); }
+    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_NUMBER, K_ANY); }
+    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_STRING, K_ANY); }
+    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, K_ANY, K_ANY); }
+    | T_VAR_LIST T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_LIST, K_ANY); }
+    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT, K_ANY); }
+    | T_VAR_BOOL T_VAR_LIST T_FUNCTION T_VAR function_parameters_start         { startFunction($4, K_LIST, K_BOOL); }
+    | T_VAR_BOOL T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($4, K_DICT, K_BOOL); }
+    | T_VAR_NUMBER T_VAR_LIST T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_LIST, K_NUMBER); }
+    | T_VAR_NUMBER T_VAR_DICT T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_DICT, K_NUMBER); }
+    | T_VAR_STRING T_VAR_LIST T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_LIST, K_STRING); }
+    | T_VAR_STRING T_VAR_DICT T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_DICT, K_STRING); }
+    | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID, K_ANY); }
     | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "\n", false, true); } free($2); }
     | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "", false, true); } free($2); }
     | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "\n", true, true); } free($3); }
@@ -537,6 +543,10 @@ variable:                                                           { }
     | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_BOOL, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
     | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_BOOL, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_LIST, $5, NULL, K_BOOL); } else { free($3); free($5); } $$ = ""; }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_LIST, $7, $5, K_BOOL); } else { free($3); free($5); free($7); } $$ = ""; }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_DICT, $5, NULL, K_BOOL); } else { free($3); free($5); } $$ = ""; }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_DICT, $7, $5, K_BOOL); } else { free($3); free($5); free($7); } $$ = ""; }
 ;
 
 variable:                                                           { }
@@ -550,6 +560,10 @@ variable:                                                           { }
     | T_VAR_NUMBER T_VAR T_EQUAL expression                         { addSymbolFloat($2, $4); $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_NUMBER, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
     | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_NUMBER, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_LIST, $5, NULL, K_NUMBER); } else { free($3); free($5); } $$ = ""; }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_LIST, $7, $5, K_NUMBER); } else { free($3); free($5); free($7); } $$ = ""; }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_DICT, $5, NULL, K_NUMBER); } else { free($3); free($5); } $$ = ""; }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_DICT, $7, $5, K_NUMBER); } else { free($3); free($5); free($7); } $$ = ""; }
 ;
 
 variable:                                                           { }
@@ -562,6 +576,10 @@ variable:                                                           { }
     | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_STRING, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_STRING, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_LIST, $5, NULL, K_STRING); } else { free($3); free($5); } $$ = ""; }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_LIST, $7, $5, K_STRING); } else { free($3); free($5); free($7); } $$ = ""; }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_DICT, $5, NULL, K_STRING); } else { free($3); free($5); } $$ = ""; }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_DICT, $7, $5, K_STRING); } else { free($3); free($5); free($7); } $$ = ""; }
 ;
 
 variable:                                                           { }

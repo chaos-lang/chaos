@@ -25,6 +25,7 @@ typedef struct _Function {
     struct Symbol** parameters;
     unsigned short parameter_count;
     enum Type type;
+    enum Type secondary_type;
     struct Symbol* symbol;
     struct _Function* previous;
     struct _Function* next;
@@ -69,7 +70,7 @@ int reset_line_no_to;
 jmp_buf InteractiveShellFunctionErrorAbsorber;
 bool interactive_shell_function_error_absorbed;
 
-void startFunction(char *name, enum Type type);
+void startFunction(char *name, enum Type type, enum Type secondary_type);
 void endFunction();
 void freeFunctionMode();
 _Function* getFunction(char *name, char *module);

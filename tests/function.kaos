@@ -281,3 +281,50 @@ print a
 b['f'] = dict_f1()
 print b
 b['f'] = lib.dict_f1()
+
+
+// Direct assignments to typed lists
+
+bool list def bool_list_test()
+    bool list x = [true, false]
+    return x
+end
+bool list bool_list_test_var = bool_list_test()
+print bool_list_test_var
+
+num list def num_list_test()
+    num list x = [1, 3.14]
+    return x
+end
+num list num_list_test_var = num_list_test()
+print num_list_test_var
+
+str list def str_list_test()
+    str list x = ['a', "b"]
+    return x
+end
+str list str_list_test_var = str_list_test()
+print str_list_test_var
+
+// Direct assignments to typed dictionaries
+
+bool dict def bool_dict_test()
+    bool dict x = {'a': true, 'b': false}
+    return x
+end
+bool dict bool_dict_test_var = bool_dict_test()
+print bool_dict_test_var
+
+num dict def num_dict_test()
+    num dict x = {'a': 1, 'b': 3.14}
+    return x
+end
+num dict num_dict_test_var = num_dict_test()
+print num_dict_test_var
+
+str dict def str_dict_test()
+    str dict x = {'a': 'a', "b": "b"}
+    return x
+end
+str dict str_dict_test_var = str_dict_test()
+print str_dict_test_var

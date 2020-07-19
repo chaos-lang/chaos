@@ -7,7 +7,7 @@ extern int yyparse();
 int reset_line_no_to = 0;
 bool decision_execution_mode = false;
 
-void startFunction(char *name, enum Type type) {
+void startFunction(char *name, enum Type type, enum Type secondary_type) {
     if (is_interactive) {
         phase = PREPARSE;
     }
@@ -42,6 +42,7 @@ void startFunction(char *name, enum Type type) {
     function_mode->line_no = yylineno;
     strcpy(function_mode->name, name);
     function_mode->type = type;
+    function_mode->secondary_type = secondary_type;
     function_mode->parameter_count = 0;
 
     function_mode->decision_expressions.capacity = 0;
@@ -341,6 +342,14 @@ void returnSymbol(char *name) {
         free(name);
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), executed_function->name);
     }
+    if (symbol->secondary_type != K_ANY &&
+        executed_function->secondary_type != K_ANY &&
+        symbol->secondary_type != executed_function->secondary_type
+    ) {
+        free(name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), executed_function->name);
+    }
+
     scope_override = executed_function->parent_scope;
     executed_function->symbol = createCloneFromSymbol(
         NULL,

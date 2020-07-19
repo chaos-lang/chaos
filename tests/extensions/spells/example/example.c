@@ -94,12 +94,12 @@ int KAOS_EXPORT Kaos_dictionary()
 int KAOS_EXPORT KaosRegister(struct Kaos _kaos)
 {
     kaos = _kaos;
-    kaos.defineFunction("hello", K_VOID, hello_params_name, hello_params_type, hello_params_length);
-    kaos.defineFunction("add", K_NUMBER, add_params_name, add_params_type, add_params_length);
-    kaos.defineFunction("log", K_VOID, log_params_name, log_params_type, log_params_length);
-    kaos.defineFunction("complex", K_VOID, complex_params_name, complex_params_type, complex_params_length);
-    kaos.defineFunction("array", K_LIST, array_params_name, array_params_type, array_params_length);
-    kaos.defineFunction("dictionary", K_DICT, dictionary_params_name, dictionary_params_type, dictionary_params_length);
+    kaos.defineFunction("hello", K_VOID, K_ANY, hello_params_name, hello_params_type, hello_params_length);
+    kaos.defineFunction("add", K_NUMBER, K_ANY, add_params_name, add_params_type, add_params_length);
+    kaos.defineFunction("log", K_VOID, K_ANY, log_params_name, log_params_type, log_params_length);
+    kaos.defineFunction("complex", K_VOID, K_ANY, complex_params_name, complex_params_type, complex_params_length);
+    kaos.defineFunction("array", K_LIST, K_ANY, array_params_name, array_params_type, array_params_length);
+    kaos.defineFunction("dictionary", K_DICT, K_ANY, dictionary_params_name, dictionary_params_type, dictionary_params_length);
 
     return 0;
 }

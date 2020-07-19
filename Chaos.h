@@ -11,7 +11,7 @@
 #include "chaos/language.h"
 #endif
 
-int defineFunction(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length);
+int defineFunction(char *name, enum Type type, enum Type secondary_type, char *params_name[], unsigned params_type[], unsigned short params_length);
 bool getVariableBool(char *name);
 long long getVariableInt(char *name);
 long double getVariableFloat(char *name);
@@ -70,7 +70,7 @@ void raiseError(char *msg);
 void parseJson(char *json);
 
 struct Kaos {
-    int (*defineFunction)(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length);
+    int (*defineFunction)(char *name, enum Type type, enum Type secondary_type, char *params_name[], unsigned params_type[], unsigned short params_length);
     bool (*getVariableBool)(char *name);
     long long (*getVariableInt)(char *name);
     long double (*getVariableFloat)(char *name);

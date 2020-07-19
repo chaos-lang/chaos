@@ -6,7 +6,7 @@
 #include "function.h"
 #include "Chaos.h"
 
-int defineFunction(char *name, enum Type type, char *params_name[], unsigned params_type[], unsigned short params_length) {
+int defineFunction(char *name, enum Type type, enum Type secondary_type, char *params_name[], unsigned params_type[], unsigned short params_length) {
     char *function_name = malloc(strlen(name) + 1);
     strcpy(function_name, name);
     startFunctionParameters();
@@ -17,7 +17,7 @@ int defineFunction(char *name, enum Type type, char *params_name[], unsigned par
         addFunctionParameter(param_name, params_type[i]);
     }
 
-    startFunction(function_name, type);
+    startFunction(function_name, type, secondary_type);
     endFunction();
     return 0;
 }
