@@ -177,6 +177,26 @@ function_parameters: T_VAR_DICT T_VAR                               { addFunctio
     | function_parameters T_NEWLINE                                 { }
 ;
 
+function_parameters: T_VAR_BOOL T_VAR T_EQUAL boolean_expression        { addFunctionOptionalParameterBool($2, $4); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR T_EQUAL mixed_expression        { addFunctionOptionalParameterFloat($2, $4); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR T_EQUAL expression              { addFunctionOptionalParameterFloat($2, $4); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_STRING T_VAR T_EQUAL T_STRING                { addFunctionOptionalParameterString($2, $4); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
 function_parameters: T_TRUE                                         { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }

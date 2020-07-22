@@ -44,6 +44,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     function_mode->type = type;
     function_mode->secondary_type = secondary_type;
     function_mode->parameter_count = 0;
+    function_mode->optional_parameter_count = 0;
 
     function_mode->decision_expressions.capacity = 0;
     function_mode->decision_expressions.size = 0;
@@ -85,6 +86,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         );
     }
     function_mode->parameter_count = function_parameters_mode->parameter_count;
+    function_mode->optional_parameter_count = function_parameters_mode->optional_parameter_count;
 
 
     for (unsigned short i = 0; i < function_mode->parameter_count; i++) {
@@ -129,22 +131,50 @@ void freeFunctionMode() {
 void callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
 
-    if (function_parameters_mode != NULL && function->parameter_count != function_parameters_mode->parameter_count)
-        throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+    if (function_parameters_mode != NULL &&
+        function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count))
+            throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
 
     if (function->parameter_count > 0 && function_parameters_mode == NULL)
+        throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+
+    if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count)
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
 
     scope_override = function;
     for (unsigned short i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
-        Symbol* parameter_call = function_parameters_mode->parameters[i];
 
-        parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
-        strcpy(parameter_call->name, parameter->secondary_name);
-        parameter_call->scope = function;
-        parameter_call->recursion_depth = recursion_depth + 1;
-        parameter_call->param_of = function;
+        if ((i + 1) > function_parameters_mode->parameter_count) {
+            function_parameters_mode->parameters = realloc(
+                function_parameters_mode->parameters,
+                sizeof(Symbol) * ++function_parameters_mode->parameter_count
+            );
+
+            if (function_parameters_mode->parameters == NULL) {
+                throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
+            }
+
+            Symbol* parameter_call = createCloneFromSymbol(
+                parameter->secondary_name,
+                parameter->type,
+                parameter,
+                parameter->secondary_type
+            );
+            parameter_call->scope = function;
+            parameter_call->recursion_depth = recursion_depth + 1;
+            parameter_call->param_of = function;
+
+            function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = parameter_call;
+        } else {
+            Symbol* parameter_call = function_parameters_mode->parameters[i];
+
+            parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
+            strcpy(parameter_call->name, parameter->secondary_name);
+            parameter_call->scope = function;
+            parameter_call->recursion_depth = recursion_depth + 1;
+            parameter_call->param_of = function;
+        }
     }
     scope_override = NULL;
 
@@ -264,6 +294,7 @@ void printFunctionTable() {
 void startFunctionParameters() {
     function_parameters_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_parameters_mode->parameter_count = 0;
+    function_parameters_mode->optional_parameter_count = 0;
 }
 
 void addFunctionParameter(char *secondary_name, enum Type type) {
@@ -272,11 +303,47 @@ void addFunctionParameter(char *secondary_name, enum Type type) {
     symbol->secondary_name = malloc(1 + strlen(secondary_name));
     strcpy(symbol->secondary_name, secondary_name);
 
-    addSymbolToFunctionParameters(symbol);
+    addSymbolToFunctionParameters(symbol, false);
     free(secondary_name);
 }
 
-void addSymbolToFunctionParameters(Symbol* symbol) {
+void addFunctionOptionalParameterBool(char *secondary_name, bool b) {
+    Symbol* symbol = addSymbolBool(NULL, b);
+    symbol->secondary_name = malloc(1 + strlen(secondary_name));
+    strcpy(symbol->secondary_name, secondary_name);
+
+    addSymbolToFunctionParameters(symbol, true);
+    free(secondary_name);
+}
+
+void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
+    Symbol* symbol = addSymbolInt(NULL, i);
+    symbol->secondary_name = malloc(1 + strlen(secondary_name));
+    strcpy(symbol->secondary_name, secondary_name);
+
+    addSymbolToFunctionParameters(symbol, true);
+    free(secondary_name);
+}
+
+void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
+    Symbol* symbol = addSymbolFloat(NULL, f);
+    symbol->secondary_name = malloc(1 + strlen(secondary_name));
+    strcpy(symbol->secondary_name, secondary_name);
+
+    addSymbolToFunctionParameters(symbol, true);
+    free(secondary_name);
+}
+
+void addFunctionOptionalParameterString(char *secondary_name, char *s) {
+    Symbol* symbol = addSymbolString(NULL, s);
+    symbol->secondary_name = malloc(1 + strlen(secondary_name));
+    strcpy(symbol->secondary_name, secondary_name);
+
+    addSymbolToFunctionParameters(symbol, true);
+    free(secondary_name);
+}
+
+void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
     if (phase == PREPARSE) {
         symbol->role = PARAM;
     } else if (phase == PROGRAM) {
@@ -293,6 +360,9 @@ void addSymbolToFunctionParameters(Symbol* symbol) {
         sizeof(Symbol) * ++function_parameters_mode->parameter_count
     );
 
+    if (is_optional)
+        ++function_parameters_mode->optional_parameter_count;
+
     if (function_parameters_mode->parameters == NULL) {
         throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
     }
@@ -304,21 +374,21 @@ void addFunctionCallParameterBool(bool b) {
     union Value value;
     value.b = b;
     Symbol* symbol = addSymbol(NULL, K_BOOL, value, V_BOOL);
-    addSymbolToFunctionParameters(symbol);
+    addSymbolToFunctionParameters(symbol, false);
 }
 
 void addFunctionCallParameterInt(long long i) {
     union Value value;
     value.i = i;
     Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_INT);
-    addSymbolToFunctionParameters(symbol);
+    addSymbolToFunctionParameters(symbol, false);
 }
 
 void addFunctionCallParameterFloat(long double f) {
     union Value value;
     value.f = f;
     Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_FLOAT);
-    addSymbolToFunctionParameters(symbol);
+    addSymbolToFunctionParameters(symbol, false);
 }
 
 void addFunctionCallParameterString(char *s) {
@@ -326,11 +396,11 @@ void addFunctionCallParameterString(char *s) {
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
     Symbol* symbol = addSymbol(NULL, K_STRING, value, V_STRING);
-    addSymbolToFunctionParameters(symbol);
+    addSymbolToFunctionParameters(symbol, false);
 }
 
 void addFunctionCallParameterSymbol(char *name) {
-    addSymbolToFunctionParameters(getSymbolFunctionParameter(name));
+    addSymbolToFunctionParameters(getSymbolFunctionParameter(name), false);
 }
 
 void returnSymbol(char *name) {

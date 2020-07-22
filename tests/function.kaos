@@ -328,3 +328,40 @@ str dict def str_dict_test()
 end
 str dict str_dict_test_var = str_dict_test()
 print str_dict_test_var
+
+
+// Optional function parameters
+
+bool def bool_optional_param_test(bool param1, bool param2 = true)
+    print param1
+    print param2
+    return param1
+end
+
+bool_optional_param_test(true)
+bool_optional_param_test(false)
+
+bool_optional_param_test(true, false)
+bool_optional_param_test(false, true)
+
+num def num_optional_param_test(num param1, num param2 = 7)
+    print param1
+    print param2
+    return param1
+end
+
+num_optional_param_test(3)
+num_optional_param_test(3.14)
+num_optional_param_test(3, 5)
+num_optional_param_test(3, 5.12)
+num_optional_param_test(3.14, 5.12)
+
+str def str_optional_param_test(str param1, str param2 = 'baz')
+    print param1
+    print param2
+    return param2
+end
+
+print str_optional_param_test('foo')
+print str_optional_param_test('foo', 'bar')
+

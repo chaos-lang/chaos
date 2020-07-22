@@ -78,3 +78,27 @@ bar
 {'a': true, 'b': false}
 {'a': 1, 'b': 3.14}
 {'a': 'a', 'b': 'b'}
+true
+true
+false
+true
+true
+false
+false
+true
+3
+7
+3.14
+7
+3
+5
+3
+5.12
+3.14
+5.12
+foo
+baz
+baz
+foo
+bar
+bar
