@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "Chaos.h"
 
@@ -91,15 +92,58 @@ int KAOS_EXPORT Kaos_dictionary()
     return 0;
 }
 
+char *optional_test_params_name[] = {
+    "param1",
+    "param2"
+};
+unsigned optional_test_params_type[] = {
+    K_STRING,
+    K_STRING
+};
+unsigned short optional_test_params_length = (unsigned short) sizeof(optional_test_params_type) / sizeof(unsigned);
+int KAOS_EXPORT Kaos_optional_test()
+{
+    char* param1 = kaos.getVariableString(optional_test_params_name[0]);
+    printf("%s\n", param1);
+    free(param1);
+    char* param2 = kaos.getVariableString(optional_test_params_name[1]);
+    printf("%s\n", param2);
+    free(param2);
+    return 0;
+}
+
 int KAOS_EXPORT KaosRegister(struct Kaos _kaos)
 {
     kaos = _kaos;
-    kaos.defineFunction("hello", K_VOID, K_ANY, hello_params_name, hello_params_type, hello_params_length);
-    kaos.defineFunction("add", K_NUMBER, K_ANY, add_params_name, add_params_type, add_params_length);
-    kaos.defineFunction("log", K_VOID, K_ANY, log_params_name, log_params_type, log_params_length);
-    kaos.defineFunction("complex", K_VOID, K_ANY, complex_params_name, complex_params_type, complex_params_length);
-    kaos.defineFunction("array", K_LIST, K_ANY, array_params_name, array_params_type, array_params_length);
-    kaos.defineFunction("dictionary", K_DICT, K_ANY, dictionary_params_name, dictionary_params_type, dictionary_params_length);
+    kaos.defineFunction("hello", K_VOID, K_ANY, hello_params_name, hello_params_type, hello_params_length, NULL, 0);
+    kaos.defineFunction("add", K_NUMBER, K_ANY, add_params_name, add_params_type, add_params_length, NULL, 0);
+    kaos.defineFunction("log", K_VOID, K_ANY, log_params_name, log_params_type, log_params_length, NULL, 0);
+    kaos.defineFunction("complex", K_VOID, K_ANY, complex_params_name, complex_params_type, complex_params_length, NULL, 0);
+    kaos.defineFunction("array", K_LIST, K_ANY, array_params_name, array_params_type, array_params_length, NULL, 0);
+    kaos.defineFunction("dictionary", K_DICT, K_ANY, dictionary_params_name, dictionary_params_type, dictionary_params_length, NULL, 0);
+
+
+    // Functions with optional parameters
+
+    struct KaosValue optional_test_optional_param1;
+    char *default_value = "default value";
+    optional_test_optional_param1.s = malloc(1 + strlen(default_value));
+    strcpy(optional_test_optional_param1.s, default_value);
+
+    struct KaosValue optional_test_optional_params[] = {
+        optional_test_optional_param1
+    };
+
+    kaos.defineFunction(
+        "optional_test",
+        K_VOID,
+        K_ANY,
+        optional_test_params_name,
+        optional_test_params_type,
+        optional_test_params_length,
+        optional_test_optional_params,
+        1
+    );
 
     return 0;
 }

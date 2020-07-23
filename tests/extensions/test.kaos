@@ -16,3 +16,6 @@ example.complex(var1, var2)
 
 print example.array()
 print example.dictionary()
+
+example.optional_test('foo')
+example.optional_test('foo', 'bar')

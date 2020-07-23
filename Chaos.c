@@ -6,15 +6,53 @@
 #include "function.h"
 #include "Chaos.h"
 
-int defineFunction(char *name, enum Type type, enum Type secondary_type, char *params_name[], unsigned params_type[], unsigned short params_length) {
+int defineFunction(
+    char *name,
+    enum Type type,
+    enum Type secondary_type,
+    char *params_name[],
+    unsigned params_type[],
+    unsigned short params_length,
+    KaosValue optional_params[],
+    unsigned short optional_params_length
+) {
     char *function_name = malloc(strlen(name) + 1);
     strcpy(function_name, name);
     startFunctionParameters();
 
-    for (unsigned short i = 0; i < params_length; i++) {
+    unsigned short optional_params_starts_from = params_length - optional_params_length;
+
+    for (unsigned short i = 0; i < optional_params_starts_from; i++) {
         char *param_name = malloc(strlen(params_name[i]) + 1);
         strcpy(param_name, params_name[i]);
         addFunctionParameter(param_name, params_type[i]);
+    }
+
+    unsigned short j = 0;
+    for (unsigned short i = optional_params_starts_from; i < params_length; i++) {
+        char *param_name = malloc(strlen(params_name[i]) + 1);
+        strcpy(param_name, params_name[i]);
+
+        enum Type optional_param_type = params_type[i];
+
+        struct KaosValue optional_param_value = optional_params[j];
+
+        switch (optional_param_type)
+        {
+            case K_BOOL:
+                addFunctionOptionalParameterBool(param_name, optional_param_value.b);
+                break;
+            case K_NUMBER:
+                addFunctionOptionalParameterFloat(param_name, optional_param_value.f);
+                break;
+            case K_STRING:
+                addFunctionOptionalParameterString(param_name, optional_param_value.s);
+                break;
+            default:
+                throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
+                break;
+        }
+        j++;
     }
 
     startFunction(function_name, type, secondary_type);
