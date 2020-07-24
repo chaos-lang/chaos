@@ -47,7 +47,7 @@
  - Ruby's loops and blocks
  - PHP's dedication to server-side
  - Haskell's immutability
- - C's speed
+ - C's speed and interoperability
  - NumPy's matrix arithmetics
  - Perl's regex engine
 
