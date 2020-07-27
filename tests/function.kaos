@@ -365,3 +365,25 @@ end
 print str_optional_param_test('foo')
 print str_optional_param_test('foo', 'bar')
 
+
+// Lists and dictionaries as function parameters
+
+void def list_as_params(str param1, list param2, list param3 = [4, 5, 6])
+    print param1
+    print param2
+    print param3
+end
+
+list_as_params('foo', [1, 2, 3])
+list_as_params('bar', [1, 2, 3], [7, 8, 9])
+
+void def dict_as_params(str param1, dict param2, dict param3 = {'d': 4, 'e': 5, 'f': 6})
+    print param1
+    print param2
+    print param3
+end
+
+dict_as_params('foo', {'a': 1, 'b': 2, 'c': 3})
+dict_as_params('bar', {'a': 1, 'b': 2, 'c': 3}, {'j': 7, 'k': 8, 'l': 9})
+
+

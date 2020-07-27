@@ -276,10 +276,11 @@ void printFunctionTable() {
         char *context_temp = malloc(1 + strlen(function->context));
         strcpy(context_temp, function->context);
         printf(
-            "\t{name: %s, type: %u, parameter_count: %hu, decision_length: %u, context: %s, module_context: %s, module: %s} =>\n",
+            "\t{name: %s, type: %u, parameter_count: %hu, optional_parameter_count: %hu, decision_length: %u, context: %s, module_context: %s, module: %s} =>\n",
             function->name,
             function->type,
             function->parameter_count,
+            function->optional_parameter_count,
             function->decision_functions.size,
             context_temp,
             function->module_context,
@@ -343,13 +344,22 @@ void addFunctionOptionalParameterString(char *secondary_name, char *s) {
     free(secondary_name);
 }
 
+void addFunctionOptionalParameterList(char *secondary_name) {
+    Symbol* symbol = finishComplexMode(NULL, K_ANY);
+    symbol->secondary_name = malloc(1 + strlen(secondary_name));
+    strcpy(symbol->secondary_name, secondary_name);
+
+    addSymbolToFunctionParameters(symbol, true);
+    free(secondary_name);
+}
+
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
     if (phase == PREPARSE) {
         symbol->role = PARAM;
     } else if (phase == PROGRAM) {
         symbol->role = CALL_PARAM;
     }
-    symbol->scope = scopeless;
+    setScopeless(symbol);
 
     if (function_parameters_mode == NULL) {
         startFunctionParameters();
@@ -401,6 +411,11 @@ void addFunctionCallParameterString(char *s) {
 
 void addFunctionCallParameterSymbol(char *name) {
     addSymbolToFunctionParameters(getSymbolFunctionParameter(name), false);
+}
+
+void addFunctionCallParameterList() {
+    Symbol* symbol = finishComplexMode(NULL, K_ANY);
+    addSymbolToFunctionParameters(symbol, false);
 }
 
 void returnSymbol(char *name) {
@@ -662,4 +677,11 @@ bool isInFunctionNamesBuffer(char *name) {
 bool isFunctionType(char *name, char *module, enum Type type) {
     _Function* function = getFunction(name, module);
     return function->type == type;
+}
+
+void setScopeless(Symbol* symbol) {
+    symbol->scope = scopeless;
+    for (unsigned long i = 0; i < symbol->children_count; i++) {
+        setScopeless(symbol->children[i]);
+    }
 }

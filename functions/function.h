@@ -83,12 +83,14 @@ void addFunctionOptionalParameterBool(char *secondary_name, bool b);
 void addFunctionOptionalParameterInt(char *secondary_name, long long i);
 void addFunctionOptionalParameterFloat(char *secondary_name, long double f);
 void addFunctionOptionalParameterString(char *secondary_name, char *s);
+void addFunctionOptionalParameterList(char *secondary_name);
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional);
 void addFunctionCallParameterBool(bool b);
 void addFunctionCallParameterInt(long long i);
 void addFunctionCallParameterFloat(long double f);
 void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);
+void addFunctionCallParameterList();
 void returnSymbol(char *name);
 void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped);
 void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name, char *module, enum Type extra_type);
@@ -106,5 +108,6 @@ void addFunctionNameToFunctionNamesBuffer(char *name);
 void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
 bool isFunctionType(char *name, char *module, enum Type type);
+void setScopeless(Symbol* symbol);
 
 #endif

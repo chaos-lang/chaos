@@ -197,6 +197,16 @@ function_parameters: T_VAR_STRING T_VAR T_EQUAL T_STRING                { addFun
     | function_parameters T_NEWLINE                                     { }
 ;
 
+function_parameters: T_VAR_LIST T_VAR T_EQUAL liststart                 { addFunctionOptionalParameterList($2); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_DICT T_VAR T_EQUAL dictionarystart           { addFunctionOptionalParameterList($2); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
 function_parameters: T_TRUE                                         { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
@@ -223,6 +233,16 @@ function_parameters: T_STRING                                       { if (!block
 ;
 
 function_parameters: T_VAR                                          { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterSymbol($1); } free($1); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: liststart                                      { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(); } else { finishComplexMode(NULL, K_ANY); } }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: dictionarystart                                { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(); } else { finishComplexMode(NULL, K_ANY); } }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
