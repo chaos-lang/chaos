@@ -911,7 +911,7 @@ quit:                                                               { }
 ;
 
 json_parser:
-    | dictionarystart                                               { Symbol* symbol = finishComplexMode(NULL, K_ANY); returnVariable(symbol); }
+    | json_parser dictionarystart                                   { Symbol* symbol = finishComplexMode(NULL, K_ANY); returnVariable(symbol); }
 ;
 
 %%
