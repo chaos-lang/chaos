@@ -152,27 +152,57 @@ function_parameters:                                                { }
     | T_NEWLINE function_parameters                                 { }
 ;
 
-function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, K_BOOL); }
+function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, K_BOOL, K_ANY); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_NUMBER T_VAR                             { addFunctionParameter($2, K_NUMBER); }
+function_parameters: T_VAR_NUMBER T_VAR                             { addFunctionParameter($2, K_NUMBER, K_ANY); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_STRING T_VAR                             { addFunctionParameter($2, K_STRING); }
+function_parameters: T_VAR_STRING T_VAR                             { addFunctionParameter($2, K_STRING, K_ANY); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_LIST T_VAR                               { addFunctionParameter($2, K_LIST); }
+function_parameters: T_VAR_LIST T_VAR                               { addFunctionParameter($2, K_LIST, K_ANY); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, K_DICT); }
+function_parameters: T_VAR_BOOL T_VAR_LIST T_VAR                    { addFunctionParameter($3, K_LIST, K_BOOL); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR_LIST T_VAR                  { addFunctionParameter($3, K_LIST, K_NUMBER); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_STRING T_VAR_LIST T_VAR                  { addFunctionParameter($3, K_LIST, K_STRING); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, K_DICT, K_ANY); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_BOOL T_VAR_DICT T_VAR                    { addFunctionParameter($3, K_DICT, K_BOOL); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR_DICT T_VAR                  { addFunctionParameter($3, K_DICT, K_NUMBER); }
+    | function_parameters T_COMMA function_parameters               { }
+    | function_parameters T_NEWLINE                                 { }
+;
+
+function_parameters: T_VAR_STRING T_VAR_DICT T_VAR                  { addFunctionParameter($3, K_DICT, K_STRING); }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
@@ -197,14 +227,44 @@ function_parameters: T_VAR_STRING T_VAR T_EQUAL T_STRING                { addFun
     | function_parameters T_NEWLINE                                     { }
 ;
 
-function_parameters: T_VAR_LIST T_VAR T_EQUAL liststart                 { addFunctionOptionalParameterList($2); }
+function_parameters: T_VAR_LIST T_VAR T_EQUAL liststart                 { addFunctionOptionalParameterComplex($2, K_ANY); }
     | function_parameters T_COMMA function_parameters                   { }
     | function_parameters T_NEWLINE                                     { }
 ;
 
-function_parameters: T_VAR_DICT T_VAR T_EQUAL dictionarystart           { addFunctionOptionalParameterList($2); }
+function_parameters: T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart      { addFunctionOptionalParameterComplex($3, K_BOOL); }
     | function_parameters T_COMMA function_parameters                   { }
     | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart    { addFunctionOptionalParameterComplex($3, K_NUMBER); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart    { addFunctionOptionalParameterComplex($3, K_STRING); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_DICT T_VAR T_EQUAL dictionarystart           { addFunctionOptionalParameterComplex($2, K_ANY); }
+    | function_parameters T_COMMA function_parameters                   { }
+    | function_parameters T_NEWLINE                                     { }
+;
+
+function_parameters: T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart        { addFunctionOptionalParameterComplex($3, K_BOOL); }
+    | function_parameters T_COMMA function_parameters                           { }
+    | function_parameters T_NEWLINE                                             { }
+;
+
+function_parameters: T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart      { addFunctionOptionalParameterComplex($3, K_NUMBER); }
+    | function_parameters T_COMMA function_parameters                           { }
+    | function_parameters T_NEWLINE                                             { }
+;
+
+function_parameters: T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart      { addFunctionOptionalParameterComplex($3, K_STRING); }
+    | function_parameters T_COMMA function_parameters                           { }
+    | function_parameters T_NEWLINE                                             { }
 ;
 
 function_parameters: T_TRUE                                         { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
@@ -237,12 +297,12 @@ function_parameters: T_VAR                                          { if (!block
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: liststart                                      { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(); } else { finishComplexMode(NULL, K_ANY); } }
+function_parameters: liststart                                      { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(K_ANY); } else { finishComplexMode(NULL, K_ANY); } }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;
 
-function_parameters: dictionarystart                                { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(); } else { finishComplexMode(NULL, K_ANY); } }
+function_parameters: dictionarystart                                { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(K_ANY); } else { finishComplexMode(NULL, K_ANY); } }
     | function_parameters T_COMMA function_parameters               { }
     | function_parameters T_NEWLINE                                 { }
 ;

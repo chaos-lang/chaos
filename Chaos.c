@@ -12,6 +12,7 @@ int defineFunction(
     enum Type secondary_type,
     char *params_name[],
     unsigned params_type[],
+    unsigned params_secondary_type[],
     unsigned short params_length,
     KaosValue optional_params[],
     unsigned short optional_params_length
@@ -25,7 +26,7 @@ int defineFunction(
     for (unsigned short i = 0; i < optional_params_starts_from; i++) {
         char *param_name = malloc(strlen(params_name[i]) + 1);
         strcpy(param_name, params_name[i]);
-        addFunctionParameter(param_name, params_type[i]);
+        addFunctionParameter(param_name, params_type[i], params_secondary_type[i]);
     }
 
     unsigned short j = 0;

@@ -24,6 +24,7 @@ int defineFunction(
     enum Type secondary_type,
     char *params_name[],
     unsigned params_type[],
+    unsigned params_secondary_type[],
     unsigned short params_length,
     KaosValue optional_params[],
     unsigned short optional_params_length
@@ -92,6 +93,7 @@ struct Kaos {
         enum Type secondary_type,
         char *params_name[],
         unsigned params_type[],
+        unsigned params_secondary_type[],
         unsigned short params_length,
         KaosValue optional_params[],
         unsigned short optional_params_length

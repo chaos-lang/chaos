@@ -387,3 +387,22 @@ dict_as_params('foo', {'a': 1, 'b': 2, 'c': 3})
 dict_as_params('bar', {'a': 1, 'b': 2, 'c': 3}, {'j': 7, 'k': 8, 'l': 9})
 
 
+// Typed lists and typed dictionaries as function parameters
+
+void def typed_list_as_params(str param1, num list param2, num list param3 = [4, 5, 6])
+    print param1
+    print param2
+    print param3
+end
+
+typed_list_as_params('foo', [1, 2, 3])
+typed_list_as_params('bar', [1, 2, 3], [7, 8, 9])
+
+void def typed_dict_as_params(str param1, num dict param2, num dict param3 = {'d': 4, 'e': 5, 'f': 6})
+    print param1
+    print param2
+    print param3
+end
+
+typed_dict_as_params('foo', {'a': 1, 'b': 2, 'c': 3})
+typed_dict_as_params('bar', {'a': 1, 'b': 2, 'c': 3}, {'j': 7, 'k': 8, 'l': 9})

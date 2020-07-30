@@ -138,8 +138,10 @@ void callFunction(char *name, char *module) {
     if (function->parameter_count > 0 && function_parameters_mode == NULL)
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
 
-    if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count)
+    if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count) {
+        freeFunctionMode();
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+    }
 
     scope_override = function;
     for (unsigned short i = 0; i < function->parameter_count; i++) {
@@ -152,6 +154,7 @@ void callFunction(char *name, char *module) {
             );
 
             if (function_parameters_mode->parameters == NULL) {
+                freeFunctionMode();
                 throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
             }
 
@@ -168,6 +171,21 @@ void callFunction(char *name, char *module) {
             function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = parameter_call;
         } else {
             Symbol* parameter_call = function_parameters_mode->parameters[i];
+
+            if (parameter->type != K_ANY && parameter->type != parameter_call->type) {
+                freeFunctionMode();
+                throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
+            }
+
+            if ((parameter->type == K_LIST || parameter->type == K_DICT) && parameter->secondary_type != K_ANY) {
+                for (unsigned long i = 0; i < parameter_call->children_count; i++) {
+                    Symbol* child = parameter_call->children[i];
+                    if (child->type != parameter->secondary_type) {
+                        freeFunctionMode();
+                        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
+                    }
+                }
+            }
 
             parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
             strcpy(parameter_call->name, parameter->secondary_name);
@@ -298,11 +316,12 @@ void startFunctionParameters() {
     function_parameters_mode->optional_parameter_count = 0;
 }
 
-void addFunctionParameter(char *secondary_name, enum Type type) {
+void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type) {
     union Value value;
     Symbol* symbol = addSymbol(NULL, type, value, V_VOID);
     symbol->secondary_name = malloc(1 + strlen(secondary_name));
     strcpy(symbol->secondary_name, secondary_name);
+    symbol->secondary_type = secondary_type;
 
     addSymbolToFunctionParameters(symbol, false);
     free(secondary_name);
@@ -344,8 +363,8 @@ void addFunctionOptionalParameterString(char *secondary_name, char *s) {
     free(secondary_name);
 }
 
-void addFunctionOptionalParameterList(char *secondary_name) {
-    Symbol* symbol = finishComplexMode(NULL, K_ANY);
+void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type) {
+    Symbol* symbol = finishComplexMode(NULL, type);
     symbol->secondary_name = malloc(1 + strlen(secondary_name));
     strcpy(symbol->secondary_name, secondary_name);
 
@@ -413,8 +432,8 @@ void addFunctionCallParameterSymbol(char *name) {
     addSymbolToFunctionParameters(getSymbolFunctionParameter(name), false);
 }
 
-void addFunctionCallParameterList() {
-    Symbol* symbol = finishComplexMode(NULL, K_ANY);
+void addFunctionCallParameterList(enum Type type) {
+    Symbol* symbol = finishComplexMode(NULL, type);
     addSymbolToFunctionParameters(symbol, false);
 }
 

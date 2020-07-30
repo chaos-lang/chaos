@@ -13,7 +13,7 @@ multiline comment
 for the function below
 @description Adds to numbers together
 */
-num def add(num x, str y)
+num def add(num x, num y)
     num z = x + y
 
     bool a = true

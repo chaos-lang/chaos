@@ -108,6 +108,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_RAISED_FROM_AN_EXTENSION:
             sprintf(error_msg, "%s", str1);
             break;
+        case E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER:
+            sprintf(error_msg, "Illegal variable type for function parameter: %s of function: %s", str1, str2);
+            break;
         default:
             sprintf(error_msg, "Unkown error.");
             break;
