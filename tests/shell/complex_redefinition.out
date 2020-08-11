@@ -9,7 +9,7 @@ Line: 1
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 [start] =>
-	{id: 0, name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: } =>
+	{id: 0, name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
 [end]
 5
 [start] =>

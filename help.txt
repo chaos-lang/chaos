@@ -2,4 +2,5 @@ Usage: chaos [options] <file> [--] [args...]
 
     -h, --help          Print this help text.
     -v, --version       Version number.
+    -d, --debug         Debug the execution of a program using AST nodes.
 

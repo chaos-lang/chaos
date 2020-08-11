@@ -1,93 +1,102 @@
+Relational operators on boolean variables
 false
 true
 true
 false
 true
 false
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
-true
-false
+Relational operators on integer variables
 true
 false
 false
 false
 true
 false
-false
-true
-true
-false
-false
-true
-true
-true
+Relational operators on float variables
 true
 false
-false
-true
-true
-true
-true
-false
-false
-true
-true
-true
-true
-false
-false
-true
-true
-true
-true
-false
-false
-true
-true
-true
-true
 false
 false
 true
 false
+Relational operators on a mix of integer and boolean variables
+true
+false
+false
+false
+true
+false
+Relational operators on a mix of integer and float variables
+true
+false
+false
+false
+true
+false
+Relational operators on a mix of float and boolean variables
+false
+true
+false
+true
+false
+true
+Relational operators on a mix of boolean variables and boolean/integer/float values
 false
 true
 false
 false
+false
+true
+Logical operators on boolean variables
+false
+false
+true
+true
+false
+false
+Logical operators on integer variables
+true
+true
+true
+true
+false
+false
+Logical operators on float variables
+true
+true
+true
+true
+false
+false
+Logical operators on a mix of integer and boolean variables
+true
+true
+true
+true
+false
+false
+Logical operators on a mix of integer and float variables
+true
+true
+true
+true
+false
+false
+Relational operators on a mix of boolean variables and boolean/integer/float values
+true
+false
+false
+true
+false
+false
+Bitwise operators
 1
 13
 12
 -6
 18
 4
+Unary operators
 24
 24
 4

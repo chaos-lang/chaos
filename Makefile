@@ -52,6 +52,9 @@ clang-dev-sanitizer-undefined_behavior:
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
+help.h:
+	xxd -i help.txt > help.h
+
 chaos.tab.c chaos.tab.h: chaos.y
 	bison -Wconflicts-rr -Wno-conflicts-sr --report=state --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d chaos.y
 
@@ -59,7 +62,7 @@ lex.yy.c: chaos.l chaos.tab.h
 	flex chaos.l
 
 chaos: lex.yy.c chaos.tab.c chaos.tab.h
-	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -fcommon -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
+	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -fcommon -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c ast/*.c interpreter/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
 	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h

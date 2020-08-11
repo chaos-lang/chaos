@@ -12,25 +12,9 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         phase = PREPARSE;
     }
 
-    function_mode = getFunction(name, NULL);
-    if (function_mode != NULL) {
-        free(function_mode->body);
-        function_mode->body = "";
-        free(name);
-        for (unsigned short i = 0; i < function_parameters_mode->parameter_count; i++) {
-            Symbol* parameter = function_parameters_mode->parameters[i];
-            removeSymbol(parameter);
-        }
-
-        if (is_interactive) {
-            phase = PROGRAM;
-        }
-        return;
-    }
-
     if (function_names_buffer.size > 0) {
         if (!isInFunctionNamesBuffer(name)) {
-            free(name);
+            //free(name);
             freeFunctionMode();
             return;
         }
@@ -60,8 +44,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     strcpy(function_mode->module_context, module_path_stack.arr[module_path_stack.size - 1]);
     function_mode->module = malloc(1 + strlen(module_stack.arr[module_stack.size - 1]));
     strcpy(function_mode->module, module_stack.arr[module_stack.size - 1]);
-
-    recordToken(strdup("\n"), 1);
 
     if (start_function == NULL) {
         start_function = function_mode;
@@ -104,7 +86,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     }
     #endif
 
-    free(name);
+    //free(name);
     freeFunctionMode();
 
     if (is_interactive) {
@@ -226,7 +208,7 @@ void callFunction(char *name, char *module) {
         ) {
             callFunctionFromDynamicLibrary(function);
         } else {
-            injectCode(function->body, INIT_PROGRAM);
+            eval_node(function->node->child, function->module_context);
         }
     }
 
@@ -281,7 +263,7 @@ _Function* getFunction(char *name, char *module) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
-        append_to_array_without_malloc(&free_string_stack, name);
+        //append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_UNDEFINED_FUNCTION, name);
     }
     return NULL;
@@ -324,7 +306,7 @@ void addFunctionParameter(char *secondary_name, enum Type type, enum Type second
     symbol->secondary_type = secondary_type;
 
     addSymbolToFunctionParameters(symbol, false);
-    free(secondary_name);
+    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterBool(char *secondary_name, bool b) {
@@ -333,7 +315,7 @@ void addFunctionOptionalParameterBool(char *secondary_name, bool b) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    free(secondary_name);
+    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
@@ -342,7 +324,7 @@ void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    free(secondary_name);
+    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
@@ -351,7 +333,7 @@ void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    free(secondary_name);
+    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterString(char *secondary_name, char *s) {
@@ -360,7 +342,7 @@ void addFunctionOptionalParameterString(char *secondary_name, char *s) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    free(secondary_name);
+    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type) {
@@ -369,7 +351,7 @@ void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    free(secondary_name);
+    //free(secondary_name);
 }
 
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
@@ -396,7 +378,11 @@ void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
         throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
     }
 
-    function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = symbol;
+    for (unsigned short i = function_parameters_mode->parameter_count - 1; i > 0; i--) {
+        function_parameters_mode->parameters[i] = function_parameters_mode->parameters[i - 1];
+    }
+
+    function_parameters_mode->parameters[0] = symbol;
 }
 
 void addFunctionCallParameterBool(bool b) {
@@ -470,7 +456,7 @@ void returnSymbol(char *name) {
     );
 
     scope_override = NULL;
-    free(name);
+    //free(name);
 }
 
 void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped) {
@@ -491,9 +477,9 @@ void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name,
         return;
     }
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
-    free(name);
-    free(clone_name);
-    free(module);
+    //free(name);
+    //free(clone_name);
+    //free(module);
 }
 
 void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module) {
@@ -504,9 +490,9 @@ void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*mod
         return;
     }
     updateSymbolByClonning(clone_name, function->symbol);
-    free(clone_name);
-    free(name);
-    free(module);
+    //free(clone_name);
+    //free(name);
+    //free(module);
 }
 
 void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
@@ -517,8 +503,8 @@ void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
         return;
     }
     updateComplexElementSymbol(function->symbol);
-    free(name);
-    free(module);
+    //free(name);
+    //free(module);
 }
 
 void initMainFunction() {
@@ -614,46 +600,13 @@ void addDefaultDecision() {
 }
 
 void executeDecision(_Function* function) {
-    if (function->decision_functions.size <= 0) {
+    if (function->decision_node == NULL) {
         return;
     }
     _Function* executed_function_backup = executed_function;
 
-    union Value value;
-    value.b = false;
-    bool is_decision_made = false;
-    char *expression_buffer = "";
-    char *function_buffer = "";
-    char *name = malloc(1 + strlen(__KAOS_LANGUAGE_NAME__));
-    strcpy(name, __KAOS_LANGUAGE_NAME__);
-    Symbol* symbol = addSymbol(name, K_BOOL, value, V_BOOL);
-
-    for (unsigned i = 0; i < function->decision_functions.size; i++) {
-        expression_buffer = strcat_ext(expression_buffer, __KAOS_LANGUAGE_NAME__);
-        expression_buffer = strcat_ext(expression_buffer, " = ");
-        expression_buffer = strcat_ext(expression_buffer, function->decision_expressions.arr[i]);
-        expression_buffer = strcat_ext(expression_buffer, "\n");
-
-        injectCode(expression_buffer, INIT_PROGRAM);
-
-        if (symbol->value.b) {
-            function_buffer = strcat_ext(function_buffer, function->decision_functions.arr[i]);
-            function_buffer = strcat_ext(function_buffer, "\n");
-            decision_execution_mode = true;
-            injectCode(function_buffer, INIT_PROGRAM);
-            decision_execution_mode = false;
-            is_decision_made = true;
-            break;
-        }
-    }
-
-    removeSymbol(symbol);
-
-    if (!is_decision_made && function->decision_default != NULL) {
-        function_buffer = strcat_ext(function_buffer, function->decision_default);
-        function_buffer = strcat_ext(function_buffer, "\n");
-        injectCode(function_buffer, INIT_PROGRAM);
-    }
+    eval_node(function->decision_node, function->module_context);
+    stop_ast_evaluation = false;
 
     executed_function = executed_function_backup;
 
@@ -669,14 +622,11 @@ void executeDecision(_Function* function) {
     if (decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
     }
-
-    free(expression_buffer);
-    free(function_buffer);
 }
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
     append_to_array(&function_names_buffer, name);
-    free(name);
+    //free(name);
 }
 
 void freeFunctionNamesBuffer() {

@@ -53,6 +53,7 @@ typedef struct symbol_array {
 
 symbol_array complex_mode_stack;
 symbol_array nested_complex_mode_stack;
+bool is_complex_parsing;
 bool disable_complex_mode;
 
 typedef struct symbol_id_array {
@@ -160,5 +161,8 @@ void buildVariableComplexElement(char *name, char *key);
 void pushNestedComplexModeStack(Symbol* complex_mode);
 void popNestedComplexModeStack(char *key);
 void freeNestedComplexModeStack();
+void reverseComplexMode();
+
+#include "../interpreter/interpreter.h"
 
 #endif

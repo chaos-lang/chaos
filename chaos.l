@@ -2,16 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+#include "symbol.h"
+#include "ast/ast.h"
+
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
+
 #include "utilities/language.h"
 #include "utilities/injector.h"
+
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "utilities/shell.h"
 #endif
-#include "loop.h"
 
 #define YY_DECL int yylex()
 
@@ -22,17 +27,23 @@ extern void yyerror(const char* s);
 
 #include "chaos.tab.h"
 
-enum Phase phase = INIT_PREPARSE;
+enum Phase phase = INIT_PROGRAM;
 unsigned short module_parsing = 0;
 
 void injectCode(char *code, enum Phase phase_arg) {
-    phase = phase_arg;
+    phase = INIT_PROGRAM;
     inject_mode = true;
 
     YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
     YY_BUFFER_STATE new_buffer = yy_scan_string(code);
     yy_switch_to_buffer(new_buffer);
     int ret = yyparse();
+
+    char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+    strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
+    interpret(interpreted_module, phase_arg, false);
+    free(interpreted_module);
+
     yy_delete_buffer(new_buffer);
     yy_switch_to_buffer(old_buffer);
 
@@ -71,7 +82,7 @@ void parseTheModuleContent(char *module_path) {
 
     if (code != NULL) {
         module_parsing++;
-        injectCode(code, INIT_PREPARSE);
+        injectCode(code, PREPARSE);
         module_parsing--;
         free(code);
 
@@ -137,95 +148,89 @@ switch (phase)
 
 %}
 
-[ \t]                           {recordToken(strdup(yytext), yyleng);}; // ignore all whitespace
-[0-9]+\.[0-9]+                  {recordToken(strdup(yytext), yyleng); yylval.fval = atof(yytext); if (isStreamOpen()) return T_FLOAT;}
-[0-9]+                          {recordToken(strdup(yytext), yyleng); yylval.ival = atoi(yytext); if (isStreamOpen()) { return T_INT; } else { return T_TIMES_DO_INT; }}
-\n                              {recordToken(strdup(yytext), yyleng); yylineno++; return T_NEWLINE;}
-"="                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_EQUAL;}
-"+"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PLUS;}
-"-"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_MINUS;}
-"*"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_MULTIPLY;}
-"/"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DIVIDE;}
-"\\"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BACKSLASH;}
-"("                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LEFT;}
-")"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RIGHT;}
-"["                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LEFT_BRACKET;}
-"]"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RIGHT_BRACKET;}
-"{"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LEFT_CURLY_BRACKET;}
-"}"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RIGHT_CURLY_BRACKET;}
-","                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_COMMA;}
-"."                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DOT;}
-"=="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_EQUAL;}
-"!="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_NOT_EQUAL;}
-">"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_GREAT;}
-"<"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_SMALL;}
-">="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_GREAT_EQUAL;}
-"<="                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_REL_SMALL_EQUAL;}
-\&\&|and                        {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LOGIC_AND;}
-\|\||or                         {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LOGIC_OR;}
-\!|not                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_LOGIC_NOT;}
-"&"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_AND;}
-"|"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_OR;}
-"^"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_XOR;}
-"~"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_NOT;}
-"<<"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_LEFT_SHIFT;}
-">>"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_BITWISE_RIGHT_SHIFT;}
-"++"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_INCREMENT;}
-"--"                            {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DECREMENT;}
-"//".*"\n"                      {recordToken(strdup("\n"), 1); yylineno++; return T_NEWLINE;}
-"#".*"\n"                       {recordToken(strdup("\n"), 1); yylineno++; return T_NEWLINE;}
-":"                             {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) { return T_COLON; } else { return T_FOREACH_AS_COLON; }}
-"exit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
-"quit"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_QUIT;}
-"print"                         {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PRINT;}
-"echo"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_ECHO;}
-"pretty"                        {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_PRETTY;}
-"true"                          {recordToken(strdup(yytext), yyleng); yylval.bval = 1; if (isStreamOpen()) return T_TRUE;}
-"false"                         {recordToken(strdup(yytext), yyleng); yylval.bval = 0; if (isStreamOpen()) return T_FALSE;}
-"symbol_table"                  {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_SYMBOL_TABLE;}
-"function_table"                {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_FUNCTION_TABLE;}
-"del"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_DEL;}
-"return"                        {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_RETURN;}
-"default"                       {if (isStreamOpen()) return T_DEFAULT;}
+[ \t]                           {}; // ignore all whitespace
+[0-9]+\.[0-9]+                  {yylval.fval = atof(yytext); return T_FLOAT;}
+[0-9]+                          {yylval.ival = atoi(yytext); return T_INT;}
+\n                              {yylineno++; return T_NEWLINE;}
+"="                             {return T_EQUAL;}
+"+"                             {return T_PLUS;}
+"-"                             {return T_MINUS;}
+"*"                             {return T_MULTIPLY;}
+"/"                             {return T_DIVIDE;}
+"\\"                            {return T_BACKSLASH;}
+"("                             {return T_LEFT;}
+")"                             {return T_RIGHT;}
+"["                             {return T_LEFT_BRACKET;}
+"]"                             {return T_RIGHT_BRACKET;}
+"{"                             {return T_LEFT_CURLY_BRACKET;}
+"}"                             {return T_RIGHT_CURLY_BRACKET;}
+","                             {return T_COMMA;}
+"."                             {return T_DOT;}
+"=="                            {return T_REL_EQUAL;}
+"!="                            {return T_REL_NOT_EQUAL;}
+">"                             {return T_REL_GREAT;}
+"<"                             {return T_REL_SMALL;}
+">="                            {return T_REL_GREAT_EQUAL;}
+"<="                            {return T_REL_SMALL_EQUAL;}
+\&\&|and                        {return T_LOGIC_AND;}
+\|\||or                         {return T_LOGIC_OR;}
+\!|not                          {return T_LOGIC_NOT;}
+"&"                             {return T_BITWISE_AND;}
+"|"                             {return T_BITWISE_OR;}
+"^"                             {return T_BITWISE_XOR;}
+"~"                             {return T_BITWISE_NOT;}
+"<<"                            {return T_BITWISE_LEFT_SHIFT;}
+">>"                            {return T_BITWISE_RIGHT_SHIFT;}
+"++"                            {return T_INCREMENT;}
+"--"                            {return T_DECREMENT;}
+"//".*"\n"                      {yylineno++; return T_NEWLINE;}
+"#".*"\n"                       {yylineno++; return T_NEWLINE;}
+":"                             {return T_COLON;}
+"exit"                          {return T_QUIT;}
+"quit"                          {return T_QUIT;}
+"print"                         {return T_PRINT;}
+"echo"                          {return T_ECHO;}
+"pretty"                        {return T_PRETTY;}
+"true"                          {yylval.bval = 1; return T_TRUE;}
+"false"                         {yylval.bval = 0; return T_FALSE;}
+"symbol_table"                  {return T_SYMBOL_TABLE;}
+"function_table"                {return T_FUNCTION_TABLE;}
+"del"                           {return T_DEL;}
+"return"                        {return T_RETURN;}
+"default"                       {return T_DEFAULT;}
 
-"times do"                      {recordToken(strdup(yytext), yyleng); return T_TIMES_DO;}
-"end"                           {recordToken(strdup(yytext), yyleng); return T_END;}
-"foreach"                       {recordToken(strdup(yytext), yyleng); return T_FOREACH;}
-"as"                            {recordToken(strdup(yytext), yyleng); return T_AS;}
-"from"                          {recordToken(strdup(yytext), yyleng); return T_FROM;}
-"INFINITE"                      {recordToken(strdup(yytext), yyleng); return T_INFINITE;}
+"times do"                      {return T_TIMES_DO;}
+"end"                           {return T_END;}
+"foreach"                       {return T_FOREACH;}
+"as"                            {return T_AS;}
+"from"                          {return T_FROM;}
+"INFINITE"                      {return T_INFINITE;}
 
 "/*"                            {BEGIN(COMMENT);}
 <COMMENT>"*/"                   {BEGIN(INITIAL);}
 <COMMENT>.|"\n"                 {yylineno++;}
 
 (\")([^\\(\")]|\\.)*(\") {
-    recordToken(strdup(yytext), yyleng);
-    if (isStreamOpen()) {
-        yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
-        strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
-        return T_STRING;
-    }
+    yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
+    strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
+    return T_STRING;
 }
 
 (\')([^\\(\')]|\\.)*(\') {
-    recordToken(strdup(yytext), yyleng);
-    if (isStreamOpen()) {
-        yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
-        strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
-        return T_STRING;
-    }
+    yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
+    strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
+    return T_STRING;
 }
 
-"bool"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_BOOL;}
-"num"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_NUMBER;}
-"str"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_STRING;}
-"list"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_LIST;}
-"dict"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_DICT;}
-"any"                           {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VAR_ANY;}
-"null"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_NULL;}
-"void"                          {recordToken(strdup(yytext), yyleng); if (isStreamOpen()) return T_VOID;}
-"def"                           {recordToken(strdup(yytext), yyleng); return T_FUNCTION;}
-"import"                        {recordToken(strdup(yytext), yyleng); return T_IMPORT;}
-[a-zA-Z_][a-zA-Z0-9_]*          {recordToken(strdup(yytext), yyleng); yylval.sval=strdup(yytext); if (isStreamOpen()) { return T_VAR; } else { return T_FOREACH_VAR; }}
+"bool"                          {return T_VAR_BOOL;}
+"num"                           {return T_VAR_NUMBER;}
+"str"                           {return T_VAR_STRING;}
+"list"                          {return T_VAR_LIST;}
+"dict"                          {return T_VAR_DICT;}
+"any"                           {return T_VAR_ANY;}
+"null"                          {return T_NULL;}
+"void"                          {return T_VOID;}
+"def"                           {return T_FUNCTION;}
+"import"                        {return T_IMPORT;}
+[a-zA-Z_][a-zA-Z0-9_]*          {yylval.sval=strdup(yytext); return T_VAR;}
 %%

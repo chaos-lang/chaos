@@ -30,3 +30,6 @@ chaos.dSYM/
 *.dll
 *.exp
 *.lib
+
+# help.txt header
+help.h

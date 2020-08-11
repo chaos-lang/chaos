@@ -6,7 +6,6 @@
 #include <readline/history.h>
 #include "language.h"
 #include "helpers.h"
-#include "loop.h"
 #include "function.h"
 
 int up_arrow_key_pressed(int count, int key);
