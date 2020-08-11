@@ -48,6 +48,7 @@ static struct option long_options[] =
 {
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'v'},
+    {"debug", no_argument, NULL, 'd'},
     {NULL, 0, NULL, 0}
 };
 #endif

@@ -19,6 +19,7 @@ char *value_type_names[] = {
 };
 
 unsigned long long symbol_id_counter = 0;
+bool is_complex_parsing = false;
 bool disable_complex_mode = false;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
@@ -39,7 +40,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
             if (type == K_STRING) {
                 free(value.s);
             }
-            append_to_array_without_malloc(&free_string_stack, name);
+            //append_to_array_without_malloc(&free_string_stack, name);
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
         if (name != NULL) {
@@ -71,7 +72,7 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     add_suggestion(name);
     #endif
 
-    free(name);
+    //free(name);
 
     return symbol;
 }
@@ -88,7 +89,7 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
     symbol->value = value;
     symbol->value_type = value_type;
 
-    free(name);
+    //free(name);
 
     return symbol;
 }
@@ -146,7 +147,7 @@ Symbol* getSymbol(char *name) {
         }
         symbol_cursor = symbol_cursor->next;
     }
-    append_to_array_without_malloc(&free_string_stack, name);
+    //append_to_array_without_malloc(&free_string_stack, name);
     throw_error(E_UNDEFINED_VARIABLE, name);
     return NULL;
 }
@@ -168,7 +169,11 @@ Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key) {
     Symbol* clone_symbol;
     if (type == K_LIST || type == K_DICT) {
         clone_symbol = deepCopyComplex(NULL, symbol);
-        clone_symbol->key = key;
+        clone_symbol->key = NULL;
+        if (key != NULL) {
+            clone_symbol->key = malloc(1 + strlen(key));
+            strcpy(clone_symbol->key, key);
+        }
     } else {
         clone_symbol = addSymbol(key, type, symbol->value, symbol->value_type);
     }
@@ -191,12 +196,14 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
     for (unsigned long i = 0; i < symbol->children_count; i++) {
         Symbol* child = symbol->children[i];
+        /*
         char *key = NULL;
         if (child->key != NULL) {
             key = malloc(1 + strlen(child->key));
             strcpy(key, child->key);
         }
-        deepCopySymbol(child, child->type, key);
+        */
+        deepCopySymbol(child, child->type, child->key);
     }
 
     Symbol* symbol_return = complex_mode_stack.arr[complex_mode_stack.size - 1];
@@ -207,7 +214,7 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
 char* getSymbolValueString(char *name) {
     Symbol* symbol = getSymbol(name);
-    free(name);
+    //free(name);
     return _getSymbolValueString(symbol);
 }
 
@@ -225,7 +232,7 @@ char* _getSymbolValueString(Symbol* symbol) {
 
 long double getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
-    free(name);
+    //free(name);
     return _getSymbolValueFloat(symbol);
 }
 
@@ -254,7 +261,7 @@ long double _getSymbolValueFloat(Symbol* symbol) {
 
 bool getSymbolValueBool(char *name) {
     Symbol* symbol = getSymbol(name);
-    free(name);
+    //free(name);
     return _getSymbolValueBool(symbol);
 }
 
@@ -284,7 +291,7 @@ bool _getSymbolValueBool(Symbol* symbol) {
 
 long long getSymbolValueInt(char *name) {
     Symbol* symbol = getSymbol(name);
-    free(name);
+    //free(name);
     return _getSymbolValueInt(symbol);
 }
 
@@ -592,13 +599,14 @@ Symbol* addSymbolString(char *name, char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
-    free(s);
+    //free(s);
     return addSymbol(name, K_STRING, value, V_STRING);
 }
 
 void updateSymbolString(char *name, char *s) {
     union Value value;
-    value.s = s;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
     updateSymbol(name, K_STRING, value, V_STRING);
 }
 
@@ -611,8 +619,8 @@ void addSymbolList(char *name) {
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
     Symbol* symbol = getSymbol(name);
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
-    free(name);
-    free(clone_name);
+    //free(name);
+    //free(clone_name);
     return clone_symbol;
 }
 
@@ -629,7 +637,7 @@ Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *na
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
 
     free(key);
-    free(clone_name);
+    //free(clone_name);
     if (_symbol->type == K_STRING) {
         removeSymbol(symbol);
     }
@@ -657,9 +665,7 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         if (type == K_ANY) {
             clone_symbol = deepCopySymbol(symbol, K_ANY, NULL);
         } else if (symbol->type == K_ANY) {
-            char *temp_clone_name = malloc(1 + strlen(clone_name));
-            strcpy(temp_clone_name, clone_name);
-            Symbol* temp_symbol = createSymbolWithoutValueType(temp_clone_name, type);
+            Symbol* temp_symbol = createSymbolWithoutValueType(clone_name, type);
             clone_symbol = assignByTypeCasting(temp_symbol, symbol);
             removeSymbol(temp_symbol);
         } else {
@@ -703,8 +709,8 @@ Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol) {
 Symbol* updateSymbolByClonningName(char *clone_name, char *name) {
     Symbol* symbol = getSymbol(name);
     updateSymbolByClonning(clone_name, symbol);
-    free(clone_name);
-    free(name);
+    //free(clone_name);
+    //free(name);
     return symbol;
 }
 
@@ -720,7 +726,7 @@ Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name) {
     Symbol* symbol = getComplexElement(_symbol, i, key);
     updateSymbolByClonning(clone_name, symbol);
 
-    free(clone_name);
+    //free(clone_name);
     free(key);
     if (_symbol->type == K_STRING) {
         removeSymbol(symbol);
@@ -748,7 +754,7 @@ Symbol* finishComplexMode(char *name, enum Type type) {
         if (isDefined(name)) {
             removeSymbol(complex_mode);
             popComplexModeStack();
-            append_to_array_without_malloc(&free_string_stack, name);
+            //append_to_array_without_malloc(&free_string_stack, name);
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
 
@@ -840,7 +846,7 @@ Symbol* getListElement(Symbol* symbol, long long i) {
 void cloneSymbolToComplex(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
     Symbol* cloned_symbol = deepCopySymbol(symbol, symbol->type, key);
-    free(name);
+    //free(name);
 }
 
 Symbol* getComplexElement(Symbol* complex, long long i, char *key) {
@@ -957,7 +963,7 @@ void updateComplexElementString(char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
-    free(s);
+    //free(s);
     updateComplexElementWrapper(K_STRING, value, V_STRING);
 }
 
@@ -996,6 +1002,7 @@ void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, 
         free(key);
         throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
     }
+    free(key);
 }
 
 void removeComplexElement(Symbol* complex, unsigned long long symbol_id) {
@@ -1089,7 +1096,8 @@ Symbol* getDictElement(Symbol* symbol, char *key) {
 
 void addSymbolAnyString(char *name, char *s) {
     union Value value;
-    value.s = s;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
     addSymbol(name, K_ANY, value, V_STRING);
 }
 
@@ -1309,23 +1317,13 @@ void removeSymbolsByScope(_Function* scope) {
 }
 
 long long incrementThenAssign(char *name, long long i) {
-    char *name1 = malloc(1 + strlen(name));
-    strcpy(name1, name);
-    char *name2 = malloc(1 + strlen(name));
-    strcpy(name2, name);
-
-    updateSymbolInt(name2, getSymbolValueInt(name1) + i);
+    updateSymbolInt(name, getSymbolValueInt(name) + i);
     return getSymbolValueInt(name);
 }
 
 long long assignThenIncrement(char *name, long long i) {
-    char *name1 = malloc(1 + strlen(name));
-    strcpy(name1, name);
-    char *name2 = malloc(1 + strlen(name));
-    strcpy(name2, name);
-
     long long result = getSymbolValueInt(name);
-    updateSymbolInt(name2, getSymbolValueInt(name1) + i);
+    updateSymbolInt(name, getSymbolValueInt(name) + i);
     return result;
 }
 
@@ -1427,7 +1425,7 @@ void freeLeftRightBracketStack() {
 
 Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested) {
     Symbol* symbol = getSymbol(name);
-    free(name);
+    //free(name);
 
     if (inverse_nested >= left_right_bracket_stack.size) {
         return symbol;
@@ -1469,7 +1467,10 @@ void buildVariableComplexElement(char *name, char *key) {
             symbol,
             symbol->secondary_type
         );
-        clone_symbol->key = key;
+        if (key != NULL) {
+            clone_symbol->key = malloc(1 + strlen(key));
+            strcpy(clone_symbol->key, key);
+        }
     }
 }
 
@@ -1487,7 +1488,8 @@ void pushNestedComplexModeStack(Symbol* complex_mode) {
 }
 
 void popNestedComplexModeStack(char *key) {
-    nested_complex_mode_stack.arr[nested_complex_mode_stack.size - 1]->key = key;
+    nested_complex_mode_stack.arr[nested_complex_mode_stack.size - 1]->key = malloc(1 + strlen(key));
+    strcpy(nested_complex_mode_stack.arr[nested_complex_mode_stack.size - 1]->key, key);
     nested_complex_mode_stack.arr[nested_complex_mode_stack.size - 1] = NULL;
     nested_complex_mode_stack.size--;
 }
@@ -1504,4 +1506,20 @@ void freeNestedComplexModeStack() {
 
     nested_complex_mode_stack.capacity = 0;
     nested_complex_mode_stack.size = 0;
+}
+
+void reverseComplexMode() {
+    Symbol* complex_mode = getComplexMode();
+    complex_mode->children_count = complex_mode_stack.child_counter[complex_mode_stack.size - 1];
+    if (complex_mode->children_count == 0) return;
+    unsigned long i = 0;
+    unsigned long j = complex_mode->children_count - 1;
+    while (i < j) {
+        Symbol* left = complex_mode->children[i];
+        Symbol* right = complex_mode->children[j];
+        complex_mode->children[i] = right;
+        complex_mode->children[j] = left;
+        i++;
+        j--;
+    }
 }

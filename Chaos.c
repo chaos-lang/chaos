@@ -17,119 +17,89 @@ int defineFunction(
     KaosValue optional_params[],
     unsigned short optional_params_length
 ) {
-    char *function_name = malloc(strlen(name) + 1);
-    strcpy(function_name, name);
     startFunctionParameters();
 
     unsigned short optional_params_starts_from = params_length - optional_params_length;
 
-    for (unsigned short i = 0; i < optional_params_starts_from; i++) {
-        char *param_name = malloc(strlen(params_name[i]) + 1);
-        strcpy(param_name, params_name[i]);
-        addFunctionParameter(param_name, params_type[i], params_secondary_type[i]);
-    }
+    unsigned short j = optional_params_length - 1;
+    if (params_length > 0) {
+        for (int i = (int) (params_length - 1); i >= optional_params_starts_from; i--) {
+            enum Type optional_param_type = params_type[i];
 
-    unsigned short j = 0;
-    for (unsigned short i = optional_params_starts_from; i < params_length; i++) {
-        char *param_name = malloc(strlen(params_name[i]) + 1);
-        strcpy(param_name, params_name[i]);
+            struct KaosValue optional_param_value = optional_params[j];
 
-        enum Type optional_param_type = params_type[i];
-
-        struct KaosValue optional_param_value = optional_params[j];
-
-        switch (optional_param_type)
-        {
-            case K_BOOL:
-                addFunctionOptionalParameterBool(param_name, optional_param_value.b);
-                break;
-            case K_NUMBER:
-                addFunctionOptionalParameterFloat(param_name, optional_param_value.f);
-                break;
-            case K_STRING:
-                addFunctionOptionalParameterString(param_name, optional_param_value.s);
-                break;
-            default:
-                throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
-                break;
+            switch (optional_param_type)
+            {
+                case K_BOOL:
+                    addFunctionOptionalParameterBool(params_name[i], optional_param_value.b);
+                    break;
+                case K_NUMBER:
+                    addFunctionOptionalParameterFloat(params_name[i], optional_param_value.f);
+                    break;
+                case K_STRING:
+                    printf("K_STRING: %s\n", optional_param_value.s);
+                    addFunctionOptionalParameterString(params_name[i], optional_param_value.s);
+                    break;
+                default:
+                    throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
+                    break;
+            }
+            j--;
         }
-        j++;
+
+        for (int i = (int) optional_params_starts_from - 1; i >= 0; i--) {
+            addFunctionParameter(params_name[i], params_type[i], params_secondary_type[i]);
+        }
     }
 
-    startFunction(function_name, type, secondary_type);
+    startFunction(name, type, secondary_type);
     endFunction();
     return 0;
 }
 
 bool getVariableBool(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    return getSymbolValueBool(symbol_name);
+    return getSymbolValueBool(name);
 }
 
 long long getVariableInt(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    return getSymbolValueInt(symbol_name);
+    return getSymbolValueInt(name);
 }
 
 long double getVariableFloat(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    return getSymbolValueFloat(symbol_name);
+    return getSymbolValueFloat(name);
 }
 
 char* getVariableString(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    return getSymbolValueString(symbol_name);
+    return getSymbolValueString(name);
 }
 
 bool getVariableBoolByTypeCasting(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     return symbolValueByTypeCastingToBool(symbol);
 }
 
 long long getVariableIntByTypeCasting(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     return symbolValueByTypeCastingToInt(symbol);
 }
 
 long double getVariableFloatByTypeCasting(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     return symbolValueByTypeCastingToFloat(symbol);
 }
 
 char* getVariableStringByTypeCasting(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     return symbolValueByTypeCastingToString(symbol);
 }
 
 unsigned long getListLength(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     return symbol->children_count;
 }
 
 bool getListElementBool(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     if (symbol->value_type != V_BOOL) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -137,32 +107,23 @@ bool getListElementBool(char *name, long long i) {
 }
 
 long long getListElementInt(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
-    if (symbol->value_type != V_INT) {
+    Symbol* symbol = getListElement(getSymbol(name), i);
+    if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return _getSymbolValueInt(symbol);
 }
 
 long double getListElementFloat(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
-    if (symbol->value_type != V_FLOAT) {
+    Symbol* symbol = getListElement(getSymbol(name), i);
+    if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return _getSymbolValueFloat(symbol);
 }
 
 char* getListElementString(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     if (symbol->value_type != V_STRING) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -170,42 +131,27 @@ char* getListElementString(char *name, long long i) {
 }
 
 bool getListElementBoolByTypeCasting(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     return symbolValueByTypeCastingToBool(symbol);
 }
 
 long long getListElementIntByTypeCasting(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     return symbolValueByTypeCastingToInt(symbol);
 }
 
 long double getListElementFloatByTypeCasting(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     return symbolValueByTypeCastingToFloat(symbol);
 }
 
 char* getListElementStringByTypeCasting(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     return symbolValueByTypeCastingToString(symbol);
 }
 
 void copyListElement(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     createCloneFromSymbol(
         NULL,
         symbol->type,
@@ -215,34 +161,22 @@ void copyListElement(char *name, long long i) {
 }
 
 enum Type getListElementType(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     return symbol->type;
 }
 
 enum ValueType getListElementValueType(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getListElement(getSymbol(symbol_name), i);
-    free(symbol_name);
+    Symbol* symbol = getListElement(getSymbol(name), i);
     return symbol->value_type;
 }
 
 unsigned long getDictLength(char *name) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     return symbol->children_count;
 }
 
 char* getDictKeyByIndex(char *name, long long i) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getSymbol(symbol_name);
-    free(symbol_name);
+    Symbol* symbol = getSymbol(name);
     Symbol* child = symbol->children[i];
     char* key;
     key = malloc(1 + strlen(child->key));
@@ -251,10 +185,7 @@ char* getDictKeyByIndex(char *name, long long i) {
 }
 
 bool getDictElementBool(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     if (symbol->value_type != V_BOOL) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -262,32 +193,23 @@ bool getDictElementBool(char *name, char *key) {
 }
 
 long long getDictElementInt(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
-    if (symbol->value_type != V_INT) {
+    Symbol* symbol = getDictElement(getSymbol(name), key);
+    if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return _getSymbolValueInt(symbol);
 }
 
 long double getDictElementFloat(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
-    if (symbol->value_type != V_FLOAT) {
+    Symbol* symbol = getDictElement(getSymbol(name), key);
+    if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
     return _getSymbolValueFloat(symbol);
 }
 
 char* getDictElementString(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     if (symbol->value_type != V_STRING) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
     }
@@ -295,42 +217,27 @@ char* getDictElementString(char *name, char *key) {
 }
 
 bool getDictElementBoolByTypeCasting(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbolValueByTypeCastingToBool(symbol);
 }
 
 long long getDictElementIntByTypeCasting(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbolValueByTypeCastingToInt(symbol);
 }
 
 long double getDictElementFloatByTypeCasting(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbolValueByTypeCastingToFloat(symbol);
 }
 
 char* getDictElementStringByTypeCasting(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbolValueByTypeCastingToString(symbol);
 }
 
 void copyDictElement(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     createCloneFromSymbol(
         key,
         symbol->type,
@@ -340,18 +247,12 @@ void copyDictElement(char *name, char *key) {
 }
 
 enum Type getDictElementType(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbol->type;
 }
 
 enum ValueType getDictElementValueType(char *name, char *key) {
-    char *symbol_name = malloc(strlen(name) + 1);
-    strcpy(symbol_name, name);
-    Symbol* symbol = getDictElement(getSymbol(symbol_name), key);
-    free(symbol_name);
+    Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbol->value_type;
 }
 
@@ -388,41 +289,19 @@ void returnVariableString(char *s) {
 }
 
 void createVariableBool(char *name, bool b) {
-    char *symbol_name = NULL;
-    if (name != NULL) {
-        symbol_name = malloc(strlen(name) + 1);
-        strcpy(symbol_name, name);
-    }
-    addSymbolBool(symbol_name, b);
+    addSymbolBool(name, b);
 }
 
 void createVariableInt(char *name, long long i) {
-    char *symbol_name = NULL;
-    if (name != NULL) {
-        symbol_name = malloc(strlen(name) + 1);
-        strcpy(symbol_name, name);
-    }
-    addSymbolInt(symbol_name, i);
+    addSymbolInt(name, i);
 }
 
 void createVariableFloat(char *name, long double f) {
-    char *symbol_name = NULL;
-    if (name != NULL) {
-        symbol_name = malloc(strlen(name) + 1);
-        strcpy(symbol_name, name);
-    }
-    addSymbolFloat(symbol_name, f);
+    addSymbolFloat(name, f);
 }
 
 void createVariableString(char *name, char *s) {
-    char *symbol_name = NULL;
-    if (name != NULL) {
-        symbol_name = malloc(strlen(name) + 1);
-        strcpy(symbol_name, name);
-    }
-    char *_s = malloc(strlen(s) + 1);
-    strcpy(_s, s);
-    addSymbolString(symbol_name, _s);
+    addSymbolString(name, s);
 }
 
 void startBuildingList() {

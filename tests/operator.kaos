@@ -1,4 +1,4 @@
-// Relational operators on boolean variables
+print "Relational operators on boolean variables"
 bool a = true
 bool b = false
 bool c = a == b
@@ -22,7 +22,7 @@ del c
 del a
 del b
 
-// Relational operators on integer variables
+print "Relational operators on integer variables"
 num a = 3
 num b = 5
 bool c = a == b
@@ -46,7 +46,7 @@ del c
 del a
 del b
 
-// Relational operators on float variables
+print "Relational operators on float variables"
 num a = 13.5
 num b = 763.78
 bool c = a == b
@@ -70,7 +70,7 @@ del c
 del a
 del b
 
-// Relational operators on a mix of integer and boolean variables
+print "Relational operators on a mix of integer and boolean variables"
 bool a = true
 num b = 37
 bool c = a == b
@@ -94,7 +94,7 @@ del c
 del a
 del b
 
-// Relational operators on a mix of integer and float variables
+print "Relational operators on a mix of integer and float variables"
 num a = 98
 num b = 643.134
 bool c = a == b
@@ -118,7 +118,7 @@ del c
 del a
 del b
 
-// Relational operators on a mix of float and boolean variables
+print "Relational operators on a mix of float and boolean variables"
 bool a = false
 num b = 3.14
 bool c = a == b
@@ -142,7 +142,7 @@ del c
 del a
 del b
 
-// Relational operators on a mix of boolean variables and boolean/integer/float values
+print "Relational operators on a mix of boolean variables and boolean/integer/float values"
 bool a = true
 bool b = false
 bool c = a == 431
@@ -167,7 +167,7 @@ del a
 del b
 
 
-// Logical operators on boolean variables
+print "Logical operators on boolean variables"
 bool a = true
 bool b = false
 bool c = a && b
@@ -191,7 +191,7 @@ del c
 del a
 del b
 
-// Logical operators on integer variables
+print "Logical operators on integer variables"
 num a = 3
 num b = 5
 bool c = a && b
@@ -215,7 +215,7 @@ del c
 del a
 del b
 
-// Logical operators on float variables
+print "Logical operators on float variables"
 num a = 13.5
 num b = 763.78
 bool c = a && b
@@ -239,7 +239,7 @@ del c
 del a
 del b
 
-// Logical operators on a mix of integer and boolean variables
+print "Logical operators on a mix of integer and boolean variables"
 bool a = true
 num b = 37
 bool c = a && b
@@ -263,7 +263,7 @@ del c
 del a
 del b
 
-// Logical operators on a mix of integer and float variables
+print "Logical operators on a mix of integer and float variables"
 num a = 98
 num b = 643.134
 bool c = a && b
@@ -287,31 +287,7 @@ del c
 del a
 del b
 
-// Logical operators on a mix of integer and float variables
-num a = 98
-num b = 643.134
-bool c = a && b
-print c
-del c
-bool c = a and b
-print c
-del c
-bool c = a || b
-print c
-del c
-bool c = a or b
-print c
-del c
-bool c = ! a
-print c
-del c
-bool c = not a
-print c
-del c
-del a
-del b
-
-// Relational operators on a mix of boolean variables and boolean/integer/float values
+print "Relational operators on a mix of boolean variables and boolean/integer/float values"
 bool a = true
 bool b = false
 bool c = a && 431
@@ -336,7 +312,7 @@ del a
 del b
 
 
-// Bitwise operators
+print "Bitwise operators"
 num a = 5
 num b = 9
 num c = a & b
@@ -360,7 +336,7 @@ del c
 del a
 del b
 
-// Unary operators
+print "Unary operators"
 num a = 3
 num b = 5
 num c = (a + b) * a

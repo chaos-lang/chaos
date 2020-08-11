@@ -144,9 +144,7 @@ int KAOS_EXPORT KaosRegister(struct Kaos _kaos)
     // Functions with optional parameters
 
     struct KaosValue optional_test_optional_param1;
-    char *default_value = "default value";
-    optional_test_optional_param1.s = malloc(1 + strlen(default_value));
-    strcpy(optional_test_optional_param1.s, default_value);
+    optional_test_optional_param1.s = "default_value";
 
     struct KaosValue optional_test_optional_params[] = {
         optional_test_optional_param1

@@ -1,7 +1,6 @@
 #include "errors.h"
 
 extern int yylineno;
-extern char *last_token;
 
 void throw_error_var(throw_error_args in) {
     unsigned short code = in.code ? in.code : 0;
@@ -18,8 +17,6 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     char line_no_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg_out[__KAOS_MSG_LINE_LENGTH__ + 4];
-
-    if (last_token != NULL && strcmp(last_token, "\n") != 0) yylineno++;
 
     sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());

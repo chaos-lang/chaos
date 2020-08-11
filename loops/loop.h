@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <setjmp.h>
 
+#include "../symbol.h"
+#include "../ast/ast.h"
+
 enum LoopType { TIMESDO, FOREACH, FOREACH_DICT };
 
 typedef struct {
@@ -21,6 +24,7 @@ typedef struct {
     unsigned nested_counter;
     char *list;
     LoopElement element;
+    struct ASTNode* ast_node;
     char *body;
 } Loop;
 
@@ -30,9 +34,9 @@ bool loop_execution_mode;
 jmp_buf InteractiveShellLoopErrorAbsorber;
 bool interactive_shell_loop_error_absorbed;
 
-void endLoop();
-
-#include "times_do.h"
-#include "foreach.h"
+ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_node);
+ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
+ASTNode* startForeachDict(char *list_name, char *element_key, char *element_value, ASTNode* ast_node);
+bool endLoop();
 
 #endif

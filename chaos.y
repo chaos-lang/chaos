@@ -23,6 +23,7 @@
 #include "loop.h"
 #include "function.h"
 #include "module.h"
+#include "interpreter/interpreter.h"
 
 extern int yylex();
 extern int yyparse();
@@ -46,6 +47,8 @@ bool fp_opened;
 char *program_file_path;
 char *program_file_dir;
 char *program_code;
+
+char *main_interpreted_module;
 %}
 
 %union {
@@ -54,13 +57,14 @@ char *program_code;
     long double fval;
     char *sval;
     unsigned long long lluval;
+    ASTNode* ast_node_type;
 }
 
 %token START_PROGRAM START_PREPARSE START_JSON_PARSE
 %token<bval> T_TRUE T_FALSE
 %token<ival> T_INT T_TIMES_DO_INT
 %token<fval> T_FLOAT
-%token<sval> T_STRING T_VAR T_FOREACH_VAR
+%token<sval> T_STRING T_VAR
 %token<lluval> T_UNSIGNED_LONG_LONG_INT
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
 %token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_DOT T_COLON
@@ -69,7 +73,7 @@ char *program_code;
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_LIST T_VAR_DICT T_VAR_ANY T_NULL
 %token T_DEL T_RETURN T_VOID T_DEFAULT
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
-%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM T_BACKSLASH T_INFINITE T_FOREACH_AS_COLON
+%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM T_BACKSLASH T_INFINITE
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
 %token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
@@ -77,12 +81,22 @@ char *program_code;
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
-%type<ival> expression
-%type<fval> mixed_expression
-%type<bval> boolean_expression
-%type<sval> variable
-%type<ival> list
-%type<lluval> left_right_bracket
+%type<ast_node_type> expression
+%type<ast_node_type> mixed_expression
+%type<ast_node_type> boolean_expression
+%type<ast_node_type> left_right_bracket
+%type<ast_node_type> variable_complex_element
+%type<ast_node_type> function_parameters_start
+%type<ast_node_type> function_call_parameters_start
+%type<ast_node_type> function_parameters
+%type<ast_node_type> function_name
+%type<ast_node_type> module
+%type<ast_node_type> liststart
+%type<ast_node_type> list
+%type<ast_node_type> dictionarystart
+%type<ast_node_type> dictionary
+%type<ast_node_type> decisionstart
+%type<ast_node_type> decision
 
 %destructor {
     free($$);
@@ -93,665 +107,627 @@ char *program_code;
 %%
 
 meta_start:
-    | START_PROGRAM parser                                          { }
-    | START_PREPARSE preparser                                      { }
-    | START_JSON_PARSE json_parser                                  { }
-;
-
-preparser:
-    | preparser preparser_line                                      { }
-;
-
-preparser_line: T_NEWLINE
-    | function T_NEWLINE                                            { }
-    | T_IMPORT module T_NEWLINE                                     { handleModuleImport(NULL, false); }
-    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { handleModuleImport($4, false); }
-    | T_FROM module T_IMPORT T_MULTIPLY                             { handleModuleImport(NULL, true); }
-    | T_FROM module T_IMPORT function_name                          { handleModuleImport(NULL, true); }
-    | T_END decisionstart                                           { }
-    | error T_NEWLINE                                               { yyerrok; }
+    | START_PROGRAM parser                                                                                              { }
+    | START_JSON_PARSE json_parser                                                                                      { }
 ;
 
 function:
-    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_BOOL, K_ANY); }
-    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_NUMBER, K_ANY); }
-    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start       { startFunction($3, K_STRING, K_ANY); }
-    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start          { startFunction($3, K_ANY, K_ANY); }
-    | T_VAR_LIST T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_LIST, K_ANY); }
-    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($3, K_DICT, K_ANY); }
-    | T_VAR_BOOL T_VAR_LIST T_FUNCTION T_VAR function_parameters_start         { startFunction($4, K_LIST, K_BOOL); }
-    | T_VAR_BOOL T_VAR_DICT T_FUNCTION T_VAR function_parameters_start         { startFunction($4, K_DICT, K_BOOL); }
-    | T_VAR_NUMBER T_VAR_LIST T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_LIST, K_NUMBER); }
-    | T_VAR_NUMBER T_VAR_DICT T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_DICT, K_NUMBER); }
-    | T_VAR_STRING T_VAR_LIST T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_LIST, K_STRING); }
-    | T_VAR_STRING T_VAR_DICT T_FUNCTION T_VAR function_parameters_start       { startFunction($4, K_DICT, K_STRING); }
-    | T_VOID T_FUNCTION T_VAR function_parameters_start             { startFunction($3, K_VOID, K_ANY); }
-    | T_PRINT T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "\n", false, true); } free($2); }
-    | T_ECHO T_VAR T_LEFT function_call_parameters_start            { if (phase == PROGRAM) { callFunction($2, NULL); printFunctionReturn($2, NULL, "", false, true); } free($2); }
-    | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "\n", true, true); } free($3); }
-    | T_PRETTY T_ECHO T_VAR T_LEFT function_call_parameters_start           { if (phase == PROGRAM) { callFunction($3, NULL); printFunctionReturn($3, NULL, "", true, true); } free($3); }
-    | T_VAR T_LEFT function_call_parameters_start                   { if (phase == PROGRAM) { callFunction($1, NULL); if (is_interactive && !isFunctionType($1, NULL, K_VOID) && !inject_mode && !decision_execution_mode) printFunctionReturn($1, NULL, "\n", false, false); } free($1); }
-    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "\n", false, true); } free($4); free($2); }
-    | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($4, $2); printFunctionReturn($4, $2, "", false, true); } free($4); free($2); }
-    | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start      { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "\n", true, true); } free($5); free($3); }
-    | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start       { if (phase == PROGRAM) { callFunction($5, $3); printFunctionReturn($5, $3, "", true, true); } free($5); free($3); }
-    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start               { if (phase == PROGRAM) { callFunction($3, $1); if (is_interactive && !isFunctionType($3, $1, K_VOID) && !inject_mode && !decision_execution_mode) printFunctionReturn($3, $1, "\n", false, false); } free($3); free($1); }
-    | error T_NEWLINE                                               { if (is_interactive) { yyerrok; yyclearin; } }
-    | T_FOREACH_AS_COLON function                                   { }
-    | T_TIMES_DO_INT function                                       { }
-    | T_FOREACH_VAR function                                        { free($1); }
+    | T_VAR_BOOL T_FUNCTION T_VAR function_parameters_start                                                             { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_BOOL, strings, 1, $4);                                    ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_NUMBER T_FUNCTION T_VAR function_parameters_start                                                           { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_NUMBER, strings, 1, $4);                                  ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_STRING T_FUNCTION T_VAR function_parameters_start                                                           { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_STRING, strings, 1, $4);                                  ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_ANY T_FUNCTION T_VAR function_parameters_start                                                              { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_ANY, strings, 1, $4);                                     ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_LIST T_FUNCTION T_VAR function_parameters_start                                                             { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_LIST, strings, 1, $4);                                    ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_DICT T_FUNCTION T_VAR function_parameters_start                                                             { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_DICT, strings, 1, $4);                                    ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_BOOL T_VAR_LIST T_FUNCTION T_VAR function_parameters_start                                                  { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_BOOL_LIST, strings, 1, $5);                               ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_BOOL T_VAR_DICT T_FUNCTION T_VAR function_parameters_start                                                  { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_BOOL_DICT, strings, 1, $5);                               ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_NUMBER T_VAR_LIST T_FUNCTION T_VAR function_parameters_start                                                { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_NUMBER_LIST, strings, 1, $5);                             ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_NUMBER T_VAR_DICT T_FUNCTION T_VAR function_parameters_start                                                { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_NUMBER_DICT, strings, 1, $5);                             ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_STRING T_VAR_LIST T_FUNCTION T_VAR function_parameters_start                                                { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_STRING_LIST, strings, 1, $5);                             ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VAR_STRING T_VAR_DICT T_FUNCTION T_VAR function_parameters_start                                                { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_STRING_DICT, strings, 1, $5);                             ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_VOID T_FUNCTION T_VAR function_parameters_start                                                                 { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DEFINE_FUNCTION_VOID, strings, 1, $4);                                    ASTNodeNext(ast_node);     ASTBranchOut();     loops_inside_function_counter++; }
+    | T_PRINT T_VAR T_LEFT function_call_parameters_start                                                               { char *strings[] = {$2, NULL};       ASTNode* ast_node = addASTNodeAssign(AST_PRINT_FUNCTION_RETURN, strings, 1, $4);                                   ASTNodeNext(ast_node); }
+    | T_ECHO T_VAR T_LEFT function_call_parameters_start                                                                { char *strings[] = {$2, NULL};       ASTNode* ast_node = addASTNodeAssign(AST_ECHO_FUNCTION_RETURN, strings, 1, $4);                                    ASTNodeNext(ast_node); }
+    | T_PRETTY T_PRINT T_VAR T_LEFT function_call_parameters_start                                                      { char *strings[] = {$3, NULL};       ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_PRINT_FUNCTION_RETURN, strings, 1, $5);                            ASTNodeNext(ast_node); }
+    | T_PRETTY T_ECHO T_VAR T_LEFT function_call_parameters_start                                                       { char *strings[] = {$3, NULL};       ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_ECHO_FUNCTION_RETURN, strings, 1, $5);                             ASTNodeNext(ast_node); }
+    | T_VAR T_LEFT function_call_parameters_start                                                                       { char *strings[] = {$1, NULL};       ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_RETURN, strings, 1, $3);                                         ASTNodeNext(ast_node); }
+    | T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                                   { char *strings[] = {$4, $2};         ASTNode* ast_node = addASTNodeAssign(AST_PRINT_FUNCTION_RETURN, strings, 2, $6);                                   ASTNodeNext(ast_node); }
+    | T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                                    { char *strings[] = {$4, $2};         ASTNode* ast_node = addASTNodeAssign(AST_ECHO_FUNCTION_RETURN, strings, 2, $6);                                    ASTNodeNext(ast_node); }
+    | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                          { char *strings[] = {$5, $3};         ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_PRINT_FUNCTION_RETURN, strings, 2, $7);                            ASTNodeNext(ast_node); }
+    | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                           { char *strings[] = {$5, $3};         ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_ECHO_FUNCTION_RETURN, strings, 2, $7);                             ASTNodeNext(ast_node); }
+    | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                                           { char *strings[] = {$3, $1};         ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_RETURN, strings, 2, $5);                                         ASTNodeNext(ast_node); }
+    | error T_NEWLINE                                                                                                   { if (is_interactive) { yyerrok; yyclearin; } }
+    | T_TIMES_DO_INT function                                                                                           { }
 ;
 
-function_parameters_start:                                          { startFunctionParameters(); }
-    | function_parameters_start T_LEFT function_parameters T_RIGHT  { }
+function_parameters_start:                                                                                              { }
+    | function_parameters_start T_LEFT function_parameters T_RIGHT                                                      { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_PARAMETERS_START, strings, 0, $3);                               $$ = ast_node; }
 ;
 
-function_call_parameters_start:                                     { }
-    | function_parameters T_RIGHT                                   { }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+function_call_parameters_start:                                                                                         { }
+    | function_parameters T_RIGHT                                                                                       { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETERS_START, strings, 0, $1);                          $$ = ast_node; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-function_parameters:                                                { }
-    | T_NEWLINE function_parameters                                 { }
-    | function_parameters T_COMMA function_parameters               { }
-    | function_parameters T_NEWLINE                                 { }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+function_parameters:                                                                                                    { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETERS_START, strings, 0);                                         $$ = ast_node; }
+    | T_NEWLINE function_parameters                                                                                     { $$ = $2; }
+    | function_parameters T_COMMA function_parameters                                                                   { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                     $$ = ast_node; $$->right = $3; $$->left = $1; }
+    | function_parameters T_NEWLINE                                                                                     { $$ = $1; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
-function_parameters: T_VAR_BOOL T_VAR                               { addFunctionParameter($2, K_BOOL, K_ANY); }
+function_parameters: T_VAR_BOOL T_VAR                                                                                   { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_BOOL, strings, 1);                                           $$ = ast_node; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR                             { addFunctionParameter($2, K_NUMBER, K_ANY); }
+function_parameters: T_VAR_NUMBER T_VAR                                                                                 { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_NUMBER, strings, 1);                                         $$ = ast_node; }
 ;
-function_parameters: T_VAR_STRING T_VAR                             { addFunctionParameter($2, K_STRING, K_ANY); }
+function_parameters: T_VAR_STRING T_VAR                                                                                 { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_STRING, strings, 1);                                         $$ = ast_node; }
 ;
-function_parameters: T_VAR_LIST T_VAR                               { addFunctionParameter($2, K_LIST, K_ANY); }
+function_parameters: T_VAR_LIST T_VAR                                                                                   { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_LIST, strings, 1);                                           $$ = ast_node; }
 ;
-function_parameters: T_VAR_BOOL T_VAR_LIST T_VAR                    { addFunctionParameter($3, K_LIST, K_BOOL); }
+function_parameters: T_VAR_BOOL T_VAR_LIST T_VAR                                                                        { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_BOOL_LIST, strings, 1);                                      $$ = ast_node; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR_LIST T_VAR                  { addFunctionParameter($3, K_LIST, K_NUMBER); }
+function_parameters: T_VAR_NUMBER T_VAR_LIST T_VAR                                                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_NUMBER_LIST, strings, 1);                                    $$ = ast_node; }
 ;
-function_parameters: T_VAR_STRING T_VAR_LIST T_VAR                  { addFunctionParameter($3, K_LIST, K_STRING); }
+function_parameters: T_VAR_STRING T_VAR_LIST T_VAR                                                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_STRING_LIST, strings, 1);                                    $$ = ast_node; }
 ;
-function_parameters: T_VAR_DICT T_VAR                               { addFunctionParameter($2, K_DICT, K_ANY); }
+function_parameters: T_VAR_DICT T_VAR                                                                                   { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_DICT, strings, 1);                                           $$ = ast_node; }
 ;
-function_parameters: T_VAR_BOOL T_VAR_DICT T_VAR                    { addFunctionParameter($3, K_DICT, K_BOOL); }
+function_parameters: T_VAR_BOOL T_VAR_DICT T_VAR                                                                        { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_BOOL_DICT, strings, 1);                                      $$ = ast_node; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR_DICT T_VAR                  { addFunctionParameter($3, K_DICT, K_NUMBER); }
+function_parameters: T_VAR_NUMBER T_VAR_DICT T_VAR                                                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_NUMBER_DICT, strings, 1);                                    $$ = ast_node; }
 ;
-function_parameters: T_VAR_STRING T_VAR_DICT T_VAR                  { addFunctionParameter($3, K_DICT, K_STRING); }
+function_parameters: T_VAR_STRING T_VAR_DICT T_VAR                                                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_STRING_DICT, strings, 1);                                    $$ = ast_node; }
 ;
-function_parameters: T_VAR_BOOL T_VAR T_EQUAL boolean_expression        { addFunctionOptionalParameterBool($2, $4); }
+function_parameters: T_VAR_BOOL T_VAR T_EQUAL boolean_expression                                                        { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_BOOL, strings, 1, $4);                        $$ = ast_node; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR T_EQUAL mixed_expression        { addFunctionOptionalParameterFloat($2, $4); }
+function_parameters: T_VAR_NUMBER T_VAR T_EQUAL mixed_expression                                                        { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER, strings, 1, $4);                      $$ = ast_node; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR T_EQUAL expression              { addFunctionOptionalParameterFloat($2, $4); }
+function_parameters: T_VAR_NUMBER T_VAR T_EQUAL expression                                                              { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER, strings, 1, $4);                      $$ = ast_node; }
 ;
-function_parameters: T_VAR_STRING T_VAR T_EQUAL T_STRING                { addFunctionOptionalParameterString($2, $4); }
+function_parameters: T_VAR_STRING T_VAR T_EQUAL T_STRING                                                                { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeString(AST_OPTIONAL_FUNCTION_PARAMETER_STRING, strings, 1, $4, NULL);                $$ = ast_node; }
 ;
-function_parameters: T_VAR_LIST T_VAR T_EQUAL liststart                 { addFunctionOptionalParameterComplex($2, K_ANY); }
+function_parameters: T_VAR_LIST T_VAR T_EQUAL liststart                                                                 { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_LIST, strings, 1, $4);                        $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart      { addFunctionOptionalParameterComplex($3, K_BOOL); }
+function_parameters: T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart                                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_LIST, strings, 1, $5);                   $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart    { addFunctionOptionalParameterComplex($3, K_NUMBER); }
+function_parameters: T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart                                                    { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_LIST, strings, 1, $5);                 $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart    { addFunctionOptionalParameterComplex($3, K_STRING); }
+function_parameters: T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart                                                    { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST, strings, 1, $5);                 $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_DICT T_VAR T_EQUAL dictionarystart           { addFunctionOptionalParameterComplex($2, K_ANY); }
+function_parameters: T_VAR_DICT T_VAR T_EQUAL dictionarystart                                                           { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_DICT, strings, 1, $4);                        $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart        { addFunctionOptionalParameterComplex($3, K_BOOL); }
+function_parameters: T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart                                                { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_DICT, strings, 1, $5);                   $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart      { addFunctionOptionalParameterComplex($3, K_NUMBER); }
+function_parameters: T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart                                              { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_DICT, strings, 1, $5);                 $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart      { addFunctionOptionalParameterComplex($3, K_STRING); }
+function_parameters: T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart                                              { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST, strings, 1, $5);                 $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: T_TRUE                                         { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
+function_parameters: boolean_expression                                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_BOOL, strings, 0, $1);                            $$ = ast_node; }
 ;
-function_parameters: T_FALSE                                        { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterBool($1); }
+function_parameters: expression                                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_NUMBER, strings, 0, $1);                          $$ = ast_node; }
 ;
-function_parameters: expression                                     { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterInt($1); }
+function_parameters: mixed_expression                                                                                   { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_NUMBER, strings, 0, $1);                          $$ = ast_node; }
 ;
-function_parameters: mixed_expression                               { if (!block(B_FUNCTION) && phase == PROGRAM) addFunctionCallParameterFloat($1); }
+function_parameters: T_STRING                                                                                           { char *strings[] = {};               ASTNode* ast_node = addASTNodeString(AST_FUNCTION_CALL_PARAMETER_STRING, strings, 0, $1, NULL);                    $$ = ast_node; }
 ;
-function_parameters: T_STRING                                       { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterString($1); } free($1); }
+function_parameters: T_VAR                                                                                              { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_FUNCTION_CALL_PARAMETER_VAR, strings, 1);                                       $$ = ast_node; }
 ;
-function_parameters: T_VAR                                          { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterSymbol($1); } free($1); }
+function_parameters: liststart                                                                                          { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_LIST, strings, 0, $1);                            $$ = ast_node; is_complex_parsing = false; }
 ;
-function_parameters: liststart                                      { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(K_ANY); } else { finishComplexMode(NULL, K_ANY); } }
-;
-function_parameters: dictionarystart                                { if (!block(B_FUNCTION) && phase == PROGRAM) { addFunctionCallParameterList(K_ANY); } else { finishComplexMode(NULL, K_ANY); } }
+function_parameters: dictionarystart                                                                                    { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_DICT, strings, 0, $1);                            $$ = ast_node; is_complex_parsing = false; }
 ;
 
 parser:
     | parser line                                                   {
+        if (is_interactive && loops_inside_function_counter == 0)
+            interpret(main_interpreted_module, INIT_PREPARSE, true);
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        is_interactive ? (
-            loop_mode || function_mode || isComplexMode() || decision_mode ? printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__) : (
-                inject_mode ? : printf("%s ", __KAOS_SHELL_INDICATOR__)
-            )
-        ) : printf("");
+            if (is_interactive) {
+                if (loops_inside_function_counter > 0 || is_complex_parsing) {
+                    printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__);
+                } else {
+                    printf("%s ", __KAOS_SHELL_INDICATOR__);
+                }
+            }
         #endif
     }
 ;
 
 line: T_NEWLINE
-    | mixed_expression T_NEWLINE                                    { if (is_interactive && isStreamOpen() && !inject_mode) printf("%Lg\n", $1); }
-    | expression T_NEWLINE                                          { if (is_interactive && isStreamOpen() && !inject_mode) printf("%lld\n", $1); }
-    | variable T_NEWLINE                                            { if ($1[0] != '\0' && is_interactive && !inject_mode) { printSymbolValueEndWithNewLine(getSymbol($1), false, false); free($1); } }
-    | expression T_TIMES_DO                                         { startTimesDo($1, false); }
-    | T_TIMES_DO_INT T_TIMES_DO                                     { startTimesDo($1, false); }
-    | T_INFINITE T_TIMES_DO                                         { startTimesDo(0, true); }
-    | T_VAR T_TIMES_DO                                              { startTimesDo((unsigned) getSymbolValueInt($1), false); }
-    | T_FOREACH T_VAR T_AS T_VAR                                    { startForeach($2, $4); }
-    | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                      { startForeachDict($2, $4, $6); }
-    | T_FOREACH T_VAR T_AS T_VAR T_FOREACH_AS_COLON T_VAR           { startForeachDict($2, $4, $6); }
-    | T_FOREACH T_FOREACH_VAR T_AS T_FOREACH_VAR                                            { startForeach($2, $4); }
-    | T_FOREACH T_FOREACH_VAR T_AS T_FOREACH_VAR T_COLON T_FOREACH_VAR                      { startForeachDict($2, $4, $6); }
-    | T_FOREACH T_FOREACH_VAR T_AS T_FOREACH_VAR T_FOREACH_AS_COLON T_FOREACH_VAR           { startForeachDict($2, $4, $6); }
-    | T_QUIT quit                                                   { }
-    | T_PRINT print T_NEWLINE                                       { }
-    | T_ECHO echo T_NEWLINE                                         { }
-    | T_PRETTY T_PRINT pretty_print T_NEWLINE                       { }
-    | T_PRETTY T_ECHO pretty_echo T_NEWLINE                         { }
-    | T_SYMBOL_TABLE T_NEWLINE                                      { printSymbolTable(); }
-    | T_DEL T_VAR T_NEWLINE                                         { removeSymbolByName($2); free($2); }
-    | T_DEL T_VAR left_right_bracket T_NEWLINE                      { removeComplexElementByLeftRightBracketStack($2); }
-    | T_FUNCTION_TABLE T_NEWLINE                                    { printFunctionTable(); }
-    | function T_NEWLINE                                            { }
-    | T_END decisionstart                                           { }
-    | T_IMPORT module T_NEWLINE                                     { if (is_interactive) handleModuleImport(NULL, false); }
-    | T_IMPORT module T_AS T_VAR T_NEWLINE                          { if (is_interactive) { handleModuleImport($4, false); } else { free($4); } }
-    | T_FROM module T_IMPORT T_MULTIPLY                             { if (is_interactive) handleModuleImport(NULL, true); }
-    | T_FROM module T_IMPORT function_name                          { if (is_interactive) handleModuleImport(NULL, true); }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+    | mixed_expression T_NEWLINE                                                                                        { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_PRINT_INTERACTIVE_MIXED_EXPRESSION, strings, 0, $1);                      ASTNodeNext(ast_node); }
+    | expression T_NEWLINE                                                                                              { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_PRINT_INTERACTIVE_EXPRESSION, strings, 0, $1);                            ASTNodeNext(ast_node); }
+    | variable T_NEWLINE                                                                                                { }
+    | expression T_TIMES_DO                                                                                             { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_START_TIMES_DO, strings, 0, $1);                                          ASTNodeNext(ast_node);     loops_inside_function_counter++; }
+    | T_INFINITE T_TIMES_DO                                                                                             { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_START_TIMES_DO_INFINITE, strings, 1);                                           ASTNodeNext(ast_node);     loops_inside_function_counter++; }
+    | T_VAR T_TIMES_DO                                                                                                  { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_START_TIMES_DO_VAR, strings, 1);                                                ASTNodeNext(ast_node);     loops_inside_function_counter++; }
+    | T_FOREACH T_VAR T_AS T_VAR                                                                                        { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_START_FOREACH, strings, 2);                                                     ASTNodeNext(ast_node);     loops_inside_function_counter++; }
+    | T_FOREACH T_VAR T_AS T_VAR T_COLON T_VAR                                                                          { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNode(AST_START_FOREACH_DICT, strings, 3);                                                ASTNodeNext(ast_node);     loops_inside_function_counter++; }
+    | T_QUIT quit                                                                                                       { }
+    | T_PRINT print T_NEWLINE                                                                                           { }
+    | T_ECHO echo T_NEWLINE                                                                                             { }
+    | T_PRETTY T_PRINT pretty_print T_NEWLINE                                                                           { }
+    | T_PRETTY T_ECHO pretty_echo T_NEWLINE                                                                             { }
+    | T_SYMBOL_TABLE T_NEWLINE                                                                                          { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_PRINT_SYMBOL_TABLE, strings, 0);                                               ASTNodeNext(ast_node); }
+    | T_DEL T_VAR T_NEWLINE                                                                                             { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_DELETE_VAR, strings, 1);                                                       ASTNodeNext(ast_node); }
+    | T_DEL T_VAR left_right_bracket T_NEWLINE                                                                          { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_DELETE_VAR_EL, strings, 1, $3);                                          ASTNodeNext(ast_node); }
+    | T_FUNCTION_TABLE T_NEWLINE                                                                                        { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_PRINT_FUNCTION_TABLE, strings, 0);                                             ASTNodeNext(ast_node); }
+    | function T_NEWLINE                                                                                                { }
+    | T_END T_NEWLINE                                                                                                   { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_END, strings, 0);                                                              ASTNodeNext(ast_node);      ASTMergeBack(); }
+    | T_END decisionstart                                                                                               { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_END, strings, 0);                                                              ASTNodeNext(ast_node);      ASTMergeBack(); ASTNode* ast_node2 = addASTNodeAssign(AST_DECISION_DEFINE, strings, 0, $2);     ASTNodeNext(ast_node2); }
+    | T_IMPORT module T_NEWLINE                                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_MODULE_IMPORT, strings, 0, $2);                                          ASTNodeNext(ast_node); }
+    | T_IMPORT module T_AS T_VAR T_NEWLINE                                                                              { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_MODULE_IMPORT_AS, strings, 1, $2);                                       ASTNodeNext(ast_node); }
+    | T_FROM module T_IMPORT T_MULTIPLY                                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_MODULE_IMPORT_PARTIAL, strings, 0, $2);                                  ASTNodeNext(ast_node); }
+    | T_FROM module T_IMPORT function_name                                                                              { char *strings[] = {};               ASTNode* ast_node = addASTNodeBranch(AST_MODULE_IMPORT_PARTIAL, $2, $4);                                          ASTNodeNext(ast_node); }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-print: T_VAR left_right_bracket                                     { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0), false, true); }
+print: T_VAR left_right_bracket                                                                                         { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_PRINT_VAR_EL, strings, 1, $2);                                ASTNodeNext(ast_node); }
 ;
-print: T_VAR                                                        { printSymbolValueEndWithNewLine(getSymbol($1), false, true); free($1); }
+print: T_VAR                                                                                                            { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_PRINT_VAR, strings, 1);                                             ASTNodeNext(ast_node); }
 ;
-print: expression                                                   { printf("%lld\n", $1); }
+print: expression                                                                                                       { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_PRINT_EXPRESSION, strings, 0, $1);                            ASTNodeNext(ast_node); }
 ;
-print: mixed_expression                                             { printf("%Lg\n", $1); }
+print: mixed_expression                                                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_PRINT_MIXED_EXPRESSION, strings, 0, $1);                      ASTNodeNext(ast_node); }
 ;
-print: T_STRING                                                     { printf("%s\n", $1); free($1); }
-;
-
-echo: T_VAR left_right_bracket                                      { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), "", false, true); }
-;
-echo: T_VAR                                                         { printSymbolValueEndWith(getSymbol($1), "", false, true); free($1); }
-;
-echo: expression                                                    { printf("%lld", $1); }
-;
-echo: mixed_expression                                              { printf("%Lg", $1); }
-;
-echo: T_STRING                                                      { printf("%s", $1); free($1); }
+print: T_STRING                                                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNodeString(AST_PRINT_STRING, strings, 0, $1, NULL);                          ASTNodeNext(ast_node); }
 ;
 
-pretty_print: T_VAR left_right_bracket                              { printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack($1, 0), true, true); }
+echo: T_VAR left_right_bracket                                                                                          { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_ECHO_VAR_EL, strings, 1, $2);                                 ASTNodeNext(ast_node); }
 ;
-pretty_print: T_VAR                                                 { printSymbolValueEndWithNewLine(getSymbol($1), true, true); free($1); }
+echo: T_VAR                                                                                                             { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_ECHO_VAR, strings, 1);                                              ASTNodeNext(ast_node); }
 ;
-pretty_echo: T_VAR left_right_bracket                               { printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack($1, 0), "", true, true); }
+echo: expression                                                                                                        { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_ECHO_EXPRESSION, strings, 0, $1);                             ASTNodeNext(ast_node); }
 ;
-pretty_echo: T_VAR                                                  { printSymbolValueEndWith(getSymbol($1), "", true, true); free($1); }
+echo: mixed_expression                                                                                                  { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_ECHO_MIXED_EXPRESSION, strings, 0, $1);                       ASTNodeNext(ast_node); }
 ;
-
-mixed_expression: T_FLOAT                                           { $$ = (long double) $1; }
-    | T_MINUS mixed_expression                                      { $$ = - $2; }
-    | mixed_expression T_PLUS mixed_expression                      { $$ = $1 + $3; }
-    | mixed_expression T_MINUS mixed_expression                     { $$ = $1 - $3; }
-    | mixed_expression T_MULTIPLY mixed_expression                  { $$ = $1 * $3; }
-    | mixed_expression T_DIVIDE mixed_expression                    { $$ = $1 / $3; }
-    | expression T_PLUS mixed_expression                            { $$ = $1 + $3; }
-    | expression T_MINUS mixed_expression                           { $$ = $1 - $3; }
-    | expression T_MULTIPLY mixed_expression                        { $$ = $1 * $3; }
-    | expression T_DIVIDE mixed_expression                          { $$ = $1 / $3; }
-    | mixed_expression T_PLUS expression                            { $$ = $1 + $3; }
-    | mixed_expression T_MINUS expression                           { $$ = $1 - $3; }
-    | mixed_expression T_MULTIPLY expression                        { $$ = $1 * $3; }
-    | mixed_expression T_DIVIDE expression                          { $$ = $1 / $3; }
-    | expression T_DIVIDE expression                                { $$ = $1 / (long double)$3; }
-    | T_VAR T_PLUS T_VAR                                            { $$ = getSymbolValueFloat($1) + getSymbolValueFloat($3); }
-    | T_VAR T_MINUS T_VAR                                           { $$ = getSymbolValueFloat($1) - getSymbolValueFloat($3); }
-    | T_VAR T_MULTIPLY T_VAR                                        { $$ = getSymbolValueFloat($1) * getSymbolValueFloat($3); }
-    | T_VAR T_DIVIDE T_VAR                                          { $$ = getSymbolValueFloat($1) / getSymbolValueFloat($3); }
-    | T_LEFT T_VAR T_RIGHT                                          { $$ = getSymbolValueFloat($2); }
-    | mixed_expression T_PLUS T_VAR                                 { $$ = $1 + getSymbolValueFloat($3); }
-    | mixed_expression T_MINUS T_VAR                                { $$ = $1 - getSymbolValueFloat($3); }
-    | mixed_expression T_MULTIPLY T_VAR                             { $$ = $1 * getSymbolValueFloat($3); }
-    | mixed_expression T_DIVIDE T_VAR                               { $$ = $1 / getSymbolValueFloat($3); }
-    | expression T_PLUS T_VAR                                       { $$ = $1 + getSymbolValueFloat($3); }
-    | expression T_MINUS T_VAR                                      { $$ = $1 - getSymbolValueFloat($3); }
-    | expression T_MULTIPLY T_VAR                                   { $$ = $1 * getSymbolValueFloat($3); }
-    | expression T_DIVIDE T_VAR                                     { $$ = $1 / getSymbolValueFloat($3); }
-    | T_VAR T_PLUS mixed_expression                                 { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_MINUS mixed_expression                                { $$ = getSymbolValueFloat($1) - $3; }
-    | T_VAR T_MULTIPLY mixed_expression                             { $$ = getSymbolValueFloat($1) * $3; }
-    | T_VAR T_DIVIDE mixed_expression                               { $$ = getSymbolValueFloat($1) / $3; }
-    | T_VAR T_PLUS expression                                       { $$ = getSymbolValueFloat($1) + $3; }
-    | T_VAR T_MINUS expression                                      { $$ = getSymbolValueFloat($1) - $3; }
-    | T_VAR T_MULTIPLY expression                                   { $$ = getSymbolValueFloat($1) * $3; }
-    | T_VAR T_DIVIDE expression                                     { $$ = getSymbolValueFloat($1) / $3; }
-    | T_LEFT mixed_expression T_RIGHT                               { $$ = $2; }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+echo: T_STRING                                                                                                          { char *strings[] = {};               ASTNode* ast_node = addASTNodeString(AST_ECHO_STRING, strings, 0, $1, NULL);                           ASTNodeNext(ast_node); }
 ;
 
-expression: T_INT                                                   { $$ = (long long) $1; }
-    | T_MINUS expression                                            { $$ = - $2; }
-    | expression T_PLUS expression                                  { $$ = $1 + $3; }
-    | expression T_MINUS expression                                 { $$ = $1 - $3; }
-    | expression T_MULTIPLY expression                              { $$ = $1 * $3; }
-    | expression T_BITWISE_AND expression                           { $$ = $1 & $3; }
-    | expression T_BITWISE_OR expression                            { $$ = $1 | $3; }
-    | expression T_BITWISE_XOR expression                           { $$ = $1 ^ $3; }
-    | expression T_BITWISE_LEFT_SHIFT expression                    { $$ = $1 << $3; }
-    | expression T_BITWISE_RIGHT_SHIFT expression                   { $$ = $1 >> $3; }
-    | T_VAR T_BITWISE_AND expression                                { $$ = getSymbolValueInt($1) & $3; }
-    | T_VAR T_BITWISE_OR expression                                 { $$ = getSymbolValueInt($1) | $3; }
-    | T_VAR T_BITWISE_XOR expression                                { $$ = getSymbolValueInt($1) ^ $3; }
-    | T_VAR T_BITWISE_LEFT_SHIFT expression                         { $$ = getSymbolValueInt($1) << $3; }
-    | T_VAR T_BITWISE_RIGHT_SHIFT expression                        { $$ = getSymbolValueInt($1) >> $3; }
-    | expression T_BITWISE_AND T_VAR                                { $$ = $1 & getSymbolValueInt($3); }
-    | expression T_BITWISE_OR T_VAR                                 { $$ = $1 | getSymbolValueInt($3); }
-    | expression T_BITWISE_XOR T_VAR                                { $$ = $1 ^ getSymbolValueInt($3); }
-    | expression T_BITWISE_LEFT_SHIFT T_VAR                         { $$ = $1 << getSymbolValueInt($3); }
-    | expression T_BITWISE_RIGHT_SHIFT T_VAR                        { $$ = $1 >> getSymbolValueInt($3); }
-    | T_VAR T_BITWISE_AND T_VAR                                     { $$ = getSymbolValueInt($1) & getSymbolValueInt($3);; }
-    | T_VAR T_BITWISE_OR T_VAR                                      { $$ = getSymbolValueInt($1) | getSymbolValueInt($3);; }
-    | T_VAR T_BITWISE_XOR T_VAR                                     { $$ = getSymbolValueInt($1) ^ getSymbolValueInt($3);; }
-    | T_VAR T_BITWISE_LEFT_SHIFT T_VAR                              { $$ = getSymbolValueInt($1) << getSymbolValueInt($3);; }
-    | T_VAR T_BITWISE_RIGHT_SHIFT T_VAR                             { $$ = getSymbolValueInt($1) >> getSymbolValueInt($3);; }
-    | T_BITWISE_NOT expression                                      { $$ = ~ $2; }
-    | T_BITWISE_NOT T_VAR                                           { $$ = ~ getSymbolValueInt($2); }
-    | T_INCREMENT expression                                        { $$ = ++ $2; }
-    | expression T_INCREMENT                                        { $$ = $1 ++; }
-    | T_DECREMENT expression                                        { $$ = -- $2; }
-    | expression T_DECREMENT                                        { $$ = $1 --; }
-    | T_INCREMENT T_VAR                                             { $$ = incrementThenAssign($2, 1); }
-    | T_VAR T_INCREMENT                                             { $$ = assignThenIncrement($1, 1); }
-    | T_DECREMENT T_VAR                                             { $$ = incrementThenAssign($2, -1); }
-    | T_VAR T_DECREMENT                                             { $$ = assignThenIncrement($1, -1); }
-    | T_LEFT expression T_RIGHT                                     { $$ = $2; }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+pretty_print: T_VAR left_right_bracket                                                                                  { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_PRINT_VAR_EL, strings, 1, $2);                         ASTNodeNext(ast_node); }
+;
+pretty_print: T_VAR                                                                                                     { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_PRETTY_PRINT_VAR, strings, 1);                                      ASTNodeNext(ast_node); }
+;
+pretty_echo: T_VAR left_right_bracket                                                                                   { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_ECHO_VAR_EL, strings, 1, $2);                          ASTNodeNext(ast_node); }
+;
+pretty_echo: T_VAR                                                                                                      { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_PRETTY_ECHO_VAR, strings, 1);                                       ASTNodeNext(ast_node); }
 ;
 
-boolean_expression: T_TRUE                                          { if (!block(B_EXPRESSION)) $$ = $1; }
-    | boolean_expression T_REL_EQUAL boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | boolean_expression T_REL_NOT_EQUAL boolean_expression         { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | boolean_expression T_REL_GREAT boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | boolean_expression T_REL_SMALL boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | boolean_expression T_REL_GREAT_EQUAL boolean_expression       { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | boolean_expression T_REL_SMALL_EQUAL boolean_expression       { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | boolean_expression T_LOGIC_AND boolean_expression             { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | boolean_expression T_LOGIC_OR boolean_expression              { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | T_LOGIC_NOT boolean_expression                                { if (!block(B_EXPRESSION)) $$ = ! $2; }
-    | T_LOGIC_NOT T_VAR                                             { if (!block(B_EXPRESSION)) { $$ = ! getSymbolValueBool($2); } else { free($2); } }
-    | T_VAR T_REL_EQUAL boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) == $3; } else { free($1); } }
-    | T_VAR T_REL_NOT_EQUAL boolean_expression                      { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) != $3; } else { free($1); } }
-    | T_VAR T_REL_GREAT boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) > $3; } else { free($1); } }
-    | T_VAR T_REL_SMALL boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) < $3; } else { free($1); } }
-    | T_VAR T_REL_GREAT_EQUAL boolean_expression                    { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) >= $3; } else { free($1); } }
-    | T_VAR T_REL_SMALL_EQUAL boolean_expression                    { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) <= $3; } else { free($1); } }
-    | T_VAR T_LOGIC_AND boolean_expression                          { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && $3; } else { free($1); } }
-    | T_VAR T_LOGIC_OR boolean_expression                           { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || $3; } else { free($1); } }
-    | boolean_expression T_REL_EQUAL T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 == getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_REL_NOT_EQUAL T_VAR                      { if (!block(B_EXPRESSION)) { $$ = $1 != getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_REL_GREAT T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 > getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_REL_SMALL T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 < getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_REL_GREAT_EQUAL T_VAR                    { if (!block(B_EXPRESSION)) { $$ = $1 >= getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_REL_SMALL_EQUAL T_VAR                    { if (!block(B_EXPRESSION)) { $$ = $1 <= getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_LOGIC_AND T_VAR                          { if (!block(B_EXPRESSION)) { $$ = $1 && getSymbolValueBool($3); } else { free($3); } }
-    | boolean_expression T_LOGIC_OR T_VAR                           { if (!block(B_EXPRESSION)) { $$ = $1 || getSymbolValueBool($3); } else { free($3); } }
-    | T_VAR T_REL_EQUAL T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) == getSymbolValueFloat($3); } else { free($1); free($3); } }
-    | T_VAR T_REL_NOT_EQUAL T_VAR                                   { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) != getSymbolValueFloat($3); } else { free($1); free($3); } }
-    | T_VAR T_REL_GREAT T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) > getSymbolValueFloat($3); } else { free($1); free($3); } }
-    | T_VAR T_REL_SMALL T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) < getSymbolValueFloat($3); } else { free($1); free($3); } }
-    | T_VAR T_REL_GREAT_EQUAL T_VAR                                 { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) >= getSymbolValueFloat($3); } else { free($1); free($3); } }
-    | T_VAR T_REL_SMALL_EQUAL T_VAR                                 { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) <= getSymbolValueFloat($3); } else { free($1); free($3); } }
-    | T_VAR T_LOGIC_AND T_VAR                                       { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && getSymbolValueBool($3); } else { free($1); free($3); } }
-    | T_VAR T_LOGIC_OR T_VAR                                        { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || getSymbolValueBool($3); free($3); } else { free($1); free($3); } }
-    | mixed_expression T_REL_EQUAL mixed_expression                 { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | mixed_expression T_REL_NOT_EQUAL mixed_expression             { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | mixed_expression T_REL_GREAT mixed_expression                 { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | mixed_expression T_REL_SMALL mixed_expression                 { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | mixed_expression T_REL_GREAT_EQUAL mixed_expression           { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | mixed_expression T_REL_SMALL_EQUAL mixed_expression           { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | mixed_expression T_LOGIC_AND mixed_expression                 { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | mixed_expression T_LOGIC_OR mixed_expression                  { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | mixed_expression T_REL_EQUAL boolean_expression               { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | mixed_expression T_REL_NOT_EQUAL boolean_expression           { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | mixed_expression T_REL_GREAT boolean_expression               { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | mixed_expression T_REL_SMALL boolean_expression               { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | mixed_expression T_REL_GREAT_EQUAL boolean_expression         { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | mixed_expression T_REL_SMALL_EQUAL boolean_expression         { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | mixed_expression T_LOGIC_AND boolean_expression               { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | mixed_expression T_LOGIC_OR boolean_expression                { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | boolean_expression T_REL_EQUAL mixed_expression               { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | boolean_expression T_REL_NOT_EQUAL mixed_expression           { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | boolean_expression T_REL_GREAT mixed_expression               { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | boolean_expression T_REL_SMALL mixed_expression               { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | boolean_expression T_REL_GREAT_EQUAL mixed_expression         { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | boolean_expression T_REL_SMALL_EQUAL mixed_expression         { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | boolean_expression T_LOGIC_AND mixed_expression               { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | boolean_expression T_LOGIC_OR mixed_expression                { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | T_LOGIC_NOT mixed_expression                                  { if (!block(B_EXPRESSION)) $$ = ! $2; }
-    | T_VAR T_REL_EQUAL mixed_expression                            { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) == $3; } else { free($1); } }
-    | T_VAR T_REL_NOT_EQUAL mixed_expression                        { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) != $3; } else { free($1); } }
-    | T_VAR T_REL_GREAT mixed_expression                            { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) > $3; } else { free($1); } }
-    | T_VAR T_REL_SMALL mixed_expression                            { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) < $3; } else { free($1); } }
-    | T_VAR T_REL_GREAT_EQUAL mixed_expression                      { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) >= $3; } else { free($1); } }
-    | T_VAR T_REL_SMALL_EQUAL mixed_expression                      { if (!block(B_EXPRESSION)) { $$ = getSymbolValueFloat($1) <= $3; } else { free($1); } }
-    | T_VAR T_LOGIC_AND mixed_expression                            { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && $3; } else { free($1); } }
-    | T_VAR T_LOGIC_OR mixed_expression                             { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || $3; } else { free($1); } }
-    | mixed_expression T_REL_EQUAL T_VAR                            { if (!block(B_EXPRESSION)) { $$ = $1 == getSymbolValueFloat($3); } else { free($3); } }
-    | mixed_expression T_REL_NOT_EQUAL T_VAR                        { if (!block(B_EXPRESSION)) { $$ = $1 != getSymbolValueFloat($3); } else { free($3); } }
-    | mixed_expression T_REL_GREAT T_VAR                            { if (!block(B_EXPRESSION)) { $$ = $1 > getSymbolValueFloat($3); } else { free($3); } }
-    | mixed_expression T_REL_SMALL T_VAR                            { if (!block(B_EXPRESSION)) { $$ = $1 < getSymbolValueFloat($3); } else { free($3); } }
-    | mixed_expression T_REL_GREAT_EQUAL T_VAR                      { if (!block(B_EXPRESSION)) { $$ = $1 >= getSymbolValueFloat($3); } else { free($3); } }
-    | mixed_expression T_REL_SMALL_EQUAL T_VAR                      { if (!block(B_EXPRESSION)) { $$ = $1 <= getSymbolValueFloat($3); } else { free($3); } }
-    | mixed_expression T_LOGIC_AND T_VAR                            { if (!block(B_EXPRESSION)) { $$ = $1 && getSymbolValueBool($3); } else { free($3); } }
-    | mixed_expression T_LOGIC_OR T_VAR                             { if (!block(B_EXPRESSION)) { $$ = $1 || getSymbolValueBool($3); } else { free($3); } }
-    | expression T_REL_EQUAL expression                             { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | expression T_REL_NOT_EQUAL expression                         { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | expression T_REL_GREAT expression                             { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | expression T_REL_SMALL expression                             { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | expression T_REL_GREAT_EQUAL expression                       { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | expression T_REL_SMALL_EQUAL expression                       { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | expression T_LOGIC_AND expression                             { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | expression T_LOGIC_OR expression                              { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | expression T_REL_EQUAL boolean_expression                     { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | expression T_REL_NOT_EQUAL boolean_expression                 { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | expression T_REL_GREAT boolean_expression                     { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | expression T_REL_SMALL boolean_expression                     { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | expression T_REL_GREAT_EQUAL boolean_expression               { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | expression T_REL_SMALL_EQUAL boolean_expression               { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | expression T_LOGIC_AND boolean_expression                     { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | expression T_LOGIC_OR boolean_expression                      { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | boolean_expression T_REL_EQUAL expression                     { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | boolean_expression T_REL_NOT_EQUAL expression                 { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | boolean_expression T_REL_GREAT expression                     { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | boolean_expression T_REL_SMALL expression                     { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | boolean_expression T_REL_GREAT_EQUAL expression               { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | boolean_expression T_REL_SMALL_EQUAL expression               { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | boolean_expression T_LOGIC_AND expression                     { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | boolean_expression T_LOGIC_OR expression                      { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | T_LOGIC_NOT expression                                        { if (!block(B_EXPRESSION)) $$ = ! $2; }
-    | T_VAR T_REL_EQUAL expression                                  { if (!block(B_EXPRESSION)) { $$ = getSymbolValueInt($1) == $3; } else { free($1); } }
-    | T_VAR T_REL_NOT_EQUAL expression                              { if (!block(B_EXPRESSION)) { $$ = getSymbolValueInt($1) != $3; } else { free($1); } }
-    | T_VAR T_REL_GREAT expression                                  { if (!block(B_EXPRESSION)) { $$ = getSymbolValueInt($1) > $3; } else { free($1); } }
-    | T_VAR T_REL_SMALL expression                                  { if (!block(B_EXPRESSION)) { $$ = getSymbolValueInt($1) < $3; } else { free($1); } }
-    | T_VAR T_REL_GREAT_EQUAL expression                            { if (!block(B_EXPRESSION)) { $$ = getSymbolValueInt($1) >= $3; } else { free($1); } }
-    | T_VAR T_REL_SMALL_EQUAL expression                            { if (!block(B_EXPRESSION)) { $$ = getSymbolValueInt($1) <= $3; } else { free($1); } }
-    | T_VAR T_LOGIC_AND expression                                  { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) && $3; } else { free($1); } }
-    | T_VAR T_LOGIC_OR expression                                   { if (!block(B_EXPRESSION)) { $$ = getSymbolValueBool($1) || $3; } else { free($1); } }
-    | expression T_REL_EQUAL T_VAR                                  { if (!block(B_EXPRESSION)) { $$ = $1 == getSymbolValueInt($3); } else { free($3); } }
-    | expression T_REL_NOT_EQUAL T_VAR                              { if (!block(B_EXPRESSION)) { $$ = $1 != getSymbolValueInt($3); } else { free($3); } }
-    | expression T_REL_GREAT T_VAR                                  { if (!block(B_EXPRESSION)) { $$ = $1 > getSymbolValueInt($3); } else { free($3); } }
-    | expression T_REL_SMALL T_VAR                                  { if (!block(B_EXPRESSION)) { $$ = $1 < getSymbolValueInt($3); } else { free($3); } }
-    | expression T_REL_GREAT_EQUAL T_VAR                            { if (!block(B_EXPRESSION)) { $$ = $1 >= getSymbolValueInt($3); } else { free($3); } }
-    | expression T_REL_SMALL_EQUAL T_VAR                            { if (!block(B_EXPRESSION)) { $$ = $1 <= getSymbolValueInt($3); } else { free($3); } }
-    | expression T_LOGIC_AND T_VAR                                  { if (!block(B_EXPRESSION)) { $$ = $1 && getSymbolValueBool($3); } else { free($3); } }
-    | expression T_LOGIC_OR T_VAR                                   { if (!block(B_EXPRESSION)) { $$ = $1 || getSymbolValueBool($3); } else { free($3); } }
-    | mixed_expression T_REL_EQUAL expression                       { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | mixed_expression T_REL_NOT_EQUAL expression                   { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | mixed_expression T_REL_GREAT expression                       { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | mixed_expression T_REL_SMALL expression                       { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | mixed_expression T_REL_GREAT_EQUAL expression                 { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | mixed_expression T_REL_SMALL_EQUAL expression                 { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | mixed_expression T_LOGIC_AND expression                       { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | mixed_expression T_LOGIC_OR expression                        { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | expression T_REL_EQUAL mixed_expression                       { if (!block(B_EXPRESSION)) $$ = $1 == $3; }
-    | expression T_REL_NOT_EQUAL mixed_expression                   { if (!block(B_EXPRESSION)) $$ = $1 != $3; }
-    | expression T_REL_GREAT mixed_expression                       { if (!block(B_EXPRESSION)) $$ = $1 > $3; }
-    | expression T_REL_SMALL mixed_expression                       { if (!block(B_EXPRESSION)) $$ = $1 < $3; }
-    | expression T_REL_GREAT_EQUAL mixed_expression                 { if (!block(B_EXPRESSION)) $$ = $1 >= $3; }
-    | expression T_REL_SMALL_EQUAL mixed_expression                 { if (!block(B_EXPRESSION)) $$ = $1 <= $3; }
-    | expression T_LOGIC_AND mixed_expression                       { if (!block(B_EXPRESSION)) $$ = $1 && $3; }
-    | expression T_LOGIC_OR mixed_expression                        { if (!block(B_EXPRESSION)) $$ = $1 || $3; }
-    | T_LEFT boolean_expression T_RIGHT                             { if (!block(B_EXPRESSION)) $$ = $2; }
+mixed_expression: T_FLOAT                                                                                               { char *strings[] = {};               ASTNode* ast_node = addASTNodeFloat(AST_MIXED_EXPRESSION_VALUE, strings, 0, $1, NULL);                                                                                                                                                                                                                              $$ = ast_node; }
+    | T_MINUS mixed_expression                                                                                          { char *strings_l[] = {};             ASTNode* ast_node_l = addASTNodeFloat(AST_MIXED_EXPRESSION_VALUE, strings_l, 0, 0, NULL);     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, ast_node_l, $2);                                                                                                                                     $$ = ast_node; }
+    | mixed_expression T_PLUS mixed_expression                                                                          {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, $1, $3);                                                                                                                                                                                                                                            $$ = ast_node; }
+    | mixed_expression T_MINUS mixed_expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | mixed_expression T_MULTIPLY mixed_expression                                                                      {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, $1, $3);                                                                                                                                                                                                                                        $$ = ast_node; }
+    | mixed_expression T_DIVIDE mixed_expression                                                                        {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, $1, $3);                                                                                                                                                                                                                                          $$ = ast_node; }
+    | expression T_PLUS mixed_expression                                                                                {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, $1, $3);                                                                                                                                                                                                                                            $$ = ast_node; }
+    | expression T_MINUS mixed_expression                                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | expression T_MULTIPLY mixed_expression                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, $1, $3);                                                                                                                                                                                                                                        $$ = ast_node; }
+    | expression T_DIVIDE mixed_expression                                                                              {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, $1, $3);                                                                                                                                                                                                                                          $$ = ast_node; }
+    | mixed_expression T_PLUS expression                                                                                {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, $1, $3);                                                                                                                                                                                                                                            $$ = ast_node; }
+    | mixed_expression T_MINUS expression                                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | mixed_expression T_MULTIPLY expression                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, $1, $3);                                                                                                                                                                                                                                        $$ = ast_node; }
+    | mixed_expression T_DIVIDE expression                                                                              {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, $1, $3);                                                                                                                                                                                                                                          $$ = ast_node; }
+    | expression T_DIVIDE expression                                                                                    {                                     ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, $1, $3);                                                                                                                                                                                                                                          $$ = ast_node; }
+    | T_VAR T_PLUS T_VAR                                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);               char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, ast_node_l, ast_node_r);       $$ = ast_node; }
+    | T_VAR T_MINUS T_VAR                                                                                               { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);               char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, ast_node_l, ast_node_r);      $$ = ast_node; }
+    | T_VAR T_MULTIPLY T_VAR                                                                                            { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);               char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, ast_node_l, ast_node_r);   $$ = ast_node; }
+    | T_VAR T_DIVIDE T_VAR                                                                                              { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);               char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, ast_node_l, ast_node_r);     $$ = ast_node; }
+    | T_LEFT T_VAR T_RIGHT                                                                                              { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings, 1);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | mixed_expression T_PLUS T_VAR                                                                                     { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, $1, ast_node_r);               $$ = ast_node; }
+    | mixed_expression T_MINUS T_VAR                                                                                    { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, $1, ast_node_r);              $$ = ast_node; }
+    | mixed_expression T_MULTIPLY T_VAR                                                                                 { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, $1, ast_node_r);           $$ = ast_node; }
+    | mixed_expression T_DIVIDE T_VAR                                                                                   { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, $1, ast_node_r);             $$ = ast_node; }
+    | expression T_PLUS T_VAR                                                                                           { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, $1, ast_node_r);               $$ = ast_node; }
+    | expression T_MINUS T_VAR                                                                                          { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, $1, ast_node_r);              $$ = ast_node; }
+    | expression T_MULTIPLY T_VAR                                                                                       { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, $1, ast_node_r);           $$ = ast_node; }
+    | expression T_DIVIDE T_VAR                                                                                         { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, $1, ast_node_r);             $$ = ast_node; }
+    | T_VAR T_PLUS mixed_expression                                                                                     { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, ast_node_l, $3);               $$ = ast_node; }
+    | T_VAR T_MINUS mixed_expression                                                                                    { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, ast_node_l, $3);              $$ = ast_node; }
+    | T_VAR T_MULTIPLY mixed_expression                                                                                 { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, ast_node_l, $3);           $$ = ast_node; }
+    | T_VAR T_DIVIDE mixed_expression                                                                                   { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, ast_node_l, $3);             $$ = ast_node; }
+    | T_VAR T_PLUS expression                                                                                           { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_PLUS, ast_node_l, $3);               $$ = ast_node; }
+    | T_VAR T_MINUS expression                                                                                          { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MINUS, ast_node_l, $3);              $$ = ast_node; }
+    | T_VAR T_MULTIPLY expression                                                                                       { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, ast_node_l, $3);           $$ = ast_node; }
+    | T_VAR T_DIVIDE expression                                                                                         { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, ast_node_l, $3);             $$ = ast_node; }
+    | T_LEFT mixed_expression T_RIGHT                                                                                   { $$ = $2; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-boolean_expression: T_FALSE                                         { }
+expression: T_INT                                                                                                       { char *strings[] = {};               ASTNode* ast_node = addASTNodeInt(AST_EXPRESSION_VALUE, strings, 0, $1, NULL);                                                                                                                                                                                                                                            $$ = ast_node; }
+    | T_MINUS expression                                                                                                { char *strings_l[] = {};             ASTNode* ast_node_l = addASTNodeInt(AST_EXPRESSION_VALUE, strings_l, 0, 0, NULL);             ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MINUS, ast_node_l, $2);                                                                                                                                                 $$ = ast_node; }
+    | expression T_PLUS expression                                                                                      {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_PLUS, $1, $3);                                                                                                                                                                                                                                                        $$ = ast_node; }
+    | expression T_MINUS expression                                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MINUS, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
+    | expression T_MULTIPLY expression                                                                                  {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MULTIPLY, $1, $3);                                                                                                                                                                                                                                                    $$ = ast_node; }
+    | expression T_BITWISE_AND expression                                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_AND, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_BITWISE_OR expression                                                                                {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_OR, $1, $3);                                                                                                                                                                                                                                                  $$ = ast_node; }
+    | expression T_BITWISE_XOR expression                                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_XOR, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_BITWISE_LEFT_SHIFT expression                                                                        {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_LEFT_SHIFT, $1, $3);                                                                                                                                                                                                                                          $$ = ast_node; }
+    | expression T_BITWISE_RIGHT_SHIFT expression                                                                       {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_RIGHT_SHIFT, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | T_VAR T_PLUS expression                                                                                           { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_PLUS, ast_node_l, $3);                                 $$ = ast_node; }
+    | T_VAR T_MINUS expression                                                                                          { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MINUS, ast_node_l, $3);                                $$ = ast_node; }
+    | T_VAR T_MULTIPLY expression                                                                                       { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MULTIPLY, ast_node_l, $3);                             $$ = ast_node; }
+    | T_VAR T_BITWISE_AND expression                                                                                    { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_AND, ast_node_l, $3);                          $$ = ast_node; }
+    | T_VAR T_BITWISE_OR expression                                                                                     { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_OR, ast_node_l, $3);                           $$ = ast_node; }
+    | T_VAR T_BITWISE_XOR expression                                                                                    { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_XOR, ast_node_l, $3);                          $$ = ast_node; }
+    | T_VAR T_BITWISE_LEFT_SHIFT expression                                                                             { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_LEFT_SHIFT, ast_node_l, $3);                   $$ = ast_node; }
+    | T_VAR T_BITWISE_RIGHT_SHIFT expression                                                                            { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_RIGHT_SHIFT, ast_node_l, $3);                  $$ = ast_node; }
+    | expression T_PLUS T_VAR                                                                                           { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_PLUS, $1, ast_node_r);                                 $$ = ast_node; }
+    | expression T_MINUS T_VAR                                                                                          { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MINUS, $1, ast_node_r);                                $$ = ast_node; }
+    | expression T_MULTIPLY T_VAR                                                                                       { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MULTIPLY, $1, ast_node_r);                             $$ = ast_node; }
+    | expression T_BITWISE_AND T_VAR                                                                                    { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_AND, $1, ast_node_r);                          $$ = ast_node; }
+    | expression T_BITWISE_OR T_VAR                                                                                     { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_OR, $1, ast_node_r);                           $$ = ast_node; }
+    | expression T_BITWISE_XOR T_VAR                                                                                    { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_XOR, $1, ast_node_r);                          $$ = ast_node; }
+    | expression T_BITWISE_LEFT_SHIFT T_VAR                                                                             { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_LEFT_SHIFT, $1, ast_node_r);                   $$ = ast_node; }
+    | expression T_BITWISE_RIGHT_SHIFT T_VAR                                                                            { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_RIGHT_SHIFT, $1, ast_node_r);                  $$ = ast_node; }
+    | T_VAR T_PLUS T_VAR                                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_PLUS, ast_node_l, ast_node_r);                         $$ = ast_node; }
+    | T_VAR T_MINUS T_VAR                                                                                               { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MINUS, ast_node_l, ast_node_r);                        $$ = ast_node; }
+    | T_VAR T_MULTIPLY T_VAR                                                                                            { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_MULTIPLY, ast_node_l, ast_node_r);                     $$ = ast_node; }
+    | T_VAR T_BITWISE_AND T_VAR                                                                                         { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_AND, ast_node_l, ast_node_r);                  $$ = ast_node; }
+    | T_VAR T_BITWISE_OR T_VAR                                                                                          { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_OR, ast_node_l, ast_node_r);                   $$ = ast_node; }
+    | T_VAR T_BITWISE_XOR T_VAR                                                                                         { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_XOR, ast_node_l, ast_node_r);                  $$ = ast_node; }
+    | T_VAR T_BITWISE_LEFT_SHIFT T_VAR                                                                                  { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_LEFT_SHIFT, ast_node_l, ast_node_r);           $$ = ast_node; }
+    | T_VAR T_BITWISE_RIGHT_SHIFT T_VAR                                                                                 { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                     char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_RIGHT_SHIFT, ast_node_l, ast_node_r);          $$ = ast_node; }
+    | T_BITWISE_NOT expression                                                                                          {                                     ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_NOT, NULL, $2);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | T_BITWISE_NOT T_VAR                                                                                               { char *strings_r[] = {$2};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_EXPRESSION_BITWISE_NOT, NULL, ast_node_r);                        $$ = ast_node; }
+    | T_INCREMENT expression                                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_VAR_EXPRESSION_INCREMENT, NULL, $2);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | expression T_INCREMENT                                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_VAR_EXPRESSION_INCREMENT, NULL, $1);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | T_DECREMENT expression                                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_VAR_EXPRESSION_DECREMENT, NULL, $2);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | expression T_DECREMENT                                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_VAR_EXPRESSION_DECREMENT, NULL, $1);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | T_INCREMENT T_VAR                                                                                                 { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeInt(AST_VAR_EXPRESSION_INCREMENT_ASSIGN, strings, 1, 1, NULL);                                                                                                                                                                                                                              $$ = ast_node; }
+    | T_VAR T_INCREMENT                                                                                                 { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeInt(AST_VAR_EXPRESSION_ASSIGN_INCREMENT, strings, 1, 1, NULL);                                                                                                                                                                                                                              $$ = ast_node; }
+    | T_DECREMENT T_VAR                                                                                                 { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeInt(AST_VAR_EXPRESSION_INCREMENT_ASSIGN, strings, 1, -1, NULL);                                                                                                                                                                                                                             $$ = ast_node; }
+    | T_VAR T_DECREMENT                                                                                                 { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeInt(AST_VAR_EXPRESSION_ASSIGN_INCREMENT, strings, 1, -1, NULL);                                                                                                                                                                                                                             $$ = ast_node; }
+    | T_LEFT expression T_RIGHT                                                                                         { $$ = $2; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-left_right_bracket: T_UNSIGNED_LONG_LONG_INT                        { $$ = $1; }
-    | T_LEFT_BRACKET expression T_RIGHT_BRACKET                     { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
-    | T_LEFT_BRACKET T_MINUS expression T_RIGHT_BRACKET             { disable_complex_mode = true; Symbol* symbol = addSymbolInt(NULL, -$3); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
-    | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                       { disable_complex_mode = true; Symbol* symbol = addSymbolString(NULL, $2); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
-    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                          { disable_complex_mode = true; Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $2, K_ANY); symbol->sign = 1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
-    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                  { disable_complex_mode = true; Symbol* symbol = createCloneFromSymbolByName(NULL, K_ANY, $3, K_ANY); symbol->sign = -1; $$ = symbol->id; pushLeftRightBracketStack(symbol->id); disable_complex_mode = false; }
-    | left_right_bracket left_right_bracket                         { }
+boolean_expression: T_TRUE                                                                                              { char *strings[] = {};               ASTNode* ast_node = addASTNodeBool(AST_BOOLEAN_EXPRESSION_VALUE, strings, 0, $1, NULL);                                                                                                                                                                                                                                                   $$ = ast_node; }
+    | boolean_expression T_REL_EQUAL boolean_expression                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL, $1, $3);                                                                                                                                                                                                                                                           $$ = ast_node; }
+    | boolean_expression T_REL_NOT_EQUAL boolean_expression                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
+    | boolean_expression T_REL_GREAT boolean_expression                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT, $1, $3);                                                                                                                                                                                                                                                           $$ = ast_node; }
+    | boolean_expression T_REL_SMALL boolean_expression                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL, $1, $3);                                                                                                                                                                                                                                                           $$ = ast_node; }
+    | boolean_expression T_REL_GREAT_EQUAL boolean_expression                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL, $1, $3);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | boolean_expression T_REL_SMALL_EQUAL boolean_expression                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL, $1, $3);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | boolean_expression T_LOGIC_AND boolean_expression                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND, $1, $3);                                                                                                                                                                                                                                                           $$ = ast_node; }
+    | boolean_expression T_LOGIC_OR boolean_expression                                                                  {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR, $1, $3);                                                                                                                                                                                                                                                            $$ = ast_node; }
+    | T_LOGIC_NOT boolean_expression                                                                                    {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_NOT, $2, $2);                                                                                                                                                                                                                                                           $$ = ast_node; }
+    | T_LOGIC_NOT T_VAR                                                                                                 { char *strings_r[] = {$2};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_NOT, NULL, ast_node_r);                         $$ = ast_node; }
+    | T_VAR T_REL_EQUAL boolean_expression                                                                              { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL, ast_node_l, $3);                           $$ = ast_node; }
+    | T_VAR T_REL_NOT_EQUAL boolean_expression                                                                          { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL, ast_node_l, $3);                       $$ = ast_node; }
+    | T_VAR T_REL_GREAT boolean_expression                                                                              { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT, ast_node_l, $3);                           $$ = ast_node; }
+    | T_VAR T_REL_SMALL boolean_expression                                                                              { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL, ast_node_l, $3);                           $$ = ast_node; }
+    | T_VAR T_REL_GREAT_EQUAL boolean_expression                                                                        { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL, ast_node_l, $3);                     $$ = ast_node; }
+    | T_VAR T_REL_SMALL_EQUAL boolean_expression                                                                        { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL, ast_node_l, $3);                     $$ = ast_node; }
+    | T_VAR T_LOGIC_AND boolean_expression                                                                              { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND, ast_node_l, $3);                           $$ = ast_node; }
+    | T_VAR T_LOGIC_OR boolean_expression                                                                               { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR, ast_node_l, $3);                            $$ = ast_node; }
+    | boolean_expression T_REL_EQUAL T_VAR                                                                              { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL, $1, ast_node_r);                           $$ = ast_node; }
+    | boolean_expression T_REL_NOT_EQUAL T_VAR                                                                          { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL, $1, ast_node_r);                       $$ = ast_node; }
+    | boolean_expression T_REL_GREAT T_VAR                                                                              { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT, $1, ast_node_r);                           $$ = ast_node; }
+    | boolean_expression T_REL_SMALL T_VAR                                                                              { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL, $1, ast_node_r);                           $$ = ast_node; }
+    | boolean_expression T_REL_GREAT_EQUAL T_VAR                                                                        { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL, $1, ast_node_r);                     $$ = ast_node; }
+    | boolean_expression T_REL_SMALL_EQUAL T_VAR                                                                        { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL, $1, ast_node_r);                     $$ = ast_node; }
+    | boolean_expression T_LOGIC_AND T_VAR                                                                              { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND, $1, ast_node_r);                           $$ = ast_node; }
+    | boolean_expression T_LOGIC_OR T_VAR                                                                               { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR, $1, ast_node_r);                            $$ = ast_node; }
+    | T_VAR T_REL_EQUAL T_VAR                                                                                           { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL, ast_node_l, ast_node_r);                   $$ = ast_node; }
+    | T_VAR T_REL_NOT_EQUAL T_VAR                                                                                       { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL, ast_node_l, ast_node_r);               $$ = ast_node; }
+    | T_VAR T_REL_GREAT T_VAR                                                                                           { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT, ast_node_l, ast_node_r);                   $$ = ast_node; }
+    | T_VAR T_REL_SMALL T_VAR                                                                                           { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL, ast_node_l, ast_node_r);                   $$ = ast_node; }
+    | T_VAR T_REL_GREAT_EQUAL T_VAR                                                                                     { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL, ast_node_l, ast_node_r);             $$ = ast_node; }
+    | T_VAR T_REL_SMALL_EQUAL T_VAR                                                                                     { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL, ast_node_l, ast_node_r);             $$ = ast_node; }
+    | T_VAR T_LOGIC_AND T_VAR                                                                                           { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND, ast_node_l, ast_node_r);                   $$ = ast_node; }
+    | T_VAR T_LOGIC_OR T_VAR                                                                                            { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);              char *strings_r[] = {$3};      ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR, ast_node_l, ast_node_r);                    $$ = ast_node; }
+    | mixed_expression T_REL_EQUAL mixed_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED, $1, $3);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | mixed_expression T_REL_NOT_EQUAL mixed_expression                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | mixed_expression T_REL_GREAT mixed_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED, $1, $3);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | mixed_expression T_REL_SMALL mixed_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED, $1, $3);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | mixed_expression T_REL_GREAT_EQUAL mixed_expression                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | mixed_expression T_REL_SMALL_EQUAL mixed_expression                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | mixed_expression T_LOGIC_AND mixed_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED, $1, $3);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | mixed_expression T_LOGIC_OR mixed_expression                                                                      {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED, $1, $3);                                                                                                                                                                                                                                                      $$ = ast_node; }
+    | mixed_expression T_REL_EQUAL boolean_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | mixed_expression T_REL_NOT_EQUAL boolean_expression                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | mixed_expression T_REL_GREAT boolean_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | mixed_expression T_REL_SMALL boolean_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | mixed_expression T_REL_GREAT_EQUAL boolean_expression                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                       $$ = ast_node; }
+    | mixed_expression T_REL_SMALL_EQUAL boolean_expression                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                       $$ = ast_node; }
+    | mixed_expression T_LOGIC_AND boolean_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | mixed_expression T_LOGIC_OR boolean_expression                                                                    {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_BOOLEAN, $1, $3);                                                                                                                                                                                                                                              $$ = ast_node; }
+    | boolean_expression T_REL_EQUAL mixed_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | boolean_expression T_REL_NOT_EQUAL mixed_expression                                                               {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | boolean_expression T_REL_GREAT mixed_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | boolean_expression T_REL_SMALL mixed_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | boolean_expression T_REL_GREAT_EQUAL mixed_expression                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                       $$ = ast_node; }
+    | boolean_expression T_REL_SMALL_EQUAL mixed_expression                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                       $$ = ast_node; }
+    | boolean_expression T_LOGIC_AND mixed_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | boolean_expression T_LOGIC_OR mixed_expression                                                                    {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED, $1, $3);                                                                                                                                                                                                                                              $$ = ast_node; }
+    | T_LOGIC_NOT mixed_expression                                                                                      {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_NOT_MIXED, NULL, $2);                                                                                                                                                                                                                                                   $$ = ast_node; }
+    | T_VAR T_REL_EQUAL mixed_expression                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED, ast_node_l, $3);                     $$ = ast_node; }
+    | T_VAR T_REL_NOT_EQUAL mixed_expression                                                                            { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED, ast_node_l, $3);                 $$ = ast_node; }
+    | T_VAR T_REL_GREAT mixed_expression                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED, ast_node_l, $3);                     $$ = ast_node; }
+    | T_VAR T_REL_SMALL mixed_expression                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED, ast_node_l, $3);                     $$ = ast_node; }
+    | T_VAR T_REL_GREAT_EQUAL mixed_expression                                                                          { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED, ast_node_l, $3);               $$ = ast_node; }
+    | T_VAR T_REL_SMALL_EQUAL mixed_expression                                                                          { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED, ast_node_l, $3);               $$ = ast_node; }
+    | T_VAR T_LOGIC_AND mixed_expression                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED, $3, ast_node_l);                     $$ = ast_node; }
+    | T_VAR T_LOGIC_OR mixed_expression                                                                                 { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED, $3, ast_node_l);                      $$ = ast_node; }
+    | mixed_expression T_REL_EQUAL T_VAR                                                                                { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED, $1, ast_node_r);                     $$ = ast_node; }
+    | mixed_expression T_REL_NOT_EQUAL T_VAR                                                                            { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED, $1, ast_node_r);                 $$ = ast_node; }
+    | mixed_expression T_REL_GREAT T_VAR                                                                                { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED, $1, ast_node_r);                     $$ = ast_node; }
+    | mixed_expression T_REL_SMALL T_VAR                                                                                { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED, $1, ast_node_r);                     $$ = ast_node; }
+    | mixed_expression T_REL_GREAT_EQUAL T_VAR                                                                          { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED, $1, ast_node_r);               $$ = ast_node; }
+    | mixed_expression T_REL_SMALL_EQUAL T_VAR                                                                          { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                         ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED, $1, ast_node_r);               $$ = ast_node; }
+    | mixed_expression T_LOGIC_AND T_VAR                                                                                { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED, $1, ast_node_r);                     $$ = ast_node; }
+    | mixed_expression T_LOGIC_OR T_VAR                                                                                 { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                       ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED, $1, ast_node_r);                      $$ = ast_node; }
+    | expression T_REL_EQUAL expression                                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
+    | expression T_REL_NOT_EQUAL expression                                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP, $1, $3);                                                                                                                                                                                                                                                   $$ = ast_node; }
+    | expression T_REL_GREAT expression                                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
+    | expression T_REL_SMALL expression                                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
+    | expression T_REL_GREAT_EQUAL expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_REL_SMALL_EQUAL expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_LOGIC_AND expression                                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
+    | expression T_LOGIC_OR expression                                                                                  {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP, $1, $3);                                                                                                                                                                                                                                                        $$ = ast_node; }
+    | expression T_REL_EQUAL boolean_expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | expression T_REL_NOT_EQUAL boolean_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | expression T_REL_GREAT boolean_expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | expression T_REL_SMALL boolean_expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | expression T_REL_GREAT_EQUAL boolean_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | expression T_REL_SMALL_EQUAL boolean_expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | expression T_LOGIC_AND boolean_expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | expression T_LOGIC_OR boolean_expression                                                                          {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_BOOLEAN, $1, $3);                                                                                                                                                                                                                                                $$ = ast_node; }
+    | boolean_expression T_REL_EQUAL expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | boolean_expression T_REL_NOT_EQUAL expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | boolean_expression T_REL_GREAT expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | boolean_expression T_REL_SMALL expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | boolean_expression T_REL_GREAT_EQUAL expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | boolean_expression T_REL_SMALL_EQUAL expression                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                         $$ = ast_node; }
+    | boolean_expression T_LOGIC_AND expression                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                               $$ = ast_node; }
+    | boolean_expression T_LOGIC_OR expression                                                                          {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_EXP, $1, $3);                                                                                                                                                                                                                                                $$ = ast_node; }
+    | T_LOGIC_NOT expression                                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP, NULL, $2);                                                                                                                                                                                                                                                     $$ = ast_node; }
+    | T_VAR T_REL_EQUAL expression                                                                                      { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP, ast_node_l, $3);                         $$ = ast_node; }
+    | T_VAR T_REL_NOT_EQUAL expression                                                                                  { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP, ast_node_l, $3);                     $$ = ast_node; }
+    | T_VAR T_REL_GREAT expression                                                                                      { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP, ast_node_l, $3);                         $$ = ast_node; }
+    | T_VAR T_REL_SMALL expression                                                                                      { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP, ast_node_l, $3);                         $$ = ast_node; }
+    | T_VAR T_REL_GREAT_EQUAL expression                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP, ast_node_l, $3);                   $$ = ast_node; }
+    | T_VAR T_REL_SMALL_EQUAL expression                                                                                { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP, ast_node_l, $3);                   $$ = ast_node; }
+    | T_VAR T_LOGIC_AND expression                                                                                      { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP, $3, ast_node_l);                         $$ = ast_node; }
+    | T_VAR T_LOGIC_OR expression                                                                                       { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_l, 1);                                                                                                                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP, $3, ast_node_l);                          $$ = ast_node; }
+    | expression T_REL_EQUAL T_VAR                                                                                      { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP, $1, ast_node_r);                         $$ = ast_node; }
+    | expression T_REL_NOT_EQUAL T_VAR                                                                                  { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP, $1, ast_node_r);                     $$ = ast_node; }
+    | expression T_REL_GREAT T_VAR                                                                                      { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP, $1, ast_node_r);                         $$ = ast_node; }
+    | expression T_REL_SMALL T_VAR                                                                                      { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP, $1, ast_node_r);                         $$ = ast_node; }
+    | expression T_REL_GREAT_EQUAL T_VAR                                                                                { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP, $1, ast_node_r);                   $$ = ast_node; }
+    | expression T_REL_SMALL_EQUAL T_VAR                                                                                { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                             ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP, $1, ast_node_r);                   $$ = ast_node; }
+    | expression T_LOGIC_AND T_VAR                                                                                      { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP, $1, ast_node_r);                         $$ = ast_node; }
+    | expression T_LOGIC_OR T_VAR                                                                                       { char *strings_r[] = {$3};           ASTNode* ast_node_r = addASTNode(AST_VAR_BOOLEAN_EXPRESSION_VALUE, strings_r, 1);                                                                                                                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP, $1, ast_node_r);                          $$ = ast_node; }
+    | mixed_expression T_REL_EQUAL expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | mixed_expression T_REL_NOT_EQUAL expression                                                                       {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | mixed_expression T_REL_GREAT expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | mixed_expression T_REL_SMALL expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | mixed_expression T_REL_GREAT_EQUAL expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | mixed_expression T_REL_SMALL_EQUAL expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | mixed_expression T_LOGIC_AND expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | mixed_expression T_LOGIC_OR expression                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_EXP, $1, $3);                                                                                                                                                                                                                                                  $$ = ast_node; }
+    | expression T_REL_EQUAL mixed_expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_REL_NOT_EQUAL mixed_expression                                                                       {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                             $$ = ast_node; }
+    | expression T_REL_GREAT mixed_expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_REL_SMALL mixed_expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_REL_GREAT_EQUAL mixed_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | expression T_REL_SMALL_EQUAL mixed_expression                                                                     {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                           $$ = ast_node; }
+    | expression T_LOGIC_AND mixed_expression                                                                           {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                                 $$ = ast_node; }
+    | expression T_LOGIC_OR mixed_expression                                                                            {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED, $1, $3);                                                                                                                                                                                                                                                  $$ = ast_node; }
+    | T_LEFT boolean_expression T_RIGHT                                                                                 { $$ = $2; }
 ;
 
-variable: T_VAR                                                     { $$ = $1; }
-    | variable T_EQUAL T_STRING                                     { updateSymbolString($1, $3); $$ = ""; }
-    | variable T_EQUAL T_VAR                                        { updateSymbolByClonningName($1, $3); $$ = ""; }
-    | variable T_EQUAL T_VAR left_right_bracket                     { updateSymbolByClonningComplexElement($1, $3); $$ = ""; }
-    | variable T_EQUAL mixed_expression                             { updateSymbolFloat($1, $3); $$ = ""; }
-    | variable T_EQUAL expression                                   { updateSymbolFloat($1, $3); $$ = ""; }
-    | variable T_EQUAL boolean_expression                           { updateSymbolBool($1, $3); $$ = ""; }
-    | variable T_EQUAL liststart                                    { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
-    | variable T_EQUAL dictionarystart                              { finishComplexModeWithUpdate($1); $$ = ""; free($1); }
-    | variable T_EQUAL T_VAR T_LEFT function_call_parameters_start                                      { if (phase == PROGRAM) { callFunction($3, NULL); updateSymbolByClonningFunctionReturn($1, $3, NULL); } else { free($1); free($3); } $$ = ""; }
-    | variable T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                          { if (phase == PROGRAM) { callFunction($5, $3); updateSymbolByClonningFunctionReturn($1, $5, $3); } else { free($1); free($3); free($5); } $$ = ""; }
-    | T_RETURN variable                                             { returnSymbol($2); $$ = ""; }
-    | variable_complex_element                                      { if (is_interactive && !inject_mode) { printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false); $$ = ""; } else { yyerror("Syntax error"); } }
-    | variable_complex_element T_EQUAL T_STRING                     { updateComplexElementString($3); $$ = ""; }
-    | variable_complex_element T_EQUAL T_VAR                        { updateComplexElementSymbol(getSymbol($3)); free($3); $$ = ""; }
-    | variable_complex_element T_EQUAL T_VAR left_right_bracket     { updateComplexElementSymbol(getComplexElementThroughLeftRightBracketStack($3, 0)); $$ = ""; }
-    | variable_complex_element T_EQUAL mixed_expression             { updateComplexElementFloat($3); $$ = ""; }
-    | variable_complex_element T_EQUAL expression                   { updateComplexElementFloat($3); $$ = ""; }
-    | variable_complex_element T_EQUAL boolean_expression           { updateComplexElementBool($3); $$ = ""; }
-    | variable_complex_element T_EQUAL liststart                    { updateComplexElementComplex(); $$ = ""; }
-    | variable_complex_element T_EQUAL dictionarystart              { updateComplexElementComplex(); $$ = ""; }
-    | variable_complex_element T_EQUAL T_VAR T_LEFT function_call_parameters_start                      { if (phase == PROGRAM) { callFunction($3, NULL); updateComplexSymbolByClonningFunctionReturn($3, NULL); } else { free($3); } $$ = ""; }
-    | variable_complex_element T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start          { if (phase == PROGRAM) { callFunction($5, $3); updateComplexSymbolByClonningFunctionReturn($5, $3); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                   { addSymbolBool($2, $4); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_BOOL, $4, K_ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket             { createCloneFromComplexElement($2, K_BOOL, $4, K_ANY); $$ = ""; }
-    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, K_LIST, $5, K_BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                     { createCloneFromSymbolByName($3, K_DICT, $5, K_BOOL); $$ = ""; }
-    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart                 { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart           { finishComplexMode($3, K_BOOL); $$ = ""; free($3); }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_BOOL, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
-    | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_BOOL, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
-    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_LIST, $5, NULL, K_BOOL); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_LIST, $7, $5, K_BOOL); } else { free($3); free($5); free($7); } $$ = ""; }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_DICT, $5, NULL, K_BOOL); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_DICT, $7, $5, K_BOOL); } else { free($3); free($5); free($7); } $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_NUMBER, $4, K_ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_NUMBER, $4, K_ANY); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_LIST, $5, K_NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_NUMBER); $$ = ""; }
-    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart               { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_NUMBER); $$ = ""; free($3); }
-    | T_VAR_NUMBER T_VAR T_EQUAL mixed_expression                   { addSymbolFloat($2, $4); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL expression                         { addSymbolFloat($2, $4); $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_NUMBER, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
-    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_NUMBER, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
-    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_LIST, $5, NULL, K_NUMBER); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_LIST, $7, $5, K_NUMBER); } else { free($3); free($5); free($7); } $$ = ""; }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_DICT, $5, NULL, K_NUMBER); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_DICT, $7, $5, K_NUMBER); } else { free($3); free($5); free($7); } $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_STRING                           { addSymbolString($2, $4); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR                              { createCloneFromSymbolByName($2, K_STRING, $4, K_ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket           { createCloneFromComplexElement($2, K_STRING, $4, K_ANY); $$ = ""; }
-    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_LIST, $5, K_STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                   { createCloneFromSymbolByName($3, K_DICT, $5, K_STRING); $$ = ""; }
-    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart               { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart         { finishComplexMode($3, K_STRING); $$ = ""; free($3); }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_STRING, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
-    | T_VAR_STRING T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_STRING, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
-    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_LIST, $5, NULL, K_STRING); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_LIST, $7, $5, K_STRING); } else { free($3); free($5); free($7); } $$ = ""; }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($5, NULL); createCloneFromFunctionReturn($3, K_DICT, $5, NULL, K_STRING); } else { free($3); free($5); } $$ = ""; }
-    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($7, $5); createCloneFromFunctionReturn($3, K_DICT, $7, $5, K_STRING); } else { free($3); free($5); free($7); } $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_STRING                              { addSymbolAnyString($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR                                 { createCloneFromSymbolByName($2, K_ANY, $4, K_ANY); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR left_right_bracket              { createCloneFromComplexElement($2, K_ANY, $4, K_ANY); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL boolean_expression                    { addSymbolAnyBool($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL mixed_expression                      { addSymbolAnyFloat($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL expression                            { addSymbolAnyFloat($2, $4); $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_ANY, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
-    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_ANY, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
-    | T_VAR_LIST T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_LIST, $4, K_ANY); $$ = "";}
-    | T_VAR_LIST T_VAR T_EQUAL liststart                            { finishComplexMode($2, K_ANY); $$ = ""; free($2); }
-    | T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_LIST, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
-    | T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_LIST, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
-    | T_VAR_DICT T_VAR T_EQUAL T_VAR                                { createCloneFromSymbolByName($2, K_DICT, $4, K_ANY); $$ = "";}
-    | T_VAR_DICT T_VAR T_EQUAL dictionarystart                      { finishComplexMode($2, K_ANY); $$ = ""; free($2); }
-    | T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                    { if (phase == PROGRAM) { callFunction($4, NULL); createCloneFromFunctionReturn($2, K_DICT, $4, NULL, K_ANY); } else { free($2); free($4); } $$ = ""; }
-    | T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start        { if (phase == PROGRAM) { callFunction($6, $4); createCloneFromFunctionReturn($2, K_DICT, $6, $4, K_ANY); } else { free($2); free($4); free($6); } $$ = ""; }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } $$ = "";}
+boolean_expression: T_FALSE                                                                                             { char *strings[] = {};               ASTNode* ast_node = addASTNodeBool(AST_BOOLEAN_EXPRESSION_VALUE, strings, 0, $1, NULL);                       $$ = ast_node; }
 ;
 
-variable_complex_element:                                           { }
-    | T_VAR left_right_bracket                                      { buildVariableComplexElement($1, NULL); }
+left_right_bracket: T_UNSIGNED_LONG_LONG_INT                                                                            { char *strings[] = {};               ASTNode* ast_node = addASTNodeInt(AST_EXPRESSION_VALUE, strings, 0, (long long) $1, NULL);                    $$ = ast_node; }
+    | T_LEFT_BRACKET expression T_RIGHT_BRACKET                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_LEFT_RIGHT_BRACKET_EXPRESSION, strings, 0, $2);                      $$ = ast_node; }
+    | T_LEFT_BRACKET T_MINUS expression T_RIGHT_BRACKET                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION, strings, 0, $3);                $$ = ast_node; }
+    | T_LEFT_BRACKET T_STRING T_RIGHT_BRACKET                                                                           { char *strings[] = {};               ASTNode* ast_node = addASTNodeString(AST_LEFT_RIGHT_BRACKET_STRING, strings, 0, $2, NULL);                    $$ = ast_node; }
+    | T_LEFT_BRACKET T_VAR T_RIGHT_BRACKET                                                                              { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_LEFT_RIGHT_BRACKET_VAR, strings, 1);                                       $$ = ast_node; }
+    | T_LEFT_BRACKET T_MINUS T_VAR T_RIGHT_BRACKET                                                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNode(AST_LEFT_RIGHT_BRACKET_VAR_MINUS, strings, 1);                                 $$ = ast_node; }
+    | left_right_bracket left_right_bracket                                                                             { $$ = $2; $2->left = $1; }
 ;
 
-liststart:                                                          { addSymbolList(NULL); }
-    | liststart T_LEFT_BRACKET list T_RIGHT_BRACKET                 { if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); finishComplexMode(NULL, K_ANY); } }
-    | error T_NEWLINE parser                                        { if (is_interactive) { yyerrok; yyclearin; } }
+variable:                                                                                                               { }
+    | T_VAR                                                                                                             { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_PRINT_INTERACTIVE_VAR, strings, 1);                                          ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL T_STRING                                                                                            { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeString(AST_VAR_UPDATE_STRING, strings, 1, $3, NULL);                              ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL T_VAR                                                                                               { char *strings[] = {$1, $3};         ASTNode* ast_node = addASTNode(AST_VAR_UPDATE_VAR, strings, 2);                                                 ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL T_VAR left_right_bracket                                                                            { char *strings[] = {$1, $3};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_VAR_EL, strings, 2, $4);                                    ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL mixed_expression                                                                                    { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_NUMBER, strings, 1, $3);                                    ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL expression                                                                                          { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_NUMBER, strings, 1, $3);                                    ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL boolean_expression                                                                                  { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_BOOL, strings, 1, $3);                                      ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL liststart                                                                                           { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_LIST, strings, 1, $3);                                      ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR T_EQUAL dictionarystart                                                                                     { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_DICT, strings, 1, $3);                                      ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                                         { char *strings[] = {$1, $3};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_FUNC_RETURN, strings, 2, $5);                               ASTNodeNext(ast_node); }
+    | T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                             { char *strings[] = {$1, $3, $5};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_UPDATE_FUNC_RETURN, strings, 3, $7);                               ASTNodeNext(ast_node); }
+    | T_RETURN T_VAR                                                                                                    { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_RETURN_VAR, strings, 1);                                                     ASTNodeNext(ast_node); }
+    | variable_complex_element                                                                                          { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_PRINT_COMPLEX_EL, strings, 0, $1);                                     ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL T_STRING                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNodeString(AST_COMPLEX_EL_UPDATE_STRING, strings, 0, $3, $1);                         ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL T_VAR                                                                            { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_COMPLEX_EL_UPDATE_VAR, strings, 1, $1);                                ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL T_VAR left_right_bracket                                                         { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeFull(AST_COMPLEX_EL_UPDATE_VAR_EL, strings, 1, $4, $1);                           ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL mixed_expression                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNodeBranch(AST_COMPLEX_EL_UPDATE_NUMBER, $1, $3);                                     ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL expression                                                                       { char *strings[] = {};               ASTNode* ast_node = addASTNodeBranch(AST_COMPLEX_EL_UPDATE_NUMBER, $1, $3);                                     ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL boolean_expression                                                               { char *strings[] = {};               ASTNode* ast_node = addASTNodeBranch(AST_COMPLEX_EL_UPDATE_BOOL, $1, $3);                                       ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL liststart                                                                        { char *strings[] = {};               ASTNode* ast_node = addASTNodeFull(AST_COMPLEX_EL_UPDATE_LIST, strings, 0, $1, $3);                             ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | variable_complex_element T_EQUAL dictionarystart                                                                  { char *strings[] = {};               ASTNode* ast_node = addASTNodeFull(AST_COMPLEX_EL_UPDATE_DICT, strings, 0, $1, $3);                             ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | variable_complex_element T_EQUAL T_VAR T_LEFT function_call_parameters_start                                      { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeFull(AST_COMPLEX_EL_UPDATE_FUNC_RETURN, strings, 1, $5, $1);                      ASTNodeNext(ast_node); }
+    | variable_complex_element T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                          { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeFull(AST_COMPLEX_EL_UPDATE_FUNC_RETURN, strings, 2, $7, $1);                      ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR T_EQUAL boolean_expression                                                                       { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL, strings, 1, $4);                                      ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR                                                                                    { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_BOOL_VAR, strings, 2);                                            ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR left_right_bracket                                                                 { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_VAR_EL, strings, 2, $5);                               ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR                                                                         { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_BOOL_LIST_VAR, strings, 2);                                       ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR                                                                         { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_BOOL_DICT_VAR, strings, 2);                                       ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL liststart                                                                     { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_LIST, strings, 1, $5);                                 ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL dictionarystart                                                               { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_DICT, strings, 1, $5);                                 ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                              { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_FUNC_RETURN, strings, 2, $6);                          ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                  { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_FUNC_RETURN, strings, 3, $8);                          ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                   { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN, strings, 2, $7);                     ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                       { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN, strings, 3, $9);                     ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                   { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN, strings, 2, $7);                     ASTNodeNext(ast_node); }
+    | T_VAR_BOOL T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                       { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN, strings, 3, $9);                     ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR                                                                                  { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_NUMBER_VAR, strings, 2);                                          ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR left_right_bracket                                                               { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_VAR_EL, strings, 2, $5);                             ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR                                                                       { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_NUMBER_LIST_VAR, strings, 2);                                     ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR                                                                       { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_NUMBER_DICT_VAR, strings, 2);                                     ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL liststart                                                                   { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_LIST, strings, 1, $5);                               ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL dictionarystart                                                             { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_DICT, strings, 1, $5);                               ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_NUMBER T_VAR T_EQUAL mixed_expression                                                                       { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER, strings, 1, $4);                                    ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR T_EQUAL expression                                                                             { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER, strings, 1, $4);                                    ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                            { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_FUNC_RETURN, strings, 2, $6);                        ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_FUNC_RETURN, strings, 3, $8);                        ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                 { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN, strings, 2, $7);                   ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                     { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN, strings, 3, $9);                   ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                 { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN, strings, 2, $7);                   ASTNodeNext(ast_node); }
+    | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                     { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN, strings, 3, $9);                   ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR T_EQUAL T_STRING                                                                               { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeString(AST_VAR_CREATE_STRING, strings, 1, $4, NULL);                              ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR                                                                                  { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_STRING_VAR, strings, 2);                                          ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR left_right_bracket                                                               { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_VAR_EL, strings, 2, $5);                             ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR                                                                       { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_STRING_LIST_VAR, strings, 2);                                     ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR                                                                       { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_STRING_DICT_VAR, strings, 2);                                     ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL liststart                                                                   { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_LIST, strings, 1, $5);                               ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL dictionarystart                                                             { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_DICT, strings, 1, $5);                               ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                            { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_FUNC_RETURN, strings, 2, $6);                        ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_FUNC_RETURN, strings, 3, $8);                        ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                 { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_LIST_FUNC_RETURN, strings, 2, $7);                   ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                     { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_LIST_FUNC_RETURN, strings, 3, $9);                   ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                 { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_DICT_FUNC_RETURN, strings, 2, $7);                   ASTNodeNext(ast_node); }
+    | T_VAR_STRING T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                     { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_STRING_DICT_FUNC_RETURN, strings, 3, $9);                   ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL T_STRING                                                                                  { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeString(AST_VAR_CREATE_ANY_STRING, strings, 1, $4, NULL);                          ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR                                                                                     { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_ANY_VAR, strings, 2);                                             ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR left_right_bracket                                                                  { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_ANY_VAR_EL, strings, 2, $5);                                ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL boolean_expression                                                                        { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_ANY_BOOL, strings, 1, $4);                                  ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL mixed_expression                                                                          { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_ANY_NUMBER, strings, 1, $4);                                ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL expression                                                                                { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_ANY_NUMBER, strings, 1, $4);                                ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                               { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_ANY_FUNC_RETURN, strings, 2, $6);                           ASTNodeNext(ast_node); }
+    | T_VAR_ANY T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                   { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_ANY_FUNC_RETURN, strings, 3, $8);                           ASTNodeNext(ast_node); }
+    | T_VAR_LIST T_VAR T_EQUAL T_VAR                                                                                    { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_LIST_VAR, strings, 2);                                            ASTNodeNext(ast_node); }
+    | T_VAR_LIST T_VAR T_EQUAL liststart                                                                                { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_LIST, strings, 1, $4);                                      ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_LIST T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                              { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_LIST_FUNC_RETURN, strings, 2, $6);                          ASTNodeNext(ast_node); }
+    | T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                  { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_LIST_FUNC_RETURN, strings, 3, $8);                          ASTNodeNext(ast_node); }
+    | T_VAR_DICT T_VAR T_EQUAL T_VAR                                                                                    { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_DICT_VAR, strings, 2);                                            ASTNodeNext(ast_node); }
+    | T_VAR_DICT T_VAR T_EQUAL dictionarystart                                                                          { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_DICT, strings, 1, $4);                                      ASTNodeNext(ast_node);      is_complex_parsing = false; }
+    | T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                              { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_DICT_FUNC_RETURN, strings, 2, $6);                          ASTNodeNext(ast_node); }
+    | T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                  { char *strings[] = {$2, $4, $6};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_DICT_FUNC_RETURN, strings, 3, $8);                          ASTNodeNext(ast_node); }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-list:                                                               { }
-    | T_NEWLINE list                                                { }
-    | liststart T_COMMA list                                        { }
-    | list T_COMMA liststart                                        { }
-    | list T_COMMA T_NEWLINE liststart                              { }
-    | liststart T_COMMA liststart                                   { }
-    | liststart T_COMMA T_NEWLINE liststart                         { }
-    | dictionarystart T_COMMA list                                  { }
-    | list T_COMMA dictionarystart                                  { }
-    | list T_COMMA T_NEWLINE dictionarystart                        { }
-    | dictionarystart T_COMMA dictionarystart                       { }
-    | dictionarystart T_COMMA T_NEWLINE dictionarystart             { }
-    | dictionarystart                                               { }
-    | list T_COMMA list                                             { }
-    | list T_NEWLINE                                                { }
-;
-list: T_TRUE                                                        { addSymbolBool(NULL, $1); }
-;
-list: T_FALSE                                                       { addSymbolBool(NULL, $1); }
-;
-list: expression                                                    { addSymbolFloat(NULL, $1); }
-;
-list: mixed_expression                                              { addSymbolFloat(NULL, $1); }
-;
-list: T_STRING                                                      { addSymbolString(NULL, $1); }
-;
-list: T_VAR                                                         { cloneSymbolToComplex($1, NULL); }
-;
-list: T_VAR left_right_bracket                                      { buildVariableComplexElement($1, NULL); }
+variable_complex_element:                                                                                               { }
+    | T_VAR left_right_bracket                                                                                          { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_BUILD_COMPLEX_VARIABLE, strings, 1, $2);                               $$ = ast_node; }
 ;
 
-dictionarystart:                                                                { addSymbolDict(NULL); }
-    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET     { if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); finishComplexMode(NULL, K_ANY); } }
-    | error T_NEWLINE parser                                                    { if (is_interactive) { yyerrok; yyclearin; } }
+liststart:                                                                                                              { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_LIST_START, strings, 0);                                                     $$ = ast_node; is_complex_parsing = true; }
+    | liststart T_LEFT_BRACKET T_RIGHT_BRACKET                                                                          { }
+    | liststart T_LEFT_BRACKET list T_RIGHT_BRACKET                                                                     { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_LIST_NESTED_FINISH, strings, 0);                                             ast_node->left = $3; $3->depend = $1; $$ = ast_node; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-dictionary:                                                             { }
-    | T_NEWLINE dictionary                                              { }
-    | T_STRING T_COLON dictionarystart T_COMMA dictionary               { popNestedComplexModeStack($1); }
-    | T_STRING T_COLON dictionarystart                                  { popNestedComplexModeStack($1); }
-    | T_STRING T_COLON liststart T_COMMA dictionary                     { popNestedComplexModeStack($1); }
-    | T_STRING T_COLON liststart                                        { popNestedComplexModeStack($1); }
-    | dictionary T_COMMA dictionary                                     { }
-    | dictionary T_NEWLINE                                              { }
-    | error T_NEWLINE parser                                            { if (is_interactive) { yyerrok; yyclearin; } }
+list:                                                                                                                   { }
+    | T_NEWLINE list                                                                                                    { $$ = $2; }
+    | liststart T_COMMA list                                                                                            { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node;   $$->right = $3; $$->left = $1; }
+    | list T_COMMA liststart                                                                                            { $$ = $1; $$->left = $3; }
+    | list T_COMMA T_NEWLINE liststart                                                                                  { $$ = $1; $$->left = $4; }
+    | liststart T_COMMA liststart                                                                                       { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node;   $$->right = $3; $$->left = $1; }
+    | liststart T_COMMA T_NEWLINE liststart                                                                             { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node;   $$->right = $4; $$->left = $1; }
+    | dictionarystart T_COMMA list                                                                                      { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node;   $$->right = $3; $$->left = $1; }
+    | list T_COMMA dictionarystart                                                                                      { $$ = $1; $$->left = $3; }
+    | list T_COMMA T_NEWLINE dictionarystart                                                                            { $$ = $1; $$->left = $4; }
+    | dictionarystart T_COMMA dictionarystart                                                                           { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node;   $$->right = $3; $$->left = $1; }
+    | dictionarystart T_COMMA T_NEWLINE dictionarystart                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node;   $$->right = $4; $$->left = $1; }
+    | dictionarystart                                                                                                   { $$ = $1; }
+    | list T_COMMA list                                                                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node; $$->right = $3; $$->left = $1; }
+    | list T_NEWLINE                                                                                                    { $$ = $1; }
 ;
-dictionary: T_STRING T_COLON T_TRUE                                 { addSymbolBool($1, $3); }
+list: boolean_expression                                                                                                { char *strings[] = {NULL};           ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL, strings, 1, $1);                                      $$ = ast_node; }
 ;
-dictionary: T_STRING T_COLON T_FALSE                                { addSymbolBool($1, $3); }
+list: expression                                                                                                        { char *strings[] = {NULL};           ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER, strings, 1, $1);                                    $$ = ast_node; }
 ;
-dictionary: T_STRING T_COLON expression                             { addSymbolFloat($1, $3); }
+list: mixed_expression                                                                                                  { char *strings[] = {NULL};           ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER, strings, 1, $1);                                    $$ = ast_node; }
 ;
-dictionary: T_STRING T_COLON mixed_expression                       { addSymbolFloat($1, $3); }
+list: T_STRING                                                                                                          { char *strings[] = {NULL};           ASTNode* ast_node = addASTNodeString(AST_VAR_CREATE_STRING, strings, 1, $1, NULL);                              $$ = ast_node; }
 ;
-dictionary: T_STRING T_COLON T_STRING                               { addSymbolString($1, $3); }
+list: T_VAR                                                                                                             { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_LIST_ADD_VAR, strings, 1);                                                   $$ = ast_node; }
 ;
-dictionary: T_STRING T_COLON T_VAR                                  { cloneSymbolToComplex($3, $1); }
-;
-dictionary: T_STRING T_COLON T_VAR left_right_bracket               { buildVariableComplexElement($3, $1); }
-;
-
-decisionstart:                                                                      { decision_mode = function_mode; handle_end_keyword(); }
-    | decisionstart T_LEFT_CURLY_BRACKET decision T_RIGHT_CURLY_BRACKET             { decision_mode = NULL; }
-    | decisionstart T_NEWLINE                                                       { decision_mode = NULL; }
-;
-
-decision:                                                                           { }
-    | T_NEWLINE decision                                                            { }
-    | decision T_COMMA decision                                                     { }
-    | decision T_NEWLINE                                                            { }
-;
-decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start    { addBooleanDecision(); free($3); }
-;
-decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start             { addDefaultDecision(); free($3); }
+list: T_VAR left_right_bracket                                                                                          { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_LIST_ADD_VAR_EL, strings, 1, $2);                                      $$ = ast_node; }
 ;
 
-module: T_VAR                                                                       { appendModuleToModuleBuffer($1); }
-    | module T_DOT module                                                           { }
-    | module T_DIVIDE module                                                        { }
-    | module T_BACKSLASH module                                                     { }
-    | T_DOT T_DOT module                                                            { prependModuleToModuleBuffer(".."); }
-    | module T_DOT T_DOT module                                                     { prependModuleToModuleBuffer(".."); }
-    | T_DOT T_DOT T_DIVIDE module                                                   { prependModuleToModuleBuffer(".."); }
-    | T_DOT T_DOT T_BACKSLASH module                                                { prependModuleToModuleBuffer(".."); }
+dictionarystart:                                                                                                        { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_DICT_START, strings, 0);                                                     $$ = ast_node; is_complex_parsing = true; }
+    | dictionarystart T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET                                                        { }
+    | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET                                             { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_DICT_NESTED_FINISH, strings, 0);                                             ast_node->left = $3; $3->depend = $1; $$ = ast_node; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
 ;
 
-function_name: T_VAR                                                                { addFunctionNameToFunctionNamesBuffer($1); }
-    | function_name T_COMMA function_name                                           { }
+dictionary:                                                                                                             { }
+    | T_NEWLINE dictionary                                                                                              { $$ = $2; }
+    | T_STRING T_COLON dictionarystart T_COMMA dictionary                                                               { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_POP_NESTED_COMPLEX_STACK, strings, 1);                                       $$ = ast_node; $$->right = $5; $$->left = $3; }
+    | T_STRING T_COLON dictionarystart                                                                                  { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_POP_NESTED_COMPLEX_STACK, strings, 1);                                       $$ = ast_node; $$->left = $3; }
+    | T_STRING T_COLON liststart T_COMMA dictionary                                                                     { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_POP_NESTED_COMPLEX_STACK, strings, 1);                                       $$ = ast_node; $$->right = $5; $$->left = $3; }
+    | T_STRING T_COLON liststart                                                                                        { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_POP_NESTED_COMPLEX_STACK, strings, 1);                                       $$ = ast_node; $$->left = $3; }
+    | dictionary T_COMMA dictionary                                                                                     { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_STEP, strings, 0);                                                           $$ = ast_node; $$->right = $3; $$->left = $1; }
+    | dictionary T_NEWLINE                                                                                              { $$ = $1; }
+    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+;
+dictionary: T_STRING T_COLON boolean_expression                                                                         { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL, strings, 1, $3);                                      $$ = ast_node; }
+;
+dictionary: T_STRING T_COLON expression                                                                                 { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER, strings, 1, $3);                                    $$ = ast_node; }
+;
+dictionary: T_STRING T_COLON mixed_expression                                                                           { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER, strings, 1, $3);                                    $$ = ast_node; }
+;
+dictionary: T_STRING T_COLON T_STRING                                                                                   { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeString(AST_VAR_CREATE_STRING, strings, 1, $3, NULL);                              $$ = ast_node; }
+;
+dictionary: T_STRING T_COLON T_VAR                                                                                      { char *strings[] = {$1, $3};         ASTNode* ast_node = addASTNode(AST_DICT_ADD_VAR, strings, 2);                                                   $$ = ast_node; }
+;
+dictionary: T_STRING T_COLON T_VAR left_right_bracket                                                                   { char *strings[] = {$1, $3};         ASTNode* ast_node = addASTNodeAssign(AST_DICT_ADD_VAR_EL, strings, 2, $4);                                      $$ = ast_node; }
 ;
 
-expression:                                                         { }
-    | T_TIMES_DO_INT expression                                     { }
+decisionstart:                                                                                                          { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; }
+    | decisionstart T_LEFT_CURLY_BRACKET decision T_RIGHT_CURLY_BRACKET                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $3; $$->left = $1; }
 ;
 
-preparser_line:                                                     { }
-    | T_TIMES_DO_INT preparser_line                                 { }
+decision:                                                                                                               { }
+    | T_NEWLINE decision                                                                                                { $$ = $2; }
+    | decision T_COMMA decision                                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $1; $$->left = $3; }
+    | decision T_NEWLINE                                                                                                { $$ = $1; }
+;
+decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start                                        { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeFull(AST_DECISION_MAKE_BOOLEAN, strings, 1, $5, $1);                              $$ = ast_node; }
+;
+decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start                                                 { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_DEFAULT, strings, 1, $5);                                $$ = ast_node; }
+;
+
+module: T_VAR                                                                                                           { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_APPEND_MODULE, strings, 1);                                                  $$ = ast_node; }
+    | module T_DOT module                                                                                               { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $1; $$->left = $3; }
+    | module T_DIVIDE module                                                                                            { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $1; $$->left = $3; }
+    | module T_BACKSLASH module                                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $1; $$->left = $3; }
+    | T_DOT T_DOT module                                                                                                { char* dotdot = malloc(1 + strlen("..")); strcpy(dotdot, ".."); char *strings[] = {dotdot};         ASTNode* ast_node = addASTNode(AST_PREPEND_MODULE, strings, 1);                                                 $$ = ast_node; $$->right = $3; }
+    | module T_DOT T_DOT module                                                                                         { char* dotdot = malloc(1 + strlen("..")); strcpy(dotdot, ".."); char *strings[] = {dotdot};         ASTNode* ast_node = addASTNode(AST_PREPEND_MODULE, strings, 1);                                                 $$ = $4; ast_node->right = $1; $$->right = ast_node; }
+    | T_DOT T_DOT T_DIVIDE module                                                                                       { char* dotdot = malloc(1 + strlen("..")); strcpy(dotdot, ".."); char *strings[] = {dotdot};         ASTNode* ast_node = addASTNode(AST_PREPEND_MODULE, strings, 1);                                                 $$ = ast_node; $$->right = $4; }
+    | T_DOT T_DOT T_BACKSLASH module                                                                                    { char* dotdot = malloc(1 + strlen("..")); strcpy(dotdot, ".."); char *strings[] = {dotdot};         ASTNode* ast_node = addASTNode(AST_PREPEND_MODULE, strings, 1);                                                 $$ = ast_node; $$->right = $4; }
+;
+
+function_name: T_VAR                                                                                                    { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_ADD_FUNCTION_NAME, strings, 1);                                              $$ = ast_node; }
+    | function_name T_COMMA function_name                                                                               { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $1; $$->left = $3; }
+;
+
+expression:                                                                                                             { }
+    | T_TIMES_DO_INT expression                                                                                         { }
 ;
 
 quit:
-    | T_NEWLINE                                              {
-        if (is_interactive) {
-            print_bye_bye();
-        } else {
-            YYABORT;
-        }
-        freeEverything();
-        exit(E_SUCCESS);
-    }
-    | expression T_NEWLINE                                   {
-        if (is_interactive) {
-            print_bye_bye();
-        } else {
-            YYABORT;
-        }
-        freeEverything();
-        exit($1);
-    }
-    | T_VAR T_NEWLINE                                        {
-        long long code = getSymbolValueInt($1);
-        if (is_interactive) {
-            print_bye_bye();
-        } else {
-            YYABORT;
-        }
-        freeEverything();
-        exit(code);
-    }
+    | T_NEWLINE                                                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_EXIT_SUCCESS, strings, 0);                                                   ASTNodeNext(ast_node); }
+    | expression T_NEWLINE                                                                                              { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_EXIT_EXPRESSION, strings, 0, $1);                                      ASTNodeNext(ast_node); }
+    | T_VAR T_NEWLINE                                                                                                   { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_EXIT_VAR, strings, 1);                                                       ASTNodeNext(ast_node); }
 ;
 
 json_parser:
-    | json_parser dictionarystart                                   { Symbol* symbol = finishComplexMode(NULL, K_ANY); returnVariable(symbol); }
+    | json_parser dictionarystart                                                                                       { Symbol* symbol = finishComplexMode(NULL, K_ANY); returnVariable(symbol); }
 ;
 
 %%
 
 int main(int argc, char** argv) {
+
+ast_debug_enabled = false;
+
 #if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
     char ch;
-    while ((ch = getopt_long(argc, argv, "hv", long_options, NULL)) != -1)
+    while ((ch = getopt_long(argc, argv, "hvd", long_options, NULL)) != -1)
     {
         switch (ch)
         {
@@ -761,6 +737,9 @@ int main(int argc, char** argv) {
             case 'v':
                 printf("%s\n", __KAOS_LANGUAGE_VERSION__);
                 exit(0);
+            case 'd':
+                ast_debug_enabled = true;
+                break;
             case '?':
                 printf("Unknown option `-%c'.\n", optopt);
                 print_help();
@@ -769,12 +748,20 @@ int main(int argc, char** argv) {
     }
 #endif
 
-    fp = argc > 1 ? fopen (argv[1], "r") : stdin;
+    char *program_file = NULL;
+
+    if (argc > 2) {
+        program_file = argv[2];
+    } else {
+        program_file = argv[1];
+    }
+
+    fp = argc > 1 ? fopen (program_file, "r") : stdin;
     fp_opened = true;
 
     if (argc > 1) {
-        program_file_path = malloc(strlen(argv[1]) + 1);
-        strcpy(program_file_path, argv[1]);
+        program_file_path = malloc(strlen(program_file) + 1);
+        strcpy(program_file_path, program_file);
 
         if (!is_file_exists(program_file_path)) {
             initMainFunction();
@@ -817,14 +804,21 @@ int main(int argc, char** argv) {
         program_code = (char*)realloc(program_code, program_length + 2);
         program_code[program_length] = '\n';
         program_code[program_length + 1] = '\0';
-        switchBuffer(program_code, INIT_PREPARSE);
+        switchBuffer(program_code, INIT_PROGRAM);
     }
 
     initMainFunction();
 
+    main_interpreted_module = NULL;
+
     do {
         if (is_interactive) {
             if (setjmp(InteractiveShellErrorAbsorber)) {
+                ast_interactive_cursor = ast_node_cursor;
+                if (main_interpreted_module != NULL) {
+                    free(main_interpreted_module);
+                    main_interpreted_module = NULL;
+                }
                 phase = INIT_PROGRAM;
                 freeComplexModeStack();
                 //freeLeftRightBracketStack();
@@ -846,7 +840,11 @@ int main(int argc, char** argv) {
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         !is_interactive ?: printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif
+        main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+        strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
+        if (!is_interactive)
+            interpret(main_interpreted_module, INIT_PREPARSE, false);
         if (!is_interactive) break;
     } while(!feof(yyin));
 
@@ -884,7 +882,6 @@ void yyerror(const char* s) {
 }
 
 void freeEverything() {
-    free(last_token);
     free(main_function);
     free(scopeless);
     freeAllSymbols();
@@ -916,6 +913,9 @@ void freeEverything() {
         }
         #endif
     }
+
+    free_node(ast_root_node);
+    free(main_interpreted_module);
 
     fclose(stdin);
     fclose(stdout);

@@ -41,15 +41,6 @@ char *trim_string(char *str) {
     return str;
 }
 
-void handle_end_keyword() {
-    if (loop_mode != NULL) {
-        endLoop();
-        return;
-    }
-
-    endFunction();
-}
-
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 char *fileGetContents(char *file_path) {
     char *file_content = "";

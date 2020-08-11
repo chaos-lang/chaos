@@ -6,6 +6,10 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
 
+    if [[ "$testname" == "exit_"* ]]; then
+        continue
+    fi
+
     echo -e "\n\nRunning memcheck: ${testname}\n"
 
     if [[ "$OSTYPE" == "linux"* ]]; then

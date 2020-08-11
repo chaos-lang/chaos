@@ -16,7 +16,7 @@ void initMainContext() {
 
 void appendModuleToModuleBuffer(char *name) {
     append_to_array(&modules_buffer, name);
-    free(name);
+    //free(name);
 }
 
 void prependModuleToModuleBuffer(char *name) {
@@ -24,6 +24,9 @@ void prependModuleToModuleBuffer(char *name) {
 }
 
 void handleModuleImport(char *module_name, bool directly_import) {
+    if (is_interactive) {
+        ast_interactive_cursor = ast_node_cursor;
+    }
     char *module_path;
     char *relative_path = "";
 
@@ -50,12 +53,17 @@ void handleModuleImport(char *module_name, bool directly_import) {
         }
     }
 
-    char *module = modules_buffer.arr[modules_buffer.size - 1];
+    char *module = malloc(strlen(modules_buffer.arr[modules_buffer.size - 1]) + 1);
+    strcpy(module, modules_buffer.arr[modules_buffer.size - 1]);
     if (module_name != NULL) {
-        module = module_name;
+        free(module);
+        module = malloc(strlen(module_name) + 1);
+        strcpy(module, module_name);
     }
     if (directly_import) {
-        module = "";
+        free(module);
+        module = malloc(strlen("") + 1);
+        strcpy(module, "");
     }
 
     module_path = strcat_ext(module_path, ".");
@@ -83,9 +91,10 @@ void handleModuleImport(char *module_name, bool directly_import) {
 
     popModuleStack();
 
+    free(module);
     free(module_path);
     free(relative_path);
-    free(module_name);
+    //free(module_name);
 }
 
 void freeModulesBuffer() {
@@ -179,6 +188,7 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
             }
         }
     }
+    printf("HOY\n");
     append_to_array_without_malloc(&free_string_stack, relative_path);
     throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, relative_path);
     return NULL;
