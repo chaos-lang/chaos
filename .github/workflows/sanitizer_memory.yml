@@ -1,6 +1,6 @@
 name: Memory Sanitizer
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   main:
