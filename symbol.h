@@ -70,6 +70,7 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
 void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
 void freeSymbol(Symbol* symbol);
+Symbol* findSymbol(char *name);
 Symbol* getSymbol(char *name);
 Symbol* getSymbolById(unsigned long long id);
 Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key);

@@ -50,7 +50,12 @@ _Function* function_mode;
 
 _Function* function_parameters_mode;
 
-_Function* executed_function;
+typedef struct function_array {
+    _Function** arr;
+    unsigned capacity, size;
+} function_array;
+
+function_array function_call_stack;
 
 _Function* main_function;
 _Function* scopeless;
@@ -111,5 +116,7 @@ void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
 bool isFunctionType(char *name, char *module, enum Type type);
 void setScopeless(Symbol* symbol);
+void pushExecutedFunctionStack(_Function* executed_function);
+void popExecutedFunctionStack();
 
 #endif

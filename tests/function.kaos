@@ -406,3 +406,23 @@ end
 
 typed_dict_as_params('foo', {'a': 1, 'b': 2, 'c': 3})
 typed_dict_as_params('bar', {'a': 1, 'b': 2, 'c': 3}, {'j': 7, 'k': 8, 'l': 9})
+
+
+// Call function inside loop inside function
+
+num def call_inside_loop_inside_function(num n)
+	print n
+	num p = n+1
+	return p
+end
+
+void def test_call_inside_loop_inside_function()
+	num x = 0
+    num r = 0
+	3 times do
+		r = call_inside_loop_inside_function(x)
+        print r
+	end
+end
+
+test_call_inside_loop_inside_function()

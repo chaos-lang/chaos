@@ -133,7 +133,7 @@ void freeSymbol(Symbol* symbol) {
     free(symbol);
 }
 
-Symbol* getSymbol(char *name) {
+Symbol* findSymbol(char *name) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         if (
@@ -147,7 +147,13 @@ Symbol* getSymbol(char *name) {
         }
         symbol_cursor = symbol_cursor->next;
     }
-    //append_to_array_without_malloc(&free_string_stack, name);
+    return NULL;
+}
+
+Symbol* getSymbol(char *name) {
+    Symbol* symbol = findSymbol(name);
+    if (symbol != NULL)
+        return symbol;
     throw_error(E_UNDEFINED_VARIABLE, name);
     return NULL;
 }
@@ -654,6 +660,11 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), clone_name);
     }
 
+    if (clone_name != NULL && findSymbol(clone_name) != NULL) {
+        append_to_array_without_malloc(&free_string_stack, clone_name);
+        throw_error(E_VARIABLE_ALREADY_DEFINED, clone_name);
+    }
+
     Symbol* clone_symbol;
     if (symbol->type == K_LIST || symbol->type == K_DICT) {
         if (symbol->secondary_type != extra_type) {
@@ -1122,8 +1133,8 @@ void addSymbolAnyBool(char *name, bool b) {
 _Function* getCurrentScope() {
     if (scope_override != NULL) return scope_override;
 
-    if (executed_function != NULL) {
-        return executed_function;
+    if (function_call_stack.size > 0) {
+        return function_call_stack.arr[function_call_stack.size - 1];
     } else if (function_parameters_mode != NULL) {
         return function_parameters_mode;
     } else {
@@ -1132,8 +1143,8 @@ _Function* getCurrentScope() {
 }
 
 Symbol* getSymbolFunctionParameter(char *name) {
-    if (executed_function != NULL) {
-        scope_override = executed_function;
+    if (function_call_stack.size > 0) {
+        scope_override = function_call_stack.arr[function_call_stack.size - 1];
     } else {
         scope_override = main_function;
     }

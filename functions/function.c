@@ -181,10 +181,10 @@ void callFunction(char *name, char *module) {
     freeFunctionMode();
 
     _Function* parent_scope = getCurrentScope();
-    executed_function = function;
-    executed_function->parent_scope = parent_scope;
+    pushExecutedFunctionStack(function);
+    function_call_stack.arr[function_call_stack.size - 1]->parent_scope = parent_scope;
 
-    pushModuleStack(executed_function->module_context, "");
+    pushModuleStack(function_call_stack.arr[function_call_stack.size - 1]->module_context, "");
 
     recursion_depth++;
 
@@ -237,7 +237,7 @@ void callFunction(char *name, char *module) {
 
     popModuleStack();
 
-    executed_function = NULL;
+    popExecutedFunctionStack();
 
     if (is_interactive && interactive_shell_function_error_absorbed) {
         interactive_shell_function_error_absorbed = false;
@@ -426,22 +426,22 @@ void addFunctionCallParameterList(enum Type type) {
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != K_ANY &&
-        executed_function->type != K_ANY &&
-        symbol->type != executed_function->type
+        function_call_stack.arr[function_call_stack.size - 1]->type != K_ANY &&
+        symbol->type != function_call_stack.arr[function_call_stack.size - 1]->type
     ) {
         free(name);
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), executed_function->name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), function_call_stack.arr[function_call_stack.size - 1]->name);
     }
     if (symbol->secondary_type != K_ANY &&
-        executed_function->secondary_type != K_ANY &&
-        symbol->secondary_type != executed_function->secondary_type
+        function_call_stack.arr[function_call_stack.size - 1]->secondary_type != K_ANY &&
+        symbol->secondary_type != function_call_stack.arr[function_call_stack.size - 1]->secondary_type
     ) {
         free(name);
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), executed_function->name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function_call_stack.arr[function_call_stack.size - 1]->name);
     }
 
-    scope_override = executed_function->parent_scope;
-    executed_function->symbol = createCloneFromSymbol(
+    scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
+    function_call_stack.arr[function_call_stack.size - 1]->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
         symbol,
@@ -603,21 +603,18 @@ void executeDecision(_Function* function) {
     if (function->decision_node == NULL) {
         return;
     }
-    _Function* executed_function_backup = executed_function;
 
     eval_node(function->decision_node, function->module_context);
     stop_ast_evaluation = false;
 
-    executed_function = executed_function_backup;
-
-    if (executed_function_backup->type != K_VOID && executed_function_backup->symbol == NULL) {
-        executed_function_backup->symbol = createCloneFromSymbol(
+    if (function_call_stack.arr[function_call_stack.size - 1]->type != K_VOID && function_call_stack.arr[function_call_stack.size - 1]->symbol == NULL) {
+        function_call_stack.arr[function_call_stack.size - 1]->symbol = createCloneFromSymbol(
             NULL,
             decision_symbol_chain->type,
             decision_symbol_chain,
             decision_symbol_chain->secondary_type
         );
-        executed_function_backup->symbol->scope = executed_function->parent_scope;
+        function_call_stack.arr[function_call_stack.size - 1]->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
     }
     if (decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
@@ -653,4 +650,20 @@ void setScopeless(Symbol* symbol) {
     for (unsigned long i = 0; i < symbol->children_count; i++) {
         setScopeless(symbol->children[i]);
     }
+}
+
+void pushExecutedFunctionStack(_Function* executed_function) {
+    if (function_call_stack.capacity == 0) {
+        function_call_stack.arr = (_Function**)malloc((function_call_stack.capacity = 2) * sizeof(_Function));
+    } else if (function_call_stack.capacity == function_call_stack.size) {
+        function_call_stack.arr = (_Function**)realloc(function_call_stack.arr, (function_call_stack.capacity *= 2) * sizeof(_Function));
+    }
+
+    function_call_stack.arr[function_call_stack.size] = executed_function;
+    function_call_stack.size++;
+}
+
+void popExecutedFunctionStack() {
+    function_call_stack.arr[function_call_stack.size - 1] = NULL;
+    function_call_stack.size--;
 }

@@ -97,8 +97,8 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
 }
 
 void returnVariable(Symbol* symbol) {
-    scope_override = executed_function->parent_scope;
-    executed_function->symbol = createCloneFromSymbol(
+    scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
+    function_call_stack.arr[function_call_stack.size - 1]->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
         symbol,

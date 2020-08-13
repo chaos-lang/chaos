@@ -853,7 +853,7 @@ ast_debug_enabled = false;
                 printf("\n");
 
                 if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
-                if (executed_function) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
+                if (function_call_stack.size > 0) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
             }
         }
 

@@ -1215,13 +1215,13 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             break;
         case AST_DECISION_MAKE_BOOLEAN:
             if (ast_node->right->value.b) {
-                callFunction(ast_node->strings[0], executed_function->module);
+                callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
                 stop_ast_evaluation = true;
             }
             break;
         case AST_DECISION_MAKE_DEFAULT:
-            if (executed_function != NULL) {
-                callFunction(ast_node->strings[0], executed_function->module);
+            if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+                callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
                 stop_ast_evaluation = true;
             }
             break;
