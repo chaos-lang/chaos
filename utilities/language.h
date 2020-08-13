@@ -11,6 +11,7 @@
 #define __KAOS_MSG_LINE_LENGTH__ 1000
 #define __KAOS_BYE_BYE__ "You have chosen the order! "
 #define __KAOS_SPELLS__ "spells"
+#define __KAOS_SYNTAX_ERROR__ "Syntax error"
 #if defined(__APPLE__) || defined(__MACH__)
     #define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dylib"
 #elif defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
