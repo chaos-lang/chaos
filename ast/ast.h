@@ -319,5 +319,6 @@ void ASTNodeNext(ASTNode* ast_node);
 void ASTBranchOut();
 void ASTMergeBack();
 ASTNode* free_node(ASTNode* ast_node);
+char* getAstNodeTypeName(unsigned i);
 
 #endif

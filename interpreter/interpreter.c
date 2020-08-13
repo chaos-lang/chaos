@@ -70,9 +70,9 @@ ASTNode* register_functions(ASTNode* ast_node, char *module) {
 
     if (ast_debug_enabled)
         printf(
-            "(Register)ASTNode: {id: %llu, node_type: %u, module: %s, string_size: %ld}\n",
+            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %ld}\n",
             ast_node->id,
-            ast_node->node_type,
+            getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
             ast_node->strings_size
         );
@@ -261,9 +261,9 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
 
     if (ast_debug_enabled)
         printf(
-            "ASTNode: {id: %llu, node_type: %u, module: %s, string_size: %ld}\n",
+            "(Execute)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %ld}\n",
             ast_node->id,
-            ast_node->node_type,
+            getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
             ast_node->strings_size
         );
