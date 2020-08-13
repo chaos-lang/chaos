@@ -1,0 +1,3 @@
+num b = 12
+num bb = 1
+b = b + + bb
