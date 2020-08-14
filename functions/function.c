@@ -20,6 +20,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         }
     }
 
+    removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->body = "";
     function_mode->name = malloc(1 + strlen(name));
@@ -267,6 +268,25 @@ _Function* getFunction(char *name, char *module) {
         throw_error(E_UNDEFINED_FUNCTION, name);
     }
     return NULL;
+}
+
+void removeFunctionIfDefined(char *name) {
+    unsigned short parent_context = 1;
+    if (module_path_stack.size > 1) parent_context = 2;
+
+    function_cursor = start_function;
+    while (function_cursor != NULL) {
+        if (strcmp(function_cursor->name, name) == 0 &&
+            strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - parent_context]) == 0 &&
+            strcmp(function_cursor->module_context, module_path_stack.arr[module_path_stack.size - 1]) == 0 &&
+            strcmp(function_cursor->module, module_stack.arr[module_stack.size - 1]) == 0
+        ) {
+            _Function* function = function_cursor;
+            removeFunction(function);
+            return;
+        }
+        function_cursor = function_cursor->next;
+    }
 }
 
 void printFunctionTable() {
@@ -526,6 +546,29 @@ void initScopeless() {
     scopeless->name = "N/A";
     scopeless->type = K_ANY;
     scopeless->parameter_count = 0;
+}
+
+void removeFunction(_Function* function) {
+    _Function* previous_function = function->previous;
+    _Function* next_function = function->next;
+
+    if (previous_function == NULL && next_function == NULL) {
+        start_function = NULL;
+        end_function = NULL;
+        freeFunction(function);
+        return;
+    } else if (previous_function == NULL) {
+        start_function = next_function;
+        start_function->previous = NULL;
+    } else if (next_function == NULL) {
+        end_function = previous_function;
+        end_function->next = NULL;
+    } else {
+        previous_function->next = next_function;
+        next_function->previous = previous_function;
+    }
+
+    freeFunction(function);
 }
 
 void freeFunction(_Function* function) {

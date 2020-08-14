@@ -82,6 +82,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type);
 void endFunction();
 void freeFunctionMode();
 _Function* getFunction(char *name, char *module);
+void removeFunctionIfDefined(char *name);
 void printFunctionTable();
 void callFunction(char *name, char *module);
 void startFunctionParameters();
@@ -105,6 +106,7 @@ void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*mod
 void updateComplexSymbolByClonningFunctionReturn(char *name, char*module);
 void initMainFunction();
 void initScopeless();
+void removeFunction(_Function* function);
 void freeFunction(_Function* function);
 void freeAllFunctions();
 bool block(enum BlockType type);

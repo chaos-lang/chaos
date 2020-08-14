@@ -1,0 +1,20 @@
+import modules.hello
+
+void def a()
+    print 1
+end
+
+void def a()
+    print 2
+end
+
+void def a()
+    print 3
+end
+
+void def hello()
+    print "mello world"
+end
+
+a()
+hello()
