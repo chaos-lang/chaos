@@ -37,7 +37,6 @@ int defineFunction(
                     addFunctionOptionalParameterFloat(params_name[i], optional_param_value.f);
                     break;
                 case K_STRING:
-                    printf("K_STRING: %s\n", optional_param_value.s);
                     addFunctionOptionalParameterString(params_name[i], optional_param_value.s);
                     break;
                 default:
