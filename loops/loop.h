@@ -37,6 +37,5 @@ bool interactive_shell_loop_error_absorbed;
 ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_node);
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
 ASTNode* startForeachDict(char *list_name, char *element_key, char *element_value, ASTNode* ast_node);
-bool endLoop();
 
 #endif

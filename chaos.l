@@ -31,7 +31,7 @@ enum Phase phase = INIT_PROGRAM;
 unsigned short module_parsing = 0;
 
 void injectCode(char *code, enum Phase phase_arg) {
-    phase = INIT_PROGRAM;
+    phase = phase_arg;
     inject_mode = true;
 
     YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
@@ -39,8 +39,15 @@ void injectCode(char *code, enum Phase phase_arg) {
     yy_switch_to_buffer(new_buffer);
     int ret = yyparse();
 
+    if (phase_arg == INIT_JSON_PARSE) {
+        phase_arg = PROGRAM;
+    } else {
+        phase_arg = PREPARSE;
+    }
+
     char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
+    //printf("Interpret code: %s\n", code);
     interpret(interpreted_module, phase_arg, false);
     free(interpreted_module);
 
@@ -82,7 +89,7 @@ void parseTheModuleContent(char *module_path) {
 
     if (code != NULL) {
         module_parsing++;
-        injectCode(code, PREPARSE);
+        injectCode(code, INIT_PROGRAM);
         module_parsing--;
         free(code);
 

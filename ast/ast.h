@@ -280,6 +280,7 @@ enum ASTNodeType {
     AST_DECISION_DEFINE,
     AST_DECISION_MAKE_BOOLEAN,
     AST_DECISION_MAKE_DEFAULT,
+    AST_JSON_PARSER,
 };
 
 typedef struct ASTNode {

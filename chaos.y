@@ -730,7 +730,7 @@ quit:
 ;
 
 json_parser:
-    | json_parser dictionarystart                                                                                       { Symbol* symbol = finishComplexMode(NULL, K_ANY); returnVariable(symbol); }
+    | json_parser dictionarystart                                                                                       { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_JSON_PARSER, strings, 0, $2);                                          ASTNodeNext(ast_node);        is_complex_parsing = false; }
 ;
 
 %%
@@ -875,7 +875,7 @@ ast_debug_enabled = false;
 
 // Syntax Error If NULL
 void SEIN(ASTNode* ast_node) {
-    if (ast_node == NULL || ast_node->node_type > AST_DECISION_MAKE_DEFAULT) yyerror(__KAOS_SYNTAX_ERROR__);
+    if (ast_node == NULL || ast_node->node_type > AST_JSON_PARSER) yyerror(__KAOS_SYNTAX_ERROR__);
 }
 
 void yyerror(const char* s) {

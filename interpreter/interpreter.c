@@ -1225,6 +1225,11 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
                 stop_ast_evaluation = true;
             }
             break;
+        case AST_JSON_PARSER:
+            reverseComplexMode();
+            symbol = finishComplexMode(NULL, K_ANY);
+            returnVariable(symbol);
+            break;
         default:
             break;
     }
