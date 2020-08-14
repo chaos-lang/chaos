@@ -921,6 +921,7 @@ void freeEverything() {
     freeLeftRightBracketStack();
     freeFreeStringStack();
     freeNestedComplexModeStack();
+    free(function_call_stack.arr);
 
     yylex_destroy();
 
