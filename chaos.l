@@ -47,7 +47,6 @@ void injectCode(char *code, enum Phase phase_arg) {
 
     char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
-    //printf("Interpret code: %s\n", code);
     interpret(interpreted_module, phase_arg, false);
     free(interpreted_module);
 

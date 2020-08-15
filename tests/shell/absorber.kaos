@@ -5,4 +5,33 @@ num a = 5
 print a
 num a = 3
 print a
+
+
+any b = "print b"
+b
+b()
+b
+
+void def b()
+    print b
+end
+
+b
+b()
+b
+
+
+any def f1()
+    bool f = r
+    return f
+end
+
+f1()
+
+any def f1()
+    bool f = true
+    return f
+end
+
+
 exit

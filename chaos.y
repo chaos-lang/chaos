@@ -835,10 +835,7 @@ ast_debug_enabled = false;
         if (is_interactive) {
             if (setjmp(InteractiveShellErrorAbsorber)) {
                 ast_interactive_cursor = ast_node_cursor;
-                if (main_interpreted_module != NULL) {
-                    free(main_interpreted_module);
-                    main_interpreted_module = NULL;
-                }
+
                 phase = INIT_PROGRAM;
                 freeComplexModeStack();
                 //freeLeftRightBracketStack();
@@ -854,6 +851,11 @@ ast_debug_enabled = false;
 
                 if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
                 if (function_call_stack.size > 0) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
+
+                if (main_interpreted_module != NULL) {
+                    free(main_interpreted_module);
+                    main_interpreted_module = NULL;
+                }
             }
         }
 
