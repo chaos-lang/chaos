@@ -1,0 +1,33 @@
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 3
+Unexpected accessor data type: List for variable: a
+Absorbed by Interactive Shell
+[0]
+[1, 2]
+[start] =>
+	{id: 0, name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: } =>
+	{id: 1, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 2, name: f, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: } =>
+	{id: 3, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 4, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 5, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: } =>
+	{id: 6, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 7, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+[end]
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 5
+Undefined variable: k
+Absorbed by Interactive Shell
+[start] =>
+	{id: 0, name: a, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: } =>
+	{id: 1, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 2, name: f, 2nd_name: (null), key: (null), scope: main, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: } =>
+	{id: 3, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 4, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 5, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: } =>
+	{id: 6, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+	{id: 7, name: (null), 2nd_name: (null), key: (null), scope: main, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: } =>
+[end]
+[1, 1, 1, 1]

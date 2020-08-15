@@ -155,6 +155,7 @@ Symbol* getComplexMode();
 void pushLeftRightBracketStack(unsigned long long symbol_id);
 unsigned long long popLeftRightBracketStack();
 void freeLeftRightBracketStack();
+void freeLeftRightBracketStackSymbols();
 Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested);
 void removeChildrenOfComplex(Symbol* symbol);
 bool isComplex(Symbol* symbol);

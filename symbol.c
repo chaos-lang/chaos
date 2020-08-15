@@ -987,8 +987,19 @@ void updateComplexElementSymbol(Symbol* source) {
 
 void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, Symbol* source) {
     Symbol* access_symbol = getSymbolById(symbol_id);
+
+    if (access_symbol->type == K_LIST || access_symbol->type == K_DICT) {
+        throw_error(E_UNEXPECTED_ACCESSOR_DATA_TYPE, getTypeName(access_symbol->type), complex->name);
+    }
+
     long long i = getSymbolValueInt_ZeroIfNotInt(access_symbol);
     char *key = getSymbolValueString_NullIfNotString(access_symbol);
+
+    if (complex->type != K_LIST && complex->type != K_DICT) {
+        removeSymbol(access_symbol);
+        free(key);
+        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
+    }
 
     if (complex->secondary_type != K_ANY && complex->secondary_type != source->type) {
         removeSymbol(access_symbol);
@@ -1008,10 +1019,6 @@ void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, 
         complex_mode_stack.child_counter[complex_mode_stack.size - 1] = complex->children_count;
         deepCopySymbol(source, source->type, key);
         finishComplexMode(NULL, complex->secondary_type);
-    } else {
-        removeSymbol(access_symbol);
-        free(key);
-        throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(complex->type), complex->name);
     }
     free(key);
 }
@@ -1432,6 +1439,14 @@ void freeLeftRightBracketStack() {
     free(left_right_bracket_stack.arr);
     left_right_bracket_stack.capacity = 0;
     left_right_bracket_stack.size = 0;
+}
+
+void freeLeftRightBracketStackSymbols() {
+    Symbol* symbol;
+    for (unsigned i = 0; i < left_right_bracket_stack.size; i++) {
+        symbol = getSymbolById(left_right_bracket_stack.arr[i]);
+        removeSymbol(symbol);
+    }
 }
 
 Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested) {

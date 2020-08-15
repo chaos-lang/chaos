@@ -1,0 +1,11 @@
+list a = [0]
+list f = [1, 2]
+a[f] = a
+a
+f
+
+symbol_table
+k[0] = 1
+symbol_table
+list k = [1, 1, 1, 1]
+k
