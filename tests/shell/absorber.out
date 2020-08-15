@@ -23,11 +23,4 @@ Line: 6
 Undefined function: b
 Absorbed by Interactive Shell
 print b
-print b
-Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 8
-Undefined variable: b
-Absorbed by Interactive Shell
-
 You have chosen the order!

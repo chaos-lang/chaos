@@ -12,22 +12,6 @@ b
 b()
 b
 
-void def b()
-    print b
-end
-
-b
-b()
-b
-
-
-any def f1()
-    bool f = r
-    return f
-end
-
-f1()
-
 any def f1()
     bool f = true
     return f
