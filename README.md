@@ -96,13 +96,14 @@ make install
 
 ```
 $ chaos
-    Chaos Language 0.0.1-alpha (Apr 10 2020 01:22:17)
-    GCC version: 7.4.0 on linux
+    Chaos Language 0.0.1-alpha (Aug 16 2020 21:56:00)
+    GCC version: 9.3.0 on linux
     Turn chaos into magic!
 
 kaos> print "hello world"
 hello world
-kaos>
+kaos> exit
+    You have chosen the order!
 ```
 
 ### Program File as Command-line Argument
@@ -135,3 +136,7 @@ make uninstall
 [**Bug Tracker**](https://github.com/chaos-lang/chaos/issues)
 
 [**Occultist Dependency Manager**](https://github.com/chaos-lang/occultist)
+
+[**Contribution Guide**](https://github.com/chaos-lang/chaos/blob/master/CONTRIBUTING.md)
+
+[**Code of Conduct**](https://github.com/chaos-lang/chaos/blob/master/CODE_OF_CONDUCT.md)
