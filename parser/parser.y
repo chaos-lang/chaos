@@ -19,7 +19,7 @@
 #include "utilities/language.h"
 #include "utilities/helpers.h"
 #include "utilities/injector.h"
-#include "symbol.h"
+#include "interpreter/symbol.h"
 #include "loop.h"
 #include "function.h"
 #include "module.h"

@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "loop.h"
-#include "../symbol.h"
+#include "../interpreter/symbol.h"
 #include "../utilities/injector.h"
 #include "../interpreter/interpreter.h"
 

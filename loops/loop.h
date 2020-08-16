@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <setjmp.h>
 
-#include "../symbol.h"
+#include "../interpreter/symbol.h"
 #include "../ast/ast.h"
 
 enum LoopType { TIMESDO, FOREACH, FOREACH_DICT };

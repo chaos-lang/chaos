@@ -7,7 +7,7 @@
 
 typedef struct _Function _Function;
 
-#include "../symbol.h"
+#include "../interpreter/symbol.h"
 #include "../interpreter/errors.h"
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "../utilities/shell.h"

@@ -7,13 +7,13 @@
 
 typedef struct Symbol Symbol;
 
-#include "enums.h"
-#include "interpreter/errors.h"
-#include "utilities/helpers.h"
+#include "../enums.h"
+#include "errors.h"
+#include "../utilities/helpers.h"
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#include "utilities/shell.h"
+#include "../utilities/shell.h"
 #endif
-#include "functions/function.h"
+#include "../functions/function.h"
 
 typedef struct Symbol {
     unsigned long long id;
@@ -165,6 +165,6 @@ void popNestedComplexModeStack(char *key);
 void freeNestedComplexModeStack();
 void reverseComplexMode();
 
-#include "../interpreter/interpreter.h"
+#include "interpreter.h"
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../symbol.h"
+#include "../interpreter/symbol.h"
 #include "../interpreter/errors.h"
 #include "../utilities/injector.h"
 #include "../utilities/helpers.h"
