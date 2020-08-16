@@ -7,14 +7,14 @@
 
 typedef struct _Function _Function;
 
-#include "../interpreter/symbol.h"
-#include "../interpreter/errors.h"
+#include "symbol.h"
+#include "errors.h"
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "../utilities/shell.h"
 #endif
 #include "../utilities/language.h"
 #include "../utilities/helpers.h"
-#include "../modules/module.h"
+#include "module.h"
 
 extern enum Phase phase;
 enum BlockType { B_EXPRESSION, B_FUNCTION };

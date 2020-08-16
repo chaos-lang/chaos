@@ -22,7 +22,7 @@
 #include "interpreter/symbol.h"
 #include "interpreter/loop.h"
 #include "interpreter/function.h"
-#include "module.h"
+#include "interpreter/module.h"
 #include "interpreter/interpreter.h"
 
 extern int yylex();
