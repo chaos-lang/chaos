@@ -59,7 +59,7 @@ chaos.tab.c chaos.tab.h: chaos.y
 	bison -Wconflicts-rr -Wno-conflicts-sr --report=state --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d chaos.y
 
 lex.yy.c:
-	flex lexer.l
+	flex lexer/lexer.l
 
 chaos: lex.yy.c chaos.tab.c chaos.tab.h
 	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -fcommon -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c ast/*.c interpreter/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}

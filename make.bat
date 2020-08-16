@@ -86,7 +86,7 @@ IF [%1]==[] (
     EXIT /B 0
 )
 
-win_flex --wincompat lexer.l
+win_flex --wincompat lexer\lexer.l
 IF errorlevel 1 (
     EXIT /B 1
 )

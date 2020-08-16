@@ -25,7 +25,7 @@ extern int oerrno;
 extern void yyerror(const char* s);
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
-#include "chaos.tab.h"
+#include "../chaos.tab.h"
 
 enum Phase phase = INIT_PROGRAM;
 unsigned short module_parsing = 0;
