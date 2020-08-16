@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "../interpreter/symbol.h"
+#include "interpreter/symbol.h"
 #include "ast/ast.h"
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
@@ -25,7 +25,7 @@ extern int oerrno;
 extern void yyerror(const char* s);
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
-#include "../parser.tab.h"
+#include "parser.tab.h"
 
 enum Phase phase = INIT_PROGRAM;
 unsigned short module_parsing = 0;
