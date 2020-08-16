@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "../symbol.h"
-#include "../errors.h"
+#include "../interpreter/errors.h"
 #include "../utilities/injector.h"
 #include "../utilities/helpers.h"
 #include "extension.h"
