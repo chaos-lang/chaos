@@ -16,7 +16,6 @@ void initMainContext() {
 
 void appendModuleToModuleBuffer(char *name) {
     append_to_array(&modules_buffer, name);
-    //free(name);
 }
 
 void prependModuleToModuleBuffer(char *name) {
@@ -94,7 +93,6 @@ void handleModuleImport(char *module_name, bool directly_import) {
     free(module);
     free(module_path);
     free(relative_path);
-    //free(module_name);
 }
 
 void freeModulesBuffer() {

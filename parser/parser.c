@@ -171,7 +171,6 @@ void yyerror(const char* s) {
         if (isComplexMode()) {
             freeComplexModeStack();
         }
-        //freeLeftRightBracketStack();
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         printf("%s ", __KAOS_SHELL_INDICATOR__);
         #endif

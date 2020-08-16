@@ -40,7 +40,6 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
             if (type == K_STRING) {
                 free(value.s);
             }
-            //append_to_array_without_malloc(&free_string_stack, name);
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
         if (name != NULL) {
@@ -72,8 +71,6 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     add_suggestion(name);
     #endif
 
-    //free(name);
-
     return symbol;
 }
 
@@ -88,8 +85,6 @@ Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueTy
     if (symbol->value_type == V_STRING) free(symbol->value.s);
     symbol->value = value;
     symbol->value_type = value_type;
-
-    //free(name);
 
     return symbol;
 }
@@ -202,13 +197,6 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
     for (unsigned long i = 0; i < symbol->children_count; i++) {
         Symbol* child = symbol->children[i];
-        /*
-        char *key = NULL;
-        if (child->key != NULL) {
-            key = malloc(1 + strlen(child->key));
-            strcpy(key, child->key);
-        }
-        */
         deepCopySymbol(child, child->type, child->key);
     }
 
@@ -220,7 +208,6 @@ Symbol* deepCopyComplex(char *name, Symbol* symbol) {
 
 char* getSymbolValueString(char *name) {
     Symbol* symbol = getSymbol(name);
-    //free(name);
     return _getSymbolValueString(symbol);
 }
 
@@ -238,7 +225,6 @@ char* _getSymbolValueString(Symbol* symbol) {
 
 long double getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
-    //free(name);
     return _getSymbolValueFloat(symbol);
 }
 
@@ -267,7 +253,6 @@ long double _getSymbolValueFloat(Symbol* symbol) {
 
 bool getSymbolValueBool(char *name) {
     Symbol* symbol = getSymbol(name);
-    //free(name);
     return _getSymbolValueBool(symbol);
 }
 
@@ -297,7 +282,6 @@ bool _getSymbolValueBool(Symbol* symbol) {
 
 long long getSymbolValueInt(char *name) {
     Symbol* symbol = getSymbol(name);
-    //free(name);
     return _getSymbolValueInt(symbol);
 }
 
@@ -605,7 +589,6 @@ Symbol* addSymbolString(char *name, char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
-    //free(s);
     return addSymbol(name, K_STRING, value, V_STRING);
 }
 
@@ -625,8 +608,6 @@ void addSymbolList(char *name) {
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
     Symbol* symbol = getSymbol(name);
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
-    //free(name);
-    //free(clone_name);
     return clone_symbol;
 }
 
@@ -643,7 +624,6 @@ Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *na
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);
 
     free(key);
-    //free(clone_name);
     if (_symbol->type == K_STRING) {
         removeSymbol(symbol);
     }
@@ -720,8 +700,6 @@ Symbol* updateSymbolByClonning(char *clone_name, Symbol* symbol) {
 Symbol* updateSymbolByClonningName(char *clone_name, char *name) {
     Symbol* symbol = getSymbol(name);
     updateSymbolByClonning(clone_name, symbol);
-    //free(clone_name);
-    //free(name);
     return symbol;
 }
 
@@ -737,7 +715,6 @@ Symbol* updateSymbolByClonningComplexElement(char *clone_name, char *name) {
     Symbol* symbol = getComplexElement(_symbol, i, key);
     updateSymbolByClonning(clone_name, symbol);
 
-    //free(clone_name);
     free(key);
     if (_symbol->type == K_STRING) {
         removeSymbol(symbol);
@@ -765,7 +742,6 @@ Symbol* finishComplexMode(char *name, enum Type type) {
         if (isDefined(name)) {
             removeSymbol(complex_mode);
             popComplexModeStack();
-            //append_to_array_without_malloc(&free_string_stack, name);
             throw_error(E_VARIABLE_ALREADY_DEFINED, name);
         }
 
@@ -857,7 +833,6 @@ Symbol* getListElement(Symbol* symbol, long long i) {
 void cloneSymbolToComplex(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
     Symbol* cloned_symbol = deepCopySymbol(symbol, symbol->type, key);
-    //free(name);
 }
 
 Symbol* getComplexElement(Symbol* complex, long long i, char *key) {
@@ -974,7 +949,6 @@ void updateComplexElementString(char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
-    //free(s);
     updateComplexElementWrapper(K_STRING, value, V_STRING);
 }
 
@@ -1451,7 +1425,6 @@ void freeLeftRightBracketStackSymbols() {
 
 Symbol* getComplexElementThroughLeftRightBracketStack(char *name, unsigned long inverse_nested) {
     Symbol* symbol = getSymbol(name);
-    //free(name);
 
     if (inverse_nested >= left_right_bracket_stack.size) {
         return symbol;

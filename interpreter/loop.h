@@ -25,7 +25,6 @@ typedef struct {
     char *list;
     LoopElement element;
     struct ASTNode* ast_node;
-    char *body;
 } Loop;
 
 Loop* loop_mode;

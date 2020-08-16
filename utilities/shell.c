@@ -84,11 +84,9 @@ int shell_readline(char *buf) {
     rl_command_func_t up_arrow_key_pressed;
     rl_command_func_t down_arrow_key_pressed;
     rl_command_func_t esc_key_pressed;
-    //rl_command_func_t tab_key_pressed;
     rl_bind_keyseq("\\e[A", up_arrow_key_pressed);
     rl_bind_keyseq("\\e[B", down_arrow_key_pressed);
     rl_bind_key(27, esc_key_pressed); /* ascii code for ESC */
-    //rl_bind_key ('\t', tab_key_pressed);
     rl_attempted_completion_function = suggestion_completion;
 
     char *line;

@@ -14,7 +14,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 
     if (function_names_buffer.size > 0) {
         if (!isInFunctionNamesBuffer(name)) {
-            //free(name);
             freeFunctionMode();
             return;
         }
@@ -22,7 +21,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 
     removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
-    function_mode->body = "";
     function_mode->name = malloc(1 + strlen(name));
     function_mode->line_no = yylineno;
     strcpy(function_mode->name, name);
@@ -87,7 +85,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     }
     #endif
 
-    //free(name);
     freeFunctionMode();
 
     if (is_interactive) {
@@ -264,7 +261,6 @@ _Function* getFunction(char *name, char *module) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
-        //append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_UNDEFINED_FUNCTION, name);
     }
     return NULL;
@@ -326,7 +322,6 @@ void addFunctionParameter(char *secondary_name, enum Type type, enum Type second
     symbol->secondary_type = secondary_type;
 
     addSymbolToFunctionParameters(symbol, false);
-    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterBool(char *secondary_name, bool b) {
@@ -335,7 +330,6 @@ void addFunctionOptionalParameterBool(char *secondary_name, bool b) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
@@ -344,7 +338,6 @@ void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
@@ -353,7 +346,6 @@ void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterString(char *secondary_name, char *s) {
@@ -362,7 +354,6 @@ void addFunctionOptionalParameterString(char *secondary_name, char *s) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    //free(secondary_name);
 }
 
 void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type) {
@@ -371,7 +362,6 @@ void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type) {
     strcpy(symbol->secondary_name, secondary_name);
 
     addSymbolToFunctionParameters(symbol, true);
-    //free(secondary_name);
 }
 
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
@@ -476,7 +466,6 @@ void returnSymbol(char *name) {
     );
 
     scope_override = NULL;
-    //free(name);
 }
 
 void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped) {
@@ -497,9 +486,6 @@ void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name,
         return;
     }
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
-    //free(name);
-    //free(clone_name);
-    //free(module);
 }
 
 void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module) {
@@ -510,9 +496,6 @@ void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*mod
         return;
     }
     updateSymbolByClonning(clone_name, function->symbol);
-    //free(clone_name);
-    //free(name);
-    //free(module);
 }
 
 void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
@@ -523,8 +506,6 @@ void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
         return;
     }
     updateComplexElementSymbol(function->symbol);
-    //free(name);
-    //free(module);
 }
 
 void initMainFunction() {
@@ -572,8 +553,6 @@ void removeFunction(_Function* function) {
 }
 
 void freeFunction(_Function* function) {
-    if (strlen(function->body) > 0)
-        free(function->body);
     free(function->name);
     free(function->parameters);
     for (unsigned i = 0; i < function->decision_functions.size; i++) {
@@ -666,7 +645,6 @@ void executeDecision(_Function* function) {
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
     append_to_array(&function_names_buffer, name);
-    //free(name);
 }
 
 void freeFunctionNamesBuffer() {

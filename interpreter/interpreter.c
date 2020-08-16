@@ -1163,7 +1163,6 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             printFunctionTable();
             break;
         case AST_FUNCTION_CALL_PARAMETERS_START:
-            //startFunctionParameters();
             break;
         case AST_FUNCTION_CALL_PARAMETER_BOOL:
             addFunctionCallParameterBool(ast_node->right->value.b);
