@@ -20,7 +20,7 @@
 #include "utilities/helpers.h"
 #include "utilities/injector.h"
 #include "interpreter/symbol.h"
-#include "loop.h"
+#include "interpreter/loop.h"
 #include "function.h"
 #include "module.h"
 #include "interpreter/interpreter.h"
