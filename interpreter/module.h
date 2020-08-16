@@ -5,7 +5,7 @@
 
 #include "symbol.h"
 #include "errors.h"
-#include "../utilities/injector.h"
+#include "../lexer/lexer.h"
 #include "../utilities/helpers.h"
 #include "extension.h"
 

@@ -3,20 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "interpreter/symbol.h"
 #include "ast/ast.h"
-
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#include <readline/readline.h>
-#include <readline/history.h>
-#endif
-
-#include "utilities/language.h"
-#include "utilities/injector.h"
-
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#include "utilities/shell.h"
-#endif
+#include "lexer/lexer.h"
 
 #define YY_DECL int yylex()
 

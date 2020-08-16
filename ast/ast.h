@@ -9,12 +9,7 @@ typedef struct ASTNode ASTNode;
 bool ast_debug_enabled;
 
 #include "../enums.h"
-#include "../interpreter/errors.h"
 #include "../utilities/helpers.h"
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#include "../utilities/shell.h"
-#endif
-#include "../interpreter/function.h"
 
 enum ASTNodeType {
     AST_STEP,

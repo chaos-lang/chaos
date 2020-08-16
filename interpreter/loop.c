@@ -3,7 +3,6 @@
 
 #include "loop.h"
 #include "../interpreter/symbol.h"
-#include "../utilities/injector.h"
 #include "../interpreter/interpreter.h"
 
 bool interactive_shell_loop_error_absorbed = false;

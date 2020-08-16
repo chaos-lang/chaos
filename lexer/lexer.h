@@ -1,5 +1,5 @@
-#ifndef INJECTOR_H
-#define INJECTOR_H
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <stdio.h>
 #include <string.h>
