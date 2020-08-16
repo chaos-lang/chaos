@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "function.h"
+#include "interpreter/function.h"
 #include "Chaos.h"
 
 int defineFunction(

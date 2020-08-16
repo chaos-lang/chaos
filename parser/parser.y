@@ -21,7 +21,7 @@
 #include "utilities/injector.h"
 #include "interpreter/symbol.h"
 #include "interpreter/loop.h"
-#include "function.h"
+#include "interpreter/function.h"
 #include "module.h"
 #include "interpreter/interpreter.h"
 

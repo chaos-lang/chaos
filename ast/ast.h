@@ -14,7 +14,7 @@ bool ast_debug_enabled;
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "../utilities/shell.h"
 #endif
-#include "../functions/function.h"
+#include "../interpreter/function.h"
 
 enum ASTNodeType {
     AST_STEP,

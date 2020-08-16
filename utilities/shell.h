@@ -6,7 +6,7 @@
 #include <readline/history.h>
 #include "language.h"
 #include "helpers.h"
-#include "function.h"
+#include "../interpreter/function.h"
 
 int up_arrow_key_pressed(int count, int key);
 int down_arrow_key_pressed(int count, int key);

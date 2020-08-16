@@ -16,7 +16,7 @@
 #define LIBFUNC(lib, fn) dlsym((lib), (fn))
 #endif
 
-#include "../functions/function.h"
+#include "../interpreter/function.h"
 #include "../Chaos.h"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)

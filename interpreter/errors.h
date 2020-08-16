@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "../utilities/language.h"
-#include "../functions/function.h"
+#include "function.h"
 
 enum ExitCode {
     E_SUCCESS,

@@ -16,7 +16,7 @@ typedef struct string_array {
 
 string_array free_string_stack;
 
-#include "function.h"
+#include "../interpreter/function.h"
 
 char *longlong_to_string(long long value, char *result, unsigned short base);
 char *trim_string(char *str);

@@ -13,7 +13,7 @@ typedef struct Symbol Symbol;
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "../utilities/shell.h"
 #endif
-#include "../functions/function.h"
+#include "function.h"
 
 typedef struct Symbol {
     unsigned long long id;
