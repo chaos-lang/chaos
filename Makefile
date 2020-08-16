@@ -55,17 +55,17 @@ clang-dev-sanitizer-undefined_behavior:
 help.h:
 	xxd -i help.txt > help.h
 
-chaos.tab.c chaos.tab.h: chaos.y
-	bison -Wconflicts-rr -Wno-conflicts-sr --report=state --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d chaos.y
+parser.tab.c parser.tab.h:
+	bison -Wconflicts-rr -Wno-conflicts-sr --report=state --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d parser.y
 
 lex.yy.c:
 	flex lexer/lexer.l
 
-chaos: lex.yy.c chaos.tab.c chaos.tab.h
-	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -fcommon -DCHAOS_INTERPRETER -o chaos chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c ast/*.c interpreter/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
+chaos: lex.yy.c parser.tab.c parser.tab.h
+	${CHAOS_COMPILER} -Werror -Iloops -Ifunctions -Imodules -fcommon -DCHAOS_INTERPRETER -o chaos parser.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c ast/*.c interpreter/*.c symbol.c errors.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
-	rm -rf chaos chaos.tab.c lex.yy.c chaos.tab.h
+	rm -rf chaos parser.tab.c lex.yy.c parser.tab.h
 
 install: requirements-dev
 	mv chaos /usr/local/bin/

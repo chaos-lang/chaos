@@ -1,7 +1,7 @@
 chaos
 chaos.exe
-chaos.tab.c
-chaos.tab.h
+parser.tab.c
+parser.tab.h
 lex.yy.c
 
 # Editors and IDEs

@@ -60,7 +60,7 @@ IF [%1]==[] (
         EXIT /B 0
     )
 ) ELSE IF [%1]==[clean] (
-    DEL chaos.exe chaos.tab.c lex.yy.c chaos.tab.h
+    DEL chaos.exe parser.tab.c parser.tab.h lex.yy.c
     EXIT /B 0
 ) ELSE IF [%1]==[test-extensions-windows-gcc] (
     CD tests\extensions\spells\example
@@ -90,11 +90,11 @@ win_flex --wincompat lexer\lexer.l
 IF errorlevel 1 (
     EXIT /B 1
 )
-win_bison -d chaos.y
+win_bison -d parser.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-%compiler% -Iloops -Ifunctions -Imodules -DCHAOS_INTERPRETER -o chaos.exe chaos.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c ast/*.c interpreter/*.c symbol.c errors.c Chaos.c %extra_flags%
+%compiler% -Iloops -Ifunctions -Imodules -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c loops/*.c functions/*.c modules/*.c utilities/*.c ast/*.c interpreter/*.c symbol.c errors.c Chaos.c %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )
