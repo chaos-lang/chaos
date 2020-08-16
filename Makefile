@@ -56,7 +56,7 @@ help.h:
 	xxd -i help.txt > help.h
 
 parser.tab.c parser.tab.h:
-	bison -Wconflicts-rr -Wno-conflicts-sr --report=state --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d parser.y
+	bison -Wconflicts-rr -Wno-conflicts-sr --report=state --report-file=bison_report.txt --graph=bison_graph.txt --xml=bison_xml.xml -d parser/parser.y
 
 lex.yy.c:
 	flex lexer/lexer.l

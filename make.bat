@@ -90,7 +90,7 @@ win_flex --wincompat lexer\lexer.l
 IF errorlevel 1 (
     EXIT /B 1
 )
-win_bison -d parser.y
+win_bison -d parser\parser.y
 IF errorlevel 1 (
     EXIT /B 1
 )
