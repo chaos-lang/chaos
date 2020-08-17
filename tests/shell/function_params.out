@@ -1,0 +1,24 @@
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 7
+Illegal variable type for function parameter: param2 of function: list_as_params
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 7
+Illegal variable type for function parameter: param2 of function: dict_as_params
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 11
+Illegal variable type for function parameter: param2 of function: typed_list_as_params
+Absorbed by Interactive Shell
+foo
+[1, 2, 3]
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Illegal element type: String for the typed list: param2
+Absorbed by Interactive Shell
+
+You have chosen the order!

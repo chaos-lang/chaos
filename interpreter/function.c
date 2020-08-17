@@ -172,6 +172,7 @@ void callFunction(char *name, char *module) {
             parameter_call->scope = function;
             parameter_call->recursion_depth = recursion_depth + 1;
             parameter_call->param_of = function;
+            parameter_call->secondary_type = parameter->secondary_type;
         }
     }
     scope_override = NULL;
