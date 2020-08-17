@@ -316,6 +316,5 @@ void ASTBranchOut();
 void ASTMergeBack();
 ASTNode* free_node(ASTNode* ast_node);
 char* getAstNodeTypeName(unsigned i);
-void SEIN(ASTNode* ast_node);
 
 #endif

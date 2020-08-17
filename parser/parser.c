@@ -187,11 +187,6 @@ void yyerror(const char* s) {
     }
 }
 
-// Syntax Error If NULL
-void SEIN(ASTNode* ast_node) {
-    if (ast_node == NULL || ast_node->node_type > AST_JSON_PARSER) yyerror(__KAOS_SYNTAX_ERROR__);
-}
-
 void absorbError() {
     ast_interactive_cursor = ast_node_cursor;
 

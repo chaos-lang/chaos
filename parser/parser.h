@@ -25,7 +25,6 @@ extern char *main_interpreted_module;
 int initParser(int argc, char** argv);
 void freeEverything();
 void yyerror(const char* s);
-void SEIN(ASTNode* ast_node);
 void absorbError();
 
 #endif
