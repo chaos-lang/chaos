@@ -454,7 +454,7 @@ char* escape_the_sequences_in_string_literal(char* string) {
     char* new_string = malloc(strlen(string) + 1);
     strcpy(new_string, string);
 
-    for (long long i = 0; i < strlen(new_string); i++){
+    for (long long i = 0; i < (long long) strlen(new_string); i++){
         if (new_string[i] == '\\') {
             switch (new_string[i+1])
             {

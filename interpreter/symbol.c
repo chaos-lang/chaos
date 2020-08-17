@@ -1357,7 +1357,7 @@ void freeComplexModeStack() {
     for (unsigned i = 0; i < complex_mode_stack.size; i++) {
         if (complex_mode_stack.arr[i] != NULL)
             removeSymbol(complex_mode_stack.arr[i]);
-            complex_mode_stack.child_counter[i] = 0;
+        complex_mode_stack.child_counter[i] = 0;
     }
 
     if (complex_mode_stack.capacity > 0) {

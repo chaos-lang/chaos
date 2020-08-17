@@ -485,7 +485,7 @@ void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name,
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
         return;
     }
-    Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
+    createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
 }
 
 void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module) {

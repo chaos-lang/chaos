@@ -25,7 +25,7 @@ void injectCode(char *code, enum Phase phase_arg) {
     YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
     YY_BUFFER_STATE new_buffer = yy_scan_string(code);
     yy_switch_to_buffer(new_buffer);
-    int ret = yyparse();
+    yyparse();
 
     if (phase_arg == INIT_JSON_PARSE) {
         phase_arg = PROGRAM;
