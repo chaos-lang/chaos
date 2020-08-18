@@ -115,6 +115,19 @@ function:
     | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                                           { char *strings[] = {$3, $1};         ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_RETURN, strings, 2, $5);                                         ASTNodeNext(ast_node); }
     | error T_NEWLINE                                                                                                   { if (is_interactive) { yyerrok; yyclearin; } }
     | T_TIMES_DO_INT function                                                                                           { }
+    | T_VAR_BOOL T_FUNCTION T_VAR                                                                                       { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_NUMBER T_FUNCTION T_VAR                                                                                     { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_STRING T_FUNCTION T_VAR                                                                                     { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_ANY T_FUNCTION T_VAR                                                                                        { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_LIST T_FUNCTION T_VAR                                                                                       { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_DICT T_FUNCTION T_VAR                                                                                       { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_BOOL T_VAR_LIST T_FUNCTION T_VAR                                                                            { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_BOOL T_VAR_DICT T_FUNCTION T_VAR                                                                            { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_NUMBER T_VAR_LIST T_FUNCTION T_VAR                                                                          { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_NUMBER T_VAR_DICT T_FUNCTION T_VAR                                                                          { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_STRING T_VAR_LIST T_FUNCTION T_VAR                                                                          { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VAR_STRING T_VAR_DICT T_FUNCTION T_VAR                                                                          { yyerror(__KAOS_SYNTAX_ERROR__); }
+    | T_VOID T_FUNCTION T_VAR                                                                                           { yyerror(__KAOS_SYNTAX_ERROR__); }
 ;
 
 function_parameters_start:                                                                                              { }
