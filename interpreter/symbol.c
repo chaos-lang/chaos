@@ -914,6 +914,8 @@ void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Ty
         return;
     } else if (complex->secondary_type != K_ANY && complex->secondary_type != type) {
         free(key);
+        if (type == K_STRING)
+            free(value.s);
         throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST, getTypeName(type), complex->name);
     }
 
