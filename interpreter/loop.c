@@ -25,10 +25,13 @@ ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_no
 }
 
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
-    ASTNode* next_node;
+    ASTNode* next_node = ast_node;
 
     Symbol* list = getSymbol(list_name);
-    for (unsigned long long i = 0; i < list->children_count; i++) {
+    if (list->type != K_LIST)
+        throw_error(E_NOT_A_LIST, list_name);
+
+    for (unsigned long i = 0; i < list->children_count; i++) {
         Symbol* child = list->children[i];
         Symbol* clone_symbol = createCloneFromSymbol(element_name, child->type, child, child->secondary_type);
         next_node = eval_node(ast_node->next, ast_node->module);
@@ -38,12 +41,15 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
     return eval_node(next_node->next, ast_node->module);
 }
 
-ASTNode* startForeachDict(char *list_name, char *element_key, char *element_value, ASTNode* ast_node) {
-    ASTNode* next_node;
+ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_value, ASTNode* ast_node) {
+    ASTNode* next_node = ast_node;
 
-    Symbol* list = getSymbol(list_name);
-    for (unsigned long long i = 0; i < list->children_count; i++) {
-        Symbol* child = list->children[i];
+    Symbol* dict = getSymbol(dict_name);
+    if (dict->type != K_DICT)
+        throw_error(E_NOT_A_DICT, dict_name);
+
+    for (unsigned long i = 0; i < dict->children_count; i++) {
+        Symbol* child = dict->children[i];
 
         addSymbolString(element_key, child->key);
         Symbol* clone_symbol = createCloneFromSymbol(element_value, child->type, child, child->secondary_type);
