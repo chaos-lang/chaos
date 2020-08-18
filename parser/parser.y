@@ -807,6 +807,7 @@ dictionary: T_STRING T_COLON T_VAR left_right_bracket                           
 
 decisionstart:                                                                                                          { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; }
     | decisionstart T_LEFT_CURLY_BRACKET decision T_RIGHT_CURLY_BRACKET                                                 { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, strings, 0);                                                  $$ = ast_node; $$->right = $3; $$->left = $1; }
+    | decisionstart T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET                                                          { yyerror(__KAOS_SYNTAX_ERROR__); }
 ;
 
 decision:                                                                                                               { }
