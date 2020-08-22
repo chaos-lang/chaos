@@ -79,7 +79,8 @@ bool interactive_shell_function_error_absorbed;
 
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 void endFunction();
-void freeFunctionMode();
+void freeFunctionParametersMode();
+void resetFunctionParametersMode();
 _Function* getFunction(char *name, char *module);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();

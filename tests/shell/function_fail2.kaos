@@ -1,0 +1,10 @@
+any f = f(1,2)
+symbol_table
+
+void def f()
+    bool f = true
+    return f
+end
+
+f(1,2)
+f()

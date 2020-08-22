@@ -14,7 +14,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 
     if (function_names_buffer.size > 0) {
         if (!isInFunctionNamesBuffer(name)) {
-            freeFunctionMode();
+            freeFunctionParametersMode();
             return;
         }
     }
@@ -85,7 +85,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     }
     #endif
 
-    freeFunctionMode();
+    freeFunctionParametersMode();
 
     if (is_interactive) {
         phase = PROGRAM;
@@ -95,10 +95,10 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 void endFunction() {
     if (function_mode == NULL) return;
     function_mode = NULL;
-    freeFunctionMode();
+    freeFunctionParametersMode();
 }
 
-void freeFunctionMode() {
+void freeFunctionParametersMode() {
     if (function_parameters_mode == NULL) return;
 
     if (function_parameters_mode->parameter_count > 0) {
@@ -106,6 +106,15 @@ void freeFunctionMode() {
     }
     free(function_parameters_mode);
     function_parameters_mode = NULL;
+}
+
+void resetFunctionParametersMode() {
+    if (function_parameters_mode == NULL) return;
+
+    for (unsigned short i = 0; i < function_parameters_mode->parameter_count; i++) {
+        removeSymbol(function_parameters_mode->parameters[i]);
+    }
+    freeFunctionParametersMode();
 }
 
 void callFunction(char *name, char *module) {
@@ -119,7 +128,7 @@ void callFunction(char *name, char *module) {
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
 
     if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count) {
-        freeFunctionMode();
+        freeFunctionParametersMode();
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
     }
 
@@ -134,7 +143,7 @@ void callFunction(char *name, char *module) {
             );
 
             if (function_parameters_mode->parameters == NULL) {
-                freeFunctionMode();
+                freeFunctionParametersMode();
                 throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
             }
 
@@ -153,7 +162,7 @@ void callFunction(char *name, char *module) {
             Symbol* parameter_call = function_parameters_mode->parameters[i];
 
             if (parameter->type != K_ANY && parameter->type != parameter_call->type) {
-                freeFunctionMode();
+                freeFunctionParametersMode();
                 throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
             }
 
@@ -161,7 +170,7 @@ void callFunction(char *name, char *module) {
                 for (unsigned long i = 0; i < parameter_call->children_count; i++) {
                     Symbol* child = parameter_call->children[i];
                     if (child->type != parameter->secondary_type) {
-                        freeFunctionMode();
+                        freeFunctionParametersMode();
                         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
                     }
                 }
@@ -177,7 +186,7 @@ void callFunction(char *name, char *module) {
     }
     scope_override = NULL;
 
-    freeFunctionMode();
+    freeFunctionParametersMode();
 
     _Function* parent_scope = getCurrentScope();
     pushExecutedFunctionStack(function);
@@ -440,14 +449,12 @@ void returnSymbol(char *name) {
         function_call_stack.arr[function_call_stack.size - 1]->type != K_ANY &&
         symbol->type != function_call_stack.arr[function_call_stack.size - 1]->type
     ) {
-        free(name);
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), function_call_stack.arr[function_call_stack.size - 1]->name);
     }
     if (symbol->secondary_type != K_ANY &&
         function_call_stack.arr[function_call_stack.size - 1]->secondary_type != K_ANY &&
         symbol->secondary_type != function_call_stack.arr[function_call_stack.size - 1]->secondary_type
     ) {
-        free(name);
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function_call_stack.arr[function_call_stack.size - 1]->name);
     }
 

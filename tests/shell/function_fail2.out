@@ -1,0 +1,19 @@
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Undefined function: f
+Absorbed by Interactive Shell
+[start] =>
+[end]
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 8
+Incorrect argument count for function: f
+Absorbed by Interactive Shell
+Chaos Error:
+Module: ~/chaos/__interactive__.kaos
+Line: 1
+Illegal variable type: Boolean for function: f
+Absorbed by Interactive Shell
+
+You have chosen the order!
