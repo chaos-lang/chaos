@@ -120,5 +120,6 @@ bool isFunctionType(char *name, char *module, enum Type type);
 void setScopeless(Symbol* symbol);
 void pushExecutedFunctionStack(_Function* executed_function);
 void popExecutedFunctionStack();
+void freeFunctionReturn(char *name, char *module);
 
 #endif

@@ -484,6 +484,7 @@ void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool 
         return;
     }
     printSymbolValueEndWith(function->symbol, end, pretty, escaped);
+    freeFunctionReturn(name, module);
 }
 
 void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name, char *module, enum Type extra_type) {
@@ -494,6 +495,7 @@ void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name,
         return;
     }
     createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
+    freeFunctionReturn(name, module);
 }
 
 void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module) {
@@ -504,6 +506,7 @@ void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*mod
         return;
     }
     updateSymbolByClonning(clone_name, function->symbol);
+    freeFunctionReturn(name, module);
 }
 
 void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
@@ -631,6 +634,10 @@ void addDefaultDecision() {
 
 void executeDecision(_Function* function) {
     if (function->decision_node == NULL) {
+        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
+            removeSymbol(decision_symbol_chain);
+            decision_symbol_chain = NULL;
+        }
         return;
     }
 
@@ -695,4 +702,12 @@ void pushExecutedFunctionStack(_Function* executed_function) {
 void popExecutedFunctionStack() {
     function_call_stack.arr[function_call_stack.size - 1] = NULL;
     function_call_stack.size--;
+}
+
+void freeFunctionReturn(char *name, char *module) {
+    _Function* function = getFunction(name, module);
+    if (function->symbol != NULL) {
+        removeSymbol(function->symbol);
+        function->symbol = NULL;
+    }
 }

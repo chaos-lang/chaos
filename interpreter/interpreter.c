@@ -1206,8 +1206,11 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             break;
         case AST_FUNCTION_RETURN:
             callFunction(ast_node->strings[0], ast_node->strings[1]);
-            if (is_interactive && !isFunctionType(ast_node->strings[0], ast_node->strings[1], K_VOID) && !inject_mode && !decision_execution_mode)
+            if (is_interactive && !isFunctionType(ast_node->strings[0], ast_node->strings[1], K_VOID) && !inject_mode && !decision_execution_mode) {
                 printFunctionReturn(ast_node->strings[0], ast_node->strings[1], "\n", false, false);
+            } else {
+                freeFunctionReturn(ast_node->strings[0], ast_node->strings[1]);
+            }
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
             reverseComplexMode();
