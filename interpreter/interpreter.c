@@ -1221,10 +1221,20 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
                 stop_ast_evaluation = true;
             }
             break;
+        case AST_DECISION_MAKE_BOOLEAN_BREAK:
+            if (nested_loop_counter > 0 && ast_node->right->value.b) {
+                decisionBreakLoop();
+            }
+            break;
         case AST_DECISION_MAKE_DEFAULT:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
                 stop_ast_evaluation = true;
+            }
+            break;
+        case AST_DECISION_MAKE_DEFAULT_BREAK:
+            if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+                decisionBreakLoop();
             }
             break;
         case AST_JSON_PARSER:
@@ -1240,5 +1250,23 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
         return ast_node;
     } else {
         return eval_node(ast_node->next, module);
+    }
+}
+
+ASTNode* walk_until_end(ASTNode* ast_node, char *module) {
+    if (ast_node == NULL) {
+        return ast_node;
+    }
+
+    if (strcmp(ast_node->module, module) != 0) return walk_until_end(ast_node->next, module);
+
+    if (ast_node->node_type == AST_END) {
+        return ast_node;
+    }
+
+    if (phase == PREPARSE) {
+        return ast_node;
+    } else {
+        return walk_until_end(ast_node->next, module);
     }
 }

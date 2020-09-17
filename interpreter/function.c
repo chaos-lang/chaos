@@ -222,12 +222,17 @@ void callFunction(char *name, char *module) {
 
     reset_line_no_to = 0;
 
-    if (!interactive_shell_function_error_absorbed)
+    bool is_loop_breaked = false;
+    if (setjmp(LoopBreakDecision))
+        is_loop_breaked = true;
+
+    if (!interactive_shell_function_error_absorbed && !is_loop_breaked)
         executeDecision(function);
 
     if (function->type != K_VOID &&
         function->symbol == NULL &&
-        !interactive_shell_function_error_absorbed
+        !interactive_shell_function_error_absorbed &&
+        !is_loop_breaked
     ) {
         append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
@@ -246,6 +251,10 @@ void callFunction(char *name, char *module) {
     popModuleStack();
 
     popExecutedFunctionStack();
+
+    if (is_loop_breaked) {
+        breakLoop();
+    }
 
     if (is_interactive && interactive_shell_function_error_absorbed) {
         interactive_shell_function_error_absorbed = false;
@@ -644,6 +653,9 @@ void executeDecision(_Function* function) {
     eval_node(function->decision_node, function->module_context);
     stop_ast_evaluation = false;
 
+    if (decision_symbol_chain == NULL)
+        return;
+
     if (function_call_stack.arr[function_call_stack.size - 1]->type != K_VOID && function_call_stack.arr[function_call_stack.size - 1]->symbol == NULL) {
         function_call_stack.arr[function_call_stack.size - 1]->symbol = createCloneFromSymbol(
             NULL,
@@ -710,4 +722,8 @@ void freeFunctionReturn(char *name, char *module) {
         removeSymbol(function->symbol);
         function->symbol = NULL;
     }
+}
+
+void decisionBreakLoop() {
+    longjmp(LoopBreakDecision, 1);
 }

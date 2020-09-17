@@ -29,12 +29,16 @@ typedef struct {
 
 Loop* loop_mode;
 bool loop_execution_mode;
+unsigned long long nested_loop_counter;
 
 jmp_buf InteractiveShellLoopErrorAbsorber;
 bool interactive_shell_loop_error_absorbed;
 
+jmp_buf LoopBreak;
+
 ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_node);
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
 ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_value, ASTNode* ast_node);
+void breakLoop();
 
 #endif

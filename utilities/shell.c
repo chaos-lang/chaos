@@ -33,7 +33,8 @@ char *suggestions[1000] = {
     "echo",
     "pretty",
     "import",
-    "from"
+    "from",
+    "break"
 };
 
 int up_arrow_key_pressed(int count, int key) {

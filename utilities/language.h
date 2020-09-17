@@ -5,7 +5,7 @@
 #define __KAOS_LANGUAGE_VERSION__ "0.0.1-alpha"
 #define __KAOS_LANGUAGE_FILE_EXTENSION__ "kaos"
 #define __KAOS_LANGUAGE_MOTTO__ "Turn chaos into magic!"
-#define __KAOS_LANGUAGE_KEYWORD_COUNT__ 31
+#define __KAOS_LANGUAGE_KEYWORD_COUNT__ 32
 #define __KAOS_INTERACTIVE_MODULE_NAME__ "__interactive__."__KAOS_LANGUAGE_FILE_EXTENSION__
 #define __KAOS_MAX_RECURSION_DEPTH__ 1000
 #define __KAOS_MSG_LINE_LENGTH__ 1000

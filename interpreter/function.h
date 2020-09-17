@@ -77,6 +77,8 @@ int reset_line_no_to;
 jmp_buf InteractiveShellFunctionErrorAbsorber;
 bool interactive_shell_function_error_absorbed;
 
+jmp_buf LoopBreakDecision;
+
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 void endFunction();
 void freeFunctionParametersMode();
@@ -121,5 +123,6 @@ void setScopeless(Symbol* symbol);
 void pushExecutedFunctionStack(_Function* executed_function);
 void popExecutedFunctionStack();
 void freeFunctionReturn(char *name, char *module);
+void decisionBreakLoop();
 
 #endif

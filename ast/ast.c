@@ -136,7 +136,7 @@ ASTNode* free_node(ASTNode* ast_node) {
 
     if (ast_debug_enabled)
         printf(
-            "(Free)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %ld}\n",
+            "(Free)\t\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %ld}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
@@ -417,7 +417,9 @@ char *ast_node_type_names[] = {
     "AST_NESTED_COMPLEX_TRANSITION",
     "AST_DECISION_DEFINE",
     "AST_DECISION_MAKE_BOOLEAN",
+    "AST_DECISION_MAKE_BOOLEAN_BREAK",
     "AST_DECISION_MAKE_DEFAULT",
+    "AST_DECISION_MAKE_DEFAULT_BREAK",
     "AST_JSON_PARSER",
 };
 
