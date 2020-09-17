@@ -14,5 +14,6 @@ ASTNode* register_functions(ASTNode* ast_node, char *module);
 ASTNode* eval_node(ASTNode* ast_node, char *module);
 ASTNode* walk_until_end(ASTNode* ast_node, char *module);
 void breakLoop();
+void continueLoop();
 
 #endif

@@ -49,7 +49,7 @@ char *main_interpreted_module;
 %token T_NEWLINE T_QUIT
 %token T_PRINT T_ECHO T_PRETTY
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_LIST T_VAR_DICT T_VAR_ANY T_NULL
-%token T_DEL T_RETURN T_VOID T_DEFAULT T_BREAK
+%token T_DEL T_RETURN T_VOID T_DEFAULT T_BREAK T_CONTINUE
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM T_BACKSLASH T_INFINITE
 %token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
@@ -819,9 +819,13 @@ decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start
 ;
 decision: boolean_expression T_COLON T_BREAK                                                                            { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_BREAK, strings, 0, $1);                          $$ = ast_node; }
 ;
+decision: boolean_expression T_COLON T_CONTINUE                                                                         { char *strings[] = {};               ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_CONTINUE, strings, 0, $1);                       $$ = ast_node; }
+;
 decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start                                                 { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_DEFAULT, strings, 1, $5);                                $$ = ast_node; }
 ;
 decision: T_DEFAULT T_COLON T_BREAK                                                                                     { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_DECISION_MAKE_DEFAULT_BREAK, strings, 0);                                    $$ = ast_node; }
+;
+decision: T_DEFAULT T_COLON T_CONTINUE                                                                                  { char *strings[] = {};               ASTNode* ast_node = addASTNode(AST_DECISION_MAKE_DEFAULT_CONTINUE, strings, 0);                                 $$ = ast_node; }
 ;
 
 module: T_VAR                                                                                                           { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_APPEND_MODULE, strings, 1);                                                  $$ = ast_node; }

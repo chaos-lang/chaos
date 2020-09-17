@@ -78,6 +78,7 @@ jmp_buf InteractiveShellFunctionErrorAbsorber;
 bool interactive_shell_function_error_absorbed;
 
 jmp_buf LoopBreakDecision;
+jmp_buf LoopContinueDecision;
 
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 void endFunction();
@@ -124,5 +125,6 @@ void pushExecutedFunctionStack(_Function* executed_function);
 void popExecutedFunctionStack();
 void freeFunctionReturn(char *name, char *module);
 void decisionBreakLoop();
+void decisionContinueLoop();
 
 #endif

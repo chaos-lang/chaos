@@ -227,5 +227,6 @@ switch (phase)
 "def"                           {return T_FUNCTION;}
 "import"                        {return T_IMPORT;}
 "break"                         {return T_BREAK;}
+"continue"                      {return T_CONTINUE;}
 [a-zA-Z_][a-zA-Z0-9_]*          {yylval.sval=strdup(yytext); return T_VAR;}
 %%

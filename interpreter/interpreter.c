@@ -1226,6 +1226,11 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
                 decisionBreakLoop();
             }
             break;
+        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
+            if (nested_loop_counter > 0 && ast_node->right->value.b) {
+                decisionContinueLoop();
+            }
+            break;
         case AST_DECISION_MAKE_DEFAULT:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
@@ -1235,6 +1240,11 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
         case AST_DECISION_MAKE_DEFAULT_BREAK:
             if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 decisionBreakLoop();
+            }
+            break;
+        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
+            if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+                decisionContinueLoop();
             }
             break;
         case AST_JSON_PARSER:

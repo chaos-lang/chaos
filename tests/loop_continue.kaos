@@ -1,0 +1,50 @@
+num def f1()
+    num a = 101
+    return a
+end
+
+num def f2()
+    num b = 102
+    return b
+end
+
+num def f3()
+    num c = 103
+    return c
+end
+
+num def f4(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 5  : continue,
+    z == 8  : f1(),
+    z > 10  : f2(),
+    default : f3()
+}
+
+num def f5(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 5  : f3(),
+    z == 8  : f1(),
+    z > 10  : f2(),
+    default : continue
+}
+
+list a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+foreach a as el
+    print f4(el, 1)
+    print el
+end
+
+print "hey"
+
+foreach a as el
+    print f5(el, 1)
+    print el
+end
+
+print "hoy"

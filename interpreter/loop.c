@@ -25,12 +25,16 @@ ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_no
             while (true) {
                 if (setjmp(LoopBreak))
                     break;
+                if (setjmp(LoopContinue))
+                    continue;
                 next_node = eval_node(ast_node->next, ast_node->module);
             }
         } else {
             for (unsigned long long i = 0; i < iter; i++) {
                 if (setjmp(LoopBreak))
                     break;
+                if (setjmp(LoopContinue))
+                    continue;
                 next_node = eval_node(ast_node->next, ast_node->module);
             }
         }
@@ -61,6 +65,10 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
             if (setjmp(LoopBreak)) {
                 removeSymbol(clone_symbol);
                 break;
+            }
+            if (setjmp(LoopContinue)) {
+                removeSymbol(clone_symbol);
+                continue;
             }
             next_node = eval_node(ast_node->next, ast_node->module);
             removeSymbol(clone_symbol);
@@ -96,6 +104,11 @@ ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_valu
                 removeSymbolByName(element_key);
                 break;
             }
+            if (setjmp(LoopContinue)) {
+                removeSymbol(clone_symbol);
+                removeSymbolByName(element_key);
+                continue;
+            }
             next_node = eval_node(ast_node->next, ast_node->module);
             removeSymbol(clone_symbol);
             removeSymbolByName(element_key);
@@ -108,4 +121,8 @@ ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_valu
 
 void breakLoop() {
     longjmp(LoopBreak, 1);
+}
+
+void continueLoop() {
+    longjmp(LoopContinue, 1);
 }

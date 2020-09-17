@@ -226,13 +226,21 @@ void callFunction(char *name, char *module) {
     if (setjmp(LoopBreakDecision))
         is_loop_breaked = true;
 
-    if (!interactive_shell_function_error_absorbed && !is_loop_breaked)
+    bool is_loop_continued = false;
+    if (setjmp(LoopContinueDecision))
+        is_loop_continued = true;
+
+    if (!interactive_shell_function_error_absorbed &&
+        !is_loop_breaked &&
+        !is_loop_continued
+    )
         executeDecision(function);
 
     if (function->type != K_VOID &&
         function->symbol == NULL &&
         !interactive_shell_function_error_absorbed &&
-        !is_loop_breaked
+        !is_loop_breaked &&
+        !is_loop_continued
     ) {
         append_to_array_without_malloc(&free_string_stack, name);
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
@@ -254,6 +262,10 @@ void callFunction(char *name, char *module) {
 
     if (is_loop_breaked) {
         breakLoop();
+    }
+
+    if (is_loop_continued) {
+        continueLoop();
     }
 
     if (is_interactive && interactive_shell_function_error_absorbed) {
@@ -726,4 +738,8 @@ void freeFunctionReturn(char *name, char *module) {
 
 void decisionBreakLoop() {
     longjmp(LoopBreakDecision, 1);
+}
+
+void decisionContinueLoop() {
+    longjmp(LoopContinueDecision, 1);
 }
