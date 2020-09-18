@@ -54,16 +54,20 @@
 ### Unique Features
 
  - There are no control structures. (no `if..else`, no `switch..case`) Decision making only possible on function returns:
-   ```
-   func myFunc(num a, num b)
-        // your code
-   end { x > 0 : f1(x), default : f2(x) }
+   ```ruby
+    num def add(num x, num y)
+        num z = x + y
+    end {
+        z == 8  : f1(),
+        z > 10  : f2(),
+        default : f3()
+    }
    ```
  - A single unit test is enough to have 100% coverage on functions, always.
  - Warns you about untested functions in the executed program.
  - Chaos language is not object-oriented. So everything is done by functions and data types.
  - Immutability everywhere.
- - No `while` or `when` keywords. Loops are predetermined. There is also `INFINITE` keyword to achieve infinite loops if it's necessary.
+ - No `while` or `when` keywords. Loops are predetermined. Infinite loops can only be achievable through the `INFINITE` keyword.
  - Single source of errors and unique exit codes for each one of them. So the errors are catchable by other programs.
  - Language's itself forces you to write less error-prone code.
  - Say goodbye to dependency conflicts with [Occultist](https://occultist.io/) dependency manager.
@@ -74,19 +78,19 @@
 
 Install the requirements:
 
-```
+```shell
 make requirements
 ```
 
 Compile the interpreter:
 
-```
+```shell
 make
 ```
 
 Install the `chaos` binary system-wide:
 
-```
+```shell
 make install
 ```
 
@@ -94,9 +98,9 @@ make install
 
 ### Interactive Shell
 
-```
+```shell
 $ chaos
-    Chaos Language 0.0.1-alpha (Aug 16 2020 21:56:00)
+    Chaos Language 0.0.1-alpha (Sep 18 2020 03:03:40)
     GCC version: 9.3.0 on linux
     Turn chaos into magic!
 
@@ -108,8 +112,8 @@ kaos> exit
 
 ### Program File as Command-line Argument
 
-```
-$ chaos dev.kaos
+```shell
+$ chaos hello.kaos
 hello world
 ```
 
@@ -117,7 +121,7 @@ hello world
 
 You can uninstall the `chaos` binary and its C headers with:
 
-```
+```shell
 make uninstall
 ```
 
