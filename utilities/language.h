@@ -33,6 +33,7 @@
 #define __KAOS_TAB__ "    "
 
 #define __KAOS_BUILD_DIRECTORY__ "build"
+#define __KAOS_WINDOWS_EXE_EXT__ ".exe"
 
 #include <stdio.h>
 #if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))

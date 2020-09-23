@@ -505,3 +505,13 @@ char* escape_the_sequences_in_string_literal(char* string) {
 void remove_nth_char(char* string, long long n) {
     memmove(&string[n], &string[n + 1], strlen(string) - n);
 }
+
+int string_ends_with(const char *str, const char *suffix) {
+    if (!str || !suffix)
+        return 0;
+    size_t lenstr = strlen(str);
+    size_t lensuffix = strlen(suffix);
+    if (lensuffix >  lenstr)
+        return 0;
+    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+}

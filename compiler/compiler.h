@@ -3,7 +3,11 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#include <windows.h>
+#else
 #include <sys/wait.h>
+#endif
 
 #if defined(__APPLE__) && defined(__MACH__)
 #include <sys/syslimits.h>

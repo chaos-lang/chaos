@@ -18,7 +18,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     }
 
     char c_file_path[PATH_MAX];
-    sprintf(c_file_path, "%s/main.c", __KAOS_BUILD_DIRECTORY__);
+    sprintf(c_file_path, "%s%smain.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
 
     printf("Compiling Chaos code into %s\n", c_file_path);
 
@@ -47,9 +47,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 
     char bin_file_path[PATH_MAX];
     if (bin_file != NULL) {
-        sprintf(bin_file_path, "%s/%s", __KAOS_BUILD_DIRECTORY__, bin_file);
+        sprintf(bin_file_path, "%s%s%s", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
     } else {
-        sprintf(bin_file_path, "%s/main", __KAOS_BUILD_DIRECTORY__);
+        sprintf(bin_file_path, "%s%smain", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
     }
 
     char c_compiler_path[PATH_MAX];
@@ -59,6 +59,30 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         sprintf(c_compiler_path, "gcc");
     #endif
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    STARTUPINFO info={sizeof(info)};
+    PROCESS_INFORMATION processInfo;
+    DWORD status;
+
+    char cmd[PATH_MAX];
+    sprintf(cmd, "/c %s -o %s %s", c_compiler_path, bin_file_path, c_file_path);
+    if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
+
+        WaitForSingleObject(processInfo.hProcess, INFINITE);
+
+        GetExitCodeProcess(processInfo.hProcess, &status);
+
+        CloseHandle(processInfo.hThread);
+        CloseHandle(processInfo.hProcess);
+
+        if (status != 0) {
+            printf("Compilation of %s is failed!\n", c_file_path);
+            exit(status);
+        }
+    } else {
+        printf("CreateProcess() failed!");
+    }
+#else
     pid_t pid;
 
     if ((pid = fork()) == -1)
@@ -77,10 +101,22 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
             exit(status);
         }
     }
+#endif
 
     printf("Finished compiling.\n\n");
 
-    printf("Binary is ready on: %s\n", bin_file_path);
+    char bin_file_path_final[PATH_MAX + 4];
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    if (!string_ends_with(bin_file_path, __KAOS_WINDOWS_EXE_EXT__)) {
+        sprintf(bin_file_path_final, "%s%s", bin_file_path, __KAOS_WINDOWS_EXE_EXT__);
+    } else {
+        sprintf(bin_file_path_final, "%s", bin_file_path);
+    }
+#else
+    sprintf(bin_file_path_final, "%s", bin_file_path);
+#endif
+
+    printf("Binary is ready on: %s\n", bin_file_path_final);
 }
 
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
