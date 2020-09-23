@@ -2,10 +2,11 @@
 
 int initParser(int argc, char** argv) {
     ast_debug_enabled = false;
+    compiler_mode = false;
 
 #if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
     char ch;
-    while ((ch = getopt_long(argc, argv, "hvd", long_options, NULL)) != -1)
+    while ((ch = getopt_long(argc, argv, "hvdc", long_options, NULL)) != -1)
     {
         switch (ch)
         {
@@ -18,9 +19,13 @@ int initParser(int argc, char** argv) {
             case 'd':
                 ast_debug_enabled = true;
                 break;
+            case 'c':
+                compiler_mode = true;
+                break;
             case '?':
-                printf("Unknown option `-%c'.\n", optopt);
+                printf("\n");
                 print_help();
+                exit(E_INVALID_OPTION);
                 break;
         }
     }
@@ -34,6 +39,8 @@ int initParser(int argc, char** argv) {
     } else if (argc == 2) {
         if (strcmp(argv[1], "-d") == 0) {
             fp = stdin;
+        } else if (strcmp(argv[1], "-c") == 0) {
+            fp = stdin;
         } else {
             program_file = argv[1];
             fp = fopen (program_file, "r");
@@ -44,6 +51,10 @@ int initParser(int argc, char** argv) {
     fp_opened = true;
 
     is_interactive = (fp != stdin) ? false : true;
+
+    if (is_interactive && compiler_mode) {
+        throwCompilerInteractiveError();
+    }
 
     if (!is_interactive) {
         program_file_path = malloc(strlen(program_file) + 1);
@@ -108,8 +119,13 @@ int initParser(int argc, char** argv) {
         main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
-        if (!is_interactive)
-            interpret(main_interpreted_module, INIT_PREPARSE, false);
+        if (!is_interactive) {
+            if (compiler_mode) {
+                compile(main_interpreted_module, INIT_PREPARSE, false);
+            } else {
+                interpret(main_interpreted_module, INIT_PREPARSE, false);
+            }
+        }
         if (!is_interactive) break;
     } while(!feof(yyin));
 
@@ -212,4 +228,19 @@ void absorbError() {
         free(main_interpreted_module);
         main_interpreted_module = NULL;
     }
+}
+
+void throwCompilerInteractiveError() {
+    printf("Compile option '-c' cannot be used with the interactive mode.\n\n");
+    printf("Specify a Chaos program file with: ");
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;45m");
+    #endif
+    printf(" chaos -c hello.kaos ");
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n\n");
+    print_help();
+    exit(E_COMPILE_OPTION_IN_INTERACTIVE_MODE);
 }

@@ -13,6 +13,7 @@
 #endif
 
 #include "../interpreter/loop.h"
+#include "../compiler/compiler.h"
 
 extern int yyparse();
 extern int yylex_destroy();
@@ -26,5 +27,6 @@ int initParser(int argc, char** argv);
 void freeEverything();
 void yyerror(const char* s);
 void absorbError();
+void throwCompilerInteractiveError();
 
 #endif

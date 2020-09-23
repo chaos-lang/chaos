@@ -33,3 +33,6 @@ chaos.dSYM/
 
 # help.txt header
 help.h
+
+# Chaos build directory
+build

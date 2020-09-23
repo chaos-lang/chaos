@@ -32,6 +32,8 @@
 
 #define __KAOS_TAB__ "    "
 
+#define __KAOS_BUILD_DIRECTORY__ "build"
+
 #include <stdio.h>
 #if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
 #include <getopt.h>
@@ -50,6 +52,7 @@ static struct option long_options[] =
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'v'},
     {"debug", no_argument, NULL, 'd'},
+    {"compile", no_argument, NULL, 'c'},
     {NULL, 0, NULL, 0}
 };
 #endif
