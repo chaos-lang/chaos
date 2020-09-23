@@ -20,7 +20,7 @@ void compile(char *module, enum Phase phase_arg, bool is_interactive) {
     char c_file_path[PATH_MAX];
     sprintf(c_file_path, "%s/main.c", __KAOS_BUILD_DIRECTORY__);
 
-    printf("Compiling C code into %s\n", c_file_path);
+    printf("Compiling Chaos code into %s\n", c_file_path);
 
     FILE *c_fp = fopen(c_file_path, "w");
     if (c_fp == NULL)
@@ -42,7 +42,41 @@ void compile(char *module, enum Phase phase_arg, bool is_interactive) {
     fprintf(c_fp, "}\n");
 
     fclose(c_fp);
-    printf("Finished compiling.\n");
+
+    printf("Compiling the C code into machine code...\n");
+
+    char bin_file_path[PATH_MAX];
+    sprintf(bin_file_path, "%s/main", __KAOS_BUILD_DIRECTORY__);
+
+    char c_compiler_path[PATH_MAX];
+    #if defined(__clang__)
+        sprintf(c_compiler_path, "clang");
+    #elif defined(__GNUC__) || defined(__GNUG__)
+        sprintf(c_compiler_path, "gcc");
+    #endif
+
+    pid_t pid;
+
+    if ((pid = fork()) == -1)
+        perror("fork error");
+    else if (pid == 0)
+        execlp(c_compiler_path, c_compiler_path, "-o", bin_file_path, c_file_path, NULL);
+
+    int status;
+    pid_t wait_result;
+
+    while ((wait_result = wait(&status)) != -1)
+    {
+        // printf("Process %lu returned result: %d\n", (unsigned long) wait_result, status);
+        if (status != 0) {
+            printf("Compilation of %s is failed!\n", c_file_path);
+            exit(status);
+        }
+    }
+
+    printf("Finished compiling.\n\n");
+
+    printf("Binary is ready on: %s\n", bin_file_path);
 }
 
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
@@ -73,5 +107,5 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     }
     fprintf(c_fp, "\n");
 
-    return transpile_node(ast_node, module, c_fp, indent);
+    return ast_node;
 }
