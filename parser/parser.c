@@ -3,10 +3,12 @@
 int initParser(int argc, char** argv) {
     ast_debug_enabled = false;
     compiler_mode = false;
+    char *program_file = NULL;
+    char *bin_file = NULL;
 
 #if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
     char ch;
-    while ((ch = getopt_long(argc, argv, "hvdc", long_options, NULL)) != -1)
+    while ((ch = getopt_long(argc, argv, "hvdco", long_options, NULL)) != -1)
     {
         switch (ch)
         {
@@ -18,9 +20,26 @@ int initParser(int argc, char** argv) {
                 exit(0);
             case 'd':
                 ast_debug_enabled = true;
+                program_file = argv[optind];
+                if (program_file == NULL) {
+                    fp = stdin;
+                } else {
+                    fp = fopen(program_file, "r");
+                }
                 break;
             case 'c':
                 compiler_mode = true;
+                program_file = argv[optind];
+                if (program_file == NULL) {
+                    throwCompilerInteractiveError();
+                } else {
+                    fp = fopen(program_file, "r");
+                }
+                break;
+            case 'o':
+                bin_file = argv[optind];
+                if (bin_file == NULL)
+                    throwMissingOutputName();
                 break;
             case '?':
                 printf("\n");
@@ -31,30 +50,19 @@ int initParser(int argc, char** argv) {
     }
 #endif
 
-    char *program_file = NULL;
+    if (bin_file != NULL && !compiler_mode)
+        throwMissingCompileOption();
 
-    if (argc == 3) {
-        program_file = argv[2];
+    if (fp == NULL && argc == 2) {
+        program_file = argv[1];
         fp = fopen (program_file, "r");
-    } else if (argc == 2) {
-        if (strcmp(argv[1], "-d") == 0) {
-            fp = stdin;
-        } else if (strcmp(argv[1], "-c") == 0) {
-            fp = stdin;
-        } else {
-            program_file = argv[1];
-            fp = fopen (program_file, "r");
-        }
     } else if (argc == 1) {
         fp = stdin;
     }
+
     fp_opened = true;
 
     is_interactive = (fp != stdin) ? false : true;
-
-    if (is_interactive && compiler_mode) {
-        throwCompilerInteractiveError();
-    }
 
     if (!is_interactive) {
         program_file_path = malloc(strlen(program_file) + 1);
@@ -121,7 +129,7 @@ int initParser(int argc, char** argv) {
         yyparse();
         if (!is_interactive) {
             if (compiler_mode) {
-                compile(main_interpreted_module, INIT_PREPARSE, false);
+                compile(main_interpreted_module, INIT_PREPARSE, bin_file);
             } else {
                 interpret(main_interpreted_module, INIT_PREPARSE, false);
             }
@@ -242,5 +250,43 @@ void throwCompilerInteractiveError() {
     #endif
     printf("\n\n");
     print_help();
-    exit(E_COMPILE_OPTION_IN_INTERACTIVE_MODE);
+    exit(E_INVALID_OPTION);
+}
+
+void throwMissingOutputName() {
+    printf("You have to supply an output filename while using the option '-o'.\n\n");
+    printf("Correct command should look like this: ");
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;45m");
+    #endif
+    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        printf(" chaos -c hello.kaos -o hello.exe");
+    #else
+        printf(" chaos -c hello.kaos -o hello");
+    #endif
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n\n");
+    print_help();
+    exit(E_INVALID_OPTION);
+}
+
+void throwMissingCompileOption() {
+    printf("You have to supply the Chaos program to be compiled with the option '-c'.\n\n");
+    printf("Correct command should look like this: ");
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[1;45m");
+    #endif
+    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        printf(" chaos -c hello.kaos -o hello.exe");
+    #else
+        printf(" chaos -c hello.kaos -o hello");
+    #endif
+    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        printf("\033[0m");
+    #endif
+    printf("\n\n");
+    print_help();
+    exit(E_INVALID_OPTION);
 }

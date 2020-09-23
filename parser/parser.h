@@ -28,5 +28,7 @@ void freeEverything();
 void yyerror(const char* s);
 void absorbError();
 void throwCompilerInteractiveError();
+void throwMissingOutputName();
+void throwMissingCompileOption();
 
 #endif

@@ -4,7 +4,7 @@ struct stat dir_stat = {0};
 
 unsigned short indent_length = 4;
 
-void compile(char *module, enum Phase phase_arg, bool is_interactive) {
+void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Starting compiling...\n");
     ASTNode* ast_node = ast_root_node;
 
@@ -46,7 +46,11 @@ void compile(char *module, enum Phase phase_arg, bool is_interactive) {
     printf("Compiling the C code into machine code...\n");
 
     char bin_file_path[PATH_MAX];
-    sprintf(bin_file_path, "%s/main", __KAOS_BUILD_DIRECTORY__);
+    if (bin_file != NULL) {
+        sprintf(bin_file_path, "%s/%s", __KAOS_BUILD_DIRECTORY__, bin_file);
+    } else {
+        sprintf(bin_file_path, "%s/main", __KAOS_BUILD_DIRECTORY__);
+    }
 
     char c_compiler_path[PATH_MAX];
     #if defined(__clang__)
