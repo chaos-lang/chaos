@@ -1,6 +1,8 @@
 #include "errors.h"
 
+#ifndef CHAOS_COMPILER
 extern int yylineno;
+#endif
 
 void throw_error_var(throw_error_args in) {
     unsigned short code = in.code ? in.code : 0;
@@ -20,7 +22,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
 
     sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());
+#ifndef CHAOS_COMPILER
     sprintf(line_no_msg, "    Line: %d", yylineno);
+#endif
 
     switch (code)
     {
@@ -168,6 +172,8 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         freeEverything();
         exit(code);
     } else {
+#ifndef CHAOS_COMPILER
         longjmp(InteractiveShellErrorAbsorber, 1);
+#endif
     }
 }

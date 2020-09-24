@@ -515,3 +515,10 @@ int string_ends_with(const char *str, const char *suffix) {
         return 0;
     return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
+
+void string_uppercase(char *s) {
+    while (*s) {
+        *s = toupper((unsigned char) *s);
+        s++;
+    }
+}

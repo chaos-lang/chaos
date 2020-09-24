@@ -19,9 +19,14 @@ extern int yyparse();
 extern int yylex_destroy();
 extern FILE* yyin;
 extern char *yytext;
-extern FILE *fp;
-extern bool fp_opened;
-extern char *main_interpreted_module;
+FILE *fp;
+bool fp_opened;
+bool is_interactive;
+char *program_file_path;
+char *program_file_dir;
+char *program_code;
+char *main_interpreted_module;
+jmp_buf InteractiveShellErrorAbsorber;
 
 int initParser(int argc, char** argv);
 void freeEverything();

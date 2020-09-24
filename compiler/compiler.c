@@ -18,7 +18,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     }
 
     char c_file_path[PATH_MAX];
+    char h_file_path[PATH_MAX];
     sprintf(c_file_path, "%s%smain.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+    sprintf(h_file_path, "%s%smain.h", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
 
     printf("Compiling Chaos code into %s\n", c_file_path);
 
@@ -29,19 +31,44 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         exit(1);
     }
 
+    FILE *h_fp = fopen(h_file_path, "w");
+    if (h_fp == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    if (bin_file != NULL) {
+        string_uppercase(bin_file);
+        fprintf(h_fp, "#ifndef %s_H\n", bin_file);
+        fprintf(h_fp, "#define %s_H\n\n", bin_file);
+    } else {
+        fprintf(h_fp, "#ifndef MAIN_H\n");
+        fprintf(h_fp, "#define MAIN_H\n\n");
+    }
+
     const char *c_file_base =
-        "#include <stdio.h>\n\n"
+        "#include \"main.h\"\n\n"
         "int main() {\n";
+
+    const char *h_file_base =
+        "#include <stdio.h>\n"
+        "#include <stdbool.h>\n\n"
+        "bool is_interactive = false;\n"
+        "#include \"interpreter/symbol.h\"\n\n";
 
     unsigned short indent = indent_length;
 
     fprintf(c_fp, "%s", c_file_base);
+    fprintf(h_fp, "%s", h_file_base);
 
     transpile_node(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "}\n");
+    fprintf(h_fp, "#endif\n");
 
     fclose(c_fp);
+    fclose(h_fp);
 
     printf("Compiling the C code into machine code...\n");
 
@@ -125,20 +152,32 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     }
 
     if (ast_node->depend != NULL) {
-        eval_node(ast_node->depend, module);
+        transpile_node(ast_node->depend, module, c_fp, indent);
     }
 
     if (ast_node->right != NULL) {
-        eval_node(ast_node->right, module);
+        transpile_node(ast_node->right, module, c_fp, indent);
     }
 
     if (ast_node->left != NULL) {
-        eval_node(ast_node->left, module);
+        transpile_node(ast_node->left, module, c_fp, indent);
     }
 
     fprintf(c_fp, "%*c", indent, ' ');
     switch (ast_node->node_type)
     {
+        case AST_VAR_CREATE_BOOL:
+            fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            break;
+        case AST_PRINT_VAR:
+            fprintf(c_fp, "printSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);", ast_node->strings[0]);
+            break;
+        case AST_PRINT_EXPRESSION:
+            fprintf(c_fp, "printf(\"%lld\\n\");", ast_node->right->value.i);
+            break;
+        case AST_PRINT_MIXED_EXPRESSION:
+            fprintf(c_fp, "printf(\"%Lg\\n\");", ast_node->right->value.f);
+            break;
         case AST_PRINT_STRING:
             fprintf(c_fp, "printf(\"%s\\n\");", ast_node->value.s);
             break;
@@ -147,5 +186,5 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     }
     fprintf(c_fp, "\n");
 
-    return ast_node;
+    return transpile_node(ast_node->next, module, c_fp, indent);
 }

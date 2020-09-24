@@ -370,6 +370,8 @@ void raiseError(char *msg) {
 }
 
 void parseJson(char *json) {
+#ifndef CHAOS_COMPILER
     injectCode(json, INIT_JSON_PARSE);
+#endif
     phase = PROGRAM;
 }

@@ -1,6 +1,8 @@
 #include "function.h"
 
+#ifndef CHAOS_COMPILER
 extern int yylineno;
+#endif
 bool interactive_shell_function_error_absorbed = false;
 extern int yyparse();
 
@@ -22,7 +24,12 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->name = malloc(1 + strlen(name));
+#ifndef CHAOS_COMPILER
     function_mode->line_no = yylineno;
+#else
+    function_mode->line_no = 0;
+#endif
+
     strcpy(function_mode->name, name);
     function_mode->type = type;
     function_mode->secondary_type = secondary_type;
@@ -80,7 +87,9 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         char *suggestion = malloc(1 + strlen(name));
         strcpy(suggestion, name);
         suggestion = strcat_ext(suggestion, "()");
+#ifndef CHAOS_COMPILER
         add_suggestion(suggestion);
+#endif
         free(suggestion);
     }
     #endif
@@ -216,7 +225,9 @@ void callFunction(char *name, char *module) {
         ) {
             callFunctionFromDynamicLibrary(function);
         } else {
+#ifndef CHAOS_COMPILER
             eval_node(function->node->child, function->module_context);
+#endif
         }
     }
 
@@ -270,8 +281,10 @@ void callFunction(char *name, char *module) {
 
     if (is_interactive && interactive_shell_function_error_absorbed) {
         interactive_shell_function_error_absorbed = false;
+#ifndef CHAOS_COMPILER
         yyrestart_interactive();
         yyparse();
+#endif
     }
 }
 
@@ -662,7 +675,9 @@ void executeDecision(_Function* function) {
         return;
     }
 
+#ifndef CHAOS_COMPILER
     eval_node(function->decision_node, function->module_context);
+#endif
     stop_ast_evaluation = false;
 
     if (decision_symbol_chain == NULL)

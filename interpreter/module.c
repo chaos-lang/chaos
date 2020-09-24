@@ -83,7 +83,9 @@ void handleModuleImport(char *module_name, bool directly_import) {
     ) {
         callRegisterInDynamicLibrary(module_path);
     } else {
+#ifndef CHAOS_COMPILER
         parseTheModuleContent(module_path);
+#endif
     }
 
     freeFunctionNamesBuffer();

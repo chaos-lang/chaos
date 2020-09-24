@@ -15,18 +15,10 @@ extern FILE* yyin;
 extern int yylineno;
 extern char *yytext;
 
-bool is_interactive = true;
+extern bool is_interactive;
 bool inject_mode = false;
 
-jmp_buf InteractiveShellErrorAbsorber;
-
-FILE *fp;
-bool fp_opened;
-char *program_file_path;
-char *program_file_dir;
-char *program_code;
-
-char *main_interpreted_module;
+extern char *main_interpreted_module;
 %}
 
 %union {

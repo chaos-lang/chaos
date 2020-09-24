@@ -68,7 +68,9 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
 
     addSymbolToComplex(symbol);
     #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+    #ifndef CHAOS_COMPILER
     add_suggestion(name);
+    #endif
     #endif
 
     return symbol;
