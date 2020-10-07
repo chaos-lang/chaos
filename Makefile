@@ -13,12 +13,12 @@ requirements:
 
 requirements-dev:
 	mkdir -p /usr/local/include/chaos
-	cp -r utilities/ /usr/local/include/chaos/
-	cp -r lexer/ /usr/local/include/chaos/
-	cp -r parser/ /usr/local/include/chaos/
-	cp -r interpreter/ /usr/local/include/chaos/
-	cp -r compiler/ /usr/local/include/chaos/
-	cp -r ast/ /usr/local/include/chaos/
+	cp -R utilities/ /usr/local/include/chaos/utilities/
+	cp -R lexer/ /usr/local/include/chaos/lexer/
+	cp -R parser/ /usr/local/include/chaos/parser/
+	cp -R interpreter/ /usr/local/include/chaos/interpreter/
+	cp -R compiler/ /usr/local/include/chaos/compiler/
+	cp -R ast/ /usr/local/include/chaos/ast/
 	cp enums.h /usr/local/include/chaos/
 	cp Chaos.c /usr/local/include/chaos/
 	cp Chaos.h /usr/local/include/
