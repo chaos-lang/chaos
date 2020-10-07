@@ -8,7 +8,7 @@
 #include "utilities/language.h"
 #else
 #include "chaos/enums.h"
-#include "chaos/language.h"
+#include "chaos/utilities/language.h"
 #endif
 
 typedef struct KaosValue {

@@ -13,9 +13,14 @@ requirements:
 
 requirements-dev:
 	mkdir -p /usr/local/include/chaos
-	cp utilities/language.h /usr/local/include/chaos/
-	cp utilities/platform.h /usr/local/include/chaos/
+	cp -r utilities/ /usr/local/include/chaos/
+	cp -r lexer/ /usr/local/include/chaos/
+	cp -r parser/ /usr/local/include/chaos/
+	cp -r interpreter/ /usr/local/include/chaos/
+	cp -r compiler/ /usr/local/include/chaos/
+	cp -r ast/ /usr/local/include/chaos/
 	cp enums.h /usr/local/include/chaos/
+	cp Chaos.c /usr/local/include/chaos/
 	cp Chaos.h /usr/local/include/
 ifeq ($(UNAME_S), Darwin)
 	echo 'export C_INCLUDE_PATH="/usr/local/include"' >> ~/.bash_profile

@@ -115,7 +115,29 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     if ((pid = fork()) == -1)
         perror("fork error");
     else if (pid == 0)
-        execlp(c_compiler_path, c_compiler_path, "-o", bin_file_path, c_file_path, NULL);
+        execlp(
+            c_compiler_path,
+            c_compiler_path,
+            "-DCHAOS_COMPILER",
+            "-o",
+            bin_file_path,
+            c_file_path,
+            "/usr/local/include/chaos/utilities/helpers.c",
+            "/usr/local/include/chaos/ast/ast.c",
+            "/usr/local/include/chaos/interpreter/errors.c",
+            "/usr/local/include/chaos/interpreter/extension.c",
+            "/usr/local/include/chaos/interpreter/function.c",
+            "/usr/local/include/chaos/interpreter/module.c",
+            "/usr/local/include/chaos/interpreter/symbol.c",
+            "/usr/local/include/chaos/compiler/compiler.c",
+            "/usr/local/include/chaos/compiler/lib/alternative.c",
+            "/usr/local/include/chaos/Chaos.c",
+            "-lreadline",
+            "-L/usr/local/opt/readline/lib",
+            "-ldl",
+            "-I/usr/local/include/chaos/",
+            NULL
+        );
 
     int status;
     pid_t wait_result;
