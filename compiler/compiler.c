@@ -191,6 +191,40 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_VAR_CREATE_BOOL:
             fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
             break;
+        case AST_VAR_CREATE_BOOL_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_BOOL, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_BOOL_VAR_EL:
+            fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_BOOL, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_BOOL_FUNC_RETURN:
+            fprintf(
+                c_fp,
+                "switch (%ld)"
+                "{"
+                "   case 2:"
+                "       callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", NULL, K_ANY);"
+                "       break;"
+                "   case 3:"
+                "       callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", \"%s\", K_ANY);"
+                "       break;"
+                "   default:"
+                "       break;"
+                "}",
+                ast_node->strings_size,
+                ast_node->strings[1],
+                ast_node->strings[0],
+                ast_node->strings[1],
+                ast_node->strings[2],
+                ast_node->strings[1],
+                ast_node->strings[0],
+                ast_node->strings[2],
+                ast_node->strings[1]
+            );
+            break;
+        case AST_VAR_UPDATE_BOOL:
+            fprintf(c_fp, "updateSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            break;
         case AST_PRINT_VAR:
             fprintf(c_fp, "printSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);", ast_node->strings[0]);
             break;
