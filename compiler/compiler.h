@@ -22,5 +22,6 @@ unsigned short indent_length;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file);
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
+bool transpile_common_operator_ii(ASTNode* ast_node, char *operator);
 
 #endif

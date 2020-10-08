@@ -291,6 +291,8 @@ typedef struct ASTNode {
     struct ASTNode* child;
     struct ASTNode* depend;
     char *module;
+    char *transpiled;
+    bool is_transpiled;
     enum ValueType value_type;
     union Value value;
     size_t strings_size;

@@ -708,7 +708,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_MINUS:
-            ast_node->value.i = ast_node->left->value.i  - ast_node->right->value.i;
+            ast_node->value.i = ast_node->left->value.i - ast_node->right->value.i;
             ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_MULTIPLY:
