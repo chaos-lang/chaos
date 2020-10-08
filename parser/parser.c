@@ -117,7 +117,6 @@ int initParser(int argc, char** argv) {
     do {
         if (is_interactive) {
             if (setjmp(InteractiveShellErrorAbsorber)) {
-                absorbError();
             }
         }
 
@@ -236,6 +235,8 @@ void absorbError() {
         free(main_interpreted_module);
         main_interpreted_module = NULL;
     }
+
+    longjmp(InteractiveShellErrorAbsorber, 1);
 }
 
 void throwCompilerInteractiveError() {

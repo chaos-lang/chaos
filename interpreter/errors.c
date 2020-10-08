@@ -173,7 +173,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         exit(code);
     } else {
 #ifndef CHAOS_COMPILER
-        longjmp(InteractiveShellErrorAbsorber, 1);
+        absorbError();
 #endif
     }
 }

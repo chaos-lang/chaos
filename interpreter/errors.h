@@ -46,6 +46,7 @@ enum ExitCode {
 };
 
 extern void freeEverything();
+extern void absorbError();
 extern bool is_interactive;
 extern jmp_buf InteractiveShellErrorAbsorber;
 
