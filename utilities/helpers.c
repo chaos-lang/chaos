@@ -502,6 +502,61 @@ char* escape_the_sequences_in_string_literal(char* string) {
     return new_string;
 }
 
+char* escape_string_literal_for_transpiler(char* string) {
+    char* new_string = malloc(strlen(string) + 1);
+    strcpy(new_string, string);
+
+    for (long long i = 0; i < (long long) strlen(new_string); i++){
+        switch (new_string[i])
+        {
+            case '\a':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'a';
+                break;
+            case '\b':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'b';
+                break;
+            case '\e':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'e';
+                break;
+            case '\f':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'f';
+                break;
+            case '\n':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'n';
+                break;
+            case '\r':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'r';
+                break;
+            case '\t':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 't';
+                break;
+            case '\v':
+                insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = 'v';
+                break;
+            default:
+                break;
+        }
+    }
+
+    return new_string;
+}
+
+void insert_nth_char(char* string, char c, long long n) {
+    string = realloc(string, 1 + strlen(string));
+    for (long long i = strlen(string); i >= n; i--) {
+        string[i + 1] = string[i];
+    }
+    string[n] = c;
+}
+
 void remove_nth_char(char* string, long long n) {
     memmove(&string[n], &string[n + 1], strlen(string) - n);
 }

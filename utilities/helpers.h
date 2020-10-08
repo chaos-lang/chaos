@@ -37,6 +37,8 @@ bool is_file_exists(char* file_path);
 const char *get_filename_ext(const char *filename);
 void freeFreeStringStack();
 char* escape_the_sequences_in_string_literal(char* string);
+char* escape_string_literal_for_transpiler(char* string);
+void insert_nth_char(char* string, char c, long long n);
 void remove_nth_char(char* string, long long n);
 int string_ends_with(const char *str, const char *suffix);
 void string_uppercase(char *s);

@@ -264,6 +264,88 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     break;
             }
             break;
+        case AST_VAR_CREATE_STRING:
+            fprintf(c_fp, "addSymbolString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            break;
+        case AST_VAR_CREATE_STRING_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_STRING, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_STRING_VAR_EL:
+            fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_STRING, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_STRING_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", \"%s\", K_ANY);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_ANY_BOOL:
+            fprintf(c_fp, "addSymbolAnyBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            break;
+        case AST_VAR_CREATE_ANY_NUMBER:
+            if (ast_node->right->value_type == V_INT) {
+                fprintf(c_fp, "addSymbolAnyInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+            } else {
+                fprintf(c_fp, "addSymbolAnyFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+            }
+            break;
+        case AST_VAR_CREATE_ANY_STRING:
+            fprintf(c_fp, "addSymbolAnyString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            break;
+        case AST_VAR_CREATE_ANY_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_ANY, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_ANY_VAR_EL:
+            fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_ANY, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_ANY_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", \"%s\", K_ANY);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
         case AST_VAR_UPDATE_BOOL:
             fprintf(c_fp, "updateSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
             break;
@@ -277,7 +359,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "printf(\"%Lg\\n\");", ast_node->right->value.f);
             break;
         case AST_PRINT_STRING:
-            fprintf(c_fp, "printf(\"%s\\n\");", ast_node->value.s);
+            fprintf(c_fp, "printf(\"%s\\n\");", escape_string_literal_for_transpiler(ast_node->value.s));
             break;
         default:
             break;
