@@ -154,6 +154,7 @@ ASTNode* free_node(ASTNode* ast_node) {
     }
     if (ast_node->value_type == V_STRING) free(ast_node->value.s);
     free(ast_node->module);
+    free(ast_node->transpiled);
     free(ast_node);
     return free_node(next_node);
 }
