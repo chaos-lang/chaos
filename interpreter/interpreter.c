@@ -298,6 +298,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
     long double l_value;
     long double r_value;
     long long exit_code;
+    char *_module = NULL;
 
     switch (ast_node->node_type)
     {
@@ -1189,27 +1190,42 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             addFunctionCallParameterList(K_ANY);
             break;
         case AST_PRINT_FUNCTION_RETURN:
-            callFunction(ast_node->strings[0], ast_node->strings[1]);
-            printFunctionReturn(ast_node->strings[0], ast_node->strings[1], "\n", false, true);
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            callFunction(ast_node->strings[0], _module);
+            printFunctionReturn(ast_node->strings[0], _module, "\n", false, true);
             break;
         case AST_ECHO_FUNCTION_RETURN:
-            callFunction(ast_node->strings[0], ast_node->strings[1]);
-            printFunctionReturn(ast_node->strings[0], ast_node->strings[1], "", false, true);
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            callFunction(ast_node->strings[0], _module);
+            printFunctionReturn(ast_node->strings[0], _module, "", false, true);
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
-            callFunction(ast_node->strings[0], ast_node->strings[1]);
-            printFunctionReturn(ast_node->strings[0], ast_node->strings[1], "\n", true, true);
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            callFunction(ast_node->strings[0], _module);
+            printFunctionReturn(ast_node->strings[0], _module, "\n", true, true);
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
-            callFunction(ast_node->strings[0], ast_node->strings[1]);
-            printFunctionReturn(ast_node->strings[0], ast_node->strings[1], "", true, true);
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            callFunction(ast_node->strings[0], _module);
+            printFunctionReturn(ast_node->strings[0], _module, "", true, true);
             break;
         case AST_FUNCTION_RETURN:
-            callFunction(ast_node->strings[0], ast_node->strings[1]);
-            if (is_interactive && !isFunctionType(ast_node->strings[0], ast_node->strings[1], K_VOID) && !inject_mode && !decision_execution_mode) {
-                printFunctionReturn(ast_node->strings[0], ast_node->strings[1], "\n", false, false);
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            callFunction(ast_node->strings[0], _module);
+            if (is_interactive && !isFunctionType(ast_node->strings[0], _module, K_VOID) && !inject_mode && !decision_execution_mode) {
+                printFunctionReturn(ast_node->strings[0], _module, "\n", false, false);
             } else {
-                freeFunctionReturn(ast_node->strings[0], ast_node->strings[1]);
+                freeFunctionReturn(ast_node->strings[0], _module);
             }
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
