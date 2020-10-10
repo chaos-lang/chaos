@@ -62,6 +62,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
 
+    fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
+
     transpile_node(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "}\n");
@@ -189,7 +191,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     switch (ast_node->node_type)
     {
         case AST_VAR_CREATE_BOOL:
-            fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            if (ast_node->strings[0] == NULL) {
+                fprintf(c_fp, "addSymbolBool(NULL, %s);", ast_node->right->value.b ? "true" : "false");
+            } else {
+                fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            }
             break;
         case AST_VAR_CREATE_BOOL_VAR:
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_BOOL, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
@@ -227,15 +233,31 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_VAR_CREATE_NUMBER:
             if (ast_node->right->is_transpiled) {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "addSymbolInt(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                    if (ast_node->strings[0] == NULL) {
+                        fprintf(c_fp, "addSymbolInt(NULL, %s);", ast_node->right->transpiled);
+                    } else {
+                        fprintf(c_fp, "addSymbolInt(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                    }
                 } else {
-                    fprintf(c_fp, "addSymbolFloat(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                    if (ast_node->strings[0] == NULL) {
+                        fprintf(c_fp, "addSymbolFloat(NULL, %s);", ast_node->right->transpiled);
+                    } else {
+                        fprintf(c_fp, "addSymbolFloat(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                    }
                 }
             } else {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "addSymbolInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+                    if (ast_node->strings[0] == NULL) {
+                        fprintf(c_fp, "addSymbolInt(NULL, %lld);", ast_node->right->value.i);
+                    } else {
+                        fprintf(c_fp, "addSymbolInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+                    }
                 } else {
-                    fprintf(c_fp, "addSymbolFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+                    if (ast_node->strings[0] == NULL) {
+                        fprintf(c_fp, "addSymbolFloat(NULL, %Lg);", ast_node->right->value.f);
+                    } else {
+                        fprintf(c_fp, "addSymbolFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+                    }
                 }
             }
             break;
@@ -273,7 +295,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_VAR_CREATE_STRING:
-            fprintf(c_fp, "addSymbolString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            if (ast_node->strings[0] == NULL) {
+                fprintf(c_fp, "addSymbolString(NULL, \"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            } else {
+                fprintf(c_fp, "addSymbolString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            }
             break;
         case AST_VAR_CREATE_STRING_VAR:
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_STRING, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
@@ -309,17 +335,33 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_VAR_CREATE_ANY_BOOL:
-            fprintf(c_fp, "addSymbolAnyBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            if (ast_node->strings[0] == NULL) {
+                fprintf(c_fp, "addSymbolAnyBool(NULL, %s);", ast_node->right->value.b ? "true" : "false");
+            } else {
+                fprintf(c_fp, "addSymbolAnyBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            }
             break;
         case AST_VAR_CREATE_ANY_NUMBER:
             if (ast_node->right->value_type == V_INT) {
-                fprintf(c_fp, "addSymbolAnyInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+                if (ast_node->strings[0] == NULL) {
+                    fprintf(c_fp, "addSymbolAnyInt(NULL, %lld);", ast_node->right->value.i);
+                } else {
+                    fprintf(c_fp, "addSymbolAnyInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+                }
             } else {
-                fprintf(c_fp, "addSymbolAnyFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+                if (ast_node->strings[0] == NULL) {
+                    fprintf(c_fp, "addSymbolAnyFloat(NULL, %Lg);", ast_node->right->value.f);
+                } else {
+                    fprintf(c_fp, "addSymbolAnyFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+                }
             }
             break;
         case AST_VAR_CREATE_ANY_STRING:
-            fprintf(c_fp, "addSymbolAnyString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            if (ast_node->strings[0] == NULL) {
+                fprintf(c_fp, "addSymbolAnyString(NULL, \"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            } else {
+                fprintf(c_fp, "addSymbolAnyString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            }
             break;
         case AST_VAR_CREATE_ANY_VAR:
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_ANY, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
@@ -343,6 +385,270 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     fprintf(
                         c_fp,
                         "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", \"%s\", K_ANY);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_LIST:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_LIST_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_ANY);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_DICT:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_DICT_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_ANY);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_BOOL_LIST:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_BOOL);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_BOOL_LIST_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_BOOL);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_BOOL);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_BOOL);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_BOOL_DICT:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_BOOL);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_BOOL_DICT_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_BOOL);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_BOOL);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_BOOL);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_NUMBER_LIST:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_NUMBER);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_NUMBER_LIST_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_NUMBER);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_NUMBER);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_NUMBER);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_NUMBER_DICT:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_NUMBER);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_NUMBER_DICT_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_NUMBER);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_NUMBER);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_NUMBER);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_STRING_LIST:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_STRING);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_STRING_LIST_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_STRING);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_STRING);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_STRING);",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_VAR_CREATE_STRING_DICT:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_STRING);", ast_node->strings[0]);
+            break;
+        case AST_VAR_CREATE_STRING_DICT_VAR:
+            fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_STRING);", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_STRING);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_STRING);",
                         ast_node->strings[2],
                         ast_node->strings[1],
                         ast_node->strings[0],
@@ -444,6 +750,42 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->value.i);
             ast_node->is_transpiled = true;
             ast_node->value_type = V_INT;
+            break;
+        case AST_DELETE_VAR:
+            fprintf(c_fp, "removeSymbolByName(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_DELETE_VAR_EL:
+            fprintf(c_fp, "removeComplexElementByLeftRightBracketStack(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_PRINT_SYMBOL_TABLE:
+            fprintf(c_fp, "printSymbolTable();");
+            break;
+        case AST_LIST_START:
+            fprintf(c_fp, "addSymbolList(NULL);");
+            break;
+        case AST_LIST_ADD_VAR:
+            fprintf(c_fp, "cloneSymbolToComplex(\"%s\", NULL);", ast_node->strings[0]);
+            break;
+        case AST_LIST_ADD_VAR_EL:
+            fprintf(c_fp, "buildVariableComplexElement(\"%s\", NULL);", ast_node->strings[0]);
+            break;
+        case AST_LIST_NESTED_FINISH:
+            fprintf(c_fp, "if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); reverseComplexMode(); finishComplexMode(NULL, K_ANY); }");
+            break;
+        case AST_DICT_START:
+            fprintf(c_fp, "addSymbolDict(NULL);");
+            break;
+        case AST_DICT_ADD_VAR:
+            fprintf(c_fp, "cloneSymbolToComplex(\"%s\", \"%s\");", ast_node->strings[1], ast_node->strings[0]);
+            break;
+        case AST_DICT_ADD_VAR_EL:
+            fprintf(c_fp, "buildVariableComplexElement(\"%s\", \"%s\");", ast_node->strings[1], ast_node->strings[0]);
+            break;
+        case AST_DICT_NESTED_FINISH:
+            fprintf(c_fp, "if (isNestedComplexMode()) { pushNestedComplexModeStack(getComplexMode()); reverseComplexMode(); finishComplexMode(NULL, K_ANY); }");
+            break;
+        case AST_POP_NESTED_COMPLEX_STACK:
+            fprintf(c_fp, "popNestedComplexModeStack(\"%s\");", ast_node->strings[0]);
             break;
         default:
             break;
