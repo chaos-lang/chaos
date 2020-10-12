@@ -187,6 +187,8 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         transpile_node(ast_node->left, module, c_fp, indent);
     }
 
+    long double l_value;
+    long double r_value;
     fprintf(c_fp, "%*c", indent, ' ');
     switch (ast_node->node_type)
     {
@@ -676,27 +678,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "printf(\"%s\\n\");", escape_string_literal_for_transpiler(ast_node->value.s));
             break;
         case AST_EXPRESSION_PLUS:
-            if (!transpile_common_operator_ii(ast_node, "+"))
+            if (!transpile_common_operator(ast_node, "+"))
                 ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
             break;
         case AST_EXPRESSION_MINUS:
-            if (!transpile_common_operator_ii(ast_node, "-"))
+            if (!transpile_common_operator(ast_node, "-"))
                 ast_node->value.i = ast_node->left->value.i - ast_node->right->value.i;
             break;
         case AST_EXPRESSION_MULTIPLY:
-            if (!transpile_common_operator_ii(ast_node, "*"))
+            if (!transpile_common_operator(ast_node, "*"))
                 ast_node->value.i = ast_node->left->value.i * ast_node->right->value.i;
             break;
         case AST_EXPRESSION_BITWISE_AND:
-            if (!transpile_common_operator_ii(ast_node, "&"))
+            if (!transpile_common_operator(ast_node, "&"))
                 ast_node->value.i = ast_node->left->value.i & ast_node->right->value.i;
             break;
         case AST_EXPRESSION_BITWISE_OR:
-            if (!transpile_common_operator_ii(ast_node, "|"))
+            if (!transpile_common_operator(ast_node, "|"))
                 ast_node->value.i = ast_node->left->value.i | ast_node->right->value.i;
             break;
         case AST_EXPRESSION_BITWISE_XOR:
-            if (!transpile_common_operator_ii(ast_node, "^"))
+            if (!transpile_common_operator(ast_node, "^"))
                 ast_node->value.i = ast_node->left->value.i ^ ast_node->right->value.i;
             break;
         case AST_EXPRESSION_BITWISE_NOT:
@@ -709,11 +711,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_LEFT_SHIFT:
-            if (!transpile_common_operator_ii(ast_node, "<<"))
+            if (!transpile_common_operator(ast_node, "<<"))
                 ast_node->value.i = ast_node->left->value.i << ast_node->right->value.i;
             break;
         case AST_EXPRESSION_BITWISE_RIGHT_SHIFT:
-            if (!transpile_common_operator_ii(ast_node, ">>"))
+            if (!transpile_common_operator(ast_node, ">>"))
                 ast_node->value.i = ast_node->left->value.i >> ast_node->right->value.i;
             break;
         case AST_VAR_EXPRESSION_VALUE:
@@ -750,6 +752,71 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->value.i);
             ast_node->is_transpiled = true;
             ast_node->value_type = V_INT;
+            break;
+        case AST_MIXED_EXPRESSION_PLUS:
+            if (!transpile_common_mixed_operator(ast_node, "+")) {
+                if (ast_node->left->value_type == V_INT) {
+                    l_value = (long double) ast_node->left->value.i;
+                } else {
+                    l_value = ast_node->left->value.f;
+                }
+                if (ast_node->right->value_type == V_INT) {
+                    r_value = (long double) ast_node->right->value.i;
+                } else {
+                    r_value = ast_node->right->value.f;
+                }
+                ast_node->value.f = l_value + r_value;
+            }
+            break;
+        case AST_MIXED_EXPRESSION_MINUS:
+            if (!transpile_common_mixed_operator(ast_node, "-")) {
+                if (ast_node->left->value_type == V_INT) {
+                    l_value = (long double) ast_node->left->value.i;
+                } else {
+                    l_value = ast_node->left->value.f;
+                }
+                if (ast_node->right->value_type == V_INT) {
+                    r_value = (long double) ast_node->right->value.i;
+                } else {
+                    r_value = ast_node->right->value.f;
+                }
+                ast_node->value.f = l_value - r_value;
+            }
+            break;
+        case AST_MIXED_EXPRESSION_MULTIPLY:
+            if (!transpile_common_mixed_operator(ast_node, "*")) {
+                if (ast_node->left->value_type == V_INT) {
+                    l_value = (long double) ast_node->left->value.i;
+                } else {
+                    l_value = ast_node->left->value.f;
+                }
+                if (ast_node->right->value_type == V_INT) {
+                    r_value = (long double) ast_node->right->value.i;
+                } else {
+                    r_value = ast_node->right->value.f;
+                }
+                ast_node->value.f = l_value * r_value;
+            }
+            break;
+        case AST_MIXED_EXPRESSION_DIVIDE:
+            if (!transpile_common_mixed_operator(ast_node, "/")) {
+                if (ast_node->left->value_type == V_INT) {
+                    l_value = (long double) ast_node->left->value.i;
+                } else {
+                    l_value = ast_node->left->value.f;
+                }
+                if (ast_node->right->value_type == V_INT) {
+                    r_value = (long double) ast_node->right->value.i;
+                } else {
+                    r_value = ast_node->right->value.f;
+                }
+                ast_node->value.f = l_value / r_value;
+            }
+            break;
+        case AST_VAR_MIXED_EXPRESSION_VALUE:
+            ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "getSymbolValueFloat(\"%s\")", ast_node->strings[0]);
+            ast_node->is_transpiled = true;
+            ast_node->value_type = V_FLOAT;
             break;
         case AST_DELETE_VAR:
             fprintf(c_fp, "removeSymbolByName(\"%s\");", ast_node->strings[0]);
@@ -795,7 +862,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     return transpile_node(ast_node->next, module, c_fp, indent);
 }
 
-bool transpile_common_operator_ii(ASTNode* ast_node, char *operator) {
+bool transpile_common_operator(ASTNode* ast_node, char *operator) {
     ast_node->value_type = V_INT;
     if (ast_node->left->is_transpiled || ast_node->right->is_transpiled) {
         if (ast_node->left->is_transpiled) {
@@ -815,4 +882,41 @@ bool transpile_common_operator_ii(ASTNode* ast_node, char *operator) {
         return true;
     }
     return false;
+}
+
+bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
+    ast_node->value_type = V_FLOAT;
+    if (ast_node->left->is_transpiled || ast_node->right->is_transpiled) {
+        if (ast_node->left->is_transpiled) {
+            if (ast_node->left->value_type == V_INT) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->left->transpiled);
+            } else {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled);
+            }
+        } else {
+            if (ast_node->left->value_type == V_INT) {
+                ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", (long double) ast_node->left->value.i);
+            } else {
+                ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->left->value.f);
+            }
+        }
+        ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
+        ast_node->transpiled = strcat_ext(ast_node->transpiled, operator);
+        ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
+        if (ast_node->right->is_transpiled) {
+            if (ast_node->right->value_type == V_INT) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->right->transpiled);
+            } else {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled);
+            }
+        } else {
+            if (ast_node->right->value_type == V_INT) {
+                ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", (long double) ast_node->right->value.i);
+            } else {
+                ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f);
+            }
+        }
+        ast_node->is_transpiled = true;
+        return true;
+    }
 }
