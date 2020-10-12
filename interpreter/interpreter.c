@@ -836,7 +836,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.b;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL:
-            ast_node->value.b = ast_node->left->value.b < ast_node->right->value.b;
+            ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.b;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND:
             ast_node->value.b = ast_node->left->value.b && ast_node->right->value.b;
@@ -863,7 +863,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.f;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED:
-            ast_node->value.b = ast_node->left->value.f < ast_node->right->value.f;
+            ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.f;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED:
             ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
@@ -887,7 +887,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.b;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f < ast_node->right->value.b;
+            ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.b;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN:
             ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
@@ -911,7 +911,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.f;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b < ast_node->right->value.f;
+            ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.f;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED:
             ast_node->value.b = ast_node->left->value.b && ast_node->right->value.f;
@@ -938,7 +938,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP:
-            ast_node->value.b = ast_node->left->value.i < ast_node->right->value.i;
+            ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP:
             ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
@@ -965,7 +965,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.b;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i < ast_node->right->value.b;
+            ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.b;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN:
             ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
@@ -989,7 +989,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b < ast_node->right->value.i;
+            ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP:
             ast_node->value.b = ast_node->left->value.b && ast_node->right->value.i;
@@ -1013,7 +1013,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f < ast_node->right->value.i;
+            ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP:
             ast_node->value.b = ast_node->left->value.f && ast_node->right->value.i;
@@ -1037,7 +1037,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.f;
             break;
         case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i < ast_node->right->value.f;
+            ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.f;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED:
             ast_node->value.b = ast_node->left->value.i && ast_node->right->value.f;

@@ -678,28 +678,34 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "printf(\"%s\\n\");", escape_string_literal_for_transpiler(ast_node->value.s));
             break;
         case AST_EXPRESSION_PLUS:
-            if (!transpile_common_operator(ast_node, "+"))
+            if (!transpile_common_operator(ast_node, "+", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_MINUS:
-            if (!transpile_common_operator(ast_node, "-"))
+            if (!transpile_common_operator(ast_node, "-", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i - ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_MULTIPLY:
-            if (!transpile_common_operator(ast_node, "*"))
+            if (!transpile_common_operator(ast_node, "*", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i * ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_AND:
-            if (!transpile_common_operator(ast_node, "&"))
+            if (!transpile_common_operator(ast_node, "&", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i & ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_OR:
-            if (!transpile_common_operator(ast_node, "|"))
+            if (!transpile_common_operator(ast_node, "|", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i | ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_XOR:
-            if (!transpile_common_operator(ast_node, "^"))
+            if (!transpile_common_operator(ast_node, "^", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i ^ ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_NOT:
             if (ast_node->right->is_transpiled) {
@@ -711,12 +717,14 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_LEFT_SHIFT:
-            if (!transpile_common_operator(ast_node, "<<"))
+            if (!transpile_common_operator(ast_node, "<<", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i << ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_EXPRESSION_BITWISE_RIGHT_SHIFT:
-            if (!transpile_common_operator(ast_node, ">>"))
+            if (!transpile_common_operator(ast_node, ">>", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i >> ast_node->right->value.i;
+            ast_node->value_type = V_INT;
             break;
         case AST_VAR_EXPRESSION_VALUE:
             ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "getSymbolValueInt(\"%s\")", ast_node->strings[0]);
@@ -767,6 +775,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 }
                 ast_node->value.f = l_value + r_value;
             }
+            ast_node->value_type = V_FLOAT;
             break;
         case AST_MIXED_EXPRESSION_MINUS:
             if (!transpile_common_mixed_operator(ast_node, "-")) {
@@ -782,6 +791,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 }
                 ast_node->value.f = l_value - r_value;
             }
+            ast_node->value_type = V_FLOAT;
             break;
         case AST_MIXED_EXPRESSION_MULTIPLY:
             if (!transpile_common_mixed_operator(ast_node, "*")) {
@@ -797,6 +807,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 }
                 ast_node->value.f = l_value * r_value;
             }
+            ast_node->value_type = V_FLOAT;
             break;
         case AST_MIXED_EXPRESSION_DIVIDE:
             if (!transpile_common_mixed_operator(ast_node, "/")) {
@@ -812,11 +823,323 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 }
                 ast_node->value.f = l_value / r_value;
             }
+            ast_node->value_type = V_FLOAT;
             break;
         case AST_VAR_MIXED_EXPRESSION_VALUE:
             ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "getSymbolValueFloat(\"%s\")", ast_node->strings[0]);
             ast_node->is_transpiled = true;
             ast_node->value_type = V_FLOAT;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL:
+            if (!transpile_common_operator(ast_node, "==", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b == ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL:
+            if (!transpile_common_operator(ast_node, "!=", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b != ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT:
+            if (!transpile_common_operator(ast_node, ">", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b > ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL:
+            if (!transpile_common_operator(ast_node, "<", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b < ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL:
+            if (!transpile_common_operator(ast_node, ">=", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL:
+            if (!transpile_common_operator(ast_node, "<=", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND:
+            if (!transpile_common_operator(ast_node, "&&", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b && ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR:
+            if (!transpile_common_operator(ast_node, "||", V_BOOL, V_BOOL))
+                ast_node->value.b = ast_node->left->value.b || ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT:
+            if (ast_node->right->is_transpiled) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "! %s", ast_node->right->transpiled);
+                ast_node->is_transpiled = true;
+            } else {
+                ast_node->value.b = ! ast_node->right->value.b;
+            }
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED:
+            if (!transpile_common_operator(ast_node, "==", V_FLOAT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.f == ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED:
+            if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.f != ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED:
+            if (!transpile_common_operator(ast_node, ">", V_FLOAT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.f > ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED:
+            if (!transpile_common_operator(ast_node, "<", V_FLOAT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.f < ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED:
+            if (!transpile_common_operator(ast_node, ">=", V_FLOAT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED:
+            if (!transpile_common_operator(ast_node, "<=", V_FLOAT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED:
+            if (!transpile_common_operator(ast_node, "&&", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED:
+            if (!transpile_common_operator(ast_node, "||", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_MIXED:
+            if (ast_node->right->is_transpiled) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "! %s", ast_node->right->transpiled);
+                ast_node->is_transpiled = true;
+            } else {
+                ast_node->value.b = ! ast_node->right->value.f;
+            }
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f != ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, ">", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f > ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "<", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f < ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, ">=", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "<=", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "&&", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "||", V_FLOAT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, "==", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b == ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, "!=", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b != ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, ">", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b > ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, "<", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b < ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, ">=", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, "<=", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, "&&", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b && ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED:
+            if (!transpile_common_operator(ast_node, "||", V_BOOL, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.b || ast_node->right->value.f;
+            break;
+        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
+            ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "getSymbolValueBool(\"%s\")", ast_node->strings[0]);
+            ast_node->is_transpiled = true;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP:
+            if (!transpile_common_operator(ast_node, "==", V_INT, V_INT))
+                ast_node->value.b = ast_node->left->value.i == ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP:
+            if (!transpile_common_operator(ast_node, "!=", V_INT, V_INT))
+                ast_node->value.b = ast_node->left->value.i != ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP:
+            if (!transpile_common_operator(ast_node, ">", V_INT, V_INT))
+                ast_node->value.b = ast_node->left->value.i > ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP:
+            if (!transpile_common_operator(ast_node, "<", V_INT, V_INT))
+                ast_node->value.b = ast_node->left->value.i < ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP:
+            if (!transpile_common_operator(ast_node, ">=", V_INT, V_INT))
+                ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP:
+            if (!transpile_common_operator(ast_node, "<=", V_INT, V_INT))
+                ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP:
+            if (!transpile_common_operator(ast_node, "&&", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP:
+            if (!transpile_common_operator(ast_node, "||", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP:
+            if (ast_node->right->is_transpiled) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "! %s", ast_node->right->transpiled);
+                ast_node->is_transpiled = true;
+            } else {
+                ast_node->value.b = ! ast_node->right->value.i;
+            }
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "==", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i == ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "!=", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i != ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, ">", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i > ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "<", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i < ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, ">=", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "<=", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "&&", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_BOOLEAN:
+            if (!transpile_common_operator(ast_node, "||", V_INT, V_BOOL))
+                ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, "==", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b == ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, "!=", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b != ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, ">", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b > ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, "<", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b < ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, ">=", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, "<=", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, "&&", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b && ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_EXP:
+            if (!transpile_common_operator(ast_node, "||", V_BOOL, V_INT))
+                ast_node->value.b = ast_node->left->value.b || ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, "==", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f == ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f != ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, ">", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f > ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, "<", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f < ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, ">=", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, "<=", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, "&&", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f && ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_EXP:
+            if (!transpile_common_operator(ast_node, "||", V_FLOAT, V_INT))
+                ast_node->value.b = ast_node->left->value.f || ast_node->right->value.i;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, "==", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i == ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, "!=", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i != ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, ">", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i > ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, "<", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i < ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, ">=", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, "<=", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, "&&", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i && ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED:
+            if (!transpile_common_operator(ast_node, "||", V_INT, V_FLOAT))
+                ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
             break;
         case AST_DELETE_VAR:
             fprintf(c_fp, "removeSymbolByName(\"%s\");", ast_node->strings[0]);
@@ -862,13 +1185,25 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     return transpile_node(ast_node->next, module, c_fp, indent);
 }
 
-bool transpile_common_operator(ASTNode* ast_node, char *operator) {
-    ast_node->value_type = V_INT;
+bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type) {
     if (ast_node->left->is_transpiled || ast_node->right->is_transpiled) {
         if (ast_node->left->is_transpiled) {
             ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled);
         } else {
-            ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i);
+            switch (left_value_type)
+            {
+                case V_BOOL:
+                    ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.b ? "true" : "false");
+                    break;
+                case V_INT:
+                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i);
+                    break;
+                case V_FLOAT:
+                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%Lg", ast_node->left->value.f);
+                    break;
+                default:
+                    break;
+            }
         }
         ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
         ast_node->transpiled = strcat_ext(ast_node->transpiled, operator);
@@ -876,7 +1211,20 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator) {
         if (ast_node->right->is_transpiled) {
             ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled);
         } else {
-            ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i);
+            switch (right_value_type)
+            {
+                case V_BOOL:
+                    ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false");
+                    break;
+                case V_INT:
+                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i);
+                    break;
+                case V_FLOAT:
+                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%Lg", ast_node->right->value.f);
+                    break;
+                default:
+                    break;
+            }
         }
         ast_node->is_transpiled = true;
         return true;
@@ -885,7 +1233,6 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator) {
 }
 
 bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
-    ast_node->value_type = V_FLOAT;
     if (ast_node->left->is_transpiled || ast_node->right->is_transpiled) {
         if (ast_node->left->is_transpiled) {
             if (ast_node->left->value_type == V_INT) {
@@ -919,4 +1266,5 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
         ast_node->is_transpiled = true;
         return true;
     }
+    return false;
 }
