@@ -63,6 +63,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(h_fp, "%s", h_file_base);
 
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
+    fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
+    fprintf(c_fp, "%*clong long exit_code;\n", indent, ' ');
 
     transpile_node(ast_node, module, c_fp, indent);
 
@@ -189,6 +191,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
 
     long double l_value;
     long double r_value;
+    char *_module = NULL;
     fprintf(c_fp, "%*c", indent, ' ');
     switch (ast_node->node_type)
     {
@@ -1176,6 +1179,281 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             break;
         case AST_POP_NESTED_COMPLEX_STACK:
             fprintf(c_fp, "popNestedComplexModeStack(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_LEFT_RIGHT_BRACKET_EXPRESSION:
+            fprintf(c_fp, "disable_complex_mode = true;");
+            if (ast_node->right->is_transpiled) {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "symbol = addSymbolInt(NULL, %s);", ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "symbol = addSymbolFloat(NULL, %s);", ast_node->right->transpiled);
+                }
+            } else {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "symbol = addSymbolInt(NULL, %lld);", ast_node->right->value.i);
+                } else {
+                    fprintf(c_fp, "symbol = addSymbolFloat(NULL, %Lg);", ast_node->right->value.f);
+                }
+            }
+            fprintf(c_fp, "symbol->sign = 1;");
+            fprintf(c_fp, "pushLeftRightBracketStack(symbol->id);");
+            fprintf(c_fp, "disable_complex_mode = false;");
+            break;
+        case AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
+            fprintf(c_fp, "disable_complex_mode = true;");
+            if (ast_node->right->is_transpiled) {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "symbol = addSymbolInt(NULL, - %s);", ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "symbol = addSymbolFloat(NULL, - %s);", ast_node->right->transpiled);
+                }
+            } else {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "symbol = addSymbolInt(NULL, - %lld);", ast_node->right->value.i);
+                } else {
+                    fprintf(c_fp, "symbol = addSymbolFloat(NULL, - %Lg);", ast_node->right->value.f);
+                }
+            }
+            fprintf(
+                c_fp,
+                "symbol->sign = 1;"
+                "pushLeftRightBracketStack(symbol->id);"
+                "disable_complex_mode = false;"
+            );
+            break;
+        case AST_LEFT_RIGHT_BRACKET_STRING:
+            fprintf(c_fp, "disable_complex_mode = true;");
+            fprintf(c_fp, "symbol = addSymbolString(NULL, \"%s\");", ast_node->value.s);
+            fprintf(
+                c_fp,
+                "symbol->sign = 1;"
+                "pushLeftRightBracketStack(symbol->id);"
+                "disable_complex_mode = false;"
+            );
+            break;
+        case AST_LEFT_RIGHT_BRACKET_VAR:
+            fprintf(c_fp, "disable_complex_mode = true;");
+            fprintf(c_fp, "symbol = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "symbol->sign = 1;"
+                "pushLeftRightBracketStack(symbol->id);"
+                "disable_complex_mode = false;"
+            );
+            break;
+        case AST_LEFT_RIGHT_BRACKET_VAR_MINUS:
+            fprintf(c_fp, "disable_complex_mode = true;");
+            fprintf(c_fp, "symbol = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "symbol->sign = -1;"
+                "pushLeftRightBracketStack(symbol->id);"
+                "disable_complex_mode = false;"
+            );
+            break;
+        case AST_BUILD_COMPLEX_VARIABLE:
+            fprintf(c_fp, "disable_complex_mode = true;");
+            fprintf(c_fp, "buildVariableComplexElement(\"%s\", NULL);", ast_node->strings[0]);
+            fprintf(c_fp, "disable_complex_mode = false;");
+            break;
+        case AST_EXIT_SUCCESS:
+            fprintf(
+                c_fp,
+                "if (is_interactive) {"
+                "    print_bye_bye();"
+                "}"
+                "freeEverything();"
+                "exit(E_SUCCESS);"
+            );
+            break;
+        case AST_EXIT_EXPRESSION:
+            if (ast_node->right->is_transpiled) {
+                fprintf(
+                    c_fp,
+                    "if (is_interactive) {"
+                    "    print_bye_bye();"
+                    "}"
+                    "exit_code = %s;"
+                    "freeEverything();"
+                    "exit(exit_code);",
+                    ast_node->right->transpiled
+                );
+            } else {
+                fprintf(
+                    c_fp,
+                    "if (is_interactive) {"
+                    "    print_bye_bye();"
+                    "}"
+                    "exit_code = %lld;"
+                    "freeEverything();"
+                    "exit(exit_code);",
+                    ast_node->right->value.i
+                );
+            }
+            break;
+        case AST_EXIT_VAR:
+            fprintf(
+                c_fp,
+                "if (is_interactive) {"
+                "    print_bye_bye();"
+                "}"
+                "exit_code = getSymbolValueInt(\"%s\");"
+                "freeEverything();"
+                "exit(exit_code);",
+                ast_node->strings[0]
+            );
+            break;
+        case AST_PRINT_FUNCTION_TABLE:
+            fprintf(c_fp, "printFunctionTable();");
+            break;
+        case AST_FUNCTION_CALL_PARAMETERS_START:
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_BOOL:
+            fprintf(c_fp, "addFunctionCallParameterBool(%s);", ast_node->right->value.b ? "true" : "false");
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_NUMBER:
+            if (ast_node->right->is_transpiled) {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "addFunctionCallParameterInt(%s);", ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "addFunctionCallParameterFloat(%s);", ast_node->right->transpiled);
+                }
+            } else {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "addFunctionCallParameterInt(%lld);", ast_node->right->value.i);
+                } else {
+                    fprintf(c_fp, "addFunctionCallParameterInt(%Lg);", ast_node->right->value.f);
+                }
+            }
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_STRING:
+            fprintf(c_fp, "addFunctionCallParameterString(\"%s\");", ast_node->value.s);
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_VAR:
+            fprintf(c_fp, "addFunctionCallParameterSymbol(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_LIST:
+            fprintf(
+                c_fp,
+                "reverseComplexMode();"
+                "addFunctionCallParameterList(K_ANY);"
+            );
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_DICT:
+            fprintf(
+                c_fp,
+                "reverseComplexMode();"
+                "addFunctionCallParameterList(K_ANY);"
+            );
+            break;
+        case AST_PRINT_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);", ast_node->strings[0], _module);
+            break;
+        case AST_ECHO_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\", false, true);", ast_node->strings[0], _module);
+            break;
+        case AST_PRETTY_PRINT_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);", ast_node->strings[0], _module);
+            break;
+        case AST_PRETTY_ECHO_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\", true, true);", ast_node->strings[0], _module);
+            break;
+        case AST_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1) {
+                _module = ast_node->strings[1];
+            }
+            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            fprintf(c_fp, "freeFunctionReturn(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            break;
+        case AST_NESTED_COMPLEX_TRANSITION:
+            fprintf(c_fp, "reverseComplexMode();");
+            break;
+        case AST_DECISION_MAKE_BOOLEAN:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "if (%s) {", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "if (%s) {", ast_node->right->value.b ? "true" : "false");
+            }
+            fprintf(
+                c_fp,
+                "    callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);"
+                "    stop_ast_evaluation = true;"
+                "}",
+                ast_node->strings[0]
+            );
+            break;
+        case AST_DECISION_MAKE_BOOLEAN_BREAK:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->value.b ? "true" : "false");
+            }
+            fprintf(
+                c_fp,
+                "    decisionBreakLoop();"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->value.b ? "true" : "false");
+            }
+            fprintf(
+                c_fp,
+                "    decisionContinueLoop();"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_DEFAULT:
+            fprintf(
+                c_fp,
+                "if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
+                "    callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);"
+                "    stop_ast_evaluation = true;"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_DEFAULT_BREAK:
+            fprintf(
+                c_fp,
+                "if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
+                "    decisionBreakLoop();"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
+            fprintf(
+                c_fp,
+                "if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
+                "    decisionContinueLoop();"
+                "}"
+            );
+            break;
+        case AST_JSON_PARSER:
+            fprintf(
+                c_fp,
+                "reverseComplexMode();"
+                "symbol = finishComplexMode(NULL, K_ANY);"
+                "returnVariable(symbol);"
+            );
             break;
         default:
             break;
