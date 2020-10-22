@@ -95,6 +95,9 @@ test:
 test-no-shell:
 	./tests/interpreter.sh --no-shell
 
+test-compiler:
+	./tests/compiler.sh
+
 test-extensions-linux-gcc:
 	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so && \
 	chaos tests/extensions/test.kaos && \

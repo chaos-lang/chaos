@@ -33,7 +33,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
-    echo "Running test: ${testname}"
+    echo "(interpreter) Running test: ${testname}"
 
     test=$(chaos tests/$filename)
     if [ "$test" == "$out" ]
@@ -55,7 +55,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
         continue
     fi
 
-    echo "Interactive test: ${testname}"
+    echo "(interpreter) Interactive test: ${testname}"
 
     cd tests/
 
