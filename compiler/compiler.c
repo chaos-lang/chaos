@@ -19,8 +19,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 
     char c_file_path[PATH_MAX];
     char h_file_path[PATH_MAX];
-    sprintf(c_file_path, "%s%smain.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
-    sprintf(h_file_path, "%s%smain.h", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+    if (bin_file != NULL) {
+        sprintf(c_file_path, "%s%s%s.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+        sprintf(h_file_path, "%s%s%s.h", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+    } else {
+        sprintf(c_file_path, "%s%smain.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+        sprintf(h_file_path, "%s%smain.h", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+    }
 
     printf("Compiling Chaos code into %s\n", c_file_path);
 
@@ -49,9 +54,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         fprintf(h_fp, "#define MAIN_H\n\n");
     }
 
-    const char *c_file_base =
-        "#include \"main.h\"\n\n"
-        "int main() {\n";
+    if (bin_file != NULL) {
+        fprintf(c_fp, "#include \"%s.h\"\n\n", bin_file);
+    } else {
+        fprintf(c_fp, "#include \"main.h\"\n\n");
+    }
+
+    const char *c_file_base = "int main() {\n";
 
     const char *h_file_base =
         "#include <stdio.h>\n"
@@ -153,7 +162,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         // printf("Process %lu returned result: %d\n", (unsigned long) wait_result, status);
         if (status != 0) {
             printf("Compilation of %s is failed!\n", c_file_path);
-            exit(status);
+            exit(1);
         }
     }
 #endif
