@@ -133,6 +133,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         execlp(
             c_compiler_path,
             c_compiler_path,
+            "-fcompare-debug-second",
             "-DCHAOS_COMPILER",
             "-o",
             bin_file_path,
@@ -1600,9 +1601,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
-                "    callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);"
+                "    callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);"
                 "    stop_ast_evaluation = true;"
-                "}"
+                "}",
+                ast_node->strings[0]
             );
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:

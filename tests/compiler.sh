@@ -11,7 +11,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     echo "(compiler) Compiling test: ${testname}"
 
-    chaos -c tests/$filename -o $testname
+    cout=$(chaos -c tests/$filename -o $testname)
     status=$?
 
     if [ $status -eq 0 ]
