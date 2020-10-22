@@ -666,10 +666,146 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_VAR_UPDATE_BOOL:
-            fprintf(c_fp, "updateSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "updateSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "updateSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            }
+            break;
+        case AST_VAR_UPDATE_NUMBER:
+            if (ast_node->right->value_type == V_INT) {
+                if (ast_node->right->is_transpiled) {
+                    fprintf(c_fp, "updateSymbolInt(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "updateSymbolInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+                }
+            } else {
+                if (ast_node->right->is_transpiled) {
+                    fprintf(c_fp, "updateSymbolFloat(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "updateSymbolFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+                }
+            }
+            break;
+        case AST_VAR_UPDATE_STRING:
+            fprintf(c_fp, "updateSymbolString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            break;
+        case AST_VAR_UPDATE_LIST:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexModeWithUpdate(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_VAR_UPDATE_DICT:
+            fprintf(c_fp, "reverseComplexMode(); finishComplexModeWithUpdate(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_VAR_UPDATE_VAR:
+            fprintf(c_fp, "updateSymbolByClonningName(\"%s\", \"%s\");", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_UPDATE_VAR_EL:
+            fprintf(c_fp, "updateSymbolByClonningComplexElement(\"%s\", \"%s\");", ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_UPDATE_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");",
+                        ast_node->strings[2],
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[2],
+                        ast_node->strings[1]
+                    );
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case AST_RETURN_VAR:
+            fprintf(c_fp, "returnSymbol(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_PRINT_COMPLEX_EL:
+            fprintf(c_fp, "printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false);");
+            break;
+        case AST_COMPLEX_EL_UPDATE_BOOL:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "updateComplexElementBool(%s);", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "updateComplexElementBool(%s);", ast_node->right->value.b ? "true" : "false");
+            }
+            break;
+        case AST_COMPLEX_EL_UPDATE_NUMBER:
+            if (ast_node->right->value_type == V_INT) {
+                if (ast_node->right->is_transpiled) {
+                    fprintf(c_fp, "updateComplexElementInt(%s);", ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "updateComplexElementInt(%lld);", ast_node->right->value.i);
+                }
+            } else {
+                if (ast_node->right->is_transpiled) {
+                    fprintf(c_fp, "updateComplexElementFloat(%s);", ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "updateComplexElementFloat(%Lg);", ast_node->right->value.f);
+                }
+            }
+            break;
+        case AST_COMPLEX_EL_UPDATE_STRING:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "updateComplexElementString(%s);", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "updateComplexElementString(\"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            }
+            break;
+        case AST_COMPLEX_EL_UPDATE_LIST:
+            fprintf(c_fp, "reverseComplexMode(); updateComplexElementComplex();");
+            break;
+        case AST_COMPLEX_EL_UPDATE_DICT:
+            fprintf(c_fp, "reverseComplexMode(); updateComplexElementComplex();");
+            break;
+        case AST_COMPLEX_EL_UPDATE_VAR:
+            fprintf(c_fp, "updateComplexElementSymbol(getSymbol(\"%s\"));", ast_node->strings[0]);
+            break;
+        case AST_COMPLEX_EL_UPDATE_VAR_EL:
+            fprintf(c_fp, "updateComplexElementSymbol(getComplexElementThroughLeftRightBracketStack(\"%s\", 0));", ast_node->strings[0]);
+            break;
+        case AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", NULL); updateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);",
+                        ast_node->strings[0],
+                        ast_node->strings[0]
+                    );
+                    break;
+                case 3:
+                    fprintf(
+                        c_fp,
+                        "callFunction(\"%s\", \"%s\"); updateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");",
+                        ast_node->strings[1],
+                        ast_node->strings[0],
+                        ast_node->strings[1],
+                        ast_node->strings[0]
+                    );
+                    break;
+                default:
+                    break;
+            }
             break;
         case AST_PRINT_VAR:
             fprintf(c_fp, "printSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);", ast_node->strings[0]);
+            break;
+        case AST_PRINT_VAR_EL:
+            fprintf(c_fp, "printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack(\"%s\", 0), false, true);", ast_node->strings[0]);
             break;
         case AST_PRINT_EXPRESSION:
             fprintf(c_fp, "printf(\"%lld\\n\");", ast_node->right->value.i);
@@ -679,6 +815,33 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             break;
         case AST_PRINT_STRING:
             fprintf(c_fp, "printf(\"%s\\n\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            break;
+        case AST_ECHO_VAR:
+            fprintf(c_fp, "printSymbolValueEndWith(getSymbol(\"%s\"), \"\", false, true);", ast_node->strings[0]);
+            break;
+        case AST_ECHO_VAR_EL:
+            fprintf(c_fp, "printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(\"%s\", 0), \"\", false, true);", ast_node->strings[0]);
+            break;
+        case AST_ECHO_EXPRESSION:
+            fprintf(c_fp, "printf(\"%lld\");", ast_node->right->value.i);
+            break;
+        case AST_ECHO_MIXED_EXPRESSION:
+            fprintf(c_fp, "printf(\"%Lg\");", ast_node->right->value.f);
+            break;
+        case AST_ECHO_STRING:
+            fprintf(c_fp, "printf(\"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            break;
+        case AST_PRETTY_PRINT_VAR:
+            fprintf(c_fp, "printSymbolValueEndWithNewLine(getSymbol(\"%s\"), true, true);", ast_node->strings[0]);
+            break;
+        case AST_PRETTY_PRINT_VAR_EL:
+            fprintf(c_fp, "printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack(\"%s\", 0), true, true);", ast_node->strings[0]);
+            break;
+        case AST_PRETTY_ECHO_VAR:
+            fprintf(c_fp, "printSymbolValueEndWith(getSymbol(\"%s\"), \"\", true, true);", ast_node->strings[0]);
+            break;
+        case AST_PRETTY_ECHO_VAR_EL:
+            fprintf(c_fp, "printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(\"%s\", 0), \"\", true, true);", ast_node->strings[0]);
             break;
         case AST_EXPRESSION_PLUS:
             if (!transpile_common_operator(ast_node, "+", V_INT, V_INT))
