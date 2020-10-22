@@ -81,7 +81,7 @@ done
 
 if [ "$SHELL" = true ] ; then
     for dirpath in $(find $DIR -mindepth 1 -maxdepth 1 -type d); do
-        $dirpath/run.sh
+        $dirpath/interpreter.sh
     done
 fi
 

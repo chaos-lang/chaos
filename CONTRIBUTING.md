@@ -11,7 +11,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 make clean
 make dev
 sudo make install
-tests/run.sh
+tests/interpreter.sh
 ```
 
 placing this command into a shell script like `dev.sh` and executing that, is the suitable way for the developers.

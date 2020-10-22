@@ -90,10 +90,10 @@ lint:
 	cppcheck --force .
 
 test:
-	./tests/run.sh
+	./tests/interpreter.sh
 
 test-no-shell:
-	./tests/run.sh --no-shell
+	./tests/interpreter.sh --no-shell
 
 test-extensions-linux-gcc:
 	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so && \
