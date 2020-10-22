@@ -39,9 +39,11 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     }
 
     if (bin_file != NULL) {
-        string_uppercase(bin_file);
-        fprintf(h_fp, "#ifndef %s_H\n", bin_file);
-        fprintf(h_fp, "#define %s_H\n\n", bin_file);
+        char *bin_file_upper = malloc(1 + strlen(bin_file));
+        strcpy(bin_file_upper, bin_file);
+        string_uppercase(bin_file_upper);
+        fprintf(h_fp, "#ifndef %s_H\n", bin_file_upper);
+        fprintf(h_fp, "#define %s_H\n\n", bin_file_upper);
     } else {
         fprintf(h_fp, "#ifndef MAIN_H\n");
         fprintf(h_fp, "#define MAIN_H\n\n");
