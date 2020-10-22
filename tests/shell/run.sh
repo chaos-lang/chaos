@@ -8,6 +8,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     alias sed='gsed'
 fi
 
+failed=false
+
 for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
@@ -24,6 +26,10 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     else
         echo "$test"
         echo "Fail"
-        exit 1
+        failed=true
     fi
 done
+
+if [ "$failed" = true ] ; then
+    exit 1
+fi

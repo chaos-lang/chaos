@@ -26,6 +26,8 @@ done
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+failed=false
+
 for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
@@ -40,7 +42,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     else
         echo "$test"
         echo "Fail"
-        exit 1
+        failed=true
     fi
 done
 
@@ -71,7 +73,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     else
         echo "$test"
         echo "Fail"
-        exit 1
+        failed=true
     fi
 
     cd ..
@@ -81,4 +83,8 @@ if [ "$SHELL" = true ] ; then
     for dirpath in $(find $DIR -mindepth 1 -maxdepth 1 -type d); do
         $dirpath/run.sh
     done
+fi
+
+if [ "$failed" = true ] ; then
+    exit 1
 fi
