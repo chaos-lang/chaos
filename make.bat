@@ -110,7 +110,7 @@ choco install mingw --confirm
 IF errorlevel 1 (
     EXIT /B 1
 )
-choco install llvm --confirm
+choco install llvm --confirm --version 10.0.0
 IF errorlevel 1 (
     EXIT /B 1
 )
