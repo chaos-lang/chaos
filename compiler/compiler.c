@@ -25,6 +25,7 @@
 struct stat dir_stat = {0};
 
 unsigned short indent_length = 4;
+unsigned long long compiler_loop_counter = 0;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Starting compiling...\n");
@@ -223,10 +224,131 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         transpile_node(ast_node->left, module, c_fp, indent);
     }
 
+    if (ast_node->node_type == AST_END) {
+        return ast_node;
+    }
+
+    fprintf(c_fp, "%*c", indent, ' ');
+
+    unsigned long long current_loop_counter = 0;
+    switch (ast_node->node_type)
+    {
+        case AST_START_TIMES_DO:
+            compiler_loop_counter++;
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "for (int i = 0; i < %s; i++) {\n", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "for (int i = 0; i < %lld; i++) {\n", ast_node->right->value.i);
+            }
+            indent += indent_length;
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            indent -= indent_length;
+            fprintf(c_fp, "%*c}\n", indent, ' ');
+            break;
+        case AST_START_TIMES_DO_INFINITE:
+            compiler_loop_counter++;
+            fprintf(c_fp, "while (true) {");
+            indent += indent_length;
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            indent -= indent_length;
+            fprintf(c_fp, "%*c}\n", indent, ' ');
+            break;
+        case AST_START_TIMES_DO_VAR:
+            compiler_loop_counter++;
+            fprintf(c_fp, "for (int i = 0; i < (unsigned) getSymbolValueInt(\"%s\"); i++) {\n", ast_node->strings[0]);
+            indent += indent_length;
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            indent -= indent_length;
+            fprintf(c_fp, "%*c}\n", indent, ' ');
+            break;
+        case AST_START_FOREACH:
+            compiler_loop_counter++;
+            current_loop_counter = compiler_loop_counter;
+            fprintf(
+                c_fp,
+                "Symbol* loop_%llu_list = getSymbol(\"%s\");\n"
+                "%*cif (loop_%llu_list->type != K_LIST) throw_error(E_NOT_A_LIST, \"%s\");\n"
+                "%*cfor (unsigned long i = 0; i < loop_%llu_list->children_count; i++) {\n"
+                "%*cSymbol* loop_%llu_child = loop_%llu_list->children[i];\n"
+                "%*cSymbol* loop_%llu_clone_symbol = createCloneFromSymbol(\"%s\", loop_%llu_child->type, loop_%llu_child, loop_%llu_child->secondary_type);\n",
+                compiler_loop_counter,
+                ast_node->strings[0],
+                indent,
+                ' ',
+                compiler_loop_counter,
+                ast_node->strings[0],
+                indent,
+                ' ',
+                compiler_loop_counter,
+                indent * 2,
+                ' ',
+                compiler_loop_counter,
+                compiler_loop_counter,
+                indent * 2,
+                ' ',
+                compiler_loop_counter,
+                ast_node->strings[1],
+                compiler_loop_counter,
+                compiler_loop_counter,
+                compiler_loop_counter
+            );
+            indent += indent_length;
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            indent -= indent_length;
+            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent * 2, ' ', current_loop_counter);
+            fprintf(c_fp, "%*c}\n", indent, ' ');
+            break;
+        case AST_START_FOREACH_DICT:
+            compiler_loop_counter++;
+            current_loop_counter = compiler_loop_counter;
+            fprintf(
+                c_fp,
+                "Symbol* loop_%llu_dict = getSymbol(\"%s\");\n"
+                "%*cif (loop_%llu_dict->type != K_DICT) throw_error(E_NOT_A_DICT, \"%s\");\n"
+                "%*cfor (unsigned long i = 0; i < loop_%llu_dict->children_count; i++) {\n"
+                "%*cSymbol* loop_%llu_child = loop_%llu_dict->children[i];\n"
+                "%*caddSymbolString(\"%s\", loop_%llu_child->key);\n"
+                "%*cSymbol* loop_%llu_clone_symbol = createCloneFromSymbol(\"%s\", loop_%llu_child->type, loop_%llu_child, loop_%llu_child->secondary_type);\n",
+                compiler_loop_counter,
+                ast_node->strings[0],
+                indent,
+                ' ',
+                compiler_loop_counter,
+                ast_node->strings[0],
+                indent,
+                ' ',
+                compiler_loop_counter,
+                indent * 2,
+                ' ',
+                compiler_loop_counter,
+                compiler_loop_counter,
+                indent * 2,
+                ' ',
+                ast_node->strings[1],
+                compiler_loop_counter,
+                indent * 2,
+                ' ',
+                compiler_loop_counter,
+                ast_node->strings[2],
+                compiler_loop_counter,
+                compiler_loop_counter,
+                compiler_loop_counter
+            );
+            indent += indent_length;
+            ASTNode* next_node = transpile_node(ast_node->next, module, c_fp, indent);
+            indent -= indent_length;
+            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent * 2, ' ', current_loop_counter);
+            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent * 2, ' ', ast_node->strings[1]);
+            fprintf(c_fp, "%*c}\n", indent, ' ');
+            ast_node = next_node;
+            break;
+        default:
+            break;
+    }
+
     long double l_value;
     long double r_value;
     char *_module = NULL;
-    fprintf(c_fp, "%*c", indent, ' ');
     switch (ast_node->node_type)
     {
         case AST_VAR_CREATE_BOOL:

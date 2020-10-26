@@ -41,6 +41,7 @@
 
 bool compiler_mode;
 unsigned short indent_length;
+unsigned long long compiler_loop_counter;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file);
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
