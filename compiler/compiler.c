@@ -231,9 +231,17 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     {
         case AST_VAR_CREATE_BOOL:
             if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "addSymbolBool(NULL, %s);", ast_node->right->value.b ? "true" : "false");
+                if (ast_node->right->is_transpiled) {
+                    fprintf(c_fp, "addSymbolBool(NULL, %s);", ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "addSymbolBool(NULL, %s);", ast_node->right->value.b ? "true" : "false");
+                }
             } else {
-                fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+                if (ast_node->right->is_transpiled) {
+                    fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "addSymbolBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+                }
             }
             break;
         case AST_VAR_CREATE_BOOL_VAR:
@@ -877,6 +885,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_PRETTY_ECHO_VAR_EL:
             fprintf(c_fp, "printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(\"%s\", 0), \"\", true, true);", ast_node->strings[0]);
             break;
+        case AST_PARENTHESIS:
+            if (ast_node->right->is_transpiled) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(%s)", ast_node->right->transpiled);
+            } else {
+                switch (ast_node->right->value_type)
+                {
+                    case V_BOOL:
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false");
+                        break;
+                    case V_INT:
+                        ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i);
+                        break;
+                    case V_FLOAT:
+                        ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            ast_node->is_transpiled = true;
+            break;
         case AST_EXPRESSION_PLUS:
             if (!transpile_common_operator(ast_node, "+", V_INT, V_INT))
                 ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
@@ -1109,6 +1138,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             } else {
                 ast_node->value.b = ! ast_node->right->value.f;
             }
+            break;
         case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN:
             if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_BOOL))
                 ast_node->value.b = ast_node->left->value.f != ast_node->right->value.b;
@@ -1662,8 +1692,8 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
 }
 
 bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type) {
-    if (ast_node->left->is_transpiled || ast_node->right->is_transpiled) {
-        if (ast_node->left->is_transpiled) {
+    if ((ast_node->left != NULL && ast_node->left->is_transpiled) || (ast_node->right != NULL && ast_node->right->is_transpiled)) {
+        if (ast_node->left != NULL && ast_node->left->is_transpiled) {
             ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled);
         } else {
             switch (left_value_type)
@@ -1675,7 +1705,7 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
                     ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i);
                     break;
                 case V_FLOAT:
-                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%Lg", ast_node->left->value.f);
+                    ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->left->value.f);
                     break;
                 default:
                     break;
@@ -1684,7 +1714,7 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
         ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
         ast_node->transpiled = strcat_ext(ast_node->transpiled, operator);
         ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
-        if (ast_node->right->is_transpiled) {
+        if (ast_node->right != NULL && ast_node->right->is_transpiled) {
             ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled);
         } else {
             switch (right_value_type)
@@ -1696,7 +1726,7 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
                     ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i);
                     break;
                 case V_FLOAT:
-                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%Lg", ast_node->right->value.f);
+                    ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f);
                     break;
                 default:
                     break;
@@ -1709,8 +1739,8 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
 }
 
 bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
-    if (ast_node->left->is_transpiled || ast_node->right->is_transpiled) {
-        if (ast_node->left->is_transpiled) {
+    if ((ast_node->left != NULL && ast_node->left->is_transpiled) || (ast_node->right != NULL && ast_node->right->is_transpiled)) {
+        if (ast_node->left != NULL && ast_node->left->is_transpiled) {
             if (ast_node->left->value_type == V_INT) {
                 ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->left->transpiled);
             } else {
@@ -1726,7 +1756,7 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
         ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
         ast_node->transpiled = strcat_ext(ast_node->transpiled, operator);
         ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
-        if (ast_node->right->is_transpiled) {
+        if (ast_node->right != NULL && ast_node->right->is_transpiled) {
             if (ast_node->right->value_type == V_INT) {
                 ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->right->transpiled);
             } else {

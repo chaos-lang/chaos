@@ -726,6 +726,9 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
         case AST_PRETTY_ECHO_VAR_EL:
             printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), "", true, true);
             break;
+        case AST_PARENTHESIS:
+            ast_node->value = ast_node->right->value;
+            break;
         case AST_EXPRESSION_PLUS:
             ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
             ast_node->value_type = V_INT;
