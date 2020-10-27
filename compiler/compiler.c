@@ -29,6 +29,10 @@ unsigned long long compiler_loop_counter = 0;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Starting compiling...\n");
+    char *module_orig = malloc(strlen(module) + 1);
+    strcpy(module_orig, module);
+    module = replace_char(module, '.', '_');
+    module = replace_char(module, '/', '_');
     ASTNode* ast_node = ast_root_node;
 
     if (stat(__KAOS_BUILD_DIRECTORY__, &dir_stat) == -1) {
@@ -83,23 +87,40 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         fprintf(c_fp, "#include \"main.h\"\n\n");
     }
 
-    const char *c_file_base = "int main() {\n";
+    unsigned short indent = indent_length;
+
+    const char *c_file_base = "bool is_interactive = false;\n\n";
 
     const char *h_file_base =
         "#include <stdio.h>\n"
         "#include <stdbool.h>\n\n"
-        "bool is_interactive = false;\n"
+        "#include \"interpreter/function.h\"\n"
         "#include \"interpreter/symbol.h\"\n\n";
-
-    unsigned short indent = indent_length;
 
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
+
+    transpile_functions(ast_node, module, c_fp, indent);
+
+    fprintf(c_fp, "int main() {\n");
+
+    fprintf(
+        c_fp,
+        "%*cprogram_file_path = malloc(strlen(\"%s\") + 1);\n"
+        "%*cstrcpy(program_file_path, \"%s\");\n",
+        indent,
+        ' ',
+        module_orig,
+        indent,
+        ' ',
+        module_orig
+    );
 
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
     fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
     fprintf(c_fp, "%*clong long exit_code;\n", indent, ' ');
 
+    compiler_register_functions(ast_node, module, c_fp, indent);
     transpile_node(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "}\n");
@@ -168,13 +189,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
             "/usr/local/include/chaos/interpreter/function.c",
             "/usr/local/include/chaos/interpreter/module.c",
             "/usr/local/include/chaos/interpreter/symbol.c",
-            "/usr/local/include/chaos/compiler/compiler.c",
             "/usr/local/include/chaos/compiler/lib/alternative.c",
             "/usr/local/include/chaos/Chaos.c",
             "-lreadline",
             "-L/usr/local/opt/readline/lib",
             "-ldl",
             "-I/usr/local/include/chaos/",
+            "-ggdb",
             NULL
         );
 
@@ -205,6 +226,81 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 #endif
 
     printf("Binary is ready on: %s\n", bin_file_path_final);
+}
+
+ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+    if (ast_node == NULL) {
+        return ast_node;
+    }
+    ast_node->module = replace_char(ast_node->module, '.', '_');
+
+    if (strcmp(ast_node->module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent);
+
+    if (is_node_function_related(ast_node)){
+        if (ast_node->depend != NULL) {
+            transpile_node(ast_node->depend, module, c_fp, indent);
+            transpile_functions(ast_node->depend, module, c_fp, indent);
+        }
+
+        if (ast_node->right != NULL) {
+            transpile_node(ast_node->right, module, c_fp, indent);
+            transpile_functions(ast_node->right, module, c_fp, indent);
+        }
+
+        if (ast_node->left != NULL) {
+            transpile_node(ast_node->left, module, c_fp, indent);
+            transpile_functions(ast_node->left, module, c_fp, indent);
+        }
+    }
+
+    switch (ast_node->node_type)
+    {
+        case AST_DEFINE_FUNCTION_VOID:
+            fprintf(c_fp, "void kaos_function_%s_%s() {\n", module, ast_node->strings[0]);
+            transpile_node(ast_node->child, module, c_fp, indent);
+            fprintf(c_fp, "}\n\n");
+            break;
+        default:
+            break;
+    }
+
+    return transpile_functions(ast_node->next, module, c_fp, indent);
+}
+
+ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+    if (ast_node == NULL) {
+        return ast_node;
+    }
+
+    if (is_node_function_related(ast_node)){
+        if (ast_node->depend != NULL) {
+            compiler_register_functions(ast_node->depend, module, c_fp, indent);
+        }
+
+        if (ast_node->right != NULL) {
+            compiler_register_functions(ast_node->right, module, c_fp, indent);
+        }
+
+        if (ast_node->left != NULL) {
+            compiler_register_functions(ast_node->left, module, c_fp, indent);
+        }
+    }
+
+    fprintf(c_fp, "%*c", indent, ' ');
+
+    switch (ast_node->node_type)
+    {
+        case AST_DEFINE_FUNCTION_VOID:
+            fprintf(c_fp, "startFunction(\"%s\", K_VOID, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETERS_START:
+            fprintf(c_fp, "if (function_parameters_mode == NULL) startFunctionParameters();\n");
+            break;
+        default:
+            break;
+    }
+
+    return compiler_register_functions(ast_node->next, module, c_fp, indent);
 }
 
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
@@ -1727,8 +1823,15 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (ast_node->strings_size > 1) {
                 _module = ast_node->strings[1];
             }
-            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
-            fprintf(c_fp, "freeFunctionReturn(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            if (_module == NULL) {
+                fprintf(c_fp, "callFunction(\"%s\", NULL);", ast_node->strings[0]);
+                fprintf(c_fp, "kaos_function_%s_%s();", module, ast_node->strings[0]);
+                fprintf(c_fp, "freeFunctionReturn(\"%s\", NULL);", ast_node->strings[0]);
+            } else {
+                fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+                fprintf(c_fp, "kaos_function_%s_%s();", _module, ast_node->strings[0]);
+                fprintf(c_fp, "freeFunctionReturn(\"%s\", \"%s\");", ast_node->strings[0], _module);
+            }
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
             fprintf(c_fp, "reverseComplexMode();");

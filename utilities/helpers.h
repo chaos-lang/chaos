@@ -64,6 +64,7 @@ void insert_nth_char(char* string, char c, long long n);
 void remove_nth_char(char* string, long long n);
 int string_ends_with(const char *str, const char *suffix);
 void string_uppercase(char *s);
+char* replace_char(char* str, char find, char replace);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>
