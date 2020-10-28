@@ -119,6 +119,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
     fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
     fprintf(c_fp, "%*clong long exit_code;\n", indent, ' ');
+    fprintf(c_fp, "%*c_Function* function;\n", indent, ' ');
 
     compiler_register_functions(ast_node, module, c_fp, indent);
     transpile_node(ast_node, module, c_fp, indent);
@@ -253,15 +254,10 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         }
     }
 
-    switch (ast_node->node_type)
-    {
-        case AST_DEFINE_FUNCTION_VOID:
-            fprintf(c_fp, "void kaos_function_%s_%s() {\n", module, ast_node->strings[0]);
-            transpile_node(ast_node->child, module, c_fp, indent);
-            fprintf(c_fp, "}\n\n");
-            break;
-        default:
-            break;
+    if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
+        fprintf(c_fp, "void kaos_function_%s_%s() {\n", module, ast_node->strings[0]);
+        transpile_node(ast_node->child, module, c_fp, indent);
+        fprintf(c_fp, "}\n\n");
     }
 
     return transpile_functions(ast_node->next, module, c_fp, indent);
@@ -290,11 +286,152 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
 
     switch (ast_node->node_type)
     {
+        case AST_DEFINE_FUNCTION_BOOL:
+            fprintf(c_fp, "startFunction(\"%s\", K_BOOL, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_NUMBER:
+            fprintf(c_fp, "startFunction(\"%s\", K_NUMBER, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_STRING:
+            fprintf(c_fp, "startFunction(\"%s\", K_STRING, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_ANY:
+            fprintf(c_fp, "startFunction(\"%s\", K_ANY, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_LIST:
+            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_DICT:
+            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_ANY);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_BOOL_LIST:
+            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_BOOL);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_BOOL_DICT:
+            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_BOOL);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_NUMBER_LIST:
+            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_NUMBER);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_NUMBER_DICT:
+            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_NUMBER);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_STRING_LIST:
+            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_STRING);\n", ast_node->strings[0]);
+            break;
+        case AST_DEFINE_FUNCTION_STRING_DICT:
+            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_STRING);\n", ast_node->strings[0]);
+            break;
         case AST_DEFINE_FUNCTION_VOID:
             fprintf(c_fp, "startFunction(\"%s\", K_VOID, K_ANY);\n", ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETERS_START:
             fprintf(c_fp, "if (function_parameters_mode == NULL) startFunctionParameters();\n");
+            break;
+        case AST_FUNCTION_PARAMETER_BOOL:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_BOOL, K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_NUMBER:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_NUMBER, K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_STRING:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_STRING, K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_LIST:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_LIST, K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_BOOL_LIST:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_LIST, K_BOOL);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_NUMBER_LIST:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_LIST, K_NUMBER);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_STRING_LIST:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_LIST, K_STRING);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_DICT:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_DICT, K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_BOOL_DICT:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_DICT, K_BOOL);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_NUMBER_DICT:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_DICT, K_NUMBER);", ast_node->strings[0]);
+            break;
+        case AST_FUNCTION_PARAMETER_STRING_DICT:
+            fprintf(c_fp, "addFunctionParameter(\"%s\", K_DICT, K_STRING);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "addFunctionOptionalParameterBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "addFunctionOptionalParameterBool(\"%s\", %s);", ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+            }
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER:
+            if (ast_node->right->is_transpiled) {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "addFunctionOptionalParameterInt(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "addFunctionOptionalParameterFloat(\"%s\", %s);", ast_node->strings[0], ast_node->right->transpiled);
+                }
+            } else {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(c_fp, "addFunctionOptionalParameterInt(\"%s\", %lld);", ast_node->strings[0], ast_node->right->value.i);
+                } else {
+                    fprintf(c_fp, "addFunctionOptionalParameterFloat(\"%s\", %Lg);", ast_node->strings[0], ast_node->right->value.f);
+                }
+            }
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_STRING:
+            fprintf(c_fp, "addFunctionOptionalParameterString(\"%s\", \"%s\");", ast_node->strings[0], ast_node->value.s);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_LIST:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_LIST:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_BOOL);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_LIST:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_NUMBER);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_STRING);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_DICT:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_ANY);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_DICT:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_BOOL);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_DICT:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_NUMBER);", ast_node->strings[0]);
+            break;
+        case AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT:
+            fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_STRING);", ast_node->strings[0]);
+            break;
+        case AST_ADD_FUNCTION_NAME:
+            fprintf(c_fp, "addFunctionNameToFunctionNamesBuffer(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_APPEND_MODULE:
+            fprintf(c_fp, "appendModuleToModuleBuffer(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_PREPEND_MODULE:
+            fprintf(c_fp, "prependModuleToModuleBuffer(\"%s\");", ast_node->strings[0]);
+            break;
+        case AST_MODULE_IMPORT:
+            fprintf(c_fp, "handleModuleImport(NULL, false);");
+            break;
+        case AST_MODULE_IMPORT_AS:
+            fprintf(c_fp, "handleModuleImport(\"%s\", false);", ast_node->strings[0]);
+            break;
+        case AST_MODULE_IMPORT_PARTIAL:
+            fprintf(c_fp, "handleModuleImport(NULL, true);");
+            break;
+        case AST_DECISION_DEFINE:
+            // TODO: The code below cannot be compiled.
+            // decision_mode->decision_node = ast_node->right;
+            // decision_mode = NULL;
             break;
         default:
             break;
@@ -1824,12 +1961,14 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 _module = ast_node->strings[1];
             }
             if (_module == NULL) {
-                fprintf(c_fp, "callFunction(\"%s\", NULL);", ast_node->strings[0]);
+                fprintf(c_fp, "function = callFunction(\"%s\", NULL);", ast_node->strings[0]);
                 fprintf(c_fp, "kaos_function_%s_%s();", module, ast_node->strings[0]);
+                fprintf(c_fp, "callFunctionCleanUp(function, \"%s\");", ast_node->strings[0]);
                 fprintf(c_fp, "freeFunctionReturn(\"%s\", NULL);", ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+                fprintf(c_fp, "function = callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
                 fprintf(c_fp, "kaos_function_%s_%s();", _module, ast_node->strings[0]);
+                fprintf(c_fp, "callFunctionCleanUp(function, \"%s\");", ast_node->strings[0]);
                 fprintf(c_fp, "freeFunctionReturn(\"%s\", \"%s\");", ast_node->strings[0], _module);
             }
             break;

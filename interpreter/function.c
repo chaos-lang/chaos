@@ -148,7 +148,7 @@ void resetFunctionParametersMode() {
     freeFunctionParametersMode();
 }
 
-void callFunction(char *name, char *module) {
+_Function* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
 
     if (function_parameters_mode != NULL &&
@@ -253,6 +253,13 @@ void callFunction(char *name, char *module) {
         }
     }
 
+#ifndef CHAOS_COMPILER
+    callFunctionCleanUp(function, name);
+#endif
+    return function;
+}
+
+void callFunctionCleanUp(_Function* function, char *name) {
     reset_line_no_to = 0;
 
     bool is_loop_breaked = false;
