@@ -611,18 +611,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", \"%s\", K_ANY);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", \"%s\", K_ANY);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -675,18 +684,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_NUMBER, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_NUMBER, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_NUMBER, \"%s\", \"%s\", K_ANY);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_NUMBER, \"%s\", \"%s\", K_ANY);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -715,18 +733,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", \"%s\", K_ANY);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", \"%s\", K_ANY);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -777,18 +804,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", \"%s\", K_ANY);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", \"%s\", K_ANY);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -810,18 +846,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_ANY);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_ANY);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -843,18 +888,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_ANY);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_ANY);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_ANY);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -876,18 +930,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_BOOL);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_BOOL);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_BOOL);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_BOOL);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -909,18 +972,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_BOOL);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_BOOL);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_BOOL);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_BOOL);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -942,18 +1014,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_NUMBER);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_NUMBER);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_NUMBER);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_NUMBER);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -975,18 +1056,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_NUMBER);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_NUMBER);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_NUMBER);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_NUMBER);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -1008,18 +1098,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_STRING);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_STRING);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_STRING);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_STRING);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -1041,18 +1140,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_STRING);",
-                        ast_node->strings[1],
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
                         ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_STRING);",
+                        ast_node->strings[0], ast_node->strings[1]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_STRING);",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_STRING);",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -1105,8 +1213,13 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);",
-                        ast_node->strings[1],
+                        "function = callFunction(\"%s\", NULL);",
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);",
                         ast_node->strings[0],
                         ast_node->strings[1]
                     );
@@ -1114,9 +1227,14 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[2],
-                        ast_node->strings[1],
+                        ast_node->strings[1]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    fprintf(
+                        c_fp,
+                        "updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");",
                         ast_node->strings[0],
                         ast_node->strings[2],
                         ast_node->strings[1]
@@ -1179,17 +1297,27 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 case 2:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", NULL); updateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);",
-                        ast_node->strings[0],
+                        "function = callFunction(\"%s\", NULL);",
+                        ast_node->strings[0]
+                    );
+                    transpile_function_call(c_fp, module, ast_node->strings[0]);
+                    fprintf(
+                        c_fp,
+                        "updateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);",
                         ast_node->strings[0]
                     );
                     break;
                 case 3:
                     fprintf(
                         c_fp,
-                        "callFunction(\"%s\", \"%s\"); updateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");",
+                        "function = callFunction(\"%s\", \"%s\");",
                         ast_node->strings[1],
-                        ast_node->strings[0],
+                        ast_node->strings[0]
+                    );
+                    transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1]);
+                    fprintf(
+                        c_fp,
+                        "updateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");",
                         ast_node->strings[1],
                         ast_node->strings[0]
                     );
@@ -1932,29 +2060,57 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (ast_node->strings_size > 1) {
                 _module = ast_node->strings[1];
             }
-            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
-            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);", ast_node->strings[0], _module);
+            if (_module == NULL) {
+                fprintf(c_fp, "function = callFunction(\"%s\", NULL);", ast_node->strings[0]);
+                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\\n\", false, true);", ast_node->strings[0]);
+            } else {
+                fprintf(c_fp, "function = callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);", ast_node->strings[0], _module);
+            }
             break;
         case AST_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
                 _module = ast_node->strings[1];
             }
-            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
-            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\", false, true);", ast_node->strings[0], _module);
+            if (_module == NULL) {
+                fprintf(c_fp, "function = callFunction(\"%s\", NULL);", ast_node->strings[0]);
+                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\", false, true);", ast_node->strings[0]);
+            } else {
+                fprintf(c_fp, "function = callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\", false, true);", ast_node->strings[0], _module);
+            }
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
                 _module = ast_node->strings[1];
             }
-            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
-            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);", ast_node->strings[0], _module);
+            if (_module == NULL) {
+                fprintf(c_fp, "function = callFunction(\"%s\", NULL);", ast_node->strings[0]);
+                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\\n\", true, true);", ast_node->strings[0]);
+            } else {
+                fprintf(c_fp, "function = callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);", ast_node->strings[0], _module);
+            }
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
                 _module = ast_node->strings[1];
             }
-            fprintf(c_fp, "callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
-            fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\", true, true);", ast_node->strings[0], _module);
+            if (_module == NULL) {
+                fprintf(c_fp, "function = callFunction(\"%s\", NULL);", ast_node->strings[0]);
+                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\", true, true);", ast_node->strings[0]);
+            } else {
+                fprintf(c_fp, "function = callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
+                fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\", true, true);", ast_node->strings[0], _module);
+            }
             break;
         case AST_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
@@ -1962,13 +2118,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             if (_module == NULL) {
                 fprintf(c_fp, "function = callFunction(\"%s\", NULL);", ast_node->strings[0]);
-                fprintf(c_fp, "kaos_function_%s_%s();", module, ast_node->strings[0]);
-                fprintf(c_fp, "callFunctionCleanUp(function, \"%s\");", ast_node->strings[0]);
+                transpile_function_call(c_fp, module, ast_node->strings[0]);
                 fprintf(c_fp, "freeFunctionReturn(\"%s\", NULL);", ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "function = callFunction(\"%s\", \"%s\");", ast_node->strings[0], _module);
-                fprintf(c_fp, "kaos_function_%s_%s();", _module, ast_node->strings[0]);
-                fprintf(c_fp, "callFunctionCleanUp(function, \"%s\");", ast_node->strings[0]);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "freeFunctionReturn(\"%s\", \"%s\");", ast_node->strings[0], _module);
             }
             break;
@@ -2137,4 +2291,9 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
         return true;
     }
     return false;
+}
+
+void transpile_function_call(FILE *c_fp, char *module, char *name) {
+    fprintf(c_fp, "kaos_function_%s_%s();", module, name);
+    fprintf(c_fp, "callFunctionCleanUp(function, \"%s\");", name);
 }
