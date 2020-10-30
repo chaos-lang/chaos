@@ -50,5 +50,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
 bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type);
 bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator);
 void transpile_function_call(FILE *c_fp, char *module, char *name);
+void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2);
 
 #endif

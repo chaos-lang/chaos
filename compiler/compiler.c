@@ -27,6 +27,16 @@ struct stat dir_stat = {0};
 unsigned short indent_length = 4;
 unsigned long long compiler_loop_counter = 0;
 
+char *type_strings[] = {
+    "K_BOOL",
+    "K_NUMBER",
+    "K_STRING",
+    "K_ANY",
+    "K_LIST",
+    "K_DICT",
+    "K_VOID"
+};
+
 void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Starting compiling...\n");
     char *module_orig = malloc(strlen(module) + 1);
@@ -612,40 +622,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_BOOL, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_BOOL, \"%s\", \"%s\", K_ANY);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_BOOL, K_ANY);
             break;
         case AST_VAR_CREATE_NUMBER:
             if (ast_node->right->is_transpiled) {
@@ -685,40 +662,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_NUMBER, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_NUMBER, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_NUMBER, \"%s\", \"%s\", K_ANY);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_NUMBER, K_ANY);
             break;
         case AST_VAR_CREATE_STRING:
             if (ast_node->strings[0] == NULL) {
@@ -734,40 +678,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_STRING, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_STRING, \"%s\", \"%s\", K_ANY);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_STRING, K_ANY);
             break;
         case AST_VAR_CREATE_ANY_BOOL:
             if (ast_node->strings[0] == NULL) {
@@ -805,40 +716,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromComplexElement(\"%s\", K_ANY, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_ANY_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_ANY, \"%s\", \"%s\", K_ANY);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_ANY, K_ANY);
             break;
         case AST_VAR_CREATE_LIST:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_ANY);", ast_node->strings[0]);
@@ -847,40 +725,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_ANY);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_ANY);
             break;
         case AST_VAR_CREATE_DICT:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_ANY);", ast_node->strings[0]);
@@ -889,40 +734,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_ANY);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_ANY);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_ANY);
             break;
         case AST_VAR_CREATE_BOOL_LIST:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_BOOL);", ast_node->strings[0]);
@@ -931,40 +743,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_BOOL);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_BOOL);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_BOOL);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_BOOL);
             break;
         case AST_VAR_CREATE_BOOL_DICT:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_BOOL);", ast_node->strings[0]);
@@ -973,40 +752,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_BOOL);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_BOOL);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_BOOL);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_BOOL);
             break;
         case AST_VAR_CREATE_NUMBER_LIST:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_NUMBER);", ast_node->strings[0]);
@@ -1015,40 +761,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_NUMBER);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_NUMBER);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_NUMBER);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_NUMBER);
             break;
         case AST_VAR_CREATE_NUMBER_DICT:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_NUMBER);", ast_node->strings[0]);
@@ -1057,40 +770,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_NUMBER);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_NUMBER);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_NUMBER);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_NUMBER);
             break;
         case AST_VAR_CREATE_STRING_LIST:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_STRING);", ast_node->strings[0]);
@@ -1099,40 +779,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_STRING);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", NULL, K_STRING);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_LIST, \"%s\", \"%s\", K_STRING);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_STRING);
             break;
         case AST_VAR_CREATE_STRING_DICT:
             fprintf(c_fp, "reverseComplexMode(); finishComplexMode(\"%s\", K_STRING);", ast_node->strings[0]);
@@ -1141,40 +788,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_STRING);", ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", NULL);",
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", NULL, K_STRING);",
-                        ast_node->strings[0], ast_node->strings[1]
-                    );
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "function = callFunction(\"%s\", \"%s\");",
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
-                    fprintf(
-                        c_fp,
-                        "createCloneFromFunctionReturn(\"%s\", K_DICT, \"%s\", \"%s\", K_STRING);",
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    break;
-                default:
-                    break;
-            }
+            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_STRING);
             break;
         case AST_VAR_UPDATE_BOOL:
             if (ast_node->right->is_transpiled) {
@@ -2302,4 +1916,46 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
 void transpile_function_call(FILE *c_fp, char *module, char *name) {
     fprintf(c_fp, "kaos_function_%s_%s();", module, name);
     fprintf(c_fp, "callFunctionCleanUp(function, \"%s\");", name);
+}
+
+void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2) {
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            fprintf(
+                c_fp,
+                "function = callFunction(\"%s\", NULL);",
+                ast_node->strings[1]
+            );
+            transpile_function_call(c_fp, module, ast_node->strings[1]);
+            fprintf(
+                c_fp,
+                "createCloneFromFunctionReturn(\"%s\", %s, \"%s\", NULL, %s);",
+                ast_node->strings[0],
+                type_strings[type1],
+                ast_node->strings[1],
+                type_strings[type2]
+            );
+            break;
+        case 3:
+            fprintf(
+                c_fp,
+                "function = callFunction(\"%s\", \"%s\");",
+                ast_node->strings[2],
+                ast_node->strings[1]
+            );
+            transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+            fprintf(
+                c_fp,
+                "createCloneFromFunctionReturn(\"%s\", %s, \"%s\", \"%s\", %s);",
+                ast_node->strings[0],
+                type_strings[type1],
+                ast_node->strings[2],
+                ast_node->strings[1],
+                type_strings[type2]
+            );
+            break;
+        default:
+            break;
+    }
 }
