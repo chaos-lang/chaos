@@ -100,6 +100,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
 
+    fprintf(c_fp, "_Function* function;\n\n");
+
     transpile_functions(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "int main() {\n");
@@ -119,7 +121,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
     fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
     fprintf(c_fp, "%*clong long exit_code;\n", indent, ' ');
-    fprintf(c_fp, "%*c_Function* function;\n", indent, ' ');
 
     compiler_register_functions(ast_node, module, c_fp, indent);
     transpile_node(ast_node, module, c_fp, indent);
@@ -237,19 +238,16 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
 
     if (strcmp(ast_node->module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent);
 
-    if (is_node_function_related(ast_node)){
+    if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
-            transpile_node(ast_node->depend, module, c_fp, indent);
             transpile_functions(ast_node->depend, module, c_fp, indent);
         }
 
         if (ast_node->right != NULL) {
-            transpile_node(ast_node->right, module, c_fp, indent);
             transpile_functions(ast_node->right, module, c_fp, indent);
         }
 
         if (ast_node->left != NULL) {
-            transpile_node(ast_node->left, module, c_fp, indent);
             transpile_functions(ast_node->left, module, c_fp, indent);
         }
     }
@@ -268,16 +266,21 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         return ast_node;
     }
 
-    if (is_node_function_related(ast_node)){
+    if (strcmp(ast_node->module, module) != 0) return compiler_register_functions(ast_node->next, module, c_fp, indent);
+
+    if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
+            transpile_node(ast_node->depend, module, c_fp, indent);
             compiler_register_functions(ast_node->depend, module, c_fp, indent);
         }
 
         if (ast_node->right != NULL) {
+            transpile_node(ast_node->right, module, c_fp, indent);
             compiler_register_functions(ast_node->right, module, c_fp, indent);
         }
 
         if (ast_node->left != NULL) {
+            transpile_node(ast_node->left, module, c_fp, indent);
             compiler_register_functions(ast_node->left, module, c_fp, indent);
         }
     }
@@ -444,6 +447,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     if (ast_node == NULL) {
         return ast_node;
     }
+
+    if (ast_node->node_type != AST_FUNCTION_STEP)
+        if (is_node_function_related(ast_node)) return transpile_node(ast_node->next, module, c_fp, indent);
 
     if (ast_node->depend != NULL) {
         transpile_node(ast_node->depend, module, c_fp, indent);
@@ -1294,7 +1300,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
             switch (ast_node->strings_size)
             {
-                case 2:
+                case 1:
                     fprintf(
                         c_fp,
                         "function = callFunction(\"%s\", NULL);",
@@ -1307,7 +1313,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         ast_node->strings[0]
                     );
                     break;
-                case 3:
+                case 2:
                     fprintf(
                         c_fp,
                         "function = callFunction(\"%s\", \"%s\");",

@@ -73,7 +73,7 @@ ASTNode* register_functions(ASTNode* ast_node, char *module) {
 
     if (strcmp(ast_node->module, module) != 0) return register_functions(ast_node->next, module);
 
-    if (is_node_function_related(ast_node)){
+    if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
             eval_node(ast_node->depend, module);
             register_functions(ast_node->depend, module);
