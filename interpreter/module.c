@@ -45,6 +45,26 @@ void prependModuleToModuleBuffer(char *name) {
 }
 
 void handleModuleImport(char *module_name, bool directly_import) {
+    char *module_path = resolveModulePath(module_name, directly_import);
+    moduleImportParse(module_path);
+    moduleImportCleanUp(module_path);
+}
+
+void moduleImportParse(char *module_path) {
+    if (strcmp(
+        get_filename_ext(module_path),
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+        ) == 0
+    ) {
+        callRegisterInDynamicLibrary(module_path);
+    } else {
+#ifndef CHAOS_COMPILER
+        parseTheModuleContent(module_path);
+#endif
+    }
+}
+
+char* resolveModulePath(char *module_name, bool directly_import) {
     if (is_interactive) {
         ast_interactive_cursor = ast_node_cursor;
     }
@@ -97,26 +117,17 @@ void handleModuleImport(char *module_name, bool directly_import) {
     pushModuleStack(module_path, module);
 
     freeModulesBuffer();
+    free(module);
+    free(relative_path);
+    return module_path;
+}
 
-    if (strcmp(
-        get_filename_ext(module_path),
-        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-        ) == 0
-    ) {
-        callRegisterInDynamicLibrary(module_path);
-    } else {
-#ifndef CHAOS_COMPILER
-        parseTheModuleContent(module_path);
-#endif
-    }
-
+void moduleImportCleanUp(char *module_path) {
     freeFunctionNamesBuffer();
 
     popModuleStack();
 
-    free(module);
     free(module_path);
-    free(relative_path);
 }
 
 void freeModulesBuffer() {
@@ -210,7 +221,6 @@ char* searchSpellsIfNotExits(char* module_path, char* relative_path) {
             }
         }
     }
-    printf("HOY\n");
     append_to_array_without_malloc(&free_string_stack, relative_path);
     throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, relative_path);
     return NULL;

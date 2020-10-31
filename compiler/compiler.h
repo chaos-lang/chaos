@@ -51,5 +51,9 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
 bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator);
 void transpile_function_call(FILE *c_fp, char *module, char *name);
 void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2);
+void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent);
+void compiler_moduleImportParse(char *module_path, FILE *c_fp, unsigned short indent);
+void compiler_parseTheModuleContent(char *module_path, FILE *c_fp, unsigned short indent);
+void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent);
 
 #endif

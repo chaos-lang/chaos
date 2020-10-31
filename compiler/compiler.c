@@ -244,6 +244,7 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         return ast_node;
     }
     ast_node->module = replace_char(ast_node->module, '.', '_');
+    ast_node->module = replace_char(ast_node->module, '/', '_');
 
     if (strcmp(ast_node->module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent);
 
@@ -274,6 +275,21 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         fprintf(c_fp, "void kaos_function_%s_%s() {\n", module, ast_node->strings[0]);
         transpile_node(ast_node->child, module, c_fp, indent);
         fprintf(c_fp, "}\n\n");
+    }
+
+    switch (ast_node->node_type)
+    {
+        case AST_APPEND_MODULE:
+            appendModuleToModuleBuffer(ast_node->strings[0]);
+            break;
+        case AST_PREPEND_MODULE:
+            prependModuleToModuleBuffer(ast_node->strings[0]);
+            break;
+        case AST_MODULE_IMPORT:
+            compiler_handleModuleImport(NULL, false, c_fp, indent);
+            break;
+        default:
+            break;
     }
 
     return transpile_functions(ast_node->next, module, c_fp, indent);
@@ -444,13 +460,13 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             fprintf(c_fp, "addFunctionNameToFunctionNamesBuffer(\"%s\");", ast_node->strings[0]);
             break;
         case AST_APPEND_MODULE:
-            fprintf(c_fp, "appendModuleToModuleBuffer(\"%s\");", ast_node->strings[0]);
+            appendModuleToModuleBuffer(ast_node->strings[0]);
             break;
         case AST_PREPEND_MODULE:
-            fprintf(c_fp, "prependModuleToModuleBuffer(\"%s\");", ast_node->strings[0]);
+            prependModuleToModuleBuffer(ast_node->strings[0]);
             break;
         case AST_MODULE_IMPORT:
-            fprintf(c_fp, "handleModuleImport(NULL, false);");
+            compiler_handleModuleImportRegister(NULL, false, c_fp, indent);
             break;
         case AST_MODULE_IMPORT_AS:
             fprintf(c_fp, "handleModuleImport(\"%s\", false);", ast_node->strings[0]);
@@ -880,7 +896,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         ast_node->strings[2],
                         ast_node->strings[1]
                     );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+                    transpile_function_call(c_fp, module, ast_node->strings[2]);
                     fprintf(
                         c_fp,
                         "updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");",
@@ -966,7 +982,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         ast_node->strings[1],
                         ast_node->strings[0]
                     );
-                    transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1]);
+                    transpile_function_call(c_fp, module, ast_node->strings[1]);
                     fprintf(
                         c_fp,
                         "updateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");",
@@ -1984,7 +2000,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 ast_node->strings[2],
                 ast_node->strings[1]
             );
-            transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
+            transpile_function_call(c_fp, module, ast_node->strings[2]);
             fprintf(
                 c_fp,
                 "createCloneFromFunctionReturn(\"%s\", %s, \"%s\", \"%s\", %s);",
@@ -1998,4 +2014,54 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
         default:
             break;
     }
+}
+
+void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
+    char *module_path = resolveModulePath(module_name, directly_import);
+    compiler_parseTheModuleContent(module_path, c_fp, indent);
+    moduleImportCleanUp(module_path);
+}
+
+void compiler_moduleImportParse(char *module_path, FILE *c_fp, unsigned short indent) {
+    compiler_parseTheModuleContent(module_path, c_fp, indent);
+}
+
+void compiler_parseTheModuleContent(char *module_path, FILE *c_fp, unsigned short indent) {
+    char *code = fileGetContents(module_path);
+    size_t code_length = strlen(code);
+    code = (char*)realloc(code, code_length + 2);
+    code[code_length] = '\n';
+    code[code_length + 1] = '\0';
+
+    if (code != NULL) {
+        module_parsing++;
+        char* compiled_module = compiler_injectCode(code, INIT_PROGRAM, c_fp, indent);
+        compiled_module = replace_char(compiled_module, '.', '_');
+        compiled_module = replace_char(compiled_module, '/', '_');
+        ASTNode* ast_node = ast_root_node;
+        transpile_functions(ast_node, compiled_module, c_fp, indent);
+        module_parsing--;
+        free(code);
+
+        if (is_interactive) {
+            phase = PROGRAM;
+        }
+    } else {
+        append_to_array_without_malloc(&free_string_stack, module_path);
+        throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, module_path);
+    }
+}
+
+void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
+    char *module_path = resolveModulePath(module_name, directly_import);
+
+    char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+    strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
+    compiled_module = replace_char(compiled_module, '.', '_');
+    compiled_module = replace_char(compiled_module, '/', '_');
+    ASTNode* ast_node = ast_root_node;
+
+    compiler_register_functions(ast_node, compiled_module, c_fp, indent);
+
+    moduleImportCleanUp(module_path);
 }
