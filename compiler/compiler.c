@@ -333,43 +333,134 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
     switch (ast_node->node_type)
     {
         case AST_DEFINE_FUNCTION_BOOL:
-            fprintf(c_fp, "startFunction(\"%s\", K_BOOL, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_BOOL, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_NUMBER:
-            fprintf(c_fp, "startFunction(\"%s\", K_NUMBER, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_NUMBER, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_STRING:
-            fprintf(c_fp, "startFunction(\"%s\", K_STRING, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_STRING, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_ANY:
-            fprintf(c_fp, "startFunction(\"%s\", K_ANY, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_ANY, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_LIST:
-            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_LIST, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_DICT:
-            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_DICT, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_BOOL_LIST:
-            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_BOOL);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_LIST, K_BOOL, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_BOOL_DICT:
-            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_BOOL);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_DICT, K_BOOL, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_NUMBER_LIST:
-            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_NUMBER);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_LIST, K_NUMBER, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_NUMBER_DICT:
-            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_NUMBER);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_DICT, K_NUMBER, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_STRING_LIST:
-            fprintf(c_fp, "startFunction(\"%s\", K_LIST, K_STRING);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_LIST, K_STRING, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_STRING_DICT:
-            fprintf(c_fp, "startFunction(\"%s\", K_DICT, K_STRING);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_DICT, K_STRING, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_DEFINE_FUNCTION_VOID:
-            fprintf(c_fp, "startFunction(\"%s\", K_VOID, K_ANY);\n", ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "startFunction(\"%s\", K_VOID, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                ast_node->strings[0],
+                compiler_getCurrentContext(),
+                compiler_getCurrentModuleContext(),
+                compiler_getCurrentModule()
+            );
             break;
         case AST_FUNCTION_PARAMETERS_START:
             fprintf(c_fp, "if (function_parameters_mode == NULL) startFunctionParameters();\n");
@@ -2064,4 +2155,18 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
     compiler_register_functions(ast_node, compiled_module, c_fp, indent);
 
     moduleImportCleanUp(module_path);
+}
+
+char* compiler_getCurrentContext() {
+    unsigned short parent_context = 1;
+    if (module_path_stack.size > 1) parent_context = 2;
+    return module_path_stack.arr[module_path_stack.size - parent_context];
+}
+
+char* compiler_getCurrentModuleContext() {
+    return module_path_stack.arr[module_path_stack.size - 1];
+}
+
+char* compiler_getCurrentModule() {
+    return module_stack.arr[module_stack.size - 1];
 }

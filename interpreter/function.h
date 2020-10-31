@@ -102,7 +102,11 @@ bool interactive_shell_function_error_absorbed;
 jmp_buf LoopBreakDecision;
 jmp_buf LoopContinueDecision;
 
+#ifdef CHAOS_COMPILER
+void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module);
+#else
 void startFunction(char *name, enum Type type, enum Type secondary_type);
+#endif
 void endFunction();
 void freeFunctionParametersMode();
 void resetFunctionParametersMode();

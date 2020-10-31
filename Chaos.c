@@ -73,7 +73,11 @@ int defineFunction(
         }
     }
 
+#ifdef CHAOS_COMPILER
+    startFunction(name, type, secondary_type, "", "", "");
+#else
     startFunction(name, type, secondary_type);
+#endif
     endFunction();
     return 0;
 }

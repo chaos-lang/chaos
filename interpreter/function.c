@@ -31,7 +31,11 @@ extern int yyparse();
 int reset_line_no_to = 0;
 bool decision_execution_mode = false;
 
+#ifdef CHAOS_COMPILER
+void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module) {
+#else
 void startFunction(char *name, enum Type type, enum Type secondary_type) {
+#endif
     if (is_interactive) {
         phase = PREPARSE;
     }
@@ -64,6 +68,14 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     function_mode->decision_functions.capacity = 0;
     function_mode->decision_functions.size = 0;
 
+#ifdef CHAOS_COMPILER
+    function_mode->context = malloc(1 + strlen(context));
+    strcpy(function_mode->context, context);
+    function_mode->module_context = malloc(1 + strlen(module_context));
+    strcpy(function_mode->module_context, module_context);
+    function_mode->module = malloc(1 + strlen(module));
+    strcpy(function_mode->module, module);
+#else
     unsigned short parent_context = 1;
     if (module_path_stack.size > 1) parent_context = 2;
     function_mode->context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - parent_context]));
@@ -72,6 +84,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     strcpy(function_mode->module_context, module_path_stack.arr[module_path_stack.size - 1]);
     function_mode->module = malloc(1 + strlen(module_stack.arr[module_stack.size - 1]));
     strcpy(function_mode->module, module_stack.arr[module_stack.size - 1]);
+#endif
 
     if (start_function == NULL) {
         start_function = function_mode;

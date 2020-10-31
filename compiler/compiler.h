@@ -55,5 +55,8 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
 void compiler_moduleImportParse(char *module_path, FILE *c_fp, unsigned short indent);
 void compiler_parseTheModuleContent(char *module_path, FILE *c_fp, unsigned short indent);
 void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent);
+char* compiler_getCurrentContext();
+char* compiler_getCurrentModuleContext();
+char* compiler_getCurrentModule();
 
 #endif
