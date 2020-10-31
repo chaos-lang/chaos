@@ -33,7 +33,6 @@
 extern bool inject_mode;
 
 void injectCode(char *code, enum Phase phase_arg);
-char* compiler_injectCode(char *code, enum Phase phase_arg, FILE *c_fp, unsigned short indent);
 void switchBuffer(char *code, enum Phase phase_arg);
 void yyrestart_interactive();
 void flushLexer();

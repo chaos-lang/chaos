@@ -67,32 +67,6 @@ void injectCode(char *code, enum Phase phase_arg) {
     inject_mode = false;
 }
 
-char* compiler_injectCode(char *code, enum Phase phase_arg, FILE *c_fp, unsigned short indent) {
-    phase = phase_arg;
-    inject_mode = true;
-
-    YY_BUFFER_STATE old_buffer = YY_CURRENT_BUFFER;
-    YY_BUFFER_STATE new_buffer = yy_scan_string(code);
-    yy_switch_to_buffer(new_buffer);
-    yyparse();
-
-    if (phase_arg == INIT_JSON_PARSE) {
-        phase_arg = PROGRAM;
-    } else {
-        phase_arg = PREPARSE;
-    }
-
-    char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-    strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
-
-    yy_delete_buffer(new_buffer);
-    yy_switch_to_buffer(old_buffer);
-
-    inject_mode = false;
-
-    return compiled_module;
-}
-
 void switchBuffer(char *code, enum Phase phase_arg) {
     phase = phase_arg;
 

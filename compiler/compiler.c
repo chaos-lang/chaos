@@ -111,6 +111,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
 
+    register_functions(ast_node, module_orig);
     transpile_functions(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "int main() {\n");
@@ -243,10 +244,13 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     if (ast_node == NULL) {
         return ast_node;
     }
-    ast_node->module = replace_char(ast_node->module, '.', '_');
-    ast_node->module = replace_char(ast_node->module, '/', '_');
+    char *ast_node_module = malloc(1 + strlen(ast_node->module));
+    strcpy(ast_node_module, ast_node->module);
+    ast_node_module = replace_char(ast_node_module, '.', '_');
+    ast_node_module = replace_char(ast_node_module, '/', '_');
 
-    if (strcmp(ast_node->module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent);
+    if (strcmp(ast_node_module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent);
+    free(ast_node_module);
 
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
@@ -299,8 +303,13 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
     if (ast_node == NULL) {
         return ast_node;
     }
+    char *ast_node_module = malloc(1 + strlen(ast_node->module));
+    strcpy(ast_node_module, ast_node->module);
+    ast_node_module = replace_char(ast_node_module, '.', '_');
+    ast_node_module = replace_char(ast_node_module, '/', '_');
 
-    if (strcmp(ast_node->module, module) != 0) return compiler_register_functions(ast_node->next, module, c_fp, indent);
+    if (strcmp(ast_node_module, module) != 0) return compiler_register_functions(ast_node->next, module, c_fp, indent);
+    free(ast_node_module);
 
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
@@ -321,7 +330,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
 
     if (debug_enabled)
         printf(
-            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(TranspileR)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
@@ -971,7 +980,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         compiler_function_counter,
                         ast_node->strings[1]
                     );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    transpile_function_call(c_fp, NULL, ast_node->strings[1]);
                     fprintf(
                         c_fp,
                         "updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);",
@@ -987,7 +996,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         ast_node->strings[2],
                         ast_node->strings[1]
                     );
-                    transpile_function_call(c_fp, module, ast_node->strings[2]);
+                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
                     fprintf(
                         c_fp,
                         "updateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");",
@@ -1058,7 +1067,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         compiler_function_counter,
                         ast_node->strings[0]
                     );
-                    transpile_function_call(c_fp, module, ast_node->strings[0]);
+                    transpile_function_call(c_fp, NULL, ast_node->strings[0]);
                     fprintf(
                         c_fp,
                         "updateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);",
@@ -1073,7 +1082,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         ast_node->strings[1],
                         ast_node->strings[0]
                     );
-                    transpile_function_call(c_fp, module, ast_node->strings[1]);
+                    transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1]);
                     fprintf(
                         c_fp,
                         "updateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");",
@@ -1822,10 +1831,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", NULL);", compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\\n\", false, true);", ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "function_%llu = callFunction(\"%s\", \"%s\");", compiler_function_counter, ast_node->strings[0], _module);
+                fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", \"%s\");", compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "printFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);", ast_node->strings[0], _module);
             }
@@ -1837,7 +1846,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", NULL);", compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\", false, true);", ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", \"%s\");", compiler_function_counter, ast_node->strings[0], _module);
@@ -1852,7 +1861,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", NULL);", compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\\n\", true, true);", ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", \"%s\");", compiler_function_counter, ast_node->strings[0], _module);
@@ -1867,7 +1876,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", NULL);", compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "printFunctionReturn(\"%s\", NULL, \"\", true, true);", ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", \"%s\");", compiler_function_counter, ast_node->strings[0], _module);
@@ -1882,7 +1891,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", NULL);", compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, module, ast_node->strings[0]);
+                transpile_function_call(c_fp, _module, ast_node->strings[0]);
                 fprintf(c_fp, "freeFunctionReturn(\"%s\", NULL);", ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "_Function* function_%llu = callFunction(\"%s\", \"%s\");", compiler_function_counter, ast_node->strings[0], _module);
@@ -2058,7 +2067,8 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
 }
 
 void transpile_function_call(FILE *c_fp, char *module, char *name) {
-    fprintf(c_fp, "kaos_function_%s_%s();", module, name);
+    char *module_context = compiler_getFunctionModuleContext(name, module);
+    fprintf(c_fp, "kaos_function_%s_%s();", module_context, name);
     fprintf(c_fp, "callFunctionCleanUp(function_%llu, \"%s\");", compiler_function_counter, name);
 }
 
@@ -2073,7 +2083,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 compiler_function_counter,
                 ast_node->strings[1]
             );
-            transpile_function_call(c_fp, module, ast_node->strings[1]);
+            transpile_function_call(c_fp, NULL, ast_node->strings[1]);
             fprintf(
                 c_fp,
                 "createCloneFromFunctionReturn(\"%s\", %s, \"%s\", NULL, %s);",
@@ -2091,7 +2101,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 ast_node->strings[2],
                 ast_node->strings[1]
             );
-            transpile_function_call(c_fp, module, ast_node->strings[2]);
+            transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2]);
             fprintf(
                 c_fp,
                 "createCloneFromFunctionReturn(\"%s\", %s, \"%s\", \"%s\", %s);",
@@ -2126,7 +2136,8 @@ void compiler_parseTheModuleContent(char *module_path, FILE *c_fp, unsigned shor
 
     if (code != NULL) {
         module_parsing++;
-        char* compiled_module = compiler_injectCode(code, INIT_PROGRAM, c_fp, indent);
+        char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+        strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
         compiled_module = replace_char(compiled_module, '.', '_');
         compiled_module = replace_char(compiled_module, '/', '_');
         ASTNode* ast_node = ast_root_node;
@@ -2169,4 +2180,12 @@ char* compiler_getCurrentModuleContext() {
 
 char* compiler_getCurrentModule() {
     return module_stack.arr[module_stack.size - 1];
+}
+
+char* compiler_getFunctionModuleContext(char *name, char *module) {
+    _Function* function = getFunction(name, module);
+    char *module_context = function->module_context;
+    module_context = replace_char(module_context, '.', '_');
+    module_context = replace_char(module_context, '/', '_');
+    return module_context;
 }

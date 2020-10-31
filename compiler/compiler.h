@@ -58,5 +58,6 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
 char* compiler_getCurrentContext();
 char* compiler_getCurrentModuleContext();
 char* compiler_getCurrentModule();
+char* compiler_getFunctionModuleContext(char *name, char *module);
 
 #endif
