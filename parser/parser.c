@@ -23,7 +23,7 @@
 #include "parser.h"
 
 int initParser(int argc, char** argv) {
-    ast_debug_enabled = false;
+    debug_enabled = false;
     compiler_mode = false;
     char *program_file = NULL;
     char *bin_file = NULL;
@@ -41,7 +41,7 @@ int initParser(int argc, char** argv) {
                 printf("%s\n", __KAOS_LANGUAGE_VERSION__);
                 exit(0);
             case 'd':
-                ast_debug_enabled = true;
+                debug_enabled = true;
                 program_file = argv[optind];
                 if (program_file == NULL) {
                     fp = stdin;

@@ -261,6 +261,15 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         }
     }
 
+    if (debug_enabled)
+        printf(
+            "(TranspileF)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            ast_node->id,
+            getAstNodeTypeName(ast_node->node_type),
+            ast_node->module,
+            ast_node->strings_size
+        );
+
     if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
         fprintf(c_fp, "void kaos_function_%s_%s() {\n", module, ast_node->strings[0]);
         transpile_node(ast_node->child, module, c_fp, indent);
@@ -293,6 +302,15 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             compiler_register_functions(ast_node->left, module, c_fp, indent);
         }
     }
+
+    if (debug_enabled)
+        printf(
+            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            ast_node->id,
+            getAstNodeTypeName(ast_node->node_type),
+            ast_node->module,
+            ast_node->strings_size
+        );
 
     fprintf(c_fp, "%*c", indent, ' ');
 
@@ -475,6 +493,15 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     if (ast_node->node_type == AST_END) {
         return ast_node;
     }
+
+    if (debug_enabled)
+        printf(
+            "(Transpile)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            ast_node->id,
+            getAstNodeTypeName(ast_node->node_type),
+            ast_node->module,
+            ast_node->strings_size
+        );
 
     fprintf(c_fp, "%*c", indent, ' ');
 

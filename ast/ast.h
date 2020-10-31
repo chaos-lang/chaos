@@ -28,7 +28,7 @@
 #include <stdbool.h>
 
 typedef struct ASTNode ASTNode;
-bool ast_debug_enabled;
+bool debug_enabled;
 
 #include "../enums.h"
 #include "../utilities/helpers.h"

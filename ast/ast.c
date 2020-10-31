@@ -47,7 +47,7 @@ ASTNode* addASTNodeBase(enum ASTNodeType node_type, char *strings[], size_t stri
         ast_node->strings[i] = strings[i];
     }
 
-    if (ast_debug_enabled)
+    if (debug_enabled)
         printf(
             "(Create)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
             ast_node->id,
@@ -160,7 +160,7 @@ ASTNode* free_node(ASTNode* ast_node) {
     free_node(ast_node->left);
     free_node(ast_node->child);
 
-    if (ast_debug_enabled)
+    if (debug_enabled)
         printf(
             "(Free)\t\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
             ast_node->id,
