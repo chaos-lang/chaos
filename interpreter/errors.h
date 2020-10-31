@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef ERRORS_H
-#define ERRORS_H
+#ifndef KAOS_ERRORS_H
+#define KAOS_ERRORS_H
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef EXTENSION_H
-#define EXTENSION_H
+#ifndef KAOS_EXTENSION_H
+#define KAOS_EXTENSION_H
 
 #include <stdio.h>
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)

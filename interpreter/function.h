@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef FUNCTION_H
-#define FUNCTION_H
+#ifndef KAOS_FUNCTION_H
+#define KAOS_FUNCTION_H
 
 #include <stdio.h>
 #include <string.h>

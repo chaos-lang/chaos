@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef MODULE_H
-#define MODULE_H
+#ifndef KAOS_MODULE_H
+#define KAOS_MODULE_H
 
 #include <stdio.h>
 

@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef ENUMS_H
-#define ENUMS_H
+#ifndef KAOS_ENUMS_H
+#define KAOS_ENUMS_H
 
 enum Phase { INIT_PREPARSE, PREPARSE, INIT_PROGRAM, PROGRAM, INIT_JSON_PARSE, JSON_PARSE };
 

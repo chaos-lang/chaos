@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#ifndef KAOS_PLATFORM_H
+#define KAOS_PLATFORM_H
 
 /**
  * Determination a platform of an operation system

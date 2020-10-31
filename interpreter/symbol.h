@@ -21,8 +21,8 @@
  *          Melih Sahin <melihsahin24@gmail.com>
  */
 
-#ifndef SYMBOL_H
-#define SYMBOL_H
+#ifndef KAOS_SYMBOL_H
+#define KAOS_SYMBOL_H
 
 #include <stdio.h>
 #include <string.h>

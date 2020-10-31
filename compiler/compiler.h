@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef COMPILER_H
-#define COMPILER_H
+#ifndef KAOS_COMPILER_H
+#define KAOS_COMPILER_H
 
 #include <sys/types.h>
 #include <sys/stat.h>

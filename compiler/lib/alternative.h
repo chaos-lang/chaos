@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef ALTERNATIVE_H
-#define ALTERNATIVE_H
+#ifndef KAOS_ALTERNATIVE_H
+#define KAOS_ALTERNATIVE_H
 
 #include "../../interpreter/function.h"
 enum Phase phase = INIT_PROGRAM;

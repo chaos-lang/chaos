@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef KAOS_SHELL_H
+#define KAOS_SHELL_H
 
 #include <stdio.h>
 #include <readline/readline.h>

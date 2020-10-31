@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef AST_H
-#define AST_H
+#ifndef KAOS_AST_H
+#define KAOS_AST_H
 
 #include <stdio.h>
 #include <string.h>

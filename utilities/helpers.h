@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef HELPERS_H
-#define HELPERS_H
+#ifndef KAOS_HELPERS_H
+#define KAOS_HELPERS_H
 
 #define STRINGIZE(x) #x
 #define STRINGIZE_VALUE_OF(x) STRINGIZE(x)

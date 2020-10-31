@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef INTERPRETER_H
-#define INTERPRETER_H
+#ifndef KAOS_INTERPRETER_H
+#define KAOS_INTERPRETER_H
 
 #include "../ast/ast.h"
 

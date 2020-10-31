@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef LANGUAGE_H
-#define LANGUAGE_H
+#ifndef KAOS_LANGUAGE_H
+#define KAOS_LANGUAGE_H
 
 #define __KAOS_LANGUAGE_NAME__ "Chaos"
 #define __KAOS_LANGUAGE_VERSION__ "0.0.1-alpha"

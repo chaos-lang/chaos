@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef LOOP_H
-#define LOOP_H
+#ifndef KAOS_LOOP_H
+#define KAOS_LOOP_H
 
 #include <stdio.h>
 #include <string.h>

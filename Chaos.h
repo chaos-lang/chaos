@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef CHAOS_H
-#define CHAOS_H
+#ifndef KAOS_CHAOS_H
+#define KAOS_CHAOS_H
 
 #include <stdbool.h>
 

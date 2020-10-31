@@ -20,8 +20,8 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef KAOS_PARSER_H
+#define KAOS_PARSER_H
 
 #include <stdio.h>
 #include <string.h>
