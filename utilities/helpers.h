@@ -50,6 +50,7 @@ char *snprintf_concat_string(char *s1, char *format, char *s2);
 void prepend_to_array(string_array *array, char *str);
 void append_to_array(string_array *array, char *str);
 void append_to_array_without_malloc(string_array *array, char *str);
+bool is_in_array(string_array *array, char *str);
 char *capitalize(const char *str);
 int largest(int arr[], int n);
 char *relative_path_to_absolute(char *path);

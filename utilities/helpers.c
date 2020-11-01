@@ -208,6 +208,14 @@ void append_to_array_without_malloc(string_array *array, char *str) {
     array->size++;
 }
 
+bool is_in_array(string_array *array, char *str) {
+    for (unsigned i = 0; i < array->size; i++) {
+        if (strcmp(array->arr[i], str) == 0)
+            return true;
+    }
+    return false;
+}
+
 char *capitalize(const char *str) {
     char *_str = malloc(1 + strlen(str));
     strcpy(_str, str);

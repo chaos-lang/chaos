@@ -276,9 +276,16 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         );
 
     if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
-        fprintf(c_fp, "void kaos_function_%s_%s() {\n", module, ast_node->strings[0]);
-        transpile_node(ast_node->child, module, c_fp, indent);
-        fprintf(c_fp, "}\n\n");
+        char *function_name = malloc(1);
+        strcpy(function_name, "");
+        function_name = snprintf_concat_string(function_name, "kaos_function_%s", module);
+        function_name = snprintf_concat_string(function_name, "_%s", ast_node->strings[0]);
+        if (!is_in_array(&transpiled_functions, function_name)) {
+            append_to_array(&transpiled_functions, function_name);
+            fprintf(c_fp, "void %s() {\n", function_name);
+            transpile_node(ast_node->child, module, c_fp, indent);
+            fprintf(c_fp, "}\n\n");
+        }
     }
 
     switch (ast_node->node_type)
@@ -291,6 +298,12 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             break;
         case AST_MODULE_IMPORT:
             compiler_handleModuleImport(NULL, false, c_fp, indent);
+            break;
+        case AST_MODULE_IMPORT_AS:
+            compiler_handleModuleImport(ast_node->strings[0], false, c_fp, indent);
+            break;
+        case AST_MODULE_IMPORT_PARTIAL:
+            compiler_handleModuleImport(NULL, true, c_fp, indent);
             break;
         default:
             break;
@@ -557,7 +570,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             fprintf(c_fp, "reverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_STRING);", ast_node->strings[0]);
             break;
         case AST_ADD_FUNCTION_NAME:
-            fprintf(c_fp, "addFunctionNameToFunctionNamesBuffer(\"%s\");", ast_node->strings[0]);
+            addFunctionNameToFunctionNamesBuffer(ast_node->strings[0]);
             break;
         case AST_APPEND_MODULE:
             appendModuleToModuleBuffer(ast_node->strings[0]);
@@ -569,10 +582,10 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             compiler_handleModuleImportRegister(NULL, false, c_fp, indent);
             break;
         case AST_MODULE_IMPORT_AS:
-            fprintf(c_fp, "handleModuleImport(\"%s\", false);", ast_node->strings[0]);
+            compiler_handleModuleImportRegister(ast_node->strings[0], false, c_fp, indent);
             break;
         case AST_MODULE_IMPORT_PARTIAL:
-            fprintf(c_fp, "handleModuleImport(NULL, true);");
+            compiler_handleModuleImportRegister(NULL, true, c_fp, indent);
             break;
         case AST_DECISION_DEFINE:
             // TODO: The code below cannot be compiled.
@@ -2119,39 +2132,15 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
 
 void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
     char *module_path = resolveModulePath(module_name, directly_import);
-    compiler_parseTheModuleContent(module_path, c_fp, indent);
+
+    char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+    strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
+    compiled_module = replace_char(compiled_module, '.', '_');
+    compiled_module = replace_char(compiled_module, '/', '_');
+    ASTNode* ast_node = ast_root_node;
+    transpile_functions(ast_node, compiled_module, c_fp, indent);
+
     moduleImportCleanUp(module_path);
-}
-
-void compiler_moduleImportParse(char *module_path, FILE *c_fp, unsigned short indent) {
-    compiler_parseTheModuleContent(module_path, c_fp, indent);
-}
-
-void compiler_parseTheModuleContent(char *module_path, FILE *c_fp, unsigned short indent) {
-    char *code = fileGetContents(module_path);
-    size_t code_length = strlen(code);
-    code = (char*)realloc(code, code_length + 2);
-    code[code_length] = '\n';
-    code[code_length + 1] = '\0';
-
-    if (code != NULL) {
-        module_parsing++;
-        char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-        strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
-        compiled_module = replace_char(compiled_module, '.', '_');
-        compiled_module = replace_char(compiled_module, '/', '_');
-        ASTNode* ast_node = ast_root_node;
-        transpile_functions(ast_node, compiled_module, c_fp, indent);
-        module_parsing--;
-        free(code);
-
-        if (is_interactive) {
-            phase = PROGRAM;
-        }
-    } else {
-        append_to_array_without_malloc(&free_string_stack, module_path);
-        throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, module_path);
-    }
 }
 
 void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
@@ -2162,7 +2151,6 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
     compiled_module = replace_char(compiled_module, '.', '_');
     compiled_module = replace_char(compiled_module, '/', '_');
     ASTNode* ast_node = ast_root_node;
-
     compiler_register_functions(ast_node, compiled_module, c_fp, indent);
 
     moduleImportCleanUp(module_path);
