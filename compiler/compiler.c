@@ -1751,9 +1751,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_EXIT_SUCCESS:
             fprintf(
                 c_fp,
-                "if (is_interactive) {"
-                "    print_bye_bye();"
-                "}"
                 "freeEverything();"
                 "exit(E_SUCCESS);"
             );
@@ -1762,9 +1759,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (ast_node->right->is_transpiled) {
                 fprintf(
                     c_fp,
-                    "if (is_interactive) {"
-                    "    print_bye_bye();"
-                    "}"
                     "exit_code = %s;"
                     "freeEverything();"
                     "exit(exit_code);",
@@ -1773,9 +1767,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             } else {
                 fprintf(
                     c_fp,
-                    "if (is_interactive) {"
-                    "    print_bye_bye();"
-                    "}"
                     "exit_code = %lld;"
                     "freeEverything();"
                     "exit(exit_code);",
@@ -1786,9 +1777,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_EXIT_VAR:
             fprintf(
                 c_fp,
-                "if (is_interactive) {"
-                "    print_bye_bye();"
-                "}"
                 "exit_code = getSymbolValueInt(\"%s\");"
                 "freeEverything();"
                 "exit(exit_code);",
