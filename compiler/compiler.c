@@ -112,7 +112,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(h_fp, "%s", h_file_base);
 
     register_functions(ast_node, module_orig);
-    transpile_functions(ast_node, module, c_fp, indent);
+    transpile_functions(ast_node, module, c_fp, indent, h_fp);
 
     fprintf(c_fp, "int main() {\n");
 
@@ -136,7 +136,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     transpile_node(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "}\n");
-    fprintf(h_fp, "#endif\n");
+    fprintf(h_fp, "\n#endif\n");
 
     fclose(c_fp);
     fclose(h_fp);
@@ -240,7 +240,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Binary is ready on: %s\n", bin_file_path_final);
 }
 
-ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
     if (ast_node == NULL) {
         return ast_node;
     }
@@ -249,20 +249,20 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     ast_node_module = replace_char(ast_node_module, '.', '_');
     ast_node_module = replace_char(ast_node_module, '/', '_');
 
-    if (strcmp(ast_node_module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent);
+    if (strcmp(ast_node_module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
     free(ast_node_module);
 
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
-            transpile_functions(ast_node->depend, module, c_fp, indent);
+            transpile_functions(ast_node->depend, module, c_fp, indent, h_fp);
         }
 
         if (ast_node->right != NULL) {
-            transpile_functions(ast_node->right, module, c_fp, indent);
+            transpile_functions(ast_node->right, module, c_fp, indent, h_fp);
         }
 
         if (ast_node->left != NULL) {
-            transpile_functions(ast_node->left, module, c_fp, indent);
+            transpile_functions(ast_node->left, module, c_fp, indent, h_fp);
         }
     }
 
@@ -282,6 +282,7 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         function_name = snprintf_concat_string(function_name, "_%s", ast_node->strings[0]);
         if (!is_in_array(&transpiled_functions, function_name)) {
             append_to_array(&transpiled_functions, function_name);
+            fprintf(h_fp, "void %s();\n", function_name);
             fprintf(c_fp, "void %s() {\n", function_name);
             transpile_node(ast_node->child, module, c_fp, indent);
             fprintf(c_fp, "}\n\n");
@@ -297,19 +298,19 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             prependModuleToModuleBuffer(ast_node->strings[0]);
             break;
         case AST_MODULE_IMPORT:
-            compiler_handleModuleImport(NULL, false, c_fp, indent);
+            compiler_handleModuleImport(NULL, false, c_fp, indent, h_fp);
             break;
         case AST_MODULE_IMPORT_AS:
-            compiler_handleModuleImport(ast_node->strings[0], false, c_fp, indent);
+            compiler_handleModuleImport(ast_node->strings[0], false, c_fp, indent, h_fp);
             break;
         case AST_MODULE_IMPORT_PARTIAL:
-            compiler_handleModuleImport(NULL, true, c_fp, indent);
+            compiler_handleModuleImport(NULL, true, c_fp, indent, h_fp);
             break;
         default:
             break;
     }
 
-    return transpile_functions(ast_node->next, module, c_fp, indent);
+    return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
 }
 
 ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
@@ -2130,7 +2131,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
     }
 }
 
-void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
+void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp) {
     char *module_path = resolveModulePath(module_name, directly_import);
 
     char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
@@ -2138,7 +2139,7 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
     compiled_module = replace_char(compiled_module, '.', '_');
     compiled_module = replace_char(compiled_module, '/', '_');
     ASTNode* ast_node = ast_root_node;
-    transpile_functions(ast_node, compiled_module, c_fp, indent);
+    transpile_functions(ast_node, compiled_module, c_fp, indent, h_fp);
 
     moduleImportCleanUp(module_path);
 }
