@@ -132,7 +132,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
     fprintf(c_fp, "%*clong long exit_code;\n", indent, ' ');
 
+    fprintf(c_fp, "phase = PREPARSE;\n");
     compiler_register_functions(ast_node, module, c_fp, indent);
+    fprintf(c_fp, "phase = PROGRAM;\n");
     transpile_node(ast_node, module, c_fp, indent);
 
     fprintf(c_fp, "}\n");
@@ -292,6 +294,9 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
 
     switch (ast_node->node_type)
     {
+        case AST_ADD_FUNCTION_NAME:
+            addFunctionNameToFunctionNamesBuffer(ast_node->strings[0]);
+            break;
         case AST_APPEND_MODULE:
             appendModuleToModuleBuffer(ast_node->strings[0]);
             break;
@@ -359,7 +364,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_BOOL:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_BOOL, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_BOOL, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -369,7 +374,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_NUMBER:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_NUMBER, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_NUMBER, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -379,7 +384,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_STRING:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_STRING, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_STRING, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -389,7 +394,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_ANY:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_ANY, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_ANY, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -399,7 +404,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_LIST:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_LIST, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_LIST, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -409,7 +414,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_DICT:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_DICT, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_DICT, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -419,7 +424,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_BOOL_LIST:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_LIST, K_BOOL, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_LIST, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -429,7 +434,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_BOOL_DICT:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_DICT, K_BOOL, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_DICT, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -439,7 +444,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_NUMBER_LIST:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_LIST, K_NUMBER, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_LIST, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -449,7 +454,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_NUMBER_DICT:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_DICT, K_NUMBER, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_DICT, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -459,7 +464,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_STRING_LIST:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_LIST, K_STRING, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_LIST, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -469,7 +474,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_STRING_DICT:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_DICT, K_STRING, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_DICT, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -479,7 +484,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         case AST_DEFINE_FUNCTION_VOID:
             fprintf(
                 c_fp,
-                "startFunction(\"%s\", K_VOID, K_ANY, \"%s\", \"%s\", \"%s\");\n",
+                "startFunction(\"%s\", K_VOID, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
                 compiler_getCurrentContext(),
                 compiler_getCurrentModuleContext(),
@@ -2078,7 +2083,9 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
 
 void transpile_function_call(FILE *c_fp, char *module, char *name) {
     char *module_context = compiler_getFunctionModuleContext(name, module);
-    fprintf(c_fp, "kaos_function_%s_%s();", module_context, name);
+    if (!isFunctionFromDynamicLibrary(name, module))
+        fprintf(c_fp, "kaos_function_%s_%s();", module_context, name);
+    free(module_context);
     fprintf(c_fp, "callFunctionCleanUp(function_%llu, \"%s\");", compiler_function_counter, name);
 }
 
@@ -2142,13 +2149,29 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
 
 void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
     char *module_path = resolveModulePath(module_name, directly_import);
-
-    char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-    strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
-    compiled_module = replace_char(compiled_module, '.', '_');
-    compiled_module = replace_char(compiled_module, '/', '_');
-    ASTNode* ast_node = ast_root_node;
-    compiler_register_functions(ast_node, compiled_module, c_fp, indent);
+    printf("module_path: %s\n", module_path);
+    if (
+        strcmp(
+            get_filename_ext(module_path),
+            __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+        ) == 0
+    ) {
+        fprintf(
+            c_fp,
+            "pushModuleStack(\"%s\", \"%s\");\n",
+            module_path_stack.arr[module_path_stack.size - 1],
+            module_stack.arr[module_stack.size - 1]
+        );
+        fprintf(c_fp, "callRegisterInDynamicLibrary(\"%s\");\n", module_path);
+        fprintf(c_fp, "popModuleStack();\n");
+    } else {
+        char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
+        strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
+        compiled_module = replace_char(compiled_module, '.', '_');
+        compiled_module = replace_char(compiled_module, '/', '_');
+        ASTNode* ast_node = ast_root_node;
+        compiler_register_functions(ast_node, compiled_module, c_fp, indent);
+    }
 
     moduleImportCleanUp(module_path);
 }
@@ -2169,8 +2192,17 @@ char* compiler_getCurrentModule() {
 
 char* compiler_getFunctionModuleContext(char *name, char *module) {
     _Function* function = getFunction(name, module);
-    char *module_context = function->module_context;
+    char *module_context = malloc(strlen(function->module_context) + 1);
+    strcpy(module_context, function->module_context);
     module_context = replace_char(module_context, '.', '_');
     module_context = replace_char(module_context, '/', '_');
     return module_context;
+}
+
+bool isFunctionFromDynamicLibrary(char *name, char *module) {
+    _Function* function = getFunction(name, module);
+    return strcmp(
+        get_filename_ext(function->module_context),
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+    ) == 0;
 }

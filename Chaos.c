@@ -74,7 +74,7 @@ int defineFunction(
     }
 
 #ifdef CHAOS_COMPILER
-    startFunction(name, type, secondary_type, "", "", "");
+    startFunction(name, type, secondary_type, "", "", "", true);
 #else
     startFunction(name, type, secondary_type);
 #endif

@@ -51,9 +51,10 @@ void handleModuleImport(char *module_name, bool directly_import) {
 }
 
 void moduleImportParse(char *module_path) {
-    if (strcmp(
-        get_filename_ext(module_path),
-        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+    if (
+        strcmp(
+            get_filename_ext(module_path),
+            __KAOS_DYNAMIC_LIBRARY_EXTENSION__
         ) == 0
     ) {
         callRegisterInDynamicLibrary(module_path);

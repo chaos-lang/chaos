@@ -103,7 +103,7 @@ jmp_buf LoopBreakDecision;
 jmp_buf LoopContinueDecision;
 
 #ifdef CHAOS_COMPILER
-void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module);
+void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module, bool is_dynamic);
 #else
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif

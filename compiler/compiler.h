@@ -59,5 +59,6 @@ char* compiler_getCurrentContext();
 char* compiler_getCurrentModuleContext();
 char* compiler_getCurrentModule();
 char* compiler_getFunctionModuleContext(char *name, char *module);
+bool isFunctionFromDynamicLibrary(char *name, char *module);
 
 #endif

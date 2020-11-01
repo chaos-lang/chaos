@@ -32,7 +32,7 @@ int reset_line_no_to = 0;
 bool decision_execution_mode = false;
 
 #ifdef CHAOS_COMPILER
-void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module) {
+void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module, bool is_dynamic) {
 #else
 void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
@@ -69,13 +69,15 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     function_mode->decision_functions.size = 0;
 
 #ifdef CHAOS_COMPILER
-    function_mode->context = malloc(1 + strlen(context));
-    strcpy(function_mode->context, context);
-    function_mode->module_context = malloc(1 + strlen(module_context));
-    strcpy(function_mode->module_context, module_context);
-    function_mode->module = malloc(1 + strlen(module));
-    strcpy(function_mode->module, module);
-#else
+    if (!is_dynamic) {
+        function_mode->context = malloc(1 + strlen(context));
+        strcpy(function_mode->context, context);
+        function_mode->module_context = malloc(1 + strlen(module_context));
+        strcpy(function_mode->module_context, module_context);
+        function_mode->module = malloc(1 + strlen(module));
+        strcpy(function_mode->module, module);
+    } else {
+#endif
     unsigned short parent_context = 1;
     if (module_path_stack.size > 1) parent_context = 2;
     function_mode->context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - parent_context]));
@@ -84,6 +86,8 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     strcpy(function_mode->module_context, module_path_stack.arr[module_path_stack.size - 1]);
     function_mode->module = malloc(1 + strlen(module_stack.arr[module_stack.size - 1]));
     strcpy(function_mode->module, module_stack.arr[module_stack.size - 1]);
+#ifdef CHAOS_COMPILER
+    }
 #endif
 
     if (start_function == NULL) {
@@ -253,10 +257,11 @@ _Function* callFunction(char *name, char *module) {
     }
 
     if (!interactive_shell_function_error_absorbed) {
-        if (strcmp(
-        get_filename_ext(function->module_context),
-        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-        ) == 0
+        if (
+            strcmp(
+                get_filename_ext(function->module_context),
+                __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+            ) == 0
         ) {
             callFunctionFromDynamicLibrary(function);
         } else {
