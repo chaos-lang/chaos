@@ -41,6 +41,7 @@ ASTNode* addASTNodeBase(enum ASTNodeType node_type, char *strings[], size_t stri
     ast_node->transpiled = malloc(1);
     strcpy(ast_node->transpiled, "");
     ast_node->is_transpiled = false;
+    ast_node->dont_transpile = false;
 
     ast_node->strings_size = strings_size;
     for (size_t i = 0; i < ast_node->strings_size; ++i) {

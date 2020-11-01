@@ -316,6 +316,7 @@ typedef struct ASTNode {
     char *module;
     char *transpiled;
     bool is_transpiled;
+    bool dont_transpile;
     enum ValueType value_type;
     union Value value;
     size_t strings_size;

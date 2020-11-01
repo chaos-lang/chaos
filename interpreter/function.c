@@ -364,6 +364,9 @@ void removeFunctionIfDefined(char *name) {
             strcmp(function_cursor->module, module_stack.arr[module_stack.size - 1]) == 0
         ) {
             _Function* function = function_cursor;
+#ifndef CHAOS_COMPILER
+            function->node->dont_transpile = true;
+#endif
             removeFunction(function);
             return;
         }

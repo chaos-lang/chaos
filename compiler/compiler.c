@@ -280,7 +280,7 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         strcpy(function_name, "");
         function_name = snprintf_concat_string(function_name, "kaos_function_%s", module);
         function_name = snprintf_concat_string(function_name, "_%s", ast_node->strings[0]);
-        if (!is_in_array(&transpiled_functions, function_name)) {
+        if (!ast_node->dont_transpile && !is_in_array(&transpiled_functions, function_name)) {
             append_to_array(&transpiled_functions, function_name);
             fprintf(h_fp, "void %s();\n", function_name);
             fprintf(c_fp, "void %s() {\n", function_name);
