@@ -287,6 +287,7 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             transpile_node(ast_node->child, module, c_fp, indent);
             fprintf(c_fp, "}\n\n");
         }
+        free(function_name);
     }
 
     switch (ast_node->node_type)
@@ -604,6 +605,13 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     if (ast_node == NULL) {
         return ast_node;
     }
+    char *ast_node_module = malloc(1 + strlen(ast_node->module));
+    strcpy(ast_node_module, ast_node->module);
+    ast_node_module = replace_char(ast_node_module, '.', '_');
+    ast_node_module = replace_char(ast_node_module, '/', '_');
+
+    if (strcmp(ast_node_module, module) != 0) return transpile_node(ast_node->next, module, c_fp, indent);
+    free(ast_node_module);
 
     if (ast_node->node_type != AST_FUNCTION_STEP)
         if (is_node_function_related(ast_node)) return transpile_node(ast_node->next, module, c_fp, indent);
