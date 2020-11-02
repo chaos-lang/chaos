@@ -40,8 +40,6 @@
 #include "../ast/ast.h"
 
 bool compiler_mode;
-unsigned short indent_length;
-unsigned long long compiler_loop_counter;
 
 string_array transpiled_functions;
 

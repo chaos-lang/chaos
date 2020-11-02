@@ -27,6 +27,7 @@ struct stat dir_stat = {0};
 unsigned short indent_length = 4;
 unsigned long long compiler_loop_counter = 0;
 unsigned long long compiler_function_counter = 0;
+unsigned long long extension_counter = 0;
 
 char *type_strings[] = {
     "K_BOOL",
@@ -47,7 +48,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     ASTNode* ast_node = ast_root_node;
 
     if (stat(__KAOS_BUILD_DIRECTORY__, &dir_stat) == -1) {
-        printf("Creating build directory...\n");
+        printf("Creating %s directory...\n", __KAOS_BUILD_DIRECTORY__);
         #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
             _mkdir(__KAOS_BUILD_DIRECTORY__);
         #else
@@ -114,7 +115,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     register_functions(ast_node, module_orig);
     transpile_functions(ast_node, module, c_fp, indent, h_fp);
 
-    fprintf(c_fp, "int main() {\n");
+    fprintf(c_fp, "int main(int argc, char** argv) {\n");
 
     fprintf(
         c_fp,
@@ -126,6 +127,12 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         indent,
         ' ',
         module_orig
+    );
+
+    fprintf(
+        c_fp,
+        "char *argv0 = malloc(1 + strlen(argv[0]));\n"
+        "strcpy(argv0, argv[0]);\n"
     );
 
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
@@ -2149,20 +2156,63 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
 
 void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
     char *module_path = resolveModulePath(module_name, directly_import);
-    printf("module_path: %s\n", module_path);
     if (
         strcmp(
             get_filename_ext(module_path),
             __KAOS_DYNAMIC_LIBRARY_EXTENSION__
         ) == 0
     ) {
+        char *extension_name = module_stack.arr[module_stack.size - 1];
+
+        char *spells_dir_path = malloc(1);
+        strcpy(spells_dir_path, "");
+        spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_BUILD_DIRECTORY__);
+        spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_PATH_SEPARATOR__);
+        spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_SPELLS__);
+        if (stat(spells_dir_path, &dir_stat) == -1) {
+            printf("Creating %s directory...\n", spells_dir_path);
+            #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+                _mkdir(spells_dir_path);
+            #else
+                mkdir(spells_dir_path, 0700);
+            #endif
+        }
+
+        char *extension_dir_path = spells_dir_path;
+        extension_dir_path = snprintf_concat_string(extension_dir_path, "%s", __KAOS_PATH_SEPARATOR__);
+        extension_dir_path = snprintf_concat_string(extension_dir_path, "%s", extension_name);
+        if (stat(extension_dir_path, &dir_stat) == -1) {
+            printf("Creating %s directory...\n", extension_dir_path);
+            #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+                _mkdir(extension_dir_path);
+            #else
+                mkdir(extension_dir_path, 0700);
+            #endif
+        }
+
+        char *new_module_path = extension_dir_path;
+        new_module_path = snprintf_concat_string(new_module_path, "%s", __KAOS_PATH_SEPARATOR__);
+        new_module_path = snprintf_concat_string(new_module_path, "%s", extension_name);
+        new_module_path = snprintf_concat_string(new_module_path, "%s", ".");
+        new_module_path = snprintf_concat_string(new_module_path, "%s", (char*) get_filename_ext(module_path));
+        printf("Copying %s to %s\n", module_path, new_module_path);
+        copy_binary_file(module_path, new_module_path);
+
+        extension_counter++;
         fprintf(
             c_fp,
-            "pushModuleStack(\"%s\", \"%s\");\n",
-            module_path_stack.arr[module_path_stack.size - 1],
-            module_stack.arr[module_stack.size - 1]
+            "char *extension_path_%llu = strcat_ext(getParentDir(argv0), \"%s%s%s%s%s%s.%s\");\n",
+            extension_counter,
+            __KAOS_PATH_SEPARATOR__,
+            __KAOS_SPELLS__,
+            __KAOS_PATH_SEPARATOR__,
+            extension_name,
+            __KAOS_PATH_SEPARATOR__,
+            extension_name,
+            get_filename_ext(module_path)
         );
-        fprintf(c_fp, "callRegisterInDynamicLibrary(\"%s\");\n", module_path);
+        fprintf(c_fp, "pushModuleStack(extension_path_%llu, \"%s\");\n", extension_counter, extension_name);
+        fprintf(c_fp, "callRegisterInDynamicLibrary(extension_path_%llu);\n", extension_counter);
         fprintf(c_fp, "popModuleStack();\n");
     } else {
         char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));

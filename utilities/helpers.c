@@ -616,3 +616,20 @@ char* replace_char(char* str, char find, char replace) {
     }
     return str;
 }
+
+void copy_binary_file(char* source_path, char* target_path) {
+    FILE *source_fp, *target_fp;
+    source_fp = fopen(source_path, "rb");
+    target_fp = fopen(target_path, "wb");
+
+    size_t n, m;
+    unsigned char buff[8192];
+    do {
+        n = fread(buff, 1, sizeof buff, source_fp);
+        if (n) m = fwrite(buff, 1, n, target_fp);
+        else   m = 0;
+    } while ((n > 0) && (n == m));
+
+    fclose(source_fp);
+    fclose(target_fp);
+}

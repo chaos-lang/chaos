@@ -183,12 +183,23 @@ char* getMainModuleDir() {
         free(module_dir);
         return "";
     }
-    char *ptr = strrchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__);
+    stripLastPathSegment(module_dir);
+
+    return module_dir;
+}
+
+char* getParentDir(char* path) {
+    char *new_path = malloc(1 + strlen(path));
+    strcpy(new_path, path);
+    stripLastPathSegment(new_path);
+    return new_path;
+}
+
+void stripLastPathSegment(char* path) {
+    char *ptr = strrchr(path, __KAOS_PATH_SEPARATOR_ASCII__);
     if (ptr) {
         *ptr = '\0';
     }
-
-    return module_dir;
 }
 
 char* searchSpellsIfNotExits(char* module_path, char* relative_path) {

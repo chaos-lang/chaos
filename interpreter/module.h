@@ -55,6 +55,8 @@ void freeModulePathStack();
 void freeModuleStack();
 char* getCurrentModule();
 char* getMainModuleDir();
+char* getParentDir(char* path);
+void stripLastPathSegment(char* path);
 char* searchSpellsIfNotExits(char* module_path, char* relative_path);
 
 #endif
