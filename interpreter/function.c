@@ -277,22 +277,35 @@ _Function* callFunction(char *name, char *module) {
     return function;
 }
 
+#ifndef CHAOS_COMPILER
 void callFunctionCleanUp(_Function* function, char *name) {
+#else
+void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
+#endif
     reset_line_no_to = 0;
 
     bool is_loop_breaked = false;
+    bool is_loop_continued = false;
+
+#ifndef CHAOS_COMPILER
     if (setjmp(LoopBreakDecision))
         is_loop_breaked = true;
 
-    bool is_loop_continued = false;
     if (setjmp(LoopContinueDecision))
         is_loop_continued = true;
+#endif
 
+#ifdef CHAOS_COMPILER
+    if (has_decision) {
+#endif
     if (!interactive_shell_function_error_absorbed &&
         !is_loop_breaked &&
         !is_loop_continued
     )
         executeDecision(function);
+#ifdef CHAOS_COMPILER
+    }
+#endif
 
     if (function->type != K_VOID &&
         function->symbol == NULL &&
@@ -717,6 +730,7 @@ void addDefaultDecision() {
 }
 
 void executeDecision(_Function* function) {
+#ifndef CHAOS_COMPILER
     if (function->decision_node == NULL) {
         if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
             removeSymbol(decision_symbol_chain);
@@ -725,10 +739,9 @@ void executeDecision(_Function* function) {
         return;
     }
 
-#ifndef CHAOS_COMPILER
     eval_node(function->decision_node, function->module_context);
-#endif
     stop_ast_evaluation = false;
+#endif
 
     if (decision_symbol_chain == NULL)
         return;

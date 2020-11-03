@@ -249,6 +249,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Binary is ready on: %s\n", bin_file_path_final);
 }
 
+char* last_function_name;
+
 ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
     if (ast_node == NULL) {
         return ast_node;
@@ -297,8 +299,10 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             fprintf(c_fp, "}\n\n");
         }
         free(function_name);
+        last_function_name = ast_node->strings[0];
     }
 
+    char *decision_name;
     switch (ast_node->node_type)
     {
         case AST_ADD_FUNCTION_NAME:
@@ -319,11 +323,141 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         case AST_MODULE_IMPORT_PARTIAL:
             compiler_handleModuleImport(NULL, true, c_fp, indent, h_fp);
             break;
+        case AST_DECISION_DEFINE:
+            decision_name = malloc(1);
+            strcpy(decision_name, "");
+            decision_name = snprintf_concat_string(decision_name, "kaos_decision_%s", module);
+            decision_name = snprintf_concat_string(decision_name, "_%s", last_function_name);
+            if (!ast_node->dont_transpile && !is_in_array(&transpiled_decisions, decision_name)) {
+                append_to_array(&transpiled_decisions, decision_name);
+                fprintf(h_fp, "void %s();\n", decision_name);
+                fprintf(c_fp, "void %s() {\n", decision_name);
+                transpile_decisions(ast_node->right, module, c_fp, indent);
+                fprintf(c_fp, "}\n\n");
+            }
+            free(decision_name);
+            break;
         default:
             break;
     }
 
     return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
+}
+
+ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+    if (ast_node == NULL) {
+        return ast_node;
+    }
+    char *ast_node_module = malloc(1 + strlen(ast_node->module));
+    strcpy(ast_node_module, ast_node->module);
+    ast_node_module = replace_char(ast_node_module, '.', '_');
+    ast_node_module = replace_char(ast_node_module, '/', '_');
+
+    if (strcmp(ast_node_module, module) != 0) return transpile_decisions(ast_node->next, module, c_fp, indent);
+    free(ast_node_module);
+
+    if (is_node_function_related(ast_node)) {
+        if (ast_node->depend != NULL) {
+            transpile_decisions(ast_node->depend, module, c_fp, indent);
+        }
+
+        if (ast_node->right != NULL) {
+            transpile_decisions(ast_node->right, module, c_fp, indent);
+        }
+
+        if (ast_node->left != NULL) {
+            transpile_decisions(ast_node->left, module, c_fp, indent);
+        }
+    }
+
+    if (ast_node->node_type == AST_DECISION_MAKE_BOOLEAN) {
+        transpile_node(ast_node->right, module, c_fp, indent);
+    }
+
+    if (debug_enabled)
+        printf(
+            "(TranspileD)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            ast_node->id,
+            getAstNodeTypeName(ast_node->node_type),
+            ast_node->module,
+            ast_node->strings_size
+        );
+
+    switch (ast_node->node_type)
+    {
+        case AST_DECISION_MAKE_BOOLEAN:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "if (%s) {", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "if (%s) {", ast_node->right->value.b ? "true" : "false");
+            }
+            fprintf(
+                c_fp,
+                "    _Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);",
+                compiler_function_counter,
+                ast_node->strings[0]
+            );
+            // TODO: NULL is not right in here. Use module_context to get function in transpile_function_call
+            transpile_function_call(c_fp, NULL, ast_node->strings[0]);
+            fprintf(c_fp, "return;\n}");
+            break;
+        case AST_DECISION_MAKE_BOOLEAN_BREAK:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->value.b ? "true" : "false");
+            }
+            fprintf(
+                c_fp,
+                "    decisionBreakLoop();"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->value.b ? "true" : "false");
+            }
+            fprintf(
+                c_fp,
+                "    decisionContinueLoop();"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_DEFAULT:
+            fprintf(
+                c_fp,
+                "if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
+                "    _Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);",
+                compiler_function_counter,
+                ast_node->strings[0]
+            );
+            // TODO: NULL is not right in here. Use module_context to get function in transpile_function_call
+            transpile_function_call(c_fp, NULL, ast_node->strings[0]);
+            fprintf(c_fp, "}");
+            break;
+        case AST_DECISION_MAKE_DEFAULT_BREAK:
+            fprintf(
+                c_fp,
+                "if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
+                "    decisionBreakLoop();"
+                "}"
+            );
+            break;
+        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
+            fprintf(
+                c_fp,
+                "if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
+                "    decisionContinueLoop();"
+                "}"
+            );
+            break;
+        default:
+            break;
+    }
+
+    return transpile_decisions(ast_node->next, module, c_fp, indent);
 }
 
 ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
@@ -1924,70 +2058,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_NESTED_COMPLEX_TRANSITION:
             fprintf(c_fp, "reverseComplexMode();");
             break;
-        case AST_DECISION_MAKE_BOOLEAN:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "if (%s) {", ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "if (%s) {", ast_node->right->value.b ? "true" : "false");
-            }
-            fprintf(
-                c_fp,
-                "    callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);"
-                "    stop_ast_evaluation = true;"
-                "}",
-                ast_node->strings[0]
-            );
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_BREAK:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->value.b ? "true" : "false");
-            }
-            fprintf(
-                c_fp,
-                "    decisionBreakLoop();"
-                "}"
-            );
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "if (nested_loop_counter > 0 && %s) {", ast_node->right->value.b ? "true" : "false");
-            }
-            fprintf(
-                c_fp,
-                "    decisionContinueLoop();"
-                "}"
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT:
-            fprintf(
-                c_fp,
-                "if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
-                "    callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);"
-                "    stop_ast_evaluation = true;"
-                "}",
-                ast_node->strings[0]
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT_BREAK:
-            fprintf(
-                c_fp,
-                "if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
-                "    decisionBreakLoop();"
-                "}"
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
-            fprintf(
-                c_fp,
-                "if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {"
-                "    decisionContinueLoop();"
-                "}"
-            );
-            break;
         case AST_JSON_PARSER:
             fprintf(
                 c_fp,
@@ -2092,8 +2162,18 @@ void transpile_function_call(FILE *c_fp, char *module, char *name) {
     char *module_context = compiler_getFunctionModuleContext(name, module);
     if (!isFunctionFromDynamicLibrary(name, module))
         fprintf(c_fp, "kaos_function_%s_%s();", module_context, name);
+    _Function* function = getFunction(name, module);
+    if (function->decision_node != NULL) {
+        fprintf(c_fp, "kaos_decision_%s_%s();", module_context, name);
+    }
     free(module_context);
-    fprintf(c_fp, "callFunctionCleanUp(function_%llu, \"%s\");", compiler_function_counter, name);
+    fprintf(
+        c_fp,
+        "callFunctionCleanUp(function_%llu, \"%s\", %s);",
+        compiler_function_counter,
+        name,
+        function->decision_node != NULL ? "true" : "false"
+    );
 }
 
 void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2) {

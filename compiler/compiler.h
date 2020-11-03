@@ -42,9 +42,11 @@
 bool compiler_mode;
 
 string_array transpiled_functions;
+string_array transpiled_decisions;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file);
 ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp);
+ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
 ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
 bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type);

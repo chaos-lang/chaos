@@ -114,7 +114,11 @@ _Function* getFunction(char *name, char *module);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
 _Function* callFunction(char *name, char *module);
+#ifndef CHAOS_COMPILER
 void callFunctionCleanUp(_Function* function, char *name);
+#else
+void callFunctionCleanUp(_Function* function, char *name, bool has_decision);
+#endif
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type);
 void addFunctionOptionalParameterBool(char *secondary_name, bool b);
