@@ -370,6 +370,26 @@ _Function* getFunction(char *name, char *module) {
     return NULL;
 }
 
+_Function* getFunctionByModuleContext(char *name, char *module_context) {
+    function_cursor = start_function;
+    while (function_cursor != NULL) {
+        if (module_context == NULL && strcmp(function_cursor->module, "") != 0) {
+            function_cursor = function_cursor->next;
+            continue;
+        }
+        bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
+        if (criteria && module_context != NULL && strcmp(function_cursor->module_context, module_context) == 0) {
+            _Function* function = function_cursor;
+            return function;
+        }
+        function_cursor = function_cursor->next;
+    }
+    if (phase == PROGRAM) {
+        throw_error(E_UNDEFINED_FUNCTION, name);
+    }
+    return NULL;
+}
+
 void removeFunctionIfDefined(char *name) {
     unsigned short parent_context = 1;
     if (module_path_stack.size > 1) parent_context = 2;

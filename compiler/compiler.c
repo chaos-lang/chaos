@@ -397,8 +397,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 compiler_function_counter,
                 ast_node->strings[0]
             );
-            // TODO: NULL is not right in here. Use module_context to get function in transpile_function_call
-            transpile_function_call(c_fp, NULL, ast_node->strings[0]);
+            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0]);
             fprintf(c_fp, "return;\n}");
             break;
         case AST_DECISION_MAKE_BOOLEAN_BREAK:
@@ -433,8 +432,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 compiler_function_counter,
                 ast_node->strings[0]
             );
-            // TODO: NULL is not right in here. Use module_context to get function in transpile_function_call
-            transpile_function_call(c_fp, NULL, ast_node->strings[0]);
+            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0]);
             fprintf(c_fp, "}");
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:
@@ -2176,6 +2174,22 @@ void transpile_function_call(FILE *c_fp, char *module, char *name) {
     );
 }
 
+void transpile_function_call_decision(FILE *c_fp, char *module_context, char* module, char *name) {
+    if (!isFunctionFromDynamicLibraryByModuleContext(name, module_context))
+        fprintf(c_fp, "kaos_function_%s_%s();", module, name);
+    _Function* function = getFunctionByModuleContext(name, module_context);
+    if (function->decision_node != NULL) {
+        fprintf(c_fp, "kaos_decision_%s_%s();", module, name);
+    }
+    fprintf(
+        c_fp,
+        "callFunctionCleanUp(function_%llu, \"%s\", %s);",
+        compiler_function_counter,
+        name,
+        function->decision_node != NULL ? "true" : "false"
+    );
+}
+
 void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2) {
     compiler_function_counter++;
     switch (ast_node->strings_size)
@@ -2331,6 +2345,14 @@ char* compiler_getFunctionModuleContext(char *name, char *module) {
 
 bool isFunctionFromDynamicLibrary(char *name, char *module) {
     _Function* function = getFunction(name, module);
+    return strcmp(
+        get_filename_ext(function->module_context),
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+    ) == 0;
+}
+
+bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module) {
+    _Function* function = getFunctionByModuleContext(name, module);
     return strcmp(
         get_filename_ext(function->module_context),
         __KAOS_DYNAMIC_LIBRARY_EXTENSION__

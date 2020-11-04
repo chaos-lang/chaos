@@ -111,6 +111,7 @@ void endFunction();
 void freeFunctionParametersMode();
 void resetFunctionParametersMode();
 _Function* getFunction(char *name, char *module);
+_Function* getFunctionByModuleContext(char *name, char *module_context);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
 _Function* callFunction(char *name, char *module);
