@@ -101,13 +101,18 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 
     unsigned short indent = indent_length;
 
-    const char *c_file_base = "bool is_interactive = false;\n\n";
+    const char *c_file_base =
+        "bool is_interactive = false;\n"
+        "unsigned long long nested_loop_counter = 0;\n\n";
 
     const char *h_file_base =
         "#include <stdio.h>\n"
         "#include <stdbool.h>\n\n"
         "#include \"interpreter/function.h\"\n"
-        "#include \"interpreter/symbol.h\"\n\n";
+        "#include \"interpreter/symbol.h\"\n\n"
+        "unsigned long long nested_loop_counter;\n"
+        "jmp_buf LoopBreak;\n"
+        "jmp_buf LoopContinue;\n\n";
 
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
@@ -370,7 +375,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         }
     }
 
-    if (ast_node->node_type == AST_DECISION_MAKE_BOOLEAN) {
+    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_BOOLEAN_CONTINUE) {
         transpile_node(ast_node->right, module, c_fp, indent);
     }
 
@@ -792,35 +797,48 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     {
         case AST_START_TIMES_DO:
             compiler_loop_counter++;
+            fprintf(c_fp, "nested_loop_counter++;");
             if (ast_node->right->is_transpiled) {
                 fprintf(c_fp, "for (int i = 0; i < %s; i++) {\n", ast_node->right->transpiled);
             } else {
                 fprintf(c_fp, "for (int i = 0; i < %lld; i++) {\n", ast_node->right->value.i);
             }
             indent += indent_length;
+            fprintf(c_fp, "if (setjmp(LoopBreak)) break;");
+            fprintf(c_fp, "if (setjmp(LoopContinue)) continue;");
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
+            fprintf(c_fp, "nested_loop_counter--;");
             break;
         case AST_START_TIMES_DO_INFINITE:
             compiler_loop_counter++;
+            fprintf(c_fp, "nested_loop_counter++;");
             fprintf(c_fp, "while (true) {");
             indent += indent_length;
+            fprintf(c_fp, "if (setjmp(LoopBreak)) break;");
+            fprintf(c_fp, "if (setjmp(LoopContinue)) continue;");
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
+            fprintf(c_fp, "nested_loop_counter--;");
             break;
         case AST_START_TIMES_DO_VAR:
             compiler_loop_counter++;
+            fprintf(c_fp, "nested_loop_counter++;");
             fprintf(c_fp, "for (int i = 0; i < (unsigned) getSymbolValueInt(\"%s\"); i++) {\n", ast_node->strings[0]);
             indent += indent_length;
+            fprintf(c_fp, "if (setjmp(LoopBreak)) break;");
+            fprintf(c_fp, "if (setjmp(LoopContinue)) continue;");
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
+            fprintf(c_fp, "nested_loop_counter--;");
             break;
         case AST_START_FOREACH:
             compiler_loop_counter++;
             current_loop_counter = compiler_loop_counter;
+            fprintf(c_fp, "nested_loop_counter++;");
             fprintf(
                 c_fp,
                 "Symbol* loop_%llu_list = getSymbol(\"%s\");\n"
@@ -850,14 +868,32 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 compiler_loop_counter
             );
             indent += indent_length;
+            fprintf(
+                c_fp,
+                "if (setjmp(LoopBreak)) {"
+                "   removeSymbol(loop_%llu_clone_symbol);"
+                "   break;"
+                "}",
+                compiler_loop_counter
+            );
+            fprintf(
+                c_fp,
+                "if (setjmp(LoopContinue)) {"
+                "   removeSymbol(loop_%llu_clone_symbol);"
+                "   continue;"
+                "}",
+                compiler_loop_counter
+            );
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent * 2, ' ', current_loop_counter);
             fprintf(c_fp, "%*c}\n", indent, ' ');
+            fprintf(c_fp, "nested_loop_counter--;");
             break;
         case AST_START_FOREACH_DICT:
             compiler_loop_counter++;
             current_loop_counter = compiler_loop_counter;
+            fprintf(c_fp, "nested_loop_counter++;");
             fprintf(
                 c_fp,
                 "Symbol* loop_%llu_dict = getSymbol(\"%s\");\n"
@@ -892,11 +928,32 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 compiler_loop_counter
             );
             indent += indent_length;
+            fprintf(
+                c_fp,
+                "if (setjmp(LoopBreak)) {"
+                "   removeSymbol(loop_%llu_clone_symbol);"
+                "   removeSymbolByName(\"%s\");"
+                "   break;"
+                "}",
+                compiler_loop_counter,
+                ast_node->strings[1]
+            );
+            fprintf(
+                c_fp,
+                "if (setjmp(LoopContinue)) {"
+                "   removeSymbol(loop_%llu_clone_symbol);"
+                "   removeSymbolByName(\"%s\");"
+                "   continue;"
+                "}",
+                compiler_loop_counter,
+                ast_node->strings[1]
+            );
             ASTNode* next_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent * 2, ' ', current_loop_counter);
             fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent * 2, ' ', ast_node->strings[1]);
             fprintf(c_fp, "%*c}\n", indent, ' ');
+            fprintf(c_fp, "nested_loop_counter--;");
             ast_node = next_node;
             break;
         default:

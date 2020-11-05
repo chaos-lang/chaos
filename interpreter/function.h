@@ -120,6 +120,7 @@ void callFunctionCleanUp(_Function* function, char *name);
 #else
 void callFunctionCleanUp(_Function* function, char *name, bool has_decision);
 #endif
+void callFunctionCleanUpCommon(_Function* function);
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type);
 void addFunctionOptionalParameterBool(char *secondary_name, bool b);

@@ -32,6 +32,11 @@ int reset_line_no_to = 0;
 bool decision_execution_mode = false;
 
 #ifdef CHAOS_COMPILER
+extern jmp_buf LoopBreak;
+extern jmp_buf LoopContinue;
+#endif
+
+#ifdef CHAOS_COMPILER
 void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module, bool is_dynamic) {
 #else
 void startFunction(char *name, enum Type type, enum Type secondary_type) {
@@ -318,18 +323,7 @@ void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
         return;
     }
 
-    for (unsigned short i = 0; i < function->parameter_count; i++) {
-        Symbol* parameter = function->parameters[i];
-        removeSymbolByName(parameter->secondary_name);
-    }
-
-    recursion_depth--;
-
-    removeSymbolsByScope(function);
-
-    popModuleStack();
-
-    popExecutedFunctionStack();
+    callFunctionCleanUpCommon(function);
 
     if (is_loop_breaked) {
         breakLoop();
@@ -346,6 +340,21 @@ void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
         yyparse();
 #endif
     }
+}
+
+void callFunctionCleanUpCommon(_Function* function) {
+    for (unsigned short i = 0; i < function->parameter_count; i++) {
+        Symbol* parameter = function->parameters[i];
+        removeSymbolByName(parameter->secondary_name);
+    }
+
+    recursion_depth--;
+
+    removeSymbolsByScope(function);
+
+    popModuleStack();
+
+    popExecutedFunctionStack();
 }
 
 _Function* getFunction(char *name, char *module) {
@@ -835,9 +844,27 @@ void freeFunctionReturn(char *name, char *module) {
 }
 
 void decisionBreakLoop() {
+#ifdef CHAOS_COMPILER
+    _Function* function = getFunction(
+        function_call_stack.arr[function_call_stack.size - 1]->name,
+        function_call_stack.arr[function_call_stack.size - 1]->module
+    );
+    callFunctionCleanUpCommon(function);
+    longjmp(LoopBreak, 1);
+#else
     longjmp(LoopBreakDecision, 1);
+#endif
 }
 
 void decisionContinueLoop() {
+#ifdef CHAOS_COMPILER
+    _Function* function = getFunction(
+        function_call_stack.arr[function_call_stack.size - 1]->name,
+        function_call_stack.arr[function_call_stack.size - 1]->module
+    );
+    callFunctionCleanUpCommon(function);
+    longjmp(LoopContinue, 1);
+#else
     longjmp(LoopContinueDecision, 1);
+#endif
 }
