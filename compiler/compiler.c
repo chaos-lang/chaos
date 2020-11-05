@@ -172,12 +172,59 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    char include_path[PATH_MAX];
+    #if defined(__clang__)
+        sprintf(include_path, "%%programfiles%%/LLVM/lib/clang/%d.%d.%d/include/chaos", __clang_major__, __clang_minor__, __clang_patchlevel__);
+    #elif defined(__GNUC__) || defined(__GNUG__)
+        sprintf(include_path, "%%programdata%%/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+    #endif
+
+    char include_path_helpers[PATH_MAX];
+    sprintf(include_path_helpers, "%s/utilities/helpers.c", include_path);
+    char include_path_ast[PATH_MAX];
+    sprintf(include_path_ast, "%s/ast/ast.c", include_path);
+    char include_path_errors[PATH_MAX];
+    sprintf(include_path_errors, "%s/interpreter/errors.c", include_path);
+    char include_path_extension[PATH_MAX];
+    sprintf(include_path_extension, "%s/interpreter/extension.c", include_path);
+    char include_path_function[PATH_MAX];
+    sprintf(include_path_function, "%s/interpreter/function.c", include_path);
+    char include_path_module[PATH_MAX];
+    sprintf(include_path_module, "%s/interpreter/module.c", include_path);
+    char include_path_symbol[PATH_MAX];
+    sprintf(include_path_symbol, "%s/interpreter/symbol.c", include_path);
+    char include_path_alternative[PATH_MAX];
+    sprintf(include_path_alternative, "%s/compiler/lib/alternative.c", include_path);
+    char include_path_chaos[PATH_MAX];
+    sprintf(include_path_chaos, "%s/Chaos.c", include_path);
+    char include_path_include[PATH_MAX];
+    sprintf(include_path_include, "-I%s", include_path);
+
     STARTUPINFO info={sizeof(info)};
     PROCESS_INFORMATION processInfo;
     DWORD status;
 
-    char cmd[PATH_MAX];
-    sprintf(cmd, "/c %s -o %s %s", c_compiler_path, bin_file_path, c_file_path);
+    char cmd[2048];
+    sprintf(
+        cmd,
+        "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        c_compiler_path,
+        "-fcompare-debug-second",
+        "-DCHAOS_COMPILER",
+        bin_file_path,
+        c_file_path,
+        include_path_helpers,
+        include_path_ast,
+        include_path_errors,
+        include_path_extension,
+        include_path_function,
+        include_path_module,
+        include_path_symbol,
+        include_path_alternative,
+        include_path_chaos,
+        include_path_include,
+        "-ggdb"
+    );
     if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
 
         WaitForSingleObject(processInfo.hProcess, INFINITE);

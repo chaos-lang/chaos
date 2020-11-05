@@ -129,9 +129,15 @@ DEL tmpFile
 
 ECHO "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
 IF not exist "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos" mkdir "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos"
-COPY utilities\language.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
-COPY utilities\platform.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
+ECHO D | XCOPY utilities "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\utilities"
+ECHO D | XCOPY lexer "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\lexer"
+ECHO D | XCOPY parser "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\parser"
+ECHO D | XCOPY interpreter "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\interpreter"
+ECHO D | XCOPY compiler "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\compiler"
+ECHO D | XCOPY compiler\lib "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\compiler\lib"
+ECHO D | XCOPY ast "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\ast"
 COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
+COPY Chaos.c "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
 COPY Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
 IF errorlevel 1 (
     EXIT /B 1
@@ -139,9 +145,15 @@ IF errorlevel 1 (
 
 ECHO "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
 IF not exist "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos" mkdir "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos"
-COPY utilities\language.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
-COPY utilities\platform.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
+ECHO D | XCOPY utilities "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\utilities"
+ECHO D | XCOPY lexer "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\lexer"
+ECHO D | XCOPY parser "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\parser"
+ECHO D | XCOPY interpreter "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\interpreter"
+ECHO D | XCOPY compiler "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\compiler"
+ECHO D | XCOPY compiler\lib "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\compiler\lib"
+ECHO D | XCOPY ast "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\ast"
 COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
+COPY Chaos.c "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
 IF errorlevel 1 (
     EXIT /B 1
