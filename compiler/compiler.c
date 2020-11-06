@@ -39,6 +39,12 @@ char *type_strings[] = {
     "K_VOID"
 };
 
+char* relational_operators[] = {"==", "!=", ">", "<", ">=", "<="};
+char* relational_operators_size[] = {">", "<", ">=", "<="};
+char* logical_operators[] = {"&&", "||", "!"};
+char* bitwise_operators[] = {"&", "|", "^", "~", "<<", ">>"};
+char* unary_operators[] = {"++", "--"};
+
 void compile(char *module, enum Phase phase_arg, char *bin_file) {
     printf("Starting compiling...\n");
     char *module_orig = malloc(strlen(module) + 1);
@@ -250,7 +256,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         execlp(
             c_compiler_path,
             c_compiler_path,
+#if !defined(__clang__)
             "-fcompare-debug-second",
+#endif
             "-DCHAOS_COMPILER",
             "-o",
             bin_file_path,
@@ -2179,18 +2187,34 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
 bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type) {
     if ((ast_node->left != NULL && ast_node->left->is_transpiled) || (ast_node->right != NULL && ast_node->right->is_transpiled)) {
         if (ast_node->left != NULL && ast_node->left->is_transpiled) {
-            ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled);
+            if (in(operator, relational_operators_size)) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->left->transpiled);
+            } else {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled);
+            }
         } else {
             switch (left_value_type)
             {
                 case V_BOOL:
-                    ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.b ? "true" : "false");
+                    if (in(operator, relational_operators_size)) {
+                        ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.b ? 1 : 0);
+                    } else {
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.b ? "true" : "false");
+                    }
                     break;
                 case V_INT:
-                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i);
+                    if (in(operator, logical_operators)) {
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.i > 0 ? "true" : "false");
+                    } else {
+                        ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i);
+                    }
                     break;
                 case V_FLOAT:
-                    ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->left->value.f);
+                    if (in(operator, logical_operators)) {
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.f > 0.0 ? "true" : "false");
+                    } else {
+                        ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->left->value.f);
+                    }
                     break;
                 default:
                     break;
@@ -2200,18 +2224,34 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
         ast_node->transpiled = strcat_ext(ast_node->transpiled, operator);
         ast_node->transpiled = strcat_ext(ast_node->transpiled, " ");
         if (ast_node->right != NULL && ast_node->right->is_transpiled) {
-            ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled);
+            if (in(operator, relational_operators_size)) {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->right->transpiled);
+            } else {
+                ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled);
+            }
         } else {
             switch (right_value_type)
             {
                 case V_BOOL:
-                    ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false");
+                    if (in(operator, relational_operators_size)) {
+                        ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.b ? 1 : 0);
+                    } else {
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false");
+                    }
                     break;
                 case V_INT:
-                    ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i);
+                    if (in(operator, logical_operators)) {
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.i ? "true" : "false");
+                    } else {
+                        ast_node->transpiled = snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i);
+                    }
                     break;
                 case V_FLOAT:
-                    ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f);
+                    if (in(operator, logical_operators)) {
+                        ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.f ? "true" : "false");
+                    } else {
+                        ast_node->transpiled = snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f);
+                    }
                     break;
                 default:
                     break;

@@ -633,3 +633,14 @@ void copy_binary_file(char* source_path, char* target_path) {
     fclose(source_fp);
     fclose(target_fp);
 }
+
+bool in(char *s, char **x) {
+    int len = sizeof(x)/sizeof(x[0]);
+    int i;
+    for (i = 0; i < len; ++i) {
+        if (!strcmp(x[i], s)) {
+            return true;
+        }
+    }
+    return false;
+}
