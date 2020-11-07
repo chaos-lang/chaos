@@ -28,7 +28,6 @@ int initParser(int argc, char** argv) {
     char *program_file = NULL;
     char *bin_file = NULL;
 
-#if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
     char ch;
     while ((ch = getopt_long(argc, argv, "hvdco", long_options, NULL)) != -1)
     {
@@ -70,7 +69,6 @@ int initParser(int argc, char** argv) {
                 break;
         }
     }
-#endif
 
     if (bin_file != NULL && !compiler_mode)
         throwMissingCompileOption();

@@ -58,7 +58,10 @@
 #define __KAOS_WINDOWS_EXE_EXT__ ".exe"
 
 #include <stdio.h>
-#if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+
+#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+#include "windows/getopt.h"
+#else
 #include <getopt.h>
 #endif
 
@@ -69,7 +72,6 @@ void yyerror_msg(char* error_name, char* current_module, char* cause);
 void print_bye_bye();
 void print_help();
 
-#if !defined(__clang__) || !(defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
 static struct option long_options[] =
 {
     {"help", no_argument, NULL, 'h'},
@@ -79,6 +81,5 @@ static struct option long_options[] =
     {"output", no_argument, NULL, 'o'},
     {NULL, 0, NULL, 0}
 };
-#endif
 
 #endif

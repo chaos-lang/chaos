@@ -165,9 +165,17 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 
     char bin_file_path[PATH_MAX];
     if (bin_file != NULL) {
-        sprintf(bin_file_path, "%s%s%s", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+        #if defined(__clang__)
+            sprintf(bin_file_path, "%s%s%s.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+        #else
+            sprintf(bin_file_path, "%s%s%s", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+        #endif
     } else {
-        sprintf(bin_file_path, "%s%smain", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+        #if defined(__clang__)
+            sprintf(bin_file_path, "%s%smain.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+        #else
+            sprintf(bin_file_path, "%s%smain", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+        #endif
     }
 
     char c_compiler_path[PATH_MAX];
@@ -186,25 +194,25 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     #endif
 
     char include_path_helpers[PATH_MAX];
-    sprintf(include_path_helpers, "%s/utilities/helpers.c", include_path);
+    sprintf(include_path_helpers, "\"%s/utilities/helpers.c\"", include_path);
     char include_path_ast[PATH_MAX];
-    sprintf(include_path_ast, "%s/ast/ast.c", include_path);
+    sprintf(include_path_ast, "\"%s/ast/ast.c\"", include_path);
     char include_path_errors[PATH_MAX];
-    sprintf(include_path_errors, "%s/interpreter/errors.c", include_path);
+    sprintf(include_path_errors, "\"%s/interpreter/errors.c\"", include_path);
     char include_path_extension[PATH_MAX];
-    sprintf(include_path_extension, "%s/interpreter/extension.c", include_path);
+    sprintf(include_path_extension, "\"%s/interpreter/extension.c\"", include_path);
     char include_path_function[PATH_MAX];
-    sprintf(include_path_function, "%s/interpreter/function.c", include_path);
+    sprintf(include_path_function, "\"%s/interpreter/function.c\"", include_path);
     char include_path_module[PATH_MAX];
-    sprintf(include_path_module, "%s/interpreter/module.c", include_path);
+    sprintf(include_path_module, "\"%s/interpreter/module.c\"", include_path);
     char include_path_symbol[PATH_MAX];
-    sprintf(include_path_symbol, "%s/interpreter/symbol.c", include_path);
+    sprintf(include_path_symbol, "\"%s/interpreter/symbol.c\"", include_path);
     char include_path_alternative[PATH_MAX];
-    sprintf(include_path_alternative, "%s/compiler/lib/alternative.c", include_path);
+    sprintf(include_path_alternative, "\"%s/compiler/lib/alternative.c\"", include_path);
     char include_path_chaos[PATH_MAX];
-    sprintf(include_path_chaos, "%s/Chaos.c", include_path);
+    sprintf(include_path_chaos, "\"%s/Chaos.c\"", include_path);
     char include_path_include[PATH_MAX];
-    sprintf(include_path_include, "-I%s", include_path);
+    sprintf(include_path_include, "\"-I%s\"", include_path);
 
     STARTUPINFO info={sizeof(info)};
     PROCESS_INFORMATION processInfo;
@@ -215,7 +223,11 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         cmd,
         "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s",
         c_compiler_path,
+#if !defined(__clang__)
         "-fcompare-debug-second",
+#else
+        "-Wno-everything",
+#endif
         "-DCHAOS_COMPILER",
         bin_file_path,
         c_file_path,
@@ -231,6 +243,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         include_path_include,
         "-ggdb"
     );
+    printf("%s\n", cmd);
     if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
 
         WaitForSingleObject(processInfo.hProcess, INFINITE);
