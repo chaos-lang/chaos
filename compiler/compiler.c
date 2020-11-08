@@ -50,7 +50,10 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     char *module_orig = malloc(strlen(module) + 1);
     strcpy(module_orig, module);
     module = replace_char(module, '.', '_');
-    module = replace_char(module, '/', '_');
+    module = replace_char(module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    module = replace_char(module, '-', '_');
+    module = replace_char(module, ':', '_');
+    module = replace_char(module, ' ', '_');
     ASTNode* ast_node = ast_root_node;
 
     if (stat(__KAOS_BUILD_DIRECTORY__, &dir_stat) == -1) {
@@ -134,10 +137,10 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         "%*cstrcpy(program_file_path, \"%s\");\n",
         indent,
         ' ',
-        module_orig,
+        fix_bs(module_orig),
         indent,
         ' ',
-        module_orig
+        fix_bs(module_orig)
     );
 
     fprintf(
@@ -221,10 +224,15 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
     char cmd[2048];
     sprintf(
         cmd,
+#if !defined(__clang__)
+        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s",
+#else
         "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s",
+#endif
         c_compiler_path,
 #if !defined(__clang__)
         "-fcompare-debug-second",
+        "-D__USE_MINGW_ANSI_STDIO",
 #else
         "-Wno-everything",
 #endif
@@ -243,7 +251,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         include_path_include,
         "-ggdb"
     );
-    printf("%s\n", cmd);
     if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
 
         WaitForSingleObject(processInfo.hProcess, INFINITE);
@@ -331,7 +338,10 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     char *ast_node_module = malloc(1 + strlen(ast_node->module));
     strcpy(ast_node_module, ast_node->module);
     ast_node_module = replace_char(ast_node_module, '.', '_');
-    ast_node_module = replace_char(ast_node_module, '/', '_');
+    ast_node_module = replace_char(ast_node_module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    ast_node_module = replace_char(ast_node_module, '-', '_');
+    ast_node_module = replace_char(ast_node_module, ':', '_');
+    ast_node_module = replace_char(ast_node_module, ' ', '_');
 
     if (strcmp(ast_node_module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
     free(ast_node_module);
@@ -424,7 +434,10 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     char *ast_node_module = malloc(1 + strlen(ast_node->module));
     strcpy(ast_node_module, ast_node->module);
     ast_node_module = replace_char(ast_node_module, '.', '_');
-    ast_node_module = replace_char(ast_node_module, '/', '_');
+    ast_node_module = replace_char(ast_node_module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    ast_node_module = replace_char(ast_node_module, '-', '_');
+    ast_node_module = replace_char(ast_node_module, ':', '_');
+    ast_node_module = replace_char(ast_node_module, ' ', '_');
 
     if (strcmp(ast_node_module, module) != 0) return transpile_decisions(ast_node->next, module, c_fp, indent);
     free(ast_node_module);
@@ -538,7 +551,10 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
     char *ast_node_module = malloc(1 + strlen(ast_node->module));
     strcpy(ast_node_module, ast_node->module);
     ast_node_module = replace_char(ast_node_module, '.', '_');
-    ast_node_module = replace_char(ast_node_module, '/', '_');
+    ast_node_module = replace_char(ast_node_module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    ast_node_module = replace_char(ast_node_module, '-', '_');
+    ast_node_module = replace_char(ast_node_module, ':', '_');
+    ast_node_module = replace_char(ast_node_module, ' ', '_');
 
     if (strcmp(ast_node_module, module) != 0) return compiler_register_functions(ast_node->next, module, c_fp, indent);
     free(ast_node_module);
@@ -825,7 +841,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     char *ast_node_module = malloc(1 + strlen(ast_node->module));
     strcpy(ast_node_module, ast_node->module);
     ast_node_module = replace_char(ast_node_module, '.', '_');
-    ast_node_module = replace_char(ast_node_module, '/', '_');
+    ast_node_module = replace_char(ast_node_module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    ast_node_module = replace_char(ast_node_module, '-', '_');
+    ast_node_module = replace_char(ast_node_module, ':', '_');
+    ast_node_module = replace_char(ast_node_module, ' ', '_');
 
     if (strcmp(ast_node_module, module) != 0) return transpile_node(ast_node->next, module, c_fp, indent);
     free(ast_node_module);
@@ -2398,7 +2417,10 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
     char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
     compiled_module = replace_char(compiled_module, '.', '_');
-    compiled_module = replace_char(compiled_module, '/', '_');
+    compiled_module = replace_char(compiled_module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    compiled_module = replace_char(compiled_module, '-', '_');
+    compiled_module = replace_char(compiled_module, ':', '_');
+    compiled_module = replace_char(compiled_module, ' ', '_');
     ASTNode* ast_node = ast_root_node;
     transpile_functions(ast_node, compiled_module, c_fp, indent, h_fp);
 
@@ -2469,7 +2491,10 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
         compiled_module = replace_char(compiled_module, '.', '_');
-        compiled_module = replace_char(compiled_module, '/', '_');
+        compiled_module = replace_char(compiled_module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+        compiled_module = replace_char(compiled_module, '-', '_');
+        compiled_module = replace_char(compiled_module, ':', '_');
+        compiled_module = replace_char(compiled_module, ' ', '_');
         ASTNode* ast_node = ast_root_node;
         compiler_register_functions(ast_node, compiled_module, c_fp, indent);
     }
@@ -2480,15 +2505,15 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
 char* compiler_getCurrentContext() {
     unsigned short parent_context = 1;
     if (module_path_stack.size > 1) parent_context = 2;
-    return module_path_stack.arr[module_path_stack.size - parent_context];
+    return fix_bs(module_path_stack.arr[module_path_stack.size - parent_context]);
 }
 
 char* compiler_getCurrentModuleContext() {
-    return module_path_stack.arr[module_path_stack.size - 1];
+    return fix_bs(module_path_stack.arr[module_path_stack.size - 1]);
 }
 
 char* compiler_getCurrentModule() {
-    return module_stack.arr[module_stack.size - 1];
+    return fix_bs(module_stack.arr[module_stack.size - 1]);
 }
 
 char* compiler_getFunctionModuleContext(char *name, char *module) {
@@ -2496,7 +2521,10 @@ char* compiler_getFunctionModuleContext(char *name, char *module) {
     char *module_context = malloc(strlen(function->module_context) + 1);
     strcpy(module_context, function->module_context);
     module_context = replace_char(module_context, '.', '_');
-    module_context = replace_char(module_context, '/', '_');
+    module_context = replace_char(module_context, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    module_context = replace_char(module_context, '-', '_');
+    module_context = replace_char(module_context, ':', '_');
+    module_context = replace_char(module_context, ' ', '_');
     return module_context;
 }
 
@@ -2514,4 +2542,11 @@ bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module) {
         get_filename_ext(function->module_context),
         __KAOS_DYNAMIC_LIBRARY_EXTENSION__
     ) == 0;
+}
+
+char* fix_bs(char* str) {
+    char* new_str = malloc(1 + strlen(str));
+    strcpy(new_str, str);
+    str_replace(new_str, "\\", "\\\\");
+    return new_str;
 }

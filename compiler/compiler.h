@@ -62,5 +62,6 @@ char* compiler_getCurrentModule();
 char* compiler_getFunctionModuleContext(char *name, char *module);
 bool isFunctionFromDynamicLibrary(char *name, char *module);
 bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module);
+char* fix_bs(char* str);
 
 #endif
