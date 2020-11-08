@@ -279,6 +279,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 #if !defined(__clang__)
             "-fcompare-debug-second",
 #endif
+            "-fcommon",
             "-DCHAOS_COMPILER",
             "-o",
             bin_file_path,

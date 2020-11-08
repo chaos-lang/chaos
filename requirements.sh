@@ -37,4 +37,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo 'export PATH="/usr/local/opt/bison/bin:$PATH"' >> ~/.bash_profile
     echo 'export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"' >> ~/.bash_profile
     source ~/.bash_profile
+    echo 'export PATH="/usr/local/opt/flex/bin:$PATH"' >> ~/.zshrc
+    echo 'export PATH="/usr/local/opt/bison/bin:$PATH"' >> ~/.zshrc
+    echo 'export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"' >> ~/.zshrc
+    source ~/.zshrc
 fi

@@ -25,7 +25,8 @@ requirements-dev:
 ifeq ($(UNAME_S), Darwin)
 	echo 'export C_INCLUDE_PATH="/usr/local/include"' >> ~/.bash_profile
 	source ~/.bash_profile
-	gcc -xc -E -v -
+	echo 'export C_INCLUDE_PATH="/usr/local/include"' >> ~/.zshrc
+	source ~/.zshrc
 endif
 
 clang:
