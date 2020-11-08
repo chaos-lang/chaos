@@ -120,5 +120,8 @@ test-extensions-macos-clang:
 memcheck:
 	./tests/memcheck.sh
 
+memcheck-compiler:
+	./tests/memcheck_compiler.sh
+
 compile-dev:
 	gcc -DCHAOS_COMPILER -o build/main build/main.c /usr/local/include/chaos/utilities/helpers.c /usr/local/include/chaos/ast/ast.c /usr/local/include/chaos/interpreter/errors.c /usr/local/include/chaos/interpreter/extension.c /usr/local/include/chaos/interpreter/function.c /usr/local/include/chaos/interpreter/module.c /usr/local/include/chaos/interpreter/symbol.c /usr/local/include/chaos/compiler/compiler.c /usr/local/include/chaos/compiler/lib/alternative.c /usr/local/include/chaos/Chaos.c -lreadline -L/usr/local/opt/readline/lib -ldl -I/usr/local/include/chaos/ -ggdb

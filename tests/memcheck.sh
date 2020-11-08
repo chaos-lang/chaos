@@ -10,7 +10,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
         continue
     fi
 
-    echo -e "\n\nRunning memcheck: ${testname}\n"
+    echo -e "\n\n(interpreter) Running memcheck: ${testname}\n"
 
     if [[ "$OSTYPE" == "linux"* ]]; then
         valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos $DIR/$filename || exit 1
