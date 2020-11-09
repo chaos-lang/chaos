@@ -24,14 +24,15 @@
 
 int initParser(int argc, char** argv) {
     debug_enabled = false;
-    compiler_mode = false;
+    bool compiler_mode = false;
     char *program_file = NULL;
     char *bin_file = NULL;
+    char *extra_flags = NULL;
 
-    char ch;
-    while ((ch = getopt_long(argc, argv, "hvdco", long_options, NULL)) != -1)
+    char opt;
+    while ((opt = getopt_long(argc, argv, "hvdcoe:", long_options, NULL)) != -1)
     {
-        switch (ch)
+        switch (opt)
         {
             case 'h':
                 print_help();
@@ -61,6 +62,9 @@ int initParser(int argc, char** argv) {
                 bin_file = argv[optind];
                 if (bin_file == NULL)
                     throwMissingOutputName();
+                break;
+            case 'e':
+                extra_flags = optarg;
                 break;
             case '?':
                 printf("\n");
@@ -148,7 +152,7 @@ int initParser(int argc, char** argv) {
         yyparse();
         if (!is_interactive) {
             if (compiler_mode) {
-                compile(main_interpreted_module, INIT_PREPARSE, bin_file);
+                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags);
             } else {
                 interpret(main_interpreted_module, INIT_PREPARSE, false);
             }

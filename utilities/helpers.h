@@ -30,6 +30,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <assert.h>
 
 typedef struct string_array {
     char **arr;
@@ -68,6 +69,7 @@ void string_uppercase(char *s);
 char* replace_char(char* str, char find, char replace);
 void copy_binary_file(char* source_path, char* target_path);
 bool in(char *s, char **x);
+string_array str_split(char* a_str, const char a_delim);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #include <direct.h>

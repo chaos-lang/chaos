@@ -99,6 +99,18 @@ test-no-shell:
 test-compiler:
 	./tests/compiler.sh
 
+test-compiler-dev:
+	./tests/compiler.sh -e "-ggdb"
+
+test-compiler-dev-sanitizer-memory:
+	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -O1 -fno-optimize-sibling-calls -ggdb"
+
+test-compiler-dev-sanitizer-address:
+	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -ggdb"
+
+test-compiler-dev-sanitizer-undefined_behavior:
+	./tests/compiler.sh -e "-fsanitize=undefined -ggdb"
+
 test-extensions-linux-gcc:
 	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so && \
 	chaos tests/extensions/test.kaos && \

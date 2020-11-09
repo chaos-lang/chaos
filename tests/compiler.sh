@@ -1,5 +1,24 @@
 #!/bin/bash
 
+extra_flags=""
+EXTRA_FLAGS_ENABLED=false
+while getopts ":e:" opt; do
+    case ${opt} in
+    e )
+        EXTRA_FLAGS_ENABLED=true;
+        extra_flags=$OPTARG
+        ;;
+    \? )
+        echo "Invalid Option: -$OPTARG" 1>&2
+        exit 1
+        ;;
+    : )
+        echo "Invalid Option: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+    esac
+done
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 failed=false
@@ -11,7 +30,11 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     echo "(compiler) Compiling test: ${testname}"
 
-    cout=$(chaos -c tests/$filename -o $testname)
+    if [ "$EXTRA_FLAGS_ENABLED" = true ] ; then
+        cout=$(chaos -c tests/$filename -o $testname -e "$extra_flags")
+    else
+        cout=$(chaos -c tests/$filename -o $testname)
+    fi
     status=$?
 
     if [ $status -eq 0 ]

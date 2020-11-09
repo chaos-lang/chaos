@@ -5,4 +5,5 @@ Usage: chaos [options] <file> [--] [args...]
     -d, --debug         Debug the execution of a program using AST nodes.
     -c, --compile       Compile a Chaos program into machine code.
     -o, --output        Binary output filename. Must be used with the -c / --compile option.
+    -e, --extra         Extra flags to inject into C compiler command.
 
