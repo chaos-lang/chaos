@@ -107,12 +107,15 @@ char *fileGetContents(char *file_path) {
 
 char *strcat_ext(char *s1, const char *s2)
 {
-    size_t n = strlen(s1);
+    size_t n = 0;
+    if (s1 != NULL)
+        n = strlen(s1);
 
     char *p = (char *)malloc(n + strlen(s2) + 1);
 
     if (p) {
-        strcpy(p, s1);
+        if (s1 != NULL)
+            strcpy(p, s1);
         strcpy(p + n, s2);
     }
 
@@ -540,35 +543,35 @@ char* escape_string_literal_for_transpiler(char* string) {
         switch (new_string[i])
         {
             case '\a':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'a';
                 break;
             case '\b':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'b';
                 break;
             case '\e':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'e';
                 break;
             case '\f':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'f';
                 break;
             case '\n':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'n';
                 break;
             case '\r':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'r';
                 break;
             case '\t':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 't';
                 break;
             case '\v':
-                insert_nth_char(new_string, '\\', i);
+                new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'v';
                 break;
             default:
@@ -579,12 +582,11 @@ char* escape_string_literal_for_transpiler(char* string) {
     return new_string;
 }
 
-void insert_nth_char(char* string, char c, long long n) {
-    string = realloc(string, 1 + strlen(string));
-    for (long long i = strlen(string); i >= n; i--) {
-        string[i + 1] = string[i];
-    }
+char* insert_nth_char(char* string, char c, long long n) {
+    string = realloc(string, 2 + strlen(string));
+    memmove(string + n + 1, string + n, strlen(string) + 1 - n);
     string[n] = c;
+    return string;
 }
 
 void remove_nth_char(char* string, long long n) {

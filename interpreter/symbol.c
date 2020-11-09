@@ -368,10 +368,8 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
 }
 
 void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter) {
-    char *encoded = malloc(2);
-    strcpy(encoded, " ");
+    char *encoded = NULL;
     encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, iter, encoded, false);
-    memmove(encoded, encoded + 1, strlen(encoded));
     printf("%s", encoded);
     free(encoded);
 }

@@ -38,8 +38,7 @@ ASTNode* addASTNodeBase(enum ASTNodeType node_type, char *strings[], size_t stri
     ast_node->module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(ast_node->module, module_path_stack.arr[module_path_stack.size - 1]);
 
-    ast_node->transpiled = malloc(1);
-    strcpy(ast_node->transpiled, "");
+    ast_node->transpiled = NULL;
     ast_node->is_transpiled = false;
     ast_node->dont_transpile = false;
 

@@ -286,10 +286,8 @@ char* dumpVariableToString(char *name, bool pretty, bool escaped, bool double_qu
     bool is_complex = false;
     if (symbol->type == K_LIST || symbol->type == K_DICT)
         is_complex = true;
-    char *encoded = malloc(2);
-    strcpy(encoded, " ");
+    char *encoded = NULL;
     encoded = encodeSymbolValueToString(symbol, is_complex, pretty, escaped, 0, encoded, double_quotes);
-    memmove(encoded, encoded + 1, strlen(encoded));
     return encoded;
 }
 

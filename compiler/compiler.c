@@ -93,6 +93,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
         string_uppercase(bin_file_upper);
         fprintf(h_fp, "#ifndef %s_H\n", bin_file_upper);
         fprintf(h_fp, "#define %s_H\n\n", bin_file_upper);
+        free(bin_file_upper);
     } else {
         fprintf(h_fp, "#ifndef MAIN_H\n");
         fprintf(h_fp, "#define MAIN_H\n\n");
@@ -124,20 +125,25 @@ void compile(char *module, enum Phase phase_arg, char *bin_file) {
 
     register_functions(ast_node, module_orig);
     transpile_functions(ast_node, module, c_fp, indent, h_fp);
+    free_transpiled_functions();
+    free_transpiled_decisions();
 
     fprintf(c_fp, "int main(int argc, char** argv) {\n");
 
+    char *fixed_module_orig = fix_bs(module_orig);
+    free(module_orig);
     fprintf(
         c_fp,
         "%*cprogram_file_path = malloc(strlen(\"%s\") + 1);\n"
         "%*cstrcpy(program_file_path, \"%s\");\n",
         indent,
         ' ',
-        fix_bs(module_orig),
+        fixed_module_orig,
         indent,
         ' ',
-        fix_bs(module_orig)
+        fixed_module_orig
     );
+    free(fixed_module_orig);
 
     fprintf(
         c_fp,
@@ -336,7 +342,10 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     strcpy(ast_node_module, ast_node->module);
     compiler_escape_module(ast_node_module);
 
-    if (strcmp(ast_node_module, module) != 0) return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
+    if (strcmp(ast_node_module, module) != 0) {
+        free(ast_node_module);
+        return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
+    }
     free(ast_node_module);
 
     if (is_node_function_related(ast_node)) {
@@ -363,8 +372,7 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         );
 
     if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
-        char *function_name = malloc(1);
-        strcpy(function_name, "");
+        char *function_name = NULL;
         function_name = snprintf_concat_string(function_name, "kaos_function_%s", module);
         function_name = snprintf_concat_string(function_name, "_%s", ast_node->strings[0]);
         if (!ast_node->dont_transpile && !is_in_array(&transpiled_functions, function_name)) {
@@ -400,8 +408,7 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             compiler_handleModuleImport(NULL, true, c_fp, indent, h_fp);
             break;
         case AST_DECISION_DEFINE:
-            decision_name = malloc(1);
-            strcpy(decision_name, "");
+            decision_name = NULL;
             decision_name = snprintf_concat_string(decision_name, "kaos_decision_%s", module);
             decision_name = snprintf_concat_string(decision_name, "_%s", last_function_name);
             if (!ast_node->dont_transpile && !is_in_array(&transpiled_decisions, decision_name)) {
@@ -428,7 +435,10 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     strcpy(ast_node_module, ast_node->module);
     compiler_escape_module(ast_node_module);
 
-    if (strcmp(ast_node_module, module) != 0) return transpile_decisions(ast_node->next, module, c_fp, indent);
+    if (strcmp(ast_node_module, module) != 0) {
+        free(ast_node_module);
+        return transpile_decisions(ast_node->next, module, c_fp, indent);
+    }
     free(ast_node_module);
 
     if (is_node_function_related(ast_node)) {
@@ -541,7 +551,10 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
     strcpy(ast_node_module, ast_node->module);
     compiler_escape_module(ast_node_module);
 
-    if (strcmp(ast_node_module, module) != 0) return compiler_register_functions(ast_node->next, module, c_fp, indent);
+    if (strcmp(ast_node_module, module) != 0) {
+        free(ast_node_module);
+        return compiler_register_functions(ast_node->next, module, c_fp, indent);
+    }
     free(ast_node_module);
 
     if (is_node_function_related(ast_node)) {
@@ -572,6 +585,15 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
 
     fprintf(c_fp, "%*c", indent, ' ');
 
+    char* compiler_current_context;
+    char* compiler_current_module_context;
+    char* compiler_current_module;
+    if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
+        compiler_current_context = compiler_getCurrentContext();
+        compiler_current_module_context = compiler_getCurrentModuleContext();
+        compiler_current_module = compiler_getCurrentModule();
+    }
+
     switch (ast_node->node_type)
     {
         case AST_DEFINE_FUNCTION_BOOL:
@@ -579,9 +601,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_BOOL, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_NUMBER:
@@ -589,9 +611,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_NUMBER, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_STRING:
@@ -599,9 +621,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_STRING, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_ANY:
@@ -609,9 +631,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_ANY, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_LIST:
@@ -619,9 +641,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_LIST, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_DICT:
@@ -629,9 +651,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_DICT, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_BOOL_LIST:
@@ -639,9 +661,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_LIST, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_BOOL_DICT:
@@ -649,9 +671,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_DICT, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_NUMBER_LIST:
@@ -659,9 +681,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_LIST, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_NUMBER_DICT:
@@ -669,9 +691,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_DICT, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_STRING_LIST:
@@ -679,9 +701,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_LIST, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_STRING_DICT:
@@ -689,9 +711,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_DICT, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_DEFINE_FUNCTION_VOID:
@@ -699,9 +721,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 c_fp,
                 "startFunction(\"%s\", K_VOID, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
                 ast_node->strings[0],
-                compiler_getCurrentContext(),
-                compiler_getCurrentModuleContext(),
-                compiler_getCurrentModule()
+                compiler_current_context,
+                compiler_current_module_context,
+                compiler_current_module
             );
             break;
         case AST_FUNCTION_PARAMETERS_START:
@@ -816,6 +838,12 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             break;
     }
 
+    if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
+        free(compiler_current_context);
+        free(compiler_current_module_context);
+        free(compiler_current_module);
+    }
+
     return compiler_register_functions(ast_node->next, module, c_fp, indent);
 }
 
@@ -827,7 +855,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     strcpy(ast_node_module, ast_node->module);
     compiler_escape_module(ast_node_module);
 
-    if (strcmp(ast_node_module, module) != 0) return transpile_node(ast_node->next, module, c_fp, indent);
+    if (strcmp(ast_node_module, module) != 0) {
+        free(ast_node_module);
+        return transpile_node(ast_node->next, module, c_fp, indent);
+    }
     free(ast_node_module);
 
     if (ast_node->node_type != AST_FUNCTION_STEP)
@@ -1031,6 +1062,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     long double l_value;
     long double r_value;
     char *_module = NULL;
+    char *value_s = NULL;
     switch (ast_node->node_type)
     {
         case AST_VAR_CREATE_BOOL:
@@ -1098,11 +1130,13 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             transpile_function_call_create_var(c_fp, ast_node, module, K_NUMBER, K_ANY);
             break;
         case AST_VAR_CREATE_STRING:
+            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
             if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "addSymbolString(NULL, \"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+                fprintf(c_fp, "addSymbolString(NULL, \"%s\");", value_s);
             } else {
-                fprintf(c_fp, "addSymbolString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+                fprintf(c_fp, "addSymbolString(\"%s\", \"%s\");", ast_node->strings[0], value_s);
             }
+            free(value_s);
             break;
         case AST_VAR_CREATE_STRING_VAR:
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_STRING, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
@@ -1136,11 +1170,13 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_VAR_CREATE_ANY_STRING:
+            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
             if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "addSymbolAnyString(NULL, \"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+                fprintf(c_fp, "addSymbolAnyString(NULL, \"%s\");", value_s);
             } else {
-                fprintf(c_fp, "addSymbolAnyString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+                fprintf(c_fp, "addSymbolAnyString(\"%s\", \"%s\");", ast_node->strings[0], value_s);
             }
+            free(value_s);
             break;
         case AST_VAR_CREATE_ANY_VAR:
             fprintf(c_fp, "createCloneFromSymbolByName(\"%s\", K_ANY, \"%s\", K_ANY);", ast_node->strings[0], ast_node->strings[1]);
@@ -1246,7 +1282,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_VAR_UPDATE_STRING:
-            fprintf(c_fp, "updateSymbolString(\"%s\", \"%s\");", ast_node->strings[0], escape_string_literal_for_transpiler(ast_node->value.s));
+            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
+            fprintf(c_fp, "updateSymbolString(\"%s\", \"%s\");", ast_node->strings[0], value_s);
+            free(value_s);
             break;
         case AST_VAR_UPDATE_LIST:
             fprintf(c_fp, "reverseComplexMode(); finishComplexModeWithUpdate(\"%s\");", ast_node->strings[0]);
@@ -1332,7 +1370,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (ast_node->right->is_transpiled) {
                 fprintf(c_fp, "updateComplexElementString(%s);", ast_node->right->transpiled);
             } else {
-                fprintf(c_fp, "updateComplexElementString(\"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+                value_s = escape_string_literal_for_transpiler(ast_node->value.s);
+                fprintf(c_fp, "updateComplexElementString(\"%s\");", value_s);
+                free(value_s);
             }
             break;
         case AST_COMPLEX_EL_UPDATE_LIST:
@@ -1398,7 +1438,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "printf(\"%Lg\\n\");", ast_node->right->value.f);
             break;
         case AST_PRINT_STRING:
-            fprintf(c_fp, "printf(\"%s\\n\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
+            fprintf(c_fp, "printf(\"%s\\n\");", value_s);
+            free(value_s);
             break;
         case AST_ECHO_VAR:
             fprintf(c_fp, "printSymbolValueEndWith(getSymbol(\"%s\"), \"\", false, true);", ast_node->strings[0]);
@@ -1413,7 +1455,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "printf(\"%Lg\");", ast_node->right->value.f);
             break;
         case AST_ECHO_STRING:
-            fprintf(c_fp, "printf(\"%s\");", escape_string_literal_for_transpiler(ast_node->value.s));
+            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
+            fprintf(c_fp, "printf(\"%s\");", value_s);
+            free(value_s);
             break;
         case AST_PRETTY_PRINT_VAR:
             fprintf(c_fp, "printSymbolValueEndWithNewLine(getSymbol(\"%s\"), true, true);", ast_node->strings[0]);
@@ -2400,6 +2444,7 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
     compiler_escape_module(compiled_module);
     ASTNode* ast_node = ast_root_node;
     transpile_functions(ast_node, compiled_module, c_fp, indent, h_fp);
+    free(compiled_module);
 
     moduleImportCleanUp(module_path);
 }
@@ -2470,6 +2515,7 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         compiler_escape_module(compiled_module);
         ASTNode* ast_node = ast_root_node;
         compiler_register_functions(ast_node, compiled_module, c_fp, indent);
+        free(compiled_module);
     }
 
     moduleImportCleanUp(module_path);
@@ -2526,4 +2572,22 @@ void compiler_escape_module(char* module) {
     module = replace_char(module, '-', '_');
     module = replace_char(module, ':', '_');
     module = replace_char(module, ' ', '_');
+}
+
+void free_transpiled_functions() {
+    for (unsigned i = 0; i < transpiled_functions.size; i++) {
+        free(transpiled_functions.arr[i]);
+    }
+    if (transpiled_functions.size > 0) free(transpiled_functions.arr);
+    transpiled_functions.capacity = 0;
+    transpiled_functions.size = 0;
+}
+
+void free_transpiled_decisions() {
+    for (unsigned i = 0; i < transpiled_decisions.size; i++) {
+        free(transpiled_decisions.arr[i]);
+    }
+    if (transpiled_decisions.size > 0) free(transpiled_decisions.arr);
+    transpiled_decisions.capacity = 0;
+    transpiled_decisions.size = 0;
 }

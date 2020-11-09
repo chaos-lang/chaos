@@ -64,5 +64,7 @@ bool isFunctionFromDynamicLibrary(char *name, char *module);
 bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module);
 char* fix_bs(char* str);
 void compiler_escape_module(char* module);
+void free_transpiled_functions();
+void free_transpiled_decisions();
 
 #endif
