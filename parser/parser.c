@@ -28,12 +28,13 @@ extern bool disable_complex_mode;
 int initParser(int argc, char** argv) {
     debug_enabled = false;
     bool compiler_mode = false;
+    bool keep = false;
     char *program_file = NULL;
     char *bin_file = NULL;
     char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvdcoe:", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvdcoe:k", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -68,6 +69,9 @@ int initParser(int argc, char** argv) {
                 break;
             case 'e':
                 extra_flags = optarg;
+                break;
+            case 'k':
+                keep = true;
                 break;
             case '?':
                 printf("\n");
@@ -155,7 +159,7 @@ int initParser(int argc, char** argv) {
         yyparse();
         if (!is_interactive) {
             if (compiler_mode) {
-                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags);
+                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep);
             } else {
                 interpret(main_interpreted_module, INIT_PREPARSE, false);
             }

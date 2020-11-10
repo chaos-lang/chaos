@@ -47,7 +47,7 @@ char* logical_operators[] = {"&&", "||", "!"};
 char* bitwise_operators[] = {"&", "|", "^", "~", "<<", ">>"};
 char* unary_operators[] = {"++", "--"};
 
-void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags) {
+void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep) {
     printf("Starting compiling...\n");
     char *module_orig = malloc(strlen(module) + 1);
     strcpy(module_orig, module);
@@ -346,6 +346,12 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         }
     }
 #endif
+
+    if (!keep) {
+        printf("Cleaning up the temporary files...\n\n");
+        remove(c_file_path);
+        remove(h_file_path);
+    }
 
     printf("Finished compiling.\n\n");
 

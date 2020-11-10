@@ -80,6 +80,7 @@ static struct option long_options[] =
     {"compile", required_argument, NULL, 'c'},
     {"output", required_argument, NULL, 'o'},
     {"extra", required_argument, NULL, 'e'},
+    {"keep", no_argument, NULL, 'k'},
     {NULL, 0, NULL, 0}
 };
 
