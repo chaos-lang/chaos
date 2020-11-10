@@ -160,6 +160,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     fprintf(c_fp, "phase = PROGRAM;\n");
     transpile_node(ast_node, module, c_fp, indent);
 
+    fprintf(
+        c_fp,
+        "free(argv0);\n"
+        "freeEverything(argv0);\n"
+        "return 0;\n"
+    );
+
     fprintf(c_fp, "}\n");
     fprintf(h_fp, "\n#endif\n");
 
