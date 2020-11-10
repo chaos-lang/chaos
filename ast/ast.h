@@ -325,11 +325,8 @@ typedef struct ASTNode {
 
 ASTNode* ast_node_cursor;
 ASTNode* ast_root_node;
-unsigned long long ast_node_id_counter;
 ASTNode* ast_node_cursor_backup;
 ASTNode* ast_interactive_cursor;
-bool enable_branch_out;
-unsigned long long loops_inside_function_counter;
 bool stop_ast_evaluation;
 
 ASTNode* addASTNodeBase(enum ASTNodeType node_type, char *strings[], size_t strings_size, union Value value, enum ValueType value_type);

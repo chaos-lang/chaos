@@ -22,6 +22,8 @@
 
 #include "compiler.h"
 
+extern bool disable_complex_mode;
+
 struct stat dir_stat = {0};
 
 unsigned short indent_length = 4;
@@ -108,6 +110,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     unsigned short indent = indent_length;
 
     const char *c_file_base =
+        "extern bool disable_complex_mode;\n\n"
         "bool is_interactive = false;\n"
         "unsigned long long nested_loop_counter = 0;\n\n";
 

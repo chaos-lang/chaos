@@ -23,6 +23,9 @@
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include "shell.h"
 
+extern unsigned long long loops_inside_function_counter;
+extern bool is_complex_parsing;
+
 unsigned long long suggestions_length = __KAOS_LANGUAGE_KEYWORD_COUNT__;
 char *suggestions[1000] = {
     "exit",

@@ -22,6 +22,9 @@
 
 #include "parser.h"
 
+extern int reset_line_no_to;
+extern bool disable_complex_mode;
+
 int initParser(int argc, char** argv) {
     debug_enabled = false;
     bool compiler_mode = false;

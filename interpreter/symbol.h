@@ -66,7 +66,6 @@ typedef struct Symbol {
 Symbol* symbol_cursor;
 Symbol* start_symbol;
 Symbol* end_symbol;
-unsigned long long symbol_id_counter;
 
 typedef struct symbol_array {
     Symbol** arr;
@@ -76,8 +75,6 @@ typedef struct symbol_array {
 
 symbol_array complex_mode_stack;
 symbol_array nested_complex_mode_stack;
-bool is_complex_parsing;
-bool disable_complex_mode;
 
 typedef struct symbol_id_array {
     unsigned long long* arr;

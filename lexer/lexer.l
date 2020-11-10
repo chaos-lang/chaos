@@ -36,6 +36,8 @@ extern int oerrno;
 extern void yyerror(const char* s);
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
+extern int reset_line_no_to;
+
 #include "parser.tab.h"
 
 enum Phase phase = INIT_PROGRAM;

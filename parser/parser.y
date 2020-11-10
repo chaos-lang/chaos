@@ -41,6 +41,8 @@ extern bool is_interactive;
 bool inject_mode = false;
 
 extern char *main_interpreted_module;
+extern unsigned long long loops_inside_function_counter;
+extern bool is_complex_parsing;
 %}
 
 %union {

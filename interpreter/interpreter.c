@@ -24,6 +24,9 @@
 
 #include "interpreter.h"
 
+extern bool decision_execution_mode;
+extern bool disable_complex_mode;
+
 void interpret(char *module, enum Phase phase_arg, bool is_interactive) {
     ASTNode* ast_node = ast_root_node;
 

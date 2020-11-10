@@ -86,7 +86,6 @@ _Function* scope_override;
 _Function* decision_mode;
 _Function* decision_expression_mode;
 _Function* decision_function_mode;
-bool decision_execution_mode;
 Symbol* decision_symbol_chain;
 char *decision_buffer;
 
@@ -94,10 +93,7 @@ string_array function_names_buffer;
 
 unsigned short recursion_depth;
 
-int reset_line_no_to;
-
 jmp_buf InteractiveShellFunctionErrorAbsorber;
-bool interactive_shell_function_error_absorbed;
 
 jmp_buf LoopBreakDecision;
 jmp_buf LoopContinueDecision;
