@@ -2605,7 +2605,8 @@ char* fix_bs(char* str) {
 
 void compiler_escape_module(char* module) {
     module = replace_char(module, '.', '_');
-    module = replace_char(module, __KAOS_PATH_SEPARATOR_ASCII__, '_');
+    module = replace_char(module, '/', '_');
+    module = replace_char(module, '\\', '_');
     module = replace_char(module, '-', '_');
     module = replace_char(module, ':', '_');
     module = replace_char(module, ' ', '_');
