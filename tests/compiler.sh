@@ -41,6 +41,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     then
         echo "OK"
     else
+        echo "$cout"
         echo "Fail"
         failed=true
     fi

@@ -49,7 +49,7 @@ clang-dev-sanitizer-memory:
 	${MAKE} chaos
 
 clang-dev-sanitizer-address:
-	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer'
+	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g'
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
@@ -106,7 +106,7 @@ test-compiler-dev-sanitizer-memory:
 	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -O1 -fno-optimize-sibling-calls -ggdb"
 
 test-compiler-dev-sanitizer-address:
-	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -ggdb"
+	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -g -ggdb"
 
 test-compiler-dev-sanitizer-undefined_behavior:
 	./tests/compiler.sh -e "-fsanitize=undefined -ggdb"
