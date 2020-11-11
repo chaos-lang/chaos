@@ -26,6 +26,7 @@
 
 extern bool decision_execution_mode;
 extern bool disable_complex_mode;
+extern unsigned long long nested_loop_counter;
 
 void interpret(char *module, enum Phase phase_arg, bool is_interactive) {
     ASTNode* ast_node = ast_root_node;

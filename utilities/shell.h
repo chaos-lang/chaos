@@ -41,7 +41,5 @@ int shell_readline(char *buf);
 char **suggestion_completion(const char *, int, int);
 char *suggestion_generator(const char *, int);
 int add_suggestion(char *suggestion);
-unsigned long long suggestions_length;
-char *suggestions[1000];
 
 #endif

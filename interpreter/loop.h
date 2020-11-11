@@ -51,10 +51,8 @@ typedef struct {
 
 Loop* loop_mode;
 bool loop_execution_mode;
-unsigned long long nested_loop_counter;
 
 jmp_buf InteractiveShellLoopErrorAbsorber;
-bool interactive_shell_loop_error_absorbed;
 
 jmp_buf LoopBreak;
 jmp_buf LoopContinue;

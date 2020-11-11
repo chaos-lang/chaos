@@ -24,6 +24,8 @@
 
 extern int reset_line_no_to;
 extern bool disable_complex_mode;
+extern char *suggestions[1000];
+extern unsigned long long suggestions_length;
 
 int initParser(int argc, char** argv) {
     debug_enabled = false;
