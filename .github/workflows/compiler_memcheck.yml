@@ -1,0 +1,166 @@
+name: "[compiler] Memory Leak Checks"
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+
+    strategy:
+      max-parallel: 6
+      fail-fast: false
+      matrix:
+        target:
+          - ubuntu
+          - debian
+          - centos
+          - fedora
+          - archlinux
+          - alpine
+
+        include:
+          - target: ubuntu
+            image: ubuntu:latest
+          - target: debian
+            image: debian:latest
+          - target: centos
+            image: centos:latest
+          - target: fedora
+            image: fedora:latest
+          - target: archlinux
+            image: archlinux:latest
+          - target: alpine
+            image: alpine:latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies (debian/ubuntu)
+      run: |
+        apt update
+        apt install -y make valgrind
+        make requirements
+      if: matrix.target == 'ubuntu' || matrix.target == 'debian'
+
+    - name: Install dependencies (centos)
+      run: |
+        yum install -y which make valgrind
+        make requirements
+      if: matrix.target == 'centos'
+
+    - name: Install dependencies (fedora)
+      run: |
+        dnf install -y which make valgrind findutils
+        make requirements
+      if: matrix.target == 'fedora'
+
+    - name: Install dependencies (archlinux)
+      run: |
+        pacman -Syu --noconfirm which make valgrind
+        make requirements
+      if: matrix.target == 'archlinux'
+
+    - name: Install dependencies (alpine)
+      run: |
+        apk update
+        apk add linux-headers bash which make valgrind
+        make requirements
+      if: matrix.target == 'alpine'
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck-compiler
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck-compiler
+
+  macos:
+    name: macos
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
+        wget -O /tmp/DrMemory-MacOS-2.3.18309.tar.gz https://github.com/DynamoRIO/drmemory/releases/download/release_2.3.18309C/DrMemory-MacOS-2.3.18309.tar.gz
+        tar -C /tmp/ -xvf /tmp/DrMemory-MacOS-2.3.18309.tar.gz
+        mv /tmp/DrMemory-MacOS-2.3.18309/ /tmp/DrMemory/
+        make requirements
+
+    - name: Build (gcc)
+      run: |
+        source ~/.bash_profile
+        make clean
+        make
+        make install
+
+    - name: Run the memory leak checks (gcc)
+      run: |
+        make memcheck-compiler
+
+    - name: Build (clang)
+      run: |
+        source ~/.bash_profile
+        make clean
+        make clang
+        make install
+
+    - name: Run the memory leak checks (clang)
+      run: |
+        make memcheck-compiler
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      shell: cmd
+      run: |
+        choco install drmemory.portable --version=2.3.0 --confirm
+        call make.bat requirements
+
+    - name: Build (gcc)
+      shell: cmd
+      run: |
+        call make.bat clean
+        call make.bat
+        call make.bat install
+
+    - name: Run the memory leak checks (gcc)
+      shell: cmd
+      run: |
+        call make.bat memcheck-compiler
+
+    - name: Build (clang)
+      shell: cmd
+      run: |
+        call RefreshEnv.cmd
+        call make.bat clean
+        call make.bat clang
+        call make.bat install
+
+    - name: Run the memory leak checks (clang)
+      shell: cmd
+      run: |
+        call make.bat memcheck-compiler

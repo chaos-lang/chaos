@@ -1,4 +1,4 @@
-name: Memory Leak Checks
+name: "[interpreter] Memory Leak Checks"
 
 on: [push, pull_request]
 
