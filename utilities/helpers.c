@@ -420,12 +420,14 @@ char *remove_ext(char* myStr, char extSep, char pathSep) {
     return retStr;
 }
 
-void str_replace(char *target, const char *needle, const char *replacement) {
-    char buffer[1024] = { 0 };
+char* str_replace(char *target, const char *needle, const char *replacement) {
+    char buffer[4096] = { 0 };
     char *insert_point = &buffer[0];
     const char *tmp = target;
     size_t needle_len = strlen(needle);
     size_t repl_len = strlen(replacement);
+
+    size_t counter = 0;
 
     while (1) {
         const char *p = strstr(tmp, needle);
@@ -435,6 +437,7 @@ void str_replace(char *target, const char *needle, const char *replacement) {
             strcpy(insert_point, tmp);
             break;
         }
+        counter++;
 
         // copy part before needle
         memcpy(insert_point, tmp, p - tmp);
@@ -449,7 +452,9 @@ void str_replace(char *target, const char *needle, const char *replacement) {
     }
 
     // write altered string back to target
-    strcpy(target, buffer);
+    char* new_target = (char*) malloc((1 + strlen(target) + counter * (repl_len - needle_len)) * sizeof(char));
+    strcpy(new_target, buffer);
+    return new_target;
 }
 
 bool is_file_exists(char* file_path) {

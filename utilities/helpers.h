@@ -56,7 +56,7 @@ char *capitalize(const char *str);
 int largest(int arr[], int n);
 char *relative_path_to_absolute(char *path);
 char *remove_ext(char* myStr, char extSep, char pathSep);
-void str_replace(char *target, const char *needle, const char *replacement);
+char* str_replace(char *target, const char *needle, const char *replacement);
 bool is_file_exists(char* file_path);
 const char *get_filename_ext(const char *filename);
 void freeFreeStringStack();

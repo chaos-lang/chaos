@@ -144,13 +144,13 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
 
     sprintf(error_msg_out, "    %s", error_msg);
 
-    str_replace(error_msg_out, "\n", "\\n");
+    char* new_error_msg_out = str_replace(error_msg_out, "\n", "\\n");
 
     int cols[4];
     cols[0] = (int) strlen(title_msg) + 1;
     cols[1] = (int) strlen(current_module_msg) + 1;
     cols[2] = (int) strlen(line_no_msg) + 1;
-    cols[3] = (int) strlen(error_msg_out) + 1;
+    cols[3] = (int) strlen(new_error_msg_out) + 1;
     int ws_col = largest(cols, 4) + 4;
     InteractiveShellErrorAbsorber_ws_col = ws_col;
 
@@ -184,7 +184,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;41m");
     #endif
-    printf("%-*s", ws_col, error_msg_out);
+    printf("%-*s", ws_col, new_error_msg_out);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif

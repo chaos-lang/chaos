@@ -2597,9 +2597,7 @@ bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module) {
 }
 
 char* fix_bs(char* str) {
-    char* new_str = malloc(1 + strlen(str));
-    strcpy(new_str, str);
-    str_replace(new_str, "\\", "\\\\");
+    char* new_str = str_replace(str, "\\", "\\\\");
     return new_str;
 }
 
