@@ -81,6 +81,9 @@ int initParser(int argc, char** argv) {
                 exit(E_INVALID_OPTION);
                 break;
         }
+#ifndef __GNU_LIBRARY__
+        optind++;
+#endif
     }
 
     if (bin_file != NULL && !compiler_mode)

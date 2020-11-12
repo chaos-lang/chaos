@@ -1,0 +1,177 @@
+name: "[compiler] Automated Tests"
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+
+    strategy:
+      max-parallel: 6
+      fail-fast: false
+      matrix:
+        target:
+          - ubuntu
+          - debian
+          - centos
+          - fedora
+          - archlinux
+          - alpine
+
+        include:
+          - target: ubuntu
+            image: ubuntu:latest
+          - target: debian
+            image: debian:latest
+          - target: centos
+            image: centos:latest
+          - target: fedora
+            image: fedora:latest
+          - target: archlinux
+            image: archlinux:latest
+          - target: alpine
+            image: alpine:latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies (debian/ubuntu)
+      run: |
+        apt update
+        apt install -y make
+        make requirements
+      if: matrix.target == 'ubuntu' || matrix.target == 'debian'
+
+    - name: Install dependencies (centos)
+      run: |
+        yum install -y which make
+        make requirements
+      if: matrix.target == 'centos'
+
+    - name: Install dependencies (fedora)
+      run: |
+        dnf install -y which make findutils
+        make requirements
+      if: matrix.target == 'fedora'
+
+    - name: Install dependencies (archlinux)
+      run: |
+        pacman -Syu --noconfirm which make
+        make requirements
+      if: matrix.target == 'archlinux'
+
+    - name: Install dependencies (alpine)
+      run: |
+        apk update
+        apk add linux-headers bash which make
+        make requirements
+      if: matrix.target == 'alpine'
+
+    - name: Build (gcc)
+      run: |
+        make clean
+        make
+        make install
+
+    - name: Run the tests (gcc)
+      run: |
+        make test-compiler
+
+    - name: Build (clang)
+      run: |
+        make clean
+        make clang
+        make install
+
+    - name: Run the tests (clang)
+      run: |
+        make test-compiler
+
+    - name: Uninstall
+      run: |
+        make uninstall
+
+  macos:
+    name: macos
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
+        make requirements
+        brew install gnu-sed
+
+    - name: Build (gcc)
+      run: |
+        source ~/.bash_profile
+        make clean
+        make
+        make install
+
+    - name: Run the tests (gcc)
+      run: |
+        make test-compiler
+
+    - name: Build (clang)
+      run: |
+        source ~/.bash_profile
+        make clean
+        make clang
+        make install
+
+    - name: Run the tests (clang)
+      run: |
+        make test-compiler
+
+    - name: Uninstall
+      run: |
+        source ~/.bash_profile
+        make uninstall
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      shell: cmd
+      run: |
+        call make.bat requirements
+
+    - name: Build (gcc)
+      shell: cmd
+      run: |
+        call make.bat clean
+        call make.bat
+        call make.bat install
+
+    - name: Run the tests (gcc)
+      shell: cmd
+      run: |
+        call make.bat test
+
+    - name: Build (clang)
+      shell: cmd
+      run: |
+        call RefreshEnv.cmd
+        call make.bat clean
+        call make.bat clang
+        call make.bat install
+
+    - name: Run the tests (clang)
+      shell: cmd
+      run: |
+        call make.bat test
+
+    - name: Uninstall
+      shell: cmd
+      run: |
+        call make.bat uninstall

@@ -37,6 +37,8 @@
 #include <linux/limits.h>
 #endif
 
+#include <errno.h>
+
 #include "../ast/ast.h"
 
 string_array transpiled_functions;

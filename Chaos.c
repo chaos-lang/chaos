@@ -26,7 +26,12 @@
 #include <stdbool.h>
 
 #include "interpreter/function.h"
-#include "Chaos.h"
+
+#ifdef CHAOS_COMPILER
+    #include "../Chaos.h"
+#else
+    #include "Chaos.h"
+#endif
 
 int defineFunction(
     char *name,

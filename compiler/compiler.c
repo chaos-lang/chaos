@@ -75,17 +75,21 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
     printf("Compiling Chaos code into %s\n", c_file_path);
 
+    errno = 0;
+
     FILE *c_fp = fopen(c_file_path, "w");
     if (c_fp == NULL)
     {
-        printf("Error opening file!\n");
+        printf("Cannot open file! Error no: %d\n", errno);
+        printf("C source path: %s\n", c_file_path);
         exit(1);
     }
 
     FILE *h_fp = fopen(h_file_path, "w");
     if (h_fp == NULL)
     {
-        printf("Error opening file!\n");
+        printf("Cannot open file! Error no: %d\n", errno);
+        printf("C header path: %s\n", h_file_path);
         exit(1);
     }
 
