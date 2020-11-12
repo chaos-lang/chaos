@@ -156,7 +156,7 @@ jobs:
     - name: Run the tests (gcc)
       shell: cmd
       run: |
-        call make.bat test
+        call make.bat test-compiler
 
     - name: Build (clang)
       shell: cmd
@@ -169,7 +169,7 @@ jobs:
     - name: Run the tests (clang)
       shell: cmd
       run: |
-        call make.bat test
+        call make.bat test-compiler
 
     - name: Uninstall
       shell: cmd
