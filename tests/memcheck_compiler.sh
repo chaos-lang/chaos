@@ -18,7 +18,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     if [[ "$OSTYPE" == "linux"* ]]; then
         valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos -c $DIR/$filename -o $testname || exit 1
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        /tmp/DrMemory/bin64/drmemory -exit_code_if_errors 1 -- chaos -c $DIR/$filename -o $testname || exit 1
+        /tmp/DrMemory/bin64/drmemory -no_follow_children -exit_code_if_errors 1 -- chaos -c $DIR/$filename -o $testname || exit 1
     fi
 done
 
@@ -35,7 +35,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     if [[ "$OSTYPE" == "linux"* ]]; then
         valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos $BUILD_DIR/$testname || exit 1
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        /tmp/DrMemory/bin64/drmemory -exit_code_if_errors 1 -- chaos $BUILD_DIR/$testname || exit 1
+        /tmp/DrMemory/bin64/drmemory -no_follow_children -exit_code_if_errors 1 -- chaos $BUILD_DIR/$testname || exit 1
     fi
 done
 
