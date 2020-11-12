@@ -66,6 +66,16 @@ IF [%1]==[] (
         CD ..
         EXIT /B 0
     )
+) ELSE IF [%1]==[memcheck-compiler] (
+    CD tests
+    CALL memcheck_compiler.bat
+    IF errorlevel 1 (
+        CD ..
+        EXIT /B 1
+    ) ELSE (
+        CD ..
+        EXIT /B 0
+    )
 ) ELSE IF [%1]==[clean] (
     DEL chaos.exe parser.tab.c parser.tab.h lex.yy.c
     EXIT /B 0
