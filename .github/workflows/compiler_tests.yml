@@ -169,6 +169,7 @@ jobs:
     - name: Run the tests (clang)
       shell: cmd
       run: |
+        call RefreshEnv.cmd
         call make.bat test-compiler
 
     - name: Uninstall

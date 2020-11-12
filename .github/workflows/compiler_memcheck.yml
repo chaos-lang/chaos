@@ -163,4 +163,5 @@ jobs:
     - name: Run the memory leak checks (clang)
       shell: cmd
       run: |
+        call RefreshEnv.cmd
         call make.bat memcheck-compiler
