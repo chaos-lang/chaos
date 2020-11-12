@@ -270,7 +270,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     if (extra_flags != NULL)
         sprintf(cmd, "%s %s", cmd, extra_flags);
 
-    if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, TRUE, NULL, &info, &processInfo)) {
+    if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
 
         WaitForSingleObject(processInfo.hProcess, INFINITE);
 
