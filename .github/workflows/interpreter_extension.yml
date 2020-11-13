@@ -1,4 +1,4 @@
-name: Chaos C Extension Feature Tests
+name: "[interpreter] Chaos C Extension Feature Tests"
 
 on: [push, pull_request]
 

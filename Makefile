@@ -129,6 +129,18 @@ test-extensions-macos-clang:
 	clang -shared -fPIC -undefined dynamic_lookup tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.dylib && \
 	chaos tests/extensions/test.kaos
 
+test-compiler-extensions-linux-gcc: test-extensions-linux-gcc
+	chaos -c tests/extensions/test.kaos && build/main
+
+test-compiler-extensions-linux-clang: test-extensions-linux-clang
+	chaos -c tests/extensions/test.kaos && build/main
+
+test-compiler-extensions-macos-gcc: test-extensions-macos-gcc
+	chaos -c tests/extensions/test.kaos && build/main
+
+test-compiler-extensions-macos-clang: test-extensions-macos-clang
+	chaos -c tests/extensions/test.kaos && build/main
+
 memcheck:
 	./tests/memcheck.sh
 

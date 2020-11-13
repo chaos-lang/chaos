@@ -101,6 +101,14 @@ IF [%1]==[] (
         EXIT /B 1
     )
     EXIT /B 0
+) ELSE IF [%1]==[test-compiler-extensions-windows-gcc] (
+    CALL make.bat test-extensions-windows-gcc
+    chaos -c tests\extensions\test.kaos
+    build\main
+) ELSE IF [%1]==[test-compiler-extensions-windows-clang] (
+    CALL make.bat test-extensions-windows-clang
+    chaos -c tests\extensions\test.kaos
+    build\main
 )
 
 win_flex --wincompat lexer\lexer.l
