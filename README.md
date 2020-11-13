@@ -44,14 +44,14 @@
  - TypeScript's type safety
  - Python's syntax, modules and extensibility
  - JavaScript's availability
- - Ruby's loops and blocks
+ - Ruby's loops and blocks, Rexx's `FOREVER` keyword
  - PHP's dedication to server-side
  - Haskell's immutability
  - C's speed and interoperability
  - NumPy's matrix arithmetics
  - Perl's regex engine
 
-### Unique Features
+### Featured Aspects
 
  - There are no control structures. (no `if..else`, no `switch..case`) Decision making only possible on function returns:
    ```ruby
@@ -82,7 +82,7 @@ Install the requirements:
 make requirements
 ```
 
-Compile the interpreter:
+Compile the Chaos source:
 
 ```shell
 make
@@ -94,7 +94,7 @@ Install the `chaos` binary system-wide:
 make install
 ```
 
-## Usage
+## Interpreter
 
 ### Interactive Shell
 
@@ -116,6 +116,24 @@ kaos> exit
 $ chaos hello.kaos
 hello world
 ```
+
+## Compiler
+
+```shell
+$ chaos -c hello.kaos -o hello
+Starting compiling...
+Compiling Chaos code into build/hello.c
+Compiling the C code into machine code...
+Cleaning up the temporary files...
+
+Finished compiling.
+
+Binary is ready on: build/hello
+$ build/hello
+hello world
+```
+
+Run `chaos --help` to see more options.
 
 ## Uninstallation
 
