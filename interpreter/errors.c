@@ -189,6 +189,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         printf("\033[0m");
     #endif
     printf("\n");
+    free(new_error_msg_out);
 
     if (!is_interactive) {
         freeEverything();

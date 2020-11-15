@@ -87,7 +87,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     cols[0] = (int) strlen(error_name_msg) + 1;
     cols[1] = (int) strlen(current_module_msg) + 1;
     cols[2] = (int) strlen(line_no_msg) + 1;
-    cols[3] = (int) strlen(cause_msg) + 1;
+    cols[3] = (int) strlen(new_cause_msg) + 1;
     int ws_col = largest(cols, 3) + 4;
 
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -120,11 +120,12 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0;46m");
     #endif
-    printf("%-*s", ws_col, cause_msg);
+    printf("%-*s", ws_col, new_cause_msg);
     #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
         printf("\033[0m");
     #endif
     printf("\n");
+    free(new_cause_msg);
 }
 
 void print_bye_bye() {
