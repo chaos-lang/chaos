@@ -218,6 +218,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     sprintf(include_path_helpers, "\"%s/utilities/helpers.c\"", include_path);
     char include_path_language[PATH_MAX];
     sprintf(include_path_language, "\"%s/utilities/language.c\"", include_path);
+    char include_path_windows_getopt[PATH_MAX];
+    sprintf(include_path_windows_getopt, "\"%s/utilities/windows/getopt.c\"", include_path);
     char include_path_ast[PATH_MAX];
     sprintf(include_path_ast, "\"%s/ast/ast.c\"", include_path);
     char include_path_interpreter[PATH_MAX];
@@ -249,13 +251,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     PROCESS_INFORMATION processInfo;
     DWORD status;
 
-    char cmd[2048];
+    char cmd[4096];
     sprintf(
         cmd,
 #   if !defined(__clang__)
-        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
 #   if !defined(__clang__)
@@ -269,6 +271,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         c_file_path,
         include_path_helpers,
         include_path_language,
+        include_path_windows_getopt,
         include_path_ast,
         include_path_interpreter,
         include_path_errors,
