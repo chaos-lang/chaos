@@ -103,6 +103,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type, char* c
 #else
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif
+
 void endFunction();
 void freeFunctionParametersMode();
 void resetFunctionParametersMode();
@@ -111,11 +112,13 @@ _Function* getFunctionByModuleContext(char *name, char *module_context);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
 _Function* callFunction(char *name, char *module);
+
 #ifndef CHAOS_COMPILER
 void callFunctionCleanUp(_Function* function, char *name);
 #else
 void callFunctionCleanUp(_Function* function, char *name, bool has_decision);
 #endif
+
 void callFunctionCleanUpCommon(_Function* function);
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type);

@@ -118,14 +118,14 @@ void parseTheModuleContent(char *module_path) {
 int yywrap() { if (phase == PREPARSE && module_parsing == 0) { switchBuffer(program_code, INIT_PROGRAM); yyparse(); } return 1; }
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#undef YY_INPUT
-#define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
+#   undef YY_INPUT
+#   define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
 
 static int custom_input(char *buf, int result, int max_size) {
     if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
-#ifndef CHAOS_COMPILER
+#   ifndef CHAOS_COMPILER
         return shell_readline(buf);
-#endif
+#   endif
     } else {
         errno = 0;
         while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) {

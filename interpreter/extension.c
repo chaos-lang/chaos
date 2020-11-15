@@ -105,9 +105,9 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
     dylib.handle = OPENLIB(dynamic_library_path);
 
     if (dylib.handle == NULL) {
-        #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         fprintf(stderr, "Unable to open lib: %s\n", dlerror());
-        #endif
+#endif
     }
     dylib.func = LIBFUNC(dylib.handle, function_name);
 

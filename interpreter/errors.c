@@ -150,40 +150,40 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     int ws_col = largest(cols, 4) + 4;
     InteractiveShellErrorAbsorber_ws_col = ws_col;
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;41m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;41m");
+#endif
     printf("%-*s", ws_col, title_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0;41m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;41m");
+#endif
     printf("%-*s", ws_col, current_module_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0;41m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;41m");
+#endif
     printf("%-*s", ws_col, line_no_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0;41m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;41m");
+#endif
     printf("%-*s", ws_col, new_error_msg_out);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
     free(new_error_msg_out);
 

@@ -28,6 +28,4 @@
 void breakLoop();
 void continueLoop();
 
-char *program_file_path = "main.kaos";
-
 #endif

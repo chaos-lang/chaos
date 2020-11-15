@@ -25,17 +25,17 @@
 
 #include <stdio.h>
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#include <windows.h>
-#define LIBTYPE HINSTANCE
-#define OPENLIB(libname) LoadLibrary(libname)
-#define CLOSELIB(handle) FreeLibrary(handle)
-#define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
+#   include <windows.h>
+#   define LIBTYPE HINSTANCE
+#   define OPENLIB(libname) LoadLibrary(libname)
+#   define CLOSELIB(handle) FreeLibrary(handle)
+#   define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
 #else
-#include <dlfcn.h>
-#define LIBTYPE void*
-#define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_NODELETE)
-#define CLOSELIB(handle) dlclose(handle)
-#define LIBFUNC(lib, fn) dlsym((lib), (fn))
+#   include <dlfcn.h>
+#   define LIBTYPE void*
+#   define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_NODELETE)
+#   define CLOSELIB(handle) dlclose(handle)
+#   define LIBFUNC(lib, fn) dlsym((lib), (fn))
 #endif
 
 #include "function.h"

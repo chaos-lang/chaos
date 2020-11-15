@@ -31,11 +31,11 @@ void greet() {
     char motto[__KAOS_MSG_LINE_LENGTH__];
 
     sprintf(lang, "    %s Language %s (%s %s) ", __KAOS_LANGUAGE_NAME__, __KAOS_LANGUAGE_VERSION__, __DATE__, __TIME__);
-    #if defined(__clang__)
-        sprintf(compiler, "    Clang version: %d.%d.%d on %s ", __clang_major__, __clang_minor__, __clang_patchlevel__, __KAOS_PLATFORM_NAME__);
-    #elif defined(__GNUC__) || defined(__GNUG__)
-        sprintf(compiler, "    GCC version: %d.%d.%d on %s ", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __KAOS_PLATFORM_NAME__);
-    #endif
+#if defined(__clang__)
+    sprintf(compiler, "    Clang version: %d.%d.%d on %s ", __clang_major__, __clang_minor__, __clang_patchlevel__, __KAOS_PLATFORM_NAME__);
+#elif defined(__GNUC__) || defined(__GNUG__)
+    sprintf(compiler, "    GCC version: %d.%d.%d on %s ", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __KAOS_PLATFORM_NAME__);
+#endif
     sprintf(motto, "    %s", __KAOS_LANGUAGE_MOTTO__);
 
     int cols[3];
@@ -44,29 +44,29 @@ void greet() {
     cols[2] = (int) strlen(motto) + 1;
     int ws_col = largest(cols, 3) + 4;
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;45m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;45m");
+#endif
     printf("%-*s", ws_col, lang);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;45m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;45m");
+#endif
     printf("%-*s", ws_col, compiler);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[5;45m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[5;45m");
+#endif
     printf("%-*s", ws_col, motto);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n\n");
 }
 
@@ -90,40 +90,40 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     cols[3] = (int) strlen(new_cause_msg) + 1;
     int ws_col = largest(cols, 3) + 4;
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;46m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;46m");
+#endif
     printf("%-*s", ws_col, error_name_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0;46m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;46m");
+#endif
     printf("%-*s", ws_col, current_module_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0;46m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;46m");
+#endif
     printf("%-*s", ws_col, line_no_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0;46m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;46m");
+#endif
     printf("%-*s", ws_col, new_cause_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
     free(new_cause_msg);
 }
@@ -133,13 +133,13 @@ void print_bye_bye() {
     char bye_bye_msg[ws_col];
     sprintf(bye_bye_msg, "    %s    ", __KAOS_BYE_BYE__);
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[5;42m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[5;42m");
+#endif
     printf("%-*s", ws_col, bye_bye_msg);
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 }
 

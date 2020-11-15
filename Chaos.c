@@ -28,9 +28,9 @@
 #include "interpreter/function.h"
 
 #ifdef CHAOS_COMPILER
-    #include "../Chaos.h"
+#   include "../Chaos.h"
 #else
-    #include "Chaos.h"
+#   include "Chaos.h"
 #endif
 
 int defineFunction(

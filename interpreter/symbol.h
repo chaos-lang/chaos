@@ -33,9 +33,11 @@ typedef struct Symbol Symbol;
 #include "../enums.h"
 #include "errors.h"
 #include "../utilities/helpers.h"
+
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#include "../utilities/shell.h"
+#   include "../utilities/shell.h"
 #endif
+
 #include "function.h"
 
 typedef struct Symbol {

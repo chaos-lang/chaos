@@ -131,10 +131,10 @@ int initParser(int argc, char** argv) {
     yyin = fp;
 
     if (is_interactive) {
-        #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         using_history();
         read_history(NULL);
-        #endif
+#endif
         greet();
         phase = INIT_PROGRAM;
     } else {
@@ -156,9 +156,9 @@ int initParser(int argc, char** argv) {
             }
         }
 
-        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         !is_interactive ?: printf("%s ", __KAOS_SHELL_INDICATOR__);
-        #endif
+#endif
         main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
@@ -206,12 +206,12 @@ void freeEverything() {
         free(program_file_path);
         free(program_file_dir);
     } else {
-        #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+#   if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         clear_history();
         for (unsigned long long i = __KAOS_LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
             free(suggestions[i]);
         }
-        #endif
+#   endif
     }
 
     free_node(ast_root_node);
@@ -234,9 +234,9 @@ void yyerror(const char* s) {
         if (isComplexMode()) {
             freeComplexModeStack();
         }
-        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         printf("%s ", __KAOS_SHELL_INDICATOR__);
-        #endif
+#endif
         flushLexer();
         phase = INIT_PROGRAM;
         yyrestart_interactive();
@@ -259,13 +259,13 @@ void absorbError() {
     freeLeftRightBracketStackSymbols();
     resetFunctionParametersMode();
 
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;44m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;44m");
+#endif
     printf("%-*s", InteractiveShellErrorAbsorber_ws_col, "    Absorbed by Interactive Shell");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n");
 
     if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
@@ -282,13 +282,13 @@ void absorbError() {
 void throwCompilerInteractiveError() {
     printf("Compile option '-c' cannot be used with the interactive mode.\n\n");
     printf("Specify a Chaos program file with: ");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;45m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;45m");
+#endif
     printf(" chaos -c hello.kaos ");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n\n");
     print_help();
     exit(E_INVALID_OPTION);
@@ -297,17 +297,19 @@ void throwCompilerInteractiveError() {
 void throwMissingOutputName() {
     printf("You have to supply an output filename while using the option '-o'.\n\n");
     printf("Correct command should look like this: ");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;45m");
-    #endif
-    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        printf(" chaos -c hello.kaos -o hello.exe");
-    #else
-        printf(" chaos -c hello.kaos -o hello");
-    #endif
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;45m");
+#endif
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    printf(" chaos -c hello.kaos -o hello.exe");
+#else
+    printf(" chaos -c hello.kaos -o hello");
+#endif
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n\n");
     print_help();
     exit(E_INVALID_OPTION);
@@ -316,17 +318,19 @@ void throwMissingOutputName() {
 void throwMissingCompileOption() {
     printf("You have to supply the Chaos program to be compiled with the option '-c'.\n\n");
     printf("Correct command should look like this: ");
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[1;45m");
-    #endif
-    #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        printf(" chaos -c hello.kaos -o hello.exe");
-    #else
-        printf(" chaos -c hello.kaos -o hello");
-    #endif
-    #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        printf("\033[0m");
-    #endif
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;45m");
+#endif
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    printf(" chaos -c hello.kaos -o hello.exe");
+#else
+    printf(" chaos -c hello.kaos -o hello");
+#endif
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
     printf("\n\n");
     print_help();
     exit(E_INVALID_OPTION);

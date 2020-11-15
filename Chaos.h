@@ -26,11 +26,11 @@
 #include <stdbool.h>
 
 #if defined(CHAOS_INTERPRETER)
-#include "enums.h"
-#include "utilities/language.h"
+#   include "enums.h"
+#   include "utilities/language.h"
 #else
-#include "chaos/enums.h"
-#include "chaos/utilities/language.h"
+#   include "chaos/enums.h"
+#   include "chaos/utilities/language.h"
 #endif
 
 typedef struct KaosValue {
@@ -181,9 +181,9 @@ struct Kaos {
 struct Kaos kaos;
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#define KAOS_EXPORT __declspec(dllexport)
+#   define KAOS_EXPORT __declspec(dllexport)
 #else
-#define KAOS_EXPORT
+#   define KAOS_EXPORT
 #endif
 
 #endif

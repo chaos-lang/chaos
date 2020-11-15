@@ -57,11 +57,11 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
     if (stat(__KAOS_BUILD_DIRECTORY__, &dir_stat) == -1) {
         printf("Creating %s directory...\n", __KAOS_BUILD_DIRECTORY__);
-        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-            _mkdir(__KAOS_BUILD_DIRECTORY__);
-        #else
-            mkdir(__KAOS_BUILD_DIRECTORY__, 0700);
-        #endif
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+        _mkdir(__KAOS_BUILD_DIRECTORY__);
+#else
+        mkdir(__KAOS_BUILD_DIRECTORY__, 0700);
+#endif
     }
 
     char c_file_path[PATH_MAX];
@@ -186,33 +186,33 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
     char bin_file_path[PATH_MAX];
     if (bin_file != NULL) {
-        #if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
-            sprintf(bin_file_path, "%s%s%s.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
-        #else
-            sprintf(bin_file_path, "%s%s%s", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
-        #endif
+#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+        sprintf(bin_file_path, "%s%s%s.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+#else
+        sprintf(bin_file_path, "%s%s%s", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
+#endif
     } else {
-        #if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
-            sprintf(bin_file_path, "%s%smain.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
-        #else
-            sprintf(bin_file_path, "%s%smain", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
-        #endif
+#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+        sprintf(bin_file_path, "%s%smain.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+#else
+        sprintf(bin_file_path, "%s%smain", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+#endif
     }
 
     char c_compiler_path[PATH_MAX];
-    #if defined(__clang__)
-        sprintf(c_compiler_path, "clang");
-    #elif defined(__GNUC__) || defined(__GNUG__)
-        sprintf(c_compiler_path, "gcc");
-    #endif
+#if defined(__clang__)
+    sprintf(c_compiler_path, "clang");
+#elif defined(__GNUC__) || defined(__GNUG__)
+    sprintf(c_compiler_path, "gcc");
+#endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     char include_path[PATH_MAX];
-    #if defined(__clang__)
-        sprintf(include_path, "%%programfiles%%/LLVM/lib/clang/%d.%d.%d/include/chaos", __clang_major__, __clang_minor__, __clang_patchlevel__);
-    #elif defined(__GNUC__) || defined(__GNUG__)
-        sprintf(include_path, "%%programdata%%/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-    #endif
+#   if defined(__clang__)
+    sprintf(include_path, "%%programfiles%%/LLVM/lib/clang/%d.%d.%d/include/chaos", __clang_major__, __clang_minor__, __clang_patchlevel__);
+#   elif defined(__GNUC__) || defined(__GNUG__)
+    sprintf(include_path, "%%programdata%%/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+#   endif
 
     char include_path_helpers[PATH_MAX];
     sprintf(include_path_helpers, "\"%s/utilities/helpers.c\"", include_path);
@@ -252,18 +252,18 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     char cmd[2048];
     sprintf(
         cmd,
-#if !defined(__clang__)
+#   if !defined(__clang__)
         "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
-#else
+#   else
         "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
-#endif
+#   endif
         c_compiler_path,
-#if !defined(__clang__)
+#   if !defined(__clang__)
         "-fcompare-debug-second",
         "-D__USE_MINGW_ANSI_STDIO",
-#else
+#   else
         "-Wno-everything",
-#endif
+#   endif
         "-DCHAOS_COMPILER",
         bin_file_path,
         c_file_path,
@@ -315,9 +315,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         extra_flags_count--;
 
     unsigned arg_count = 25 + extra_flags_count;
-#if !defined(__clang__)
+#   if !defined(__clang__)
     arg_count++;
-#endif
+#   endif
 
     char *c_compiler_args[arg_count];
     c_compiler_args[0] = c_compiler_path;
@@ -349,9 +349,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         c_compiler_args[24 + i] = extra_flags_arr.arr[i];
     }
 
-#if !defined(__clang__)
+#   if !defined(__clang__)
     c_compiler_args[24 + extra_flags_count] = "-fcompare-debug-second",
-#endif
+#   endif
 
     c_compiler_args[arg_count - 1] = NULL;
 
@@ -898,11 +898,6 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             break;
         case AST_MODULE_IMPORT_PARTIAL:
             compiler_handleModuleImportRegister(NULL, true, c_fp, indent);
-            break;
-        case AST_DECISION_DEFINE:
-            // TODO: The code below cannot be compiled.
-            // decision_mode->decision_node = ast_node->right;
-            // decision_mode = NULL;
             break;
         default:
             break;
@@ -2539,11 +2534,11 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_SPELLS__);
         if (stat(spells_dir_path, &dir_stat) == -1) {
             printf("Creating %s directory...\n", spells_dir_path);
-            #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-                _mkdir(spells_dir_path);
-            #else
-                mkdir(spells_dir_path, 0700);
-            #endif
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+            _mkdir(spells_dir_path);
+#else
+            mkdir(spells_dir_path, 0700);
+#endif
         }
 
         char *extension_dir_path = spells_dir_path;
@@ -2551,11 +2546,11 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         extension_dir_path = snprintf_concat_string(extension_dir_path, "%s", extension_name);
         if (stat(extension_dir_path, &dir_stat) == -1) {
             printf("Creating %s directory...\n", extension_dir_path);
-            #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-                _mkdir(extension_dir_path);
-            #else
-                mkdir(extension_dir_path, 0700);
-            #endif
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+            _mkdir(extension_dir_path);
+#else
+            mkdir(extension_dir_path, 0700);
+#endif
         }
 
         char *new_module_path = extension_dir_path;

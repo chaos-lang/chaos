@@ -72,15 +72,15 @@ bool in(char *s, char **x);
 string_array str_split(char* a_str, const char a_delim);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    #include <direct.h>
-    #define GetCurrentDir _getcwd
+#   include <direct.h>
+#   define GetCurrentDir _getcwd
 #else
-    #include <unistd.h>
-    #define GetCurrentDir getcwd
+#   include <unistd.h>
+#   define GetCurrentDir getcwd
 #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    #define strdup _strdup
+#   define strdup _strdup
 #endif
 
 #endif

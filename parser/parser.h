@@ -29,9 +29,9 @@
 #include <stdbool.h>
 
 #if defined(__APPLE__) && defined(__MACH__)
-#include <sys/syslimits.h>
+#   include <sys/syslimits.h>
 #elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#include <linux/limits.h>
+#   include <linux/limits.h>
 #endif
 
 #include "../interpreter/loop.h"
