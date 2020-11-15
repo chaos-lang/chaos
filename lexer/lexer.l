@@ -138,6 +138,7 @@ static int custom_input(char *buf, int result, int max_size) {
         }
         return result;
     }
+    return -1;
 }
 #endif
 %}
