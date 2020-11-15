@@ -308,6 +308,7 @@ enum ASTNodeType {
 typedef struct ASTNode {
     unsigned long long id;
     enum ASTNodeType node_type;
+    int lineno;
     struct ASTNode* next;
     struct ASTNode* left;
     struct ASTNode* right;
@@ -329,15 +330,15 @@ ASTNode* ast_node_cursor_backup;
 ASTNode* ast_interactive_cursor;
 bool stop_ast_evaluation;
 
-ASTNode* addASTNodeBase(enum ASTNodeType node_type, char *strings[], size_t strings_size, union Value value, enum ValueType value_type);
-ASTNode* addASTNode(enum ASTNodeType node_type, char *strings[], size_t strings_size);
-ASTNode* addASTNodeBool(enum ASTNodeType node_type, char *strings[], size_t strings_size, bool b, ASTNode* node);
-ASTNode* addASTNodeInt(enum ASTNodeType node_type, char *strings[], size_t strings_size, long long i, ASTNode* node);
-ASTNode* addASTNodeFloat(enum ASTNodeType node_type, char *strings[], size_t strings_size, long double f, ASTNode* node);
-ASTNode* addASTNodeString(enum ASTNodeType node_type, char *strings[], size_t strings_size, char *s, ASTNode* node);
-ASTNode* addASTNodeBranch(enum ASTNodeType node_type, ASTNode* l_node, ASTNode* r_node);
-ASTNode* addASTNodeAssign(enum ASTNodeType node_type, char *strings[], size_t strings_size, ASTNode* node);
-ASTNode* addASTNodeFull(enum ASTNodeType node_type, char *strings[], size_t strings_size, ASTNode* l_node, ASTNode* r_node);
+ASTNode* addASTNodeBase(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, union Value value, enum ValueType value_type);
+ASTNode* addASTNode(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size);
+ASTNode* addASTNodeBool(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, bool b, ASTNode* node);
+ASTNode* addASTNodeInt(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long long i, ASTNode* node);
+ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long double f, ASTNode* node);
+ASTNode* addASTNodeString(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, char *s, ASTNode* node);
+ASTNode* addASTNodeBranch(enum ASTNodeType node_type, int lineno, ASTNode* l_node, ASTNode* r_node);
+ASTNode* addASTNodeAssign(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, ASTNode* node);
+ASTNode* addASTNodeFull(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, ASTNode* l_node, ASTNode* r_node);
 void ASTNodeNext(ASTNode* ast_node);
 void ASTBranchOut();
 void ASTMergeBack();
