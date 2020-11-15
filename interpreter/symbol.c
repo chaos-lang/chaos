@@ -659,19 +659,16 @@ Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, 
         symbol->type != K_ANY &&
         symbol->type != type
     ) {
-        append_to_array_without_malloc(&free_string_stack, clone_name);
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(type), clone_name);
     }
 
     if (clone_name != NULL && findSymbol(clone_name) != NULL) {
-        append_to_array_without_malloc(&free_string_stack, clone_name);
         throw_error(E_VARIABLE_ALREADY_DEFINED, clone_name);
     }
 
     Symbol* clone_symbol;
     if (symbol->type == K_LIST || symbol->type == K_DICT) {
         if (symbol->secondary_type != extra_type) {
-            append_to_array_without_malloc(&free_string_stack, clone_name);
             throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(extra_type), clone_name);
         }
         clone_symbol = deepCopyComplex(clone_name, symbol);
