@@ -15,7 +15,6 @@ jobs:
         sudo apt update
         sudo apt install -y valgrind
         sudo make requirements
-        sudo make requirements-dev
 
     - name: Build (gcc)
       run: |
@@ -50,7 +49,6 @@ jobs:
       run: |
         mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
         make requirements
-        make requirements-dev
 
     - name: Build (gcc)
       run: |
@@ -88,7 +86,6 @@ jobs:
       shell: cmd
       run: |
         call make.bat requirements
-        call make.bat requirements-dev
 
     - name: Build (gcc)
       shell: cmd
