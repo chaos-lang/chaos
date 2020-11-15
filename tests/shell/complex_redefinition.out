@@ -38,7 +38,7 @@ The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 1
+Line: 0
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 [1]

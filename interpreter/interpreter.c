@@ -28,6 +28,8 @@ extern bool decision_execution_mode;
 extern bool disable_complex_mode;
 extern unsigned long long nested_loop_counter;
 
+int kaos_lineno = 0;
+
 void interpret(char *module, enum Phase phase_arg, bool is_interactive) {
     ASTNode* ast_node = ast_root_node;
 
@@ -93,6 +95,8 @@ ASTNode* register_functions(ASTNode* ast_node, char *module) {
             register_functions(ast_node->left, module);
         }
     }
+
+    kaos_lineno = ast_node->lineno;
 
     if (debug_enabled)
         printf(
@@ -284,6 +288,8 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
     if (ast_node->left != NULL) {
         eval_node(ast_node->left, module);
     }
+
+    kaos_lineno = ast_node->lineno;
 
     if (debug_enabled)
         printf(

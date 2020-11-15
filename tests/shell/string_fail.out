@@ -5,7 +5,7 @@ Illegal character assignment for string: k
 Absorbed by Interactive Shell
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 1
+Line: 0
 Right hand side of the assignment is not a character for string: k
 Absorbed by Interactive Shell
 chaos

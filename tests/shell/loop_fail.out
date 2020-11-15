@@ -1,15 +1,15 @@
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 3
+Line: 2
 Undefined variable: b
 Absorbed by Interactive Shell
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 6
+Line: 5
 'n' is not a list!
 Absorbed by Interactive Shell
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 3
+Line: 1
 'n' is not a dictionary!
 Absorbed by Interactive Shell

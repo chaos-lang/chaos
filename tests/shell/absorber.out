@@ -19,7 +19,7 @@ Absorbed by Interactive Shell
 print b
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 6
+Line: 5
 Undefined function: b
 Absorbed by Interactive Shell
 print b

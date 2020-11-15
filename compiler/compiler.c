@@ -23,6 +23,7 @@
 #include "compiler.h"
 
 extern bool disable_complex_mode;
+extern int kaos_lineno;
 
 struct stat dir_stat = {0};
 
@@ -115,6 +116,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
     const char *c_file_base =
         "extern bool disable_complex_mode;\n\n"
+        "int kaos_lineno;\n"
         "bool is_interactive = false;\n"
         "unsigned long long nested_loop_counter = 0;\n\n";
 
@@ -403,6 +405,8 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
         }
     }
 
+    kaos_lineno = ast_node->lineno;
+
     if (debug_enabled)
         printf(
             "(TranspileF)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
@@ -499,6 +503,8 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
     if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_BOOLEAN_CONTINUE) {
         transpile_node(ast_node->right, module, c_fp, indent);
     }
+
+    kaos_lineno = ast_node->lineno;
 
     if (debug_enabled)
         printf(
@@ -614,6 +620,9 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             compiler_register_functions(ast_node->left, module, c_fp, indent);
         }
     }
+
+    kaos_lineno = ast_node->lineno;
+    fprintf(c_fp, "kaos_lineno = %d;\n", ast_node->lineno);
 
     if (debug_enabled)
         printf(
@@ -920,6 +929,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     if (ast_node->node_type == AST_END) {
         return ast_node;
     }
+
+    kaos_lineno = ast_node->lineno;
+    fprintf(c_fp, "kaos_lineno = %d;\n", ast_node->lineno);
 
     if (debug_enabled)
         printf(

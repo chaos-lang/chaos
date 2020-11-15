@@ -23,7 +23,7 @@
 #include "language.h"
 #include "helpers.h"
 
-extern int yylineno;
+extern int kaos_lineno;
 
 void greet() {
     char lang[__KAOS_MSG_LINE_LENGTH__];
@@ -78,7 +78,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
 
     sprintf(error_name_msg, "  %s:", error_name);
     sprintf(current_module_msg, "    Module: %s", current_module);
-    sprintf(line_no_msg, "    Line: %d", yylineno);
+    sprintf(line_no_msg, "    Line: %d", kaos_lineno);
     sprintf(cause_msg, "    Cause: %s", cause);
 
     char* new_cause_msg = str_replace(cause_msg, "\n", "\\n");

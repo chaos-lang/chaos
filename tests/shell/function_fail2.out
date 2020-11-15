@@ -1,18 +1,18 @@
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 1
+Line: 0
 Undefined function: f
 Absorbed by Interactive Shell
 [start] =>
 [end]
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 8
+Line: 7
 Incorrect argument count for function: f
 Absorbed by Interactive Shell
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 1
+Line: 4
 Illegal variable type: Boolean for function: f
 Absorbed by Interactive Shell
 

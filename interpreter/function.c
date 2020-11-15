@@ -22,9 +22,7 @@
 
 #include "function.h"
 
-#ifndef CHAOS_COMPILER
-extern int yylineno;
-#endif
+extern int kaos_lineno;
 bool interactive_shell_function_error_absorbed = false;
 extern int yyparse();
 
@@ -55,11 +53,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->name = malloc(1 + strlen(name));
-#ifndef CHAOS_COMPILER
-    function_mode->line_no = yylineno;
-#else
-    function_mode->line_no = 0;
-#endif
+    function_mode->line_no = kaos_lineno;
 
     strcpy(function_mode->name, name);
     function_mode->type = type;

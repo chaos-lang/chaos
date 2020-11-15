@@ -1,6 +1,6 @@
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 22
+Line: 21
 Undefined function: asdasd1
 Absorbed by Interactive Shell
 module1
@@ -9,6 +9,6 @@ f3
 f5
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
-Line: 7
+Line: 6
 Undefined function: asdasd2
 Absorbed by Interactive Shell
