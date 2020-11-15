@@ -24,9 +24,7 @@
 #define KAOS_ALTERNATIVE_H
 
 #include "../../interpreter/function.h"
-enum Phase phase = INIT_PROGRAM;
 
-void freeEverything();
 void breakLoop();
 void continueLoop();
 

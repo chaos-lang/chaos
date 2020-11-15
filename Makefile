@@ -19,6 +19,9 @@ requirements-dev:
 	rsync -av interpreter/ /usr/local/include/chaos/interpreter/
 	rsync -av compiler/ /usr/local/include/chaos/compiler/
 	rsync -av ast/ /usr/local/include/chaos/ast/
+	cp lex.yy.c /usr/local/include/chaos/
+	cp parser.tab.h /usr/local/include/chaos/
+	cp parser.tab.c /usr/local/include/chaos/
 	cp enums.h /usr/local/include/chaos/
 	cp Chaos.c /usr/local/include/chaos/
 	cp Chaos.h /usr/local/include/

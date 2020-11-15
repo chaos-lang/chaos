@@ -874,6 +874,8 @@ json_parser:
 
 %%
 
+#ifndef CHAOS_COMPILER
 int main(int argc, char** argv) {
     initParser(argc, argv);
 }
+#endif

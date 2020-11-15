@@ -164,7 +164,9 @@ int initParser(int argc, char** argv) {
         yyparse();
         if (!is_interactive) {
             if (compiler_mode) {
+#ifndef CHAOS_COMPILER
                 compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep);
+#endif
             } else {
                 interpret(main_interpreted_module, INIT_PREPARSE, false);
             }
@@ -194,6 +196,7 @@ void freeEverything() {
     freeNestedComplexModeStack();
     free(function_call_stack.arr);
 
+#ifndef CHAOS_COMPILER
     yylex_destroy();
 
     if (!is_interactive) {
@@ -217,6 +220,7 @@ void freeEverything() {
     fclose(stdin);
     fclose(stdout);
     fclose(stderr);
+#endif
 }
 
 void yyerror(const char* s) {

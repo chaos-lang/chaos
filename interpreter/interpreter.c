@@ -109,6 +109,7 @@ ASTNode* register_functions(ASTNode* ast_node, char *module) {
 
     switch (ast_node->node_type)
     {
+#ifndef CHAOS_COMPILER
         case AST_DEFINE_FUNCTION_BOOL:
             startFunction(ast_node->strings[0], K_BOOL, K_ANY);
             break;
@@ -148,6 +149,7 @@ ASTNode* register_functions(ASTNode* ast_node, char *module) {
         case AST_DEFINE_FUNCTION_VOID:
             startFunction(ast_node->strings[0], K_VOID, K_ANY);
             break;
+#endif
         case AST_FUNCTION_PARAMETERS_START:
             if (function_parameters_mode == NULL)
                 startFunctionParameters();
@@ -304,6 +306,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
         return ast_node;
     }
 
+#ifndef CHAOS_COMPILER
     switch (ast_node->node_type)
     {
         case AST_START_TIMES_DO:
@@ -324,6 +327,7 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
         default:
             break;
     }
+#endif
 
 
     Symbol* symbol;

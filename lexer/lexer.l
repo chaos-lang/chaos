@@ -123,7 +123,9 @@ int yywrap() { if (phase == PREPARSE && module_parsing == 0) { switchBuffer(prog
 
 static int custom_input(char *buf, int result, int max_size) {
     if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
+#ifndef CHAOS_COMPILER
         return shell_readline(buf);
+#endif
     } else {
         errno = 0;
         while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) {
