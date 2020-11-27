@@ -942,86 +942,158 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
             );
             break;
         case AST_FUNCTION_PARAMETER_BOOL:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_BOOL, K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_BOOL, K_ANY);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_NUMBER:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_NUMBER, K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_NUMBER, K_ANY);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_STRING:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_STRING, K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_STRING, K_ANY);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_ANY);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_BOOL_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_BOOL);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_BOOL);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_NUMBER_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_NUMBER);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_NUMBER);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_STRING_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_STRING);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_STRING);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_ANY);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_BOOL_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_BOOL);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_BOOL);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_NUMBER_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_NUMBER);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_NUMBER);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_PARAMETER_STRING_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_STRING);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_STRING);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL:
             if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*caddFunctionOptionalParameterBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                fprintf(c_fp, "%*caddFunctionOptionalParameterBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
             } else {
-                fprintf(c_fp, "%*caddFunctionOptionalParameterBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+                fprintf(c_fp, "%*caddFunctionOptionalParameterBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
             }
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER:
             if (ast_node->right->is_transpiled) {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                    fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 }
             } else {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %lld);", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
+                    fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %Lg);", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                 }
             }
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_STRING:
-            fprintf(c_fp, "%*caddFunctionOptionalParameterString(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], ast_node->value.s);
+            fprintf(c_fp, "%*caddFunctionOptionalParameterString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], ast_node->value.s);
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_LIST:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_ANY);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_LIST:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_BOOL);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_BOOL);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_LIST:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_NUMBER);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_NUMBER);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_STRING);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_STRING);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_DICT:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_ANY);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_ANY);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_DICT:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_BOOL);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_BOOL);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_DICT:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_NUMBER);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_NUMBER);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT:
-            fprintf(c_fp, "%*creverseComplexMode(); addFunctionOptionalParameterComplex(\"%s\", K_STRING);", indent, ' ', ast_node->strings[0]);
+            fprintf(
+                c_fp,
+                "%*creverseComplexMode();\n"
+                "%*caddFunctionOptionalParameterComplex(\"%s\", K_STRING);\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                ast_node->strings[0]
+            );
             break;
         case AST_ADD_FUNCTION_NAME:
             addFunctionNameToFunctionNamesBuffer(ast_node->strings[0]);
@@ -1145,7 +1217,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_START_FOREACH:
             compiler_loop_counter++;
             current_loop_counter = compiler_loop_counter;
-            fprintf(c_fp, "nested_loop_counter++;");
+            fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
             fprintf(
                 c_fp,
                 "%*cSymbol* loop_%llu_list = getSymbol(\"%s\");\n"
@@ -1316,23 +1388,23 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_VAR_CREATE_BOOL:
             if (ast_node->strings[0] == NULL) {
                 if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*caddSymbolBool(NULL, %s);", indent, ' ', ast_node->right->transpiled);
+                    fprintf(c_fp, "%*caddSymbolBool(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*caddSymbolBool(NULL, %s);", indent, ' ', ast_node->right->value.b ? "true" : "false");
+                    fprintf(c_fp, "%*caddSymbolBool(NULL, %s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
                 }
             } else {
                 if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*caddSymbolBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                    fprintf(c_fp, "%*caddSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*caddSymbolBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+                    fprintf(c_fp, "%*caddSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
                 }
             }
             break;
         case AST_VAR_CREATE_BOOL_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_BOOL, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_BOOL, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_BOOL, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_BOOL, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_BOOL, K_ANY, indent);
@@ -1341,38 +1413,38 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (ast_node->right->is_transpiled) {
                 if (ast_node->right->value_type == V_INT) {
                     if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolInt(NULL, %s);", indent, ' ', ast_node->right->transpiled);
+                        fprintf(c_fp, "%*caddSymbolInt(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
                     } else {
-                        fprintf(c_fp, "%*caddSymbolInt(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                        fprintf(c_fp, "%*caddSymbolInt(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                     }
                 } else {
                     if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %s);", indent, ' ', ast_node->right->transpiled);
+                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
                     } else {
-                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                     }
                 }
             } else {
                 if (ast_node->right->value_type == V_INT) {
                     if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolInt(NULL, %lld);", indent, ' ', ast_node->right->value.i);
+                        fprintf(c_fp, "%*caddSymbolInt(NULL, %lld);\n", indent, ' ', ast_node->right->value.i);
                     } else {
-                        fprintf(c_fp, "%*caddSymbolInt(\"%s\", %lld);", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
+                        fprintf(c_fp, "%*caddSymbolInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
                     }
                 } else {
                     if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %Lg);", indent, ' ', ast_node->right->value.f);
+                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %Lg);\n", indent, ' ', ast_node->right->value.f);
                     } else {
-                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %Lg);", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                     }
                 }
             }
             break;
         case AST_VAR_CREATE_NUMBER_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_NUMBER, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_NUMBER, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_NUMBER, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_NUMBER, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_NUMBER, K_ANY, indent);
@@ -1380,57 +1452,57 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_VAR_CREATE_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
             if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "%*caddSymbolString(NULL, \"%s\");", indent, ' ', value_s);
+                fprintf(c_fp, "%*caddSymbolString(NULL, \"%s\");\n", indent, ' ', value_s);
             } else {
-                fprintf(c_fp, "%*caddSymbolString(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], value_s);
+                fprintf(c_fp, "%*caddSymbolString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], value_s);
             }
             free(value_s);
             break;
         case AST_VAR_CREATE_STRING_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_STRING, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_STRING, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_STRING, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_STRING, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_STRING, K_ANY, indent);
             break;
         case AST_VAR_CREATE_ANY_BOOL:
             if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "%*caddSymbolAnyBool(NULL, %s);", indent, ' ', ast_node->right->value.b ? "true" : "false");
+                fprintf(c_fp, "%*caddSymbolAnyBool(NULL, %s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
             } else {
-                fprintf(c_fp, "%*caddSymbolAnyBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+                fprintf(c_fp, "%*caddSymbolAnyBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
             }
             break;
         case AST_VAR_CREATE_ANY_NUMBER:
             if (ast_node->right->value_type == V_INT) {
                 if (ast_node->strings[0] == NULL) {
-                    fprintf(c_fp, "%*caddSymbolAnyInt(NULL, %lld);", indent, ' ', ast_node->right->value.i);
+                    fprintf(c_fp, "%*caddSymbolAnyInt(NULL, %lld);\n", indent, ' ', ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*caddSymbolAnyInt(\"%s\", %lld);", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
+                    fprintf(c_fp, "%*caddSymbolAnyInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
                 }
             } else {
                 if (ast_node->strings[0] == NULL) {
-                    fprintf(c_fp, "%*caddSymbolAnyFloat(NULL, %Lg);", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddSymbolAnyFloat(NULL, %Lg);\n", indent, ' ', ast_node->right->value.f);
                 } else {
-                    fprintf(c_fp, "%*caddSymbolAnyFloat(\"%s\", %Lg);", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddSymbolAnyFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                 }
             }
             break;
         case AST_VAR_CREATE_ANY_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
             if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "%*caddSymbolAnyString(NULL, \"%s\");", indent, ' ', value_s);
+                fprintf(c_fp, "%*caddSymbolAnyString(NULL, \"%s\");\n", indent, ' ', value_s);
             } else {
-                fprintf(c_fp, "%*caddSymbolAnyString(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], value_s);
+                fprintf(c_fp, "%*caddSymbolAnyString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], value_s);
             }
             free(value_s);
             break;
         case AST_VAR_CREATE_ANY_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_ANY, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_ANY_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_ANY, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_ANY_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_ANY, K_ANY, indent);
@@ -1439,7 +1511,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_ANY);",
+                "%*cfinishComplexMode(\"%s\", K_ANY);\n",
                 indent,
                 ' ',
                 indent,
@@ -1448,7 +1520,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_LIST_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_ANY, indent);
@@ -1457,7 +1529,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_ANY);",
+                "%*cfinishComplexMode(\"%s\", K_ANY);\n",
                 indent,
                 ' ',
                 indent,
@@ -1466,7 +1538,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_ANY);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_DICT_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_ANY, indent);
@@ -1475,7 +1547,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_BOOL);",
+                "%*cfinishComplexMode(\"%s\", K_BOOL);\n",
                 indent,
                 ' ',
                 indent,
@@ -1484,7 +1556,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_BOOL_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_BOOL);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_BOOL);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_BOOL, indent);
@@ -1493,7 +1565,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_BOOL);",
+                "%*cfinishComplexMode(\"%s\", K_BOOL);\n",
                 indent,
                 ' ',
                 indent,
@@ -1502,7 +1574,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_BOOL_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_BOOL);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_BOOL);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_BOOL, indent);
@@ -1511,7 +1583,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_NUMBER);",
+                "%*cfinishComplexMode(\"%s\", K_NUMBER);\n",
                 indent,
                 ' ',
                 indent,
@@ -1520,7 +1592,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_NUMBER_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_NUMBER);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_NUMBER);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_NUMBER, indent);
@@ -1529,7 +1601,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_NUMBER);",
+                "%*cfinishComplexMode(\"%s\", K_NUMBER);\n",
                 indent,
                 ' ',
                 indent,
@@ -1538,7 +1610,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_NUMBER_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_NUMBER);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_NUMBER);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_NUMBER, indent);
@@ -1547,7 +1619,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_STRING);",
+                "%*cfinishComplexMode(\"%s\", K_STRING);\n",
                 indent,
                 ' ',
                 indent,
@@ -1556,7 +1628,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_STRING_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_STRING);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_STRING);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_STRING, indent);
@@ -1565,7 +1637,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_STRING);",
+                "%*cfinishComplexMode(\"%s\", K_STRING);\n",
                 indent,
                 ' ',
                 indent,
@@ -1574,43 +1646,43 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_CREATE_STRING_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_STRING);", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_STRING);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_STRING, indent);
             break;
         case AST_VAR_UPDATE_BOOL:
             if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cupdateSymbolBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                fprintf(c_fp, "%*cupdateSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
             } else {
-                fprintf(c_fp, "%*cupdateSymbolBool(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
+                fprintf(c_fp, "%*cupdateSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
             }
             break;
         case AST_VAR_UPDATE_NUMBER:
             if (ast_node->right->value_type == V_INT) {
                 if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateSymbolInt(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                    fprintf(c_fp, "%*cupdateSymbolInt(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*cupdateSymbolInt(\"%s\", %lld);", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
+                    fprintf(c_fp, "%*cupdateSymbolInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
                 }
             } else {
                 if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %s);", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %Lg);", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                 }
             }
             break;
         case AST_VAR_UPDATE_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cupdateSymbolString(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], value_s);
+            fprintf(c_fp, "%*cupdateSymbolString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], value_s);
             free(value_s);
             break;
         case AST_VAR_UPDATE_LIST:
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexModeWithUpdate(\"%s\");",
+                "%*cfinishComplexModeWithUpdate(\"%s\");\n",
                 indent,
                 ' ',
                 indent,
@@ -1622,7 +1694,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cfinishComplexModeWithUpdate(\"%s\");",
+                "%*cfinishComplexModeWithUpdate(\"%s\");\n",
                 indent,
                 ' ',
                 indent,
@@ -1631,10 +1703,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_VAR_UPDATE_VAR:
-            fprintf(c_fp, "%*cupdateSymbolByClonningName(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*cupdateSymbolByClonningName(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_UPDATE_VAR_EL:
-            fprintf(c_fp, "%*cupdateSymbolByClonningComplexElement(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
+            fprintf(c_fp, "%*cupdateSymbolByClonningComplexElement(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_UPDATE_FUNC_RETURN:
             compiler_function_counter++;
@@ -1652,7 +1724,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
                     fprintf(
                         c_fp,
-                        "%*cupdateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);",
+                        "%*cupdateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);\n",
                         indent,
                         ' ',
                         ast_node->strings[0],
@@ -1672,7 +1744,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
                     fprintf(
                         c_fp,
-                        "%*cupdateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");",
+                        "%*cupdateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");\n",
                         indent,
                         ' ',
                         ast_node->strings[0],
@@ -1685,7 +1757,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_RETURN_VAR:
-            fprintf(c_fp, "%*creturnSymbol(\"%s\");", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*creturnSymbol(\"%s\");\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_PRINT_COMPLEX_EL:
             fprintf(
@@ -1694,7 +1766,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*cgetComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id),\n"
                 "%*cfalse,\n"
                 "%*cfalse\n"
-                "%*c);",
+                "%*c);\n",
                 indent,
                 ' ',
                 indent * 2,
@@ -1709,32 +1781,32 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             break;
         case AST_COMPLEX_EL_UPDATE_BOOL:
             if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cupdateComplexElementBool(%s);", indent, ' ', ast_node->right->transpiled);
+                fprintf(c_fp, "%*cupdateComplexElementBool(%s);\n", indent, ' ', ast_node->right->transpiled);
             } else {
-                fprintf(c_fp, "%*cupdateComplexElementBool(%s);", indent, ' ', ast_node->right->value.b ? "true" : "false");
+                fprintf(c_fp, "%*cupdateComplexElementBool(%s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
             }
             break;
         case AST_COMPLEX_EL_UPDATE_NUMBER:
             if (ast_node->right->value_type == V_INT) {
                 if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateComplexElementInt(%s);", indent, ' ', ast_node->right->transpiled);
+                    fprintf(c_fp, "%*cupdateComplexElementInt(%s);\n", indent, ' ', ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*cupdateComplexElementInt(%lld);", indent, ' ', ast_node->right->value.i);
+                    fprintf(c_fp, "%*cupdateComplexElementInt(%lld);\n", indent, ' ', ast_node->right->value.i);
                 }
             } else {
                 if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateComplexElementFloat(%s);", indent, ' ', ast_node->right->transpiled);
+                    fprintf(c_fp, "%*cupdateComplexElementFloat(%s);\n", indent, ' ', ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*cupdateComplexElementFloat(%Lg);", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*cupdateComplexElementFloat(%Lg);\n", indent, ' ', ast_node->right->value.f);
                 }
             }
             break;
         case AST_COMPLEX_EL_UPDATE_STRING:
             if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cupdateComplexElementString(%s);", indent, ' ', ast_node->right->transpiled);
+                fprintf(c_fp, "%*cupdateComplexElementString(%s);\n", indent, ' ', ast_node->right->transpiled);
             } else {
                 value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-                fprintf(c_fp, "%*cupdateComplexElementString(\"%s\");", indent, ' ', value_s);
+                fprintf(c_fp, "%*cupdateComplexElementString(\"%s\");\n", indent, ' ', value_s);
                 free(value_s);
             }
             break;
@@ -1742,7 +1814,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cupdateComplexElementComplex();",
+                "%*cupdateComplexElementComplex();\n",
                 indent,
                 ' ',
                 indent,
@@ -1753,7 +1825,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*cupdateComplexElementComplex();",
+                "%*cupdateComplexElementComplex();\n",
                 indent,
                 ' ',
                 indent,
@@ -1761,14 +1833,14 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_COMPLEX_EL_UPDATE_VAR:
-            fprintf(c_fp, "%*cupdateComplexElementSymbol(getSymbol(\"%s\"));", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cupdateComplexElementSymbol(getSymbol(\"%s\"));\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_COMPLEX_EL_UPDATE_VAR_EL:
             fprintf(
                 c_fp,
                 "%*cupdateComplexElementSymbol(\n"
                 "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0)\n"
-                "%*c);",
+                "%*c);\n",
                 indent,
                 ' ',
                 indent * 2,
@@ -1794,7 +1866,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     transpile_function_call(c_fp, NULL, ast_node->strings[0], indent);
                     fprintf(
                         c_fp,
-                        "%*cupdateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);",
+                        "%*cupdateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);\n",
                         indent,
                         ' ',
                         ast_node->strings[0]
@@ -1813,7 +1885,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1], indent);
                     fprintf(
                         c_fp,
-                        "%*cupdateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");",
+                        "%*cupdateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");\n",
                         indent,
                         ' ',
                         ast_node->strings[1],
@@ -1825,7 +1897,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             break;
         case AST_PRINT_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_PRINT_VAR_EL:
             fprintf(
@@ -1834,7 +1906,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0),\n"
                 "%*cfalse,\n"
                 "%*ctrue\n"
-                "%*c);",
+                "%*c);\n",
                 indent,
                 ' ',
                 indent * 2,
@@ -1849,18 +1921,18 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_PRINT_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%lld\\n\");", indent, ' ', ast_node->right->value.i);
+            fprintf(c_fp, "%*cprintf(\"%lld\\n\");\n", indent, ' ', ast_node->right->value.i);
             break;
         case AST_PRINT_MIXED_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%Lg\\n\");", indent, ' ', ast_node->right->value.f);
+            fprintf(c_fp, "%*cprintf(\"%Lg\\n\");\n", indent, ' ', ast_node->right->value.f);
             break;
         case AST_PRINT_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cprintf(\"%s\\n\");", indent, ' ', value_s);
+            fprintf(c_fp, "%*cprintf(\"%s\\n\");\n", indent, ' ', value_s);
             free(value_s);
             break;
         case AST_ECHO_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", false, true);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", false, true);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_ECHO_VAR_EL:
             fprintf(
@@ -1870,7 +1942,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c\"\",\n"
                 "%*cfalse,\n"
                 "%*ctrue\n"
-                "%*c);",
+                "%*c);\n",
                 indent,
                 ' ',
                 indent * 2,
@@ -1887,18 +1959,18 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_ECHO_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%lld\");", indent, ' ', ast_node->right->value.i);
+            fprintf(c_fp, "%*cprintf(\"%lld\");\n", indent, ' ', ast_node->right->value.i);
             break;
         case AST_ECHO_MIXED_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%Lg\");", indent, ' ', ast_node->right->value.f);
+            fprintf(c_fp, "%*cprintf(\"%Lg\");\n", indent, ' ', ast_node->right->value.f);
             break;
         case AST_ECHO_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cprintf(\"%s\");", indent, ' ', value_s);
+            fprintf(c_fp, "%*cprintf(\"%s\");\n", indent, ' ', value_s);
             free(value_s);
             break;
         case AST_PRETTY_PRINT_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), true, true);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), true, true);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_PRETTY_PRINT_VAR_EL:
             fprintf(
@@ -1907,7 +1979,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0),\n"
                 "%*ctrue,\n"
                 "%*ctrue\n"
-                "%*c);",
+                "%*c);\n",
                 indent,
                 ' ',
                 indent * 2,
@@ -1922,7 +1994,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_PRETTY_ECHO_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", true, true);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", true, true);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_PRETTY_ECHO_VAR_EL:
             fprintf(
@@ -1932,7 +2004,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c\"\",\n"
                 "%*ctrue,\n"
                 "%*ctrue\n"
-                "%*c);",
+                "%*c);\n",
                 indent,
                 ' ',
                 indent * 2,
@@ -2435,22 +2507,22 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
             break;
         case AST_DELETE_VAR:
-            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_DELETE_VAR_EL:
-            fprintf(c_fp, "%*cremoveComplexElementByLeftRightBracketStack(\"%s\");", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cremoveComplexElementByLeftRightBracketStack(\"%s\");\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_PRINT_SYMBOL_TABLE:
-            fprintf(c_fp, "%*cprintSymbolTable();", indent, ' ');
+            fprintf(c_fp, "%*cprintSymbolTable();\n", indent, ' ');
             break;
         case AST_LIST_START:
-            fprintf(c_fp, "%*caddSymbolList(NULL);", indent, ' ');
+            fprintf(c_fp, "%*caddSymbolList(NULL);\n", indent, ' ');
             break;
         case AST_LIST_ADD_VAR:
-            fprintf(c_fp, "%*ccloneSymbolToComplex(\"%s\", NULL);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*ccloneSymbolToComplex(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_LIST_ADD_VAR_EL:
-            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", NULL);", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_LIST_NESTED_FINISH:
             fprintf(
@@ -2460,7 +2532,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*cpushNestedComplexModeStack(getComplexMode());\n"
                 "%*creverseComplexMode();\n"
                 "%*cfinishComplexMode(NULL, K_ANY);\n"
-                "%*c}",
+                "%*c}\n",
                 indent,
                 ' ',
                 indent,
@@ -2476,13 +2548,13 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_DICT_START:
-            fprintf(c_fp, "%*caddSymbolDict(NULL);", indent, ' ');
+            fprintf(c_fp, "%*caddSymbolDict(NULL);\n", indent, ' ');
             break;
         case AST_DICT_ADD_VAR:
-            fprintf(c_fp, "%*ccloneSymbolToComplex(\"%s\", \"%s\");", indent, ' ', ast_node->strings[1], ast_node->strings[0]);
+            fprintf(c_fp, "%*ccloneSymbolToComplex(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[1], ast_node->strings[0]);
             break;
         case AST_DICT_ADD_VAR_EL:
-            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", \"%s\");", indent, ' ', ast_node->strings[1], ast_node->strings[0]);
+            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[1], ast_node->strings[0]);
             break;
         case AST_DICT_NESTED_FINISH:
             fprintf(
@@ -2492,7 +2564,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*cpushNestedComplexModeStack(getComplexMode());\n"
                 "%*creverseComplexMode();\n"
                 "%*cfinishComplexMode(NULL, K_ANY);\n"
-                "%*c}",
+                "%*c}\n",
                 indent,
                 ' ',
                 indent,
@@ -2508,7 +2580,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_POP_NESTED_COMPLEX_STACK:
-            fprintf(c_fp, "%*cpopNestedComplexModeStack(\"%s\");", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*cpopNestedComplexModeStack(\"%s\");\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_LEFT_RIGHT_BRACKET_EXPRESSION:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
@@ -2527,7 +2599,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             }
             fprintf(c_fp, "%*csymbol->sign = 1;\n", indent, ' ');
             fprintf(c_fp, "%*cpushLeftRightBracketStack(symbol->id);\n", indent, ' ');
-            fprintf(c_fp, "%*cdisable_complex_mode = false;", indent, ' ');
+            fprintf(c_fp, "%*cdisable_complex_mode = false;\n", indent, ' ');
             break;
         case AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
@@ -2548,7 +2620,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 c_fp,
                 "%*csymbol->sign = 1;\n"
                 "%*cpushLeftRightBracketStack(symbol->id);\n"
-                "%*cdisable_complex_mode = false;",
+                "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
                 indent,
@@ -2564,7 +2636,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 c_fp,
                 "%*csymbol->sign = 1;\n"
                 "%*cpushLeftRightBracketStack(symbol->id);\n"
-                "%*cdisable_complex_mode = false;",
+                "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
                 indent,
@@ -2580,7 +2652,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 c_fp,
                 "%*csymbol->sign = 1;\n"
                 "%*cpushLeftRightBracketStack(symbol->id);\n"
-                "%*cdisable_complex_mode = false;",
+                "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
                 indent,
@@ -2596,7 +2668,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 c_fp,
                 "%*csymbol->sign = -1;\n"
                 "%*cpushLeftRightBracketStack(symbol->id);\n"
-                "%*cdisable_complex_mode = false;",
+                "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
                 indent,
@@ -2608,7 +2680,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_BUILD_COMPLEX_VARIABLE:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
             fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
-            fprintf(c_fp, "%*cdisable_complex_mode = false;", indent, ' ');
+            fprintf(c_fp, "%*cdisable_complex_mode = false;\n", indent, ' ');
             break;
         case AST_EXIT_SUCCESS:
             fprintf(
@@ -2668,33 +2740,33 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             );
             break;
         case AST_PRINT_FUNCTION_TABLE:
-            fprintf(c_fp, "%*cprintFunctionTable();", indent, ' ');
+            fprintf(c_fp, "%*cprintFunctionTable();\n", indent, ' ');
             break;
         case AST_FUNCTION_CALL_PARAMETERS_START:
             break;
         case AST_FUNCTION_CALL_PARAMETER_BOOL:
-            fprintf(c_fp, "%*caddFunctionCallParameterBool(%s);", indent, ' ', ast_node->right->value.b ? "true" : "false");
+            fprintf(c_fp, "%*caddFunctionCallParameterBool(%s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
             break;
         case AST_FUNCTION_CALL_PARAMETER_NUMBER:
             if (ast_node->right->is_transpiled) {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionCallParameterInt(%s);", indent, ' ', ast_node->right->transpiled);
+                    fprintf(c_fp, "%*caddFunctionCallParameterInt(%s);\n", indent, ' ', ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%s);", indent, ' ', ast_node->right->transpiled);
+                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%s);\n", indent, ' ', ast_node->right->transpiled);
                 }
             } else {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionCallParameterInt(%lld);", indent, ' ', ast_node->right->value.i);
+                    fprintf(c_fp, "%*caddFunctionCallParameterInt(%lld);\n", indent, ' ', ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%Lg);", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%Lg);\n", indent, ' ', ast_node->right->value.f);
                 }
             }
             break;
         case AST_FUNCTION_CALL_PARAMETER_STRING:
-            fprintf(c_fp, "%*caddFunctionCallParameterString(\"%s\");", indent, ' ', ast_node->value.s);
+            fprintf(c_fp, "%*caddFunctionCallParameterString(\"%s\");\n", indent, ' ', ast_node->value.s);
             break;
         case AST_FUNCTION_CALL_PARAMETER_VAR:
-            fprintf(c_fp, "%*caddFunctionCallParameterSymbol(\"%s\");", indent, ' ', ast_node->strings[0]);
+            fprintf(c_fp, "%*caddFunctionCallParameterSymbol(\"%s\");\n", indent, ' ', ast_node->strings[0]);
             break;
         case AST_FUNCTION_CALL_PARAMETER_LIST:
             fprintf(
@@ -2726,11 +2798,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (_module == NULL) {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", false, true);", indent, ' ', ast_node->strings[0]);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", false, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);", indent, ' ', ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
             break;
         case AST_ECHO_FUNCTION_RETURN:
@@ -2741,11 +2813,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (_module == NULL) {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", false, true);", indent, ' ', ast_node->strings[0]);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", false, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", false, true);", indent, ' ', ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", false, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
@@ -2756,11 +2828,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (_module == NULL) {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", true, true);", indent, ' ', ast_node->strings[0]);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", true, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);", indent, ' ', ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
@@ -2771,11 +2843,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (_module == NULL) {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", true, true);", indent, ' ', ast_node->strings[0]);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", true, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", true, true);", indent, ' ', ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", true, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
             break;
         case AST_FUNCTION_RETURN:
@@ -2786,11 +2858,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (_module == NULL) {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", NULL);", indent, ' ', ast_node->strings[0]);
+                fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", \"%s\");", indent, ' ', ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], _module);
             }
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
@@ -2813,7 +2885,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         default:
             break;
     }
-    fprintf(c_fp, "\n");
 
     return transpile_node(ast_node->next, module, c_fp, indent);
 }
