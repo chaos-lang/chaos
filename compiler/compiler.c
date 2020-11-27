@@ -577,17 +577,17 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             fprintf(
                 c_fp,
                 "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);\n",
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_function_counter,
                 ast_node->strings[0]
             );
-            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent * 2);
+            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
                 "%*creturn;\n"
                 "%*c}\n",
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -621,7 +621,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 c_fp,
                 "%*cdecisionBreakLoop();\n"
                 "%*c}\n",
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -655,7 +655,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 c_fp,
                 "%*cdecisionContinueLoop();\n"
                 "%*c}\n",
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -671,12 +671,12 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 ' ',
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_function_counter,
                 ast_node->strings[0]
             );
-            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent * 2);
+            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(c_fp, "%*c}\n", indent, ' ');
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:
@@ -690,7 +690,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 ' ',
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -707,7 +707,7 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
                 ' ',
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -937,7 +937,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 "%*cstartFunctionParameters();\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' '
             );
             break;
@@ -1236,11 +1236,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 indent,
                 ' ',
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
                 ast_node->strings[1],
@@ -1257,10 +1257,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c}\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -1273,17 +1273,17 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c}\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
             );
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
-            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent * 2, ' ', current_loop_counter);
+            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent + indent_length, ' ', current_loop_counter);
             fprintf(c_fp, "%*c}\n", indent, ' ');
             fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
             break;
@@ -1310,15 +1310,15 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 indent,
                 ' ',
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[1],
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
                 ast_node->strings[2],
@@ -1336,13 +1336,13 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c}\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[1],
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -1356,21 +1356,21 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c}\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 compiler_loop_counter,
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[1],
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
             );
             ASTNode* next_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
-            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent * 2, ' ', current_loop_counter);
-            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent * 2, ' ', ast_node->strings[1]);
+            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent + indent_length, ' ', current_loop_counter);
+            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent + indent_length, ' ', ast_node->strings[1]);
             fprintf(c_fp, "%*c}\n", indent, ' ');
             fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
             ast_node = next_node;
@@ -1769,11 +1769,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c);\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -1843,7 +1843,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c);\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[0],
                 indent,
@@ -1909,12 +1909,12 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c);\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[0],
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -1945,14 +1945,14 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c);\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[0],
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -1982,12 +1982,12 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c);\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[0],
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -2007,14 +2007,14 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 "%*c);\n",
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 ast_node->strings[0],
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -2537,11 +2537,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 ' ',
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
@@ -2569,11 +2569,11 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 ' ',
                 indent,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
-                indent * 2,
+                indent + indent_length,
                 ' ',
                 indent,
                 ' '
