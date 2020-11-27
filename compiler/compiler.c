@@ -778,7 +778,15 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
     }
 
     kaos_lineno = ast_node->lineno;
-    fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
+    if (
+        (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID)
+        ||
+        (ast_node->node_type == AST_FUNCTION_PARAMETERS_START)
+        ||
+        (ast_node->node_type >= AST_FUNCTION_PARAMETER_BOOL && ast_node->node_type <= AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT)
+    ) {
+        fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
+    }
 
     if (debug_enabled)
         printf(
@@ -1186,7 +1194,25 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
     }
 
     kaos_lineno = ast_node->lineno;
-    fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
+    if (
+        (ast_node->node_type >= AST_START_TIMES_DO && ast_node->node_type <= AST_START_FOREACH_DICT)
+        ||
+        (ast_node->node_type >= AST_VAR_CREATE_BOOL && ast_node->node_type <= AST_PRETTY_ECHO_VAR_EL)
+        ||
+        (ast_node->node_type >= AST_DELETE_VAR && ast_node->node_type <= AST_EXIT_VAR)
+        ||
+        (ast_node->node_type == AST_PRINT_FUNCTION_TABLE)
+        ||
+        (ast_node->node_type >= AST_FUNCTION_CALL_PARAMETER_BOOL && ast_node->node_type <= AST_FUNCTION_CALL_PARAMETER_DICT)
+        ||
+        (ast_node->node_type >= AST_PRINT_FUNCTION_RETURN && ast_node->node_type <= AST_FUNCTION_RETURN)
+        ||
+        (ast_node->node_type == AST_NESTED_COMPLEX_TRANSITION)
+        ||
+        (ast_node->node_type == AST_JSON_PARSER)
+    ) {
+        fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
+    }
 
     if (debug_enabled)
         printf(
@@ -2360,10 +2386,6 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (!transpile_common_operator(ast_node, "||", V_BOOL, V_FLOAT))
                 ast_node->value.b = ast_node->left->value.b || ast_node->right->value.f;
             break;
-        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
-            ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "getSymbolValueBool(\"%s\")", ast_node->strings[0]);
-            ast_node->is_transpiled = true;
-            break;
         case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP:
             if (!transpile_common_operator(ast_node, "==", V_INT, V_INT))
                 ast_node->value.b = ast_node->left->value.i == ast_node->right->value.i;
@@ -2531,6 +2553,10 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
         case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED:
             if (!transpile_common_operator(ast_node, "||", V_INT, V_FLOAT))
                 ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
+            break;
+        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
+            ast_node->transpiled = snprintf_concat_string(ast_node->transpiled, "getSymbolValueBool(\"%s\")", ast_node->strings[0]);
+            ast_node->is_transpiled = true;
             break;
         case AST_DELETE_VAR:
             fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent, ' ', ast_node->strings[0]);
