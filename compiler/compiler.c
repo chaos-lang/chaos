@@ -3261,7 +3261,9 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         extension_counter++;
         fprintf(
             c_fp,
-            "char *extension_path_%llu = strcat_ext(getParentDir(argv0), \"%s%s%s%s%s%s.%s\");\n",
+            "%*cchar *extension_path_%llu = strcat_ext(getParentDir(argv0), \"%s%s%s%s%s%s.%s\");\n",
+            indent,
+            ' ',
             extension_counter,
             __KAOS_PATH_SEPARATOR__,
             __KAOS_SPELLS__,
@@ -3271,10 +3273,17 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
             extension_name,
             get_filename_ext(module_path)
         );
-        fprintf(c_fp, "pushModuleStack(extension_path_%llu, \"%s\");\n", extension_counter, extension_name);
-        fprintf(c_fp, "callRegisterInDynamicLibrary(extension_path_%llu);\n", extension_counter);
-        fprintf(c_fp, "popModuleStack();\n");
-        fprintf(c_fp, "free(extension_path_%llu);\n", extension_counter);
+        fprintf(
+            c_fp,
+            "%*cpushModuleStack(extension_path_%llu, \"%s\");\n",
+            indent,
+            ' ',
+            extension_counter,
+            extension_name
+        );
+        fprintf(c_fp, "%*ccallRegisterInDynamicLibrary(extension_path_%llu);\n", indent, ' ', extension_counter);
+        fprintf(c_fp, "%*cpopModuleStack();\n", indent, ' ');
+        fprintf(c_fp, "%*cfree(extension_path_%llu);\n", indent, ' ', extension_counter);
     } else {
         char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
