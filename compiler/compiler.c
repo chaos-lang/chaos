@@ -3265,11 +3265,11 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
             indent,
             ' ',
             extension_counter,
-            __KAOS_PATH_SEPARATOR__,
+            __KAOS_PATH_SEPARATOR_COMPILER__,
             __KAOS_SPELLS__,
-            __KAOS_PATH_SEPARATOR__,
+            __KAOS_PATH_SEPARATOR_COMPILER__,
             extension_name,
-            __KAOS_PATH_SEPARATOR__,
+            __KAOS_PATH_SEPARATOR_COMPILER__,
             extension_name,
             get_filename_ext(module_path)
         );

@@ -65,9 +65,11 @@
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 #   define __KAOS_PATH_SEPARATOR__ "\\"
 #   define __KAOS_PATH_SEPARATOR_ASCII__ '\\'
+#   define __KAOS_PATH_SEPARATOR_COMPILER__ "\\\\"
 #else
 #   define __KAOS_PATH_SEPARATOR__ "/"
 #   define __KAOS_PATH_SEPARATOR_ASCII__ '/'
+#   define __KAOS_PATH_SEPARATOR_COMPILER__ "/"
 #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)

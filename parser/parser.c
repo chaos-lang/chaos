@@ -54,6 +54,9 @@ int initParser(int argc, char** argv) {
                 } else {
                     fp = fopen(program_file, "r");
                 }
+#ifndef __GNU_LIBRARY__
+                optind++;
+#endif
                 break;
             case 'c':
                 compiler_mode = true;
@@ -63,11 +66,17 @@ int initParser(int argc, char** argv) {
                 } else {
                     fp = fopen(program_file, "r");
                 }
+#ifndef __GNU_LIBRARY__
+                optind++;
+#endif
                 break;
             case 'o':
                 bin_file = argv[optind];
                 if (bin_file == NULL)
                     throwMissingOutputName();
+#ifndef __GNU_LIBRARY__
+                optind++;
+#endif
                 break;
             case 'e':
                 extra_flags = optarg;
@@ -81,9 +90,6 @@ int initParser(int argc, char** argv) {
                 exit(E_INVALID_OPTION);
                 break;
         }
-#ifndef __GNU_LIBRARY__
-        optind++;
-#endif
     }
 
     if (bin_file != NULL && !compiler_mode)
