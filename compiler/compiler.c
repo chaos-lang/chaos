@@ -3224,8 +3224,7 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
     ) {
         char *extension_name = module_stack.arr[module_stack.size - 1];
 
-        char *spells_dir_path = malloc(1);
-        strcpy(spells_dir_path, "");
+        char *spells_dir_path = NULL;
         spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_BUILD_DIRECTORY__);
         spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_PATH_SEPARATOR__);
         spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_SPELLS__);
@@ -3257,6 +3256,7 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         new_module_path = snprintf_concat_string(new_module_path, "%s", (char*) get_filename_ext(module_path));
         printf("Copying %s to %s\n", module_path, new_module_path);
         copy_binary_file(module_path, new_module_path);
+        free(new_module_path);
 
         extension_counter++;
         fprintf(
@@ -3274,6 +3274,7 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         fprintf(c_fp, "pushModuleStack(extension_path_%llu, \"%s\");\n", extension_counter, extension_name);
         fprintf(c_fp, "callRegisterInDynamicLibrary(extension_path_%llu);\n", extension_counter);
         fprintf(c_fp, "popModuleStack();\n");
+        fprintf(c_fp, "free(extension_path_%llu);\n", extension_counter);
     } else {
         char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
