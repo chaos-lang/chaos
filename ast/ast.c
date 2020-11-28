@@ -182,6 +182,11 @@ ASTNode* free_node(ASTNode* ast_node) {
     return free_node(next_node);
 }
 
+void setASTNodeTranspiled(ASTNode* ast_node, char* transpiled) {
+    ast_node->transpiled = transpiled;
+    ast_node->is_transpiled = true;
+}
+
 char *ast_node_type_names[] = {
     "AST_STEP",
     "AST_VAR_CREATE_BOOL",

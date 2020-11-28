@@ -343,6 +343,7 @@ void ASTNodeNext(ASTNode* ast_node);
 void ASTBranchOut();
 void ASTMergeBack();
 ASTNode* free_node(ASTNode* ast_node);
+void setASTNodeTranspiled(ASTNode* ast_node, char* transpiled);
 char* getAstNodeTypeName(unsigned i);
 
 #endif
