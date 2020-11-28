@@ -1027,7 +1027,7 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
                 if (ast_node->right->value_type == V_INT) {
                     fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                 }
             }
             break;
@@ -1539,9 +1539,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                     }
                 } else {
                     if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %Lg);\n", indent, ' ', ast_node->right->value.f);
+                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %Lf);\n", indent, ' ', ast_node->right->value.f);
                     } else {
-                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                     }
                 }
             }
@@ -1589,9 +1589,9 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 }
             } else {
                 if (ast_node->strings[0] == NULL) {
-                    fprintf(c_fp, "%*caddSymbolAnyFloat(NULL, %Lg);\n", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddSymbolAnyFloat(NULL, %Lf);\n", indent, ' ', ast_node->right->value.f);
                 } else {
-                    fprintf(c_fp, "%*caddSymbolAnyFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddSymbolAnyFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                 }
             }
             break;
@@ -1775,7 +1775,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 if (ast_node->right->is_transpiled) {
                     fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %Lg);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
+                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
                 }
             }
             break;
@@ -1903,7 +1903,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 if (ast_node->right->is_transpiled) {
                     fprintf(c_fp, "%*cupdateComplexElementFloat(%s);\n", indent, ' ', ast_node->right->transpiled);
                 } else {
-                    fprintf(c_fp, "%*cupdateComplexElementFloat(%Lg);\n", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*cupdateComplexElementFloat(%Lf);\n", indent, ' ', ast_node->right->value.f);
                 }
             }
             break;
@@ -2030,7 +2030,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "%*cprintf(\"%lld\\n\");\n", indent, ' ', ast_node->right->value.i);
             break;
         case AST_PRINT_MIXED_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%Lg\\n\");\n", indent, ' ', ast_node->right->value.f);
+            fprintf(c_fp, "%*cprintf(\"%Lf\\n\");\n", indent, ' ', ast_node->right->value.f);
             break;
         case AST_PRINT_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
@@ -2068,7 +2068,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             fprintf(c_fp, "%*cprintf(\"%lld\");\n", indent, ' ', ast_node->right->value.i);
             break;
         case AST_ECHO_MIXED_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%Lg\");\n", indent, ' ', ast_node->right->value.f);
+            fprintf(c_fp, "%*cprintf(\"%Lf\");\n", indent, ' ', ast_node->right->value.f);
             break;
         case AST_ECHO_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
@@ -2139,7 +2139,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                         setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i));
                         break;
                     case V_FLOAT:
-                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f));
+                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
                         break;
                     default:
                         break;
@@ -2688,7 +2688,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 if (ast_node->right->value_type == V_INT) {
                     fprintf(c_fp, "%*csymbol = addSymbolInt(NULL, %lld);\n", indent, ' ', ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, %Lg);\n", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, %Lf);\n", indent, ' ', ast_node->right->value.f);
                 }
             }
             fprintf(c_fp, "%*csymbol->sign = 1;\n", indent, ' ');
@@ -2707,7 +2707,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 if (ast_node->right->value_type == V_INT) {
                     fprintf(c_fp, "%*csymbol = addSymbolInt(NULL, - %lld);\n", indent, ' ', ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, - %Lg);\n", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, - %Lf);\n", indent, ' ', ast_node->right->value.f);
                 }
             }
             fprintf(
@@ -2852,7 +2852,7 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
                 if (ast_node->right->value_type == V_INT) {
                     fprintf(c_fp, "%*caddFunctionCallParameterInt(%lld);\n", indent, ' ', ast_node->right->value.i);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%Lg);\n", indent, ' ', ast_node->right->value.f);
+                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%Lf);\n", indent, ' ', ast_node->right->value.f);
                 }
             }
             break;
@@ -3012,7 +3012,7 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
                     if (in(operator, logical_operators)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.f > 0.0 ? "true" : "false"));
                     } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->left->value.f));
+                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->left->value.f));
                     }
                     break;
                 default:
@@ -3049,7 +3049,7 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
                     if (in(operator, logical_operators)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.f ? "true" : "false"));
                     } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f));
+                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
                     }
                     break;
                 default:
@@ -3073,7 +3073,7 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
             if (ast_node->left->value_type == V_INT) {
                 setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", (long double) ast_node->left->value.i));
             } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->left->value.f));
+                setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->left->value.f));
             }
         }
         setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, " "));
@@ -3089,7 +3089,7 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
             if (ast_node->right->value_type == V_INT) {
                 setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", (long double) ast_node->right->value.i));
             } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lg", ast_node->right->value.f));
+                setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
             }
         }
         return true;
