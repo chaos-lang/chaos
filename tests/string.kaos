@@ -73,3 +73,19 @@ print a
 del a
 str a = "hello\t\tworld"
 print a
+
+del a
+str a = 'hello"world'
+print a
+
+del a
+str a = "hello'world"
+print a
+
+del a
+str a = "hello\"world"
+print a
+
+del a
+str a = 'hello\'world'
+print a

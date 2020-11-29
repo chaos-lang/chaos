@@ -531,6 +531,12 @@ char* escape_the_sequences_in_string_literal(char* string) {
                     new_string[i+1] = '\v';
                     remove_nth_char(new_string, i);
                     break;
+                case '"':
+                    remove_nth_char(new_string, i);
+                    break;
+                case '\'':
+                    remove_nth_char(new_string, i);
+                    break;
                 default:
                     break;
             }
@@ -543,8 +549,15 @@ char* escape_the_sequences_in_string_literal(char* string) {
 char* escape_string_literal_for_transpiler(char* string) {
     char* new_string = malloc(strlen(string) + 1);
     strcpy(new_string, string);
+    bool pass_next = false;
+    char prev_char = '\0';
 
     for (long long i = 0; i < (long long) strlen(new_string); i++){
+        if (pass_next) {
+            pass_next = false;
+            continue;
+        }
+
         switch (new_string[i])
         {
             case '\a':
@@ -579,9 +592,22 @@ char* escape_string_literal_for_transpiler(char* string) {
                 new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'v';
                 break;
+            case '"':
+                if (prev_char == '\\')
+                    break;
+                new_string = insert_nth_char(new_string, '\\', i);
+                new_string[i+1] = '"';
+                pass_next = true;
+                break;
+            case '\'':
+                if (prev_char == '\\')
+                    remove_nth_char(new_string, i-1);
+                break;
             default:
                 break;
         }
+
+        prev_char = new_string[i];
     }
 
     return new_string;
