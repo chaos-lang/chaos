@@ -100,7 +100,7 @@ make install
 
 ```shell
 $ chaos
-    Chaos Language 0.0.1-alpha (Sep 18 2020 03:03:40)
+    Chaos Language 0.1.0 (Nov 30 2020 04:39:36)
     GCC version: 9.3.0 on linux
     Turn chaos into magic!
 

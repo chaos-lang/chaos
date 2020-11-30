@@ -27,7 +27,7 @@ If applicable, add screenshots to help explain your problem.
  - CPU Architecture: [e.g. `x86_64`]
  - Operating System - Distro : Version/Build: [e.g. `Linux - Ubuntu : 18.04`]
  - C Compiler Name and Version [e.g. `gcc (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0`]
- - Chaos Language Version [e.g. `Chaos Language 0.0.1-alpha (Dec 23 2019 04:18:23)`]
+ - Chaos Language Version [e.g. `Chaos Language 0.1.0 (Nov 30 2020 04:39:36)`]
 
 **Additional context**
 Add any other context about the problem here.
