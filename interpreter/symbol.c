@@ -1542,3 +1542,135 @@ void reverseComplexMode() {
         j--;
     }
 }
+
+bool resolveRelEqualUnknown(char* name_l, char* name_r) {
+    Symbol* symbol_l = getSymbol(name_l);
+    Symbol* symbol_r = getSymbol(name_r);
+
+    switch (symbol_l->value_type)
+    {
+        case V_BOOL:
+            return symbol_l->value.b == _getSymbolValueBool(symbol_r);
+            break;
+        case V_INT:
+            return symbol_l->value.i == _getSymbolValueInt(symbol_r);
+            break;
+        case V_FLOAT:
+            return symbol_l->value.f == _getSymbolValueFloat(symbol_r);
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            break;
+    }
+    return 0;
+}
+
+bool resolveRelNotEqualUnknown(char* name_l, char* name_r) {
+    Symbol* symbol_l = getSymbol(name_l);
+    Symbol* symbol_r = getSymbol(name_r);
+
+    switch (symbol_l->value_type)
+    {
+        case V_BOOL:
+            return symbol_l->value.b != _getSymbolValueBool(symbol_r);
+            break;
+        case V_INT:
+            return symbol_l->value.i != _getSymbolValueInt(symbol_r);
+            break;
+        case V_FLOAT:
+            return symbol_l->value.f != _getSymbolValueFloat(symbol_r);
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            break;
+    }
+    return 0;
+}
+
+bool resolveRelGreatUnknown(char* name_l, char* name_r) {
+    Symbol* symbol_l = getSymbol(name_l);
+    Symbol* symbol_r = getSymbol(name_r);
+
+    switch (symbol_l->value_type)
+    {
+        case V_BOOL:
+            return symbol_l->value.b > _getSymbolValueBool(symbol_r);
+            break;
+        case V_INT:
+            return symbol_l->value.i > _getSymbolValueInt(symbol_r);
+            break;
+        case V_FLOAT:
+            return symbol_l->value.f > _getSymbolValueFloat(symbol_r);
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            break;
+    }
+    return 0;
+}
+
+bool resolveRelSmallUnknown(char* name_l, char* name_r) {
+    Symbol* symbol_l = getSymbol(name_l);
+    Symbol* symbol_r = getSymbol(name_r);
+
+    switch (symbol_l->value_type)
+    {
+        case V_BOOL:
+            return symbol_l->value.b < _getSymbolValueBool(symbol_r);
+            break;
+        case V_INT:
+            return symbol_l->value.i < _getSymbolValueInt(symbol_r);
+            break;
+        case V_FLOAT:
+            return symbol_l->value.f < _getSymbolValueFloat(symbol_r);
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            break;
+    }
+    return 0;
+}
+
+bool resolveRelGreatEqualUnknown(char* name_l, char* name_r) {
+    Symbol* symbol_l = getSymbol(name_l);
+    Symbol* symbol_r = getSymbol(name_r);
+
+    switch (symbol_l->value_type)
+    {
+        case V_BOOL:
+            return symbol_l->value.b >= _getSymbolValueBool(symbol_r);
+            break;
+        case V_INT:
+            return symbol_l->value.i >= _getSymbolValueInt(symbol_r);
+            break;
+        case V_FLOAT:
+            return symbol_l->value.f >= _getSymbolValueFloat(symbol_r);
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            break;
+    }
+    return 0;
+}
+
+bool resolveRelSmallEqualUnknown(char* name_l, char* name_r) {
+    Symbol* symbol_l = getSymbol(name_l);
+    Symbol* symbol_r = getSymbol(name_r);
+
+    switch (symbol_l->value_type)
+    {
+        case V_BOOL:
+            return symbol_l->value.b <= _getSymbolValueBool(symbol_r);
+            break;
+        case V_INT:
+            return symbol_l->value.i <= _getSymbolValueInt(symbol_r);
+            break;
+        case V_FLOAT:
+            return symbol_l->value.f <= _getSymbolValueFloat(symbol_r);
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            break;
+    }
+    return 0;
+}

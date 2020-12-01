@@ -2597,6 +2597,114 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             if (!transpile_common_operator(ast_node, "||", V_INT, V_FLOAT))
                 ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
             break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_UNKNOWN:
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "resolveRelEqualUnknown(\"%s\",",
+                    ast_node->strings[0]
+                )
+            );
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "\"%s\")",
+                    ast_node->strings[1]
+                )
+            );
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_UNKNOWN:
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "resolveRelNotEqualUnknown(\"%s\",",
+                    ast_node->strings[0]
+                )
+            );
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "\"%s\")",
+                    ast_node->strings[1]
+                )
+            );
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_UNKNOWN:
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "resolveRelGreatUnknown(\"%s\",",
+                    ast_node->strings[0]
+                )
+            );
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "\"%s\")",
+                    ast_node->strings[1]
+                )
+            );
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_UNKNOWN:
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "resolveRelSmallUnknown(\"%s\",",
+                    ast_node->strings[0]
+                )
+            );
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "\"%s\")",
+                    ast_node->strings[1]
+                )
+            );
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_UNKNOWN:
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "resolveRelGreatEqualUnknown(\"%s\",",
+                    ast_node->strings[0]
+                )
+            );
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "\"%s\")",
+                    ast_node->strings[1]
+                )
+            );
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_UNKNOWN:
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "resolveRelSmallEqualUnknown(\"%s\",",
+                    ast_node->strings[0]
+                )
+            );
+            setASTNodeTranspiled(
+                ast_node,
+                snprintf_concat_string(
+                    ast_node->transpiled,
+                    "\"%s\")",
+                    ast_node->strings[1]
+                )
+            );
+            break;
         case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
             setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "getSymbolValueBool(\"%s\")", ast_node->strings[0]));
             break;

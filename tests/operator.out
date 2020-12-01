@@ -6,18 +6,18 @@ false
 true
 false
 Relational operators on integer variables
-true
-false
-false
 false
 true
+false
+true
+false
 true
 Relational operators on float variables
-true
-false
-false
 false
 true
+false
+true
+false
 true
 Relational operators on a mix of integer and boolean variables
 true
@@ -27,11 +27,11 @@ false
 true
 true
 Relational operators on a mix of integer and float variables
-true
-false
-false
 false
 true
+false
+true
+false
 true
 Relational operators on a mix of float and boolean variables
 false

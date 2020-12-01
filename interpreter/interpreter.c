@@ -958,9 +958,6 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
         case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED:
             ast_node->value.b = ast_node->left->value.b || ast_node->right->value.f;
             break;
-        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
-            ast_node->value.b = getSymbolValueBool(ast_node->strings[0]);
-            break;
         case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP:
             ast_node->value.b = ast_node->left->value.i == ast_node->right->value.i;
             break;
@@ -1083,6 +1080,27 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED:
             ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_UNKNOWN:
+            ast_node->value.b = resolveRelEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_UNKNOWN:
+            ast_node->value.b = resolveRelNotEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_UNKNOWN:
+            ast_node->value.b = resolveRelGreatUnknown(ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_UNKNOWN:
+            ast_node->value.b = resolveRelSmallUnknown(ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_UNKNOWN:
+            ast_node->value.b = resolveRelGreatEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_UNKNOWN:
+            ast_node->value.b = resolveRelSmallEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+            break;
+        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
+            ast_node->value.b = getSymbolValueBool(ast_node->strings[0]);
             break;
         case AST_DELETE_VAR:
             removeSymbolByName(ast_node->strings[0]);

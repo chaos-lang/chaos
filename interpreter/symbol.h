@@ -186,6 +186,12 @@ void pushNestedComplexModeStack(Symbol* complex_mode);
 void popNestedComplexModeStack(char *key);
 void freeNestedComplexModeStack();
 void reverseComplexMode();
+bool resolveRelEqualUnknown(char* name_l, char* name_r);
+bool resolveRelNotEqualUnknown(char* name_l, char* name_r);
+bool resolveRelGreatUnknown(char* name_l, char* name_r);
+bool resolveRelSmallUnknown(char* name_l, char* name_r);
+bool resolveRelGreatEqualUnknown(char* name_l, char* name_r);
+bool resolveRelSmallEqualUnknown(char* name_l, char* name_r);
 
 #include "interpreter.h"
 
