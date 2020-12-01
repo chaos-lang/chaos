@@ -417,6 +417,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         printf("Cleaning up the temporary files...\n\n");
         remove(c_file_path);
         remove(h_file_path);
+    } else {
+        printf("\n");
     }
 
     printf("Finished compiling.\n\n");
