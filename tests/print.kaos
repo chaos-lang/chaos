@@ -3,3 +3,6 @@ print "hello world"
 print 'hello world'
 str hello = "world"
 print hello
+
+// String literal with escape sequences
+print "Hello\n\tWorld!"

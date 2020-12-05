@@ -350,6 +350,7 @@ eval_node_label:
     long double r_value;
     long long exit_code;
     char *_module = NULL;
+    char *out = NULL;
 
     switch (ast_node->node_type)
     {
@@ -714,7 +715,9 @@ eval_node_label:
             printf("%Lg\n", ast_node->right->value.f);
             break;
         case AST_PRINT_STRING:
-            printf("%s\n", ast_node->value.s);
+            out = escape_the_sequences_in_string_literal(ast_node->value.s);
+            printf("%s\n", out);
+            free(out);
             break;
         case AST_PRINT_INTERACTIVE_VAR:
             if (ast_node->strings[0][0] != '\0' && is_interactive)
@@ -741,7 +744,9 @@ eval_node_label:
             printf("%Lg", ast_node->right->value.f);
             break;
         case AST_ECHO_STRING:
-            printf("%s", ast_node->value.s);
+            out = escape_the_sequences_in_string_literal(ast_node->value.s);
+            printf("%s", out);
+            free(out);
             break;
         case AST_PRETTY_PRINT_VAR:
             printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), true, true);

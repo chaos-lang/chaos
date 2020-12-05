@@ -3,3 +3,6 @@ echo "hello world"
 echo 'hello world'
 str hello = "world"
 echo hello
+
+// String literal with escape sequences
+echo "Hello\n\tWorld!"
