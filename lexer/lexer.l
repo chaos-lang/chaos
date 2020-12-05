@@ -232,13 +232,13 @@ switch (phase)
 <COMMENT>"*/"                   {BEGIN(INITIAL);}
 <COMMENT>.|"\n"                 {yylineno++;}
 
-(\")([^\\(\")]|\\.)*(\") {
+\"(\$\{.*\}|\\.|[^\"\\])*\" {
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
     strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
     return T_STRING;
 }
 
-(\')([^\\(\')]|\\.)*(\') {
+\'(\$\{.*\}|\\.|[^\'\\])*\' {
     yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));
     strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);
     return T_STRING;

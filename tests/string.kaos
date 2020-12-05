@@ -89,3 +89,12 @@ print a
 del a
 str a = 'hello\'world'
 print a
+
+// Punctuation marks (special characters) in string literals
+del a
+str a = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+print a
+
+del a
+str a = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+print a
