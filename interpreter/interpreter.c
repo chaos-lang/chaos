@@ -73,11 +73,15 @@ bool is_node_function_related(ASTNode* ast_node) {
 }
 
 ASTNode* register_functions(ASTNode* ast_node, char *module) {
+register_functions_label:
     if (ast_node == NULL) {
         return ast_node;
     }
 
-    if (strcmp(ast_node->module, module) != 0) return register_functions(ast_node->next, module);
+    if (strcmp(ast_node->module, module) != 0) {
+        ast_node = ast_node->next;
+        goto register_functions_label;
+    }
 
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
@@ -264,20 +268,31 @@ ASTNode* register_functions(ASTNode* ast_node, char *module) {
         function_mode = NULL;
     }
 
-    return register_functions(ast_node->next, module);
+    ast_node = ast_node->next;
+    goto register_functions_label;
 }
 
 ASTNode* eval_node(ASTNode* ast_node, char *module) {
+eval_node_label:
     if (ast_node == NULL || stop_ast_evaluation) {
         return ast_node;
     }
 
-    if (strcmp(ast_node->module, module) != 0) return eval_node(ast_node->next, module);
+    if (strcmp(ast_node->module, module) != 0) {
+        ast_node = ast_node->next;
+        goto eval_node_label;
+    }
 
-    if (ast_node->node_type == AST_DECISION_DEFINE) return eval_node(ast_node->next, module);
+    if (ast_node->node_type == AST_DECISION_DEFINE) {
+        ast_node = ast_node->next;
+        goto eval_node_label;
+    }
 
     if (ast_node->node_type != AST_FUNCTION_STEP)
-        if (is_node_function_related(ast_node)) return eval_node(ast_node->next, module);
+        if (is_node_function_related(ast_node)) {
+            ast_node = ast_node->next;
+            goto eval_node_label;
+    }
 
     if (ast_node->depend != NULL) {
         eval_node(ast_node->depend, module);
@@ -1329,14 +1344,15 @@ ASTNode* eval_node(ASTNode* ast_node, char *module) {
             break;
     }
 
-    if (phase == PREPARSE) {
-        return ast_node;
-    } else {
-        return eval_node(ast_node->next, module);
+    if (phase != PREPARSE) {
+        ast_node = ast_node->next;
+        goto eval_node_label;
     }
+    return ast_node;
 }
 
 ASTNode* walk_until_end(ASTNode* ast_node, char *module) {
+walk_until_end_label:
     if (ast_node == NULL) {
         return ast_node;
     }
@@ -1347,9 +1363,9 @@ ASTNode* walk_until_end(ASTNode* ast_node, char *module) {
         return ast_node;
     }
 
-    if (phase == PREPARSE) {
-        return ast_node;
-    } else {
-        return walk_until_end(ast_node->next, module);
+    if (phase != PREPARSE) {
+        ast_node = ast_node->next;
+        goto walk_until_end_label;
     }
+    return ast_node;
 }
