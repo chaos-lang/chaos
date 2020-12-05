@@ -87,11 +87,15 @@ int initParser(int argc, char** argv) {
     if (bin_file != NULL && !compiler_mode)
         throwMissingCompileOption();
 
-    if (fp == NULL && argc == 2) {
-        program_file = argv[1];
-        fp = fopen (program_file, "r");
-    } else if (argc == 1) {
-        fp = stdin;
+    if (fp == NULL) {
+        if (argc == 1) {
+            fp = stdin;
+        } else if (debug_enabled && argc == 2) {
+            fp = stdin;
+        } else {
+            program_file = argv[argc - 1];
+            fp = fopen (program_file, "r");
+        }
     }
 
     fp_opened = true;

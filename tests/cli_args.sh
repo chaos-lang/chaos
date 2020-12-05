@@ -2,9 +2,11 @@
 
 echo -e "\nINFO: Test the positional arguments (interpreter)\n"
 chaos tests/number.kaos && echo -e "\nOK\n\n" && \
+chaos -d tests/number.kaos && echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test no arguments (REPL)\n"
 echo "exit" | chaos && echo -e "\nOK\n\n" && \
+echo "exit" | chaos -d && echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test compilation variants with short options\n"
 chaos -c tests/number.kaos && echo -e "\nOK\n\n" && \
