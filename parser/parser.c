@@ -36,7 +36,7 @@ int initParser(int argc, char** argv) {
     char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvdcoe:k", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvdc:o:e:k", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -48,35 +48,14 @@ int initParser(int argc, char** argv) {
                 exit(0);
             case 'd':
                 debug_enabled = true;
-                program_file = argv[optind];
-                if (program_file == NULL) {
-                    fp = stdin;
-                } else {
-                    fp = fopen(program_file, "r");
-                }
-#ifndef __GNU_LIBRARY__
-                optind++;
-#endif
                 break;
             case 'c':
                 compiler_mode = true;
-                program_file = argv[optind];
-                if (program_file == NULL) {
-                    throwCompilerInteractiveError();
-                } else {
-                    fp = fopen(program_file, "r");
-                }
-#ifndef __GNU_LIBRARY__
-                optind++;
-#endif
+                program_file = optarg;
+                fp = fopen(program_file, "r");
                 break;
             case 'o':
-                bin_file = argv[optind];
-                if (bin_file == NULL)
-                    throwMissingOutputName();
-#ifndef __GNU_LIBRARY__
-                optind++;
-#endif
+                bin_file = optarg;
                 break;
             case 'e':
                 extra_flags = optarg;
@@ -85,9 +64,22 @@ int initParser(int argc, char** argv) {
                 keep = true;
                 break;
             case '?':
-                printf("\n");
-                print_help();
-                exit(E_INVALID_OPTION);
+                switch (optopt)
+                {
+                    case 'c':
+                        throwCompilerInteractiveError();
+                        break;
+                    case 'o':
+                        throwMissingOutputName();
+                        break;
+                    case 'e':
+                        throwMissingExtraFlags();
+                        break;
+                    default:
+                        print_help();
+                        exit(E_INVALID_OPTION);
+                        break;
+                }
                 break;
         }
     }
@@ -308,9 +300,9 @@ void throwMissingOutputName() {
 #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    printf(" chaos -c hello.kaos -o hello.exe");
+    printf(" chaos -c hello.kaos -o hello.exe ");
 #else
-    printf(" chaos -c hello.kaos -o hello");
+    printf(" chaos -c hello.kaos -o hello ");
 #endif
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -322,16 +314,37 @@ void throwMissingOutputName() {
 }
 
 void throwMissingCompileOption() {
-    printf("You have to supply the Chaos program to be compiled with the option '-c'.\n\n");
+    printf("You have to give the path of Chaos program file with the option '-c'.\n\n");
     printf("Correct command should look like this: ");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     printf("\033[1;45m");
 #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    printf(" chaos -c hello.kaos -o hello.exe");
+    printf(" chaos -c hello.kaos -o hello.exe ");
 #else
-    printf(" chaos -c hello.kaos -o hello");
+    printf(" chaos -c hello.kaos -o hello ");
+#endif
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
+    printf("\n\n");
+    print_help();
+    exit(E_INVALID_OPTION);
+}
+
+void throwMissingExtraFlags() {
+    printf("You have to specify a string that contains the extra flags with the option '-e'.\n\n");
+    printf("Correct command should look like this: ");
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[1;45m");
+#endif
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    printf(" chaos -c hello.kaos -o hello.exe -e \"-ggdb\" ");
+#else
+    printf(" chaos -c hello.kaos -o hello -e \"-ggdb\" ");
 #endif
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)

@@ -1,0 +1,25 @@
+name: "Command-line Arguments"
+
+on: [push, pull_request]
+
+jobs:
+  main:
+    name: cli_args
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo make requirements
+
+    - name: Build
+      run: |
+        make clean
+        make
+        sudo make install
+
+    - name: Run the tests
+      run: |
+        make test-cli-args

@@ -57,5 +57,6 @@ void absorbError();
 void throwCompilerInteractiveError();
 void throwMissingOutputName();
 void throwMissingCompileOption();
+void throwMissingExtraFlags();
 
 #endif

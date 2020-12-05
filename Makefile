@@ -144,6 +144,9 @@ test-compiler-extensions-macos-gcc: test-extensions-macos-gcc
 test-compiler-extensions-macos-clang: test-extensions-macos-clang
 	chaos -c tests/extensions/test.kaos && build/main
 
+test-cli-args:
+	./tests/cli_args.sh
+
 memcheck:
 	./tests/memcheck.sh
 
