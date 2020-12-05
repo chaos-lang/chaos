@@ -440,6 +440,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 char* last_function_name;
 
 ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
+transpile_functions_label:
     if (ast_node == NULL) {
         return ast_node;
     }
@@ -449,7 +450,8 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
 
     if (strcmp(ast_node_module, module) != 0) {
         free(ast_node_module);
-        return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
+        ast_node = ast_node->next;
+        goto transpile_functions_label;
     }
     free(ast_node_module);
 
@@ -531,10 +533,12 @@ ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             break;
     }
 
-    return transpile_functions(ast_node->next, module, c_fp, indent, h_fp);
+    ast_node = ast_node->next;
+    goto transpile_functions_label;
 }
 
 ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+transpile_decisions_label:
     if (ast_node == NULL) {
         return ast_node;
     }
@@ -544,7 +548,8 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
 
     if (strcmp(ast_node_module, module) != 0) {
         free(ast_node_module);
-        return transpile_decisions(ast_node->next, module, c_fp, indent);
+        ast_node = ast_node->next;
+        goto transpile_decisions_label;
     }
     free(ast_node_module);
 
@@ -746,10 +751,12 @@ ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsign
             break;
     }
 
-    return transpile_decisions(ast_node->next, module, c_fp, indent);
+    ast_node = ast_node->next;
+    goto transpile_decisions_label;
 }
 
 ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+compiler_register_functions_label:
     if (ast_node == NULL) {
         return ast_node;
     }
@@ -759,7 +766,8 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
 
     if (strcmp(ast_node_module, module) != 0) {
         free(ast_node_module);
-        return compiler_register_functions(ast_node->next, module, c_fp, indent);
+        ast_node = ast_node->next;
+        goto compiler_register_functions_label;
     }
     free(ast_node_module);
 
@@ -1160,10 +1168,12 @@ ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp
         free(compiler_current_module);
     }
 
-    return compiler_register_functions(ast_node->next, module, c_fp, indent);
+    ast_node = ast_node->next;
+    goto compiler_register_functions_label;
 }
 
 ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+transpile_node_label:
     if (ast_node == NULL) {
         return ast_node;
     }
@@ -1173,12 +1183,16 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
 
     if (strcmp(ast_node_module, module) != 0) {
         free(ast_node_module);
-        return transpile_node(ast_node->next, module, c_fp, indent);
+        ast_node = ast_node->next;
+        goto transpile_node_label;
     }
     free(ast_node_module);
 
     if (ast_node->node_type != AST_FUNCTION_STEP)
-        if (is_node_function_related(ast_node)) return transpile_node(ast_node->next, module, c_fp, indent);
+        if (is_node_function_related(ast_node)) {
+            ast_node = ast_node->next;
+            goto transpile_node_label;
+        }
 
     if (ast_node->depend != NULL) {
         transpile_node(ast_node->depend, module, c_fp, indent);
@@ -3090,7 +3104,8 @@ ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned sh
             break;
     }
 
-    return transpile_node(ast_node->next, module, c_fp, indent);
+    ast_node = ast_node->next;
+    goto transpile_node_label;
 }
 
 bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type) {

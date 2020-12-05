@@ -27,10 +27,6 @@
 
 extern unsigned long long nested_loop_counter;
 
-jmp_buf EvalNodeRecursiveJumper;
-ASTNode* global_ast_node;
-char* global_module;
-
 void interpret(char *module, enum Phase phase_arg, bool is_interactive);
 ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_node);
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
