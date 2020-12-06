@@ -5,7 +5,21 @@ true
 false
 true
 false
+Relational operators on boolean literals
+false
+true
+true
+false
+true
+false
 Relational operators on integer variables
+false
+true
+false
+true
+false
+true
+Relational operators on integer literals
 false
 true
 false
@@ -19,6 +33,13 @@ false
 true
 false
 true
+Relational operators on float literals
+false
+true
+false
+true
+false
+true
 Relational operators on a mix of integer and boolean variables
 true
 false
@@ -26,7 +47,21 @@ false
 false
 true
 true
+Relational operators on a mix of integer and boolean literals
+false
+true
+false
+true
+false
+true
 Relational operators on a mix of integer and float variables
+false
+true
+false
+true
+false
+true
+Relational operators on a mix of integer and float literals
 false
 true
 false
@@ -40,7 +75,21 @@ false
 true
 false
 true
+Relational operators on a mix of float and boolean literals
+false
+true
+false
+true
+false
+true
 Relational operators on a mix of boolean variables and boolean/integer/float values
+false
+true
+false
+false
+false
+true
+Relational operators on a mix of boolean literals and boolean/integer/float values
 false
 true
 false
@@ -54,7 +103,21 @@ true
 true
 false
 false
+Logical operators on boolean literals
+false
+false
+true
+true
+false
+false
 Logical operators on integer variables
+true
+true
+true
+true
+false
+false
+Logical operators on integer literals
 true
 true
 true
@@ -68,7 +131,21 @@ true
 true
 false
 false
+Logical operators on float literals
+false
+false
+true
+true
+false
+false
 Logical operators on a mix of integer and boolean variables
+true
+true
+true
+true
+false
+false
+Logical operators on a mix of integer and boolean literals
 true
 true
 true
@@ -82,6 +159,13 @@ true
 true
 false
 false
+Logical operators on a mix of integer and float literals
+true
+true
+true
+true
+false
+false
 Relational operators on a mix of boolean variables and boolean/integer/float values
 true
 false
@@ -89,7 +173,21 @@ false
 true
 false
 false
-Bitwise operators
+Relational operators on a mix of boolean literals and boolean/integer/float values
+true
+false
+false
+true
+false
+false
+Bitwise operators on integer variables
+1
+13
+12
+-6
+18
+4
+Bitwise operators on integer literals
 1
 13
 12
@@ -101,5 +199,13 @@ Unary operators
 24
 4
 4
+14
+5
 4
+14
+4
+4
+12
 3
+4
+12
