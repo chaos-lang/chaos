@@ -42,6 +42,50 @@ bool c = true <= false
 print c
 del c
 
+print "Relational operators on boolean variables vs. boolean literals"
+bool a = true
+bool c = a == false
+print c
+del c
+bool c = a != false
+print c
+del c
+bool c = a > false
+print c
+del c
+bool c = a < false
+print c
+del c
+bool c = a >= false
+print c
+del c
+bool c = a <= false
+print c
+del c
+del a
+
+print "Relational operators on boolean literals vs. boolean variables"
+bool b = false
+bool c = true == b
+print c
+del c
+bool c = true != b
+print c
+del c
+bool c = true > b
+print c
+del c
+bool c = true < b
+print c
+del c
+bool c = true >= b
+print c
+del c
+bool c = true <= b
+print c
+del c
+del b
+
 print "Relational operators on integer variables"
 num a = 3
 num b = 5
@@ -86,6 +130,50 @@ bool c = 3 <= 5
 print c
 del c
 
+print "Relational operators on integer variables vs. integer literals"
+num a = 3
+bool c = a == 5
+print c
+del c
+bool c = a != 5
+print c
+del c
+bool c = a > 5
+print c
+del c
+bool c = a < 5
+print c
+del c
+bool c = a >= 5
+print c
+del c
+bool c = a <= 5
+print c
+del c
+del a
+
+print "Relational operators on integer literals vs. integer variables"
+num b = 5
+bool c = 3 == b
+print c
+del c
+bool c = 3 != b
+print c
+del c
+bool c = 3 > b
+print c
+del c
+bool c = 3 < b
+print c
+del c
+bool c = 3 >= b
+print c
+del c
+bool c = 3 <= b
+print c
+del c
+del b
+
 print "Relational operators on float variables"
 num a = 13.5
 num b = 763.78
@@ -129,6 +217,50 @@ del c
 bool c = 13.5 <= 763.78
 print c
 del c
+
+print "Relational operators on float variables vs. float literals"
+num a = 13.5
+bool c = a == 763.78
+print c
+del c
+bool c = a != 763.78
+print c
+del c
+bool c = a > 763.78
+print c
+del c
+bool c = a < 763.78
+print c
+del c
+bool c = a >= 763.78
+print c
+del c
+bool c = a <= 763.78
+print c
+del c
+del a
+
+print "Relational operators on float literals vs. float variables"
+num b = 763.78
+bool c = 13.5 == b
+print c
+del c
+bool c = 13.5 != b
+print c
+del c
+bool c = 13.5 > b
+print c
+del c
+bool c = 13.5 < b
+print c
+del c
+bool c = 13.5 >= b
+print c
+del c
+bool c = 13.5 <= b
+print c
+del c
+del b
 
 print "Relational operators on a mix of integer and boolean variables"
 bool a = true
@@ -351,6 +483,50 @@ bool c = not true
 print c
 del c
 
+print "Logical operators on boolean variables vs. boolean literals"
+bool a = true
+bool c = a && false
+print c
+del c
+bool c = a and false
+print c
+del c
+bool c = a || false
+print c
+del c
+bool c = a or false
+print c
+del c
+bool c = ! a
+print c
+del c
+bool c = not a
+print c
+del c
+del a
+
+print "Logical operators on boolean literals vs. boolean variables"
+bool b = false
+bool c = true && b
+print c
+del c
+bool c = true and b
+print c
+del c
+bool c = true || b
+print c
+del c
+bool c = true or b
+print c
+del c
+bool c = ! true
+print c
+del c
+bool c = not true
+print c
+del c
+del b
+
 print "Logical operators on integer variables"
 num a = 3
 num b = 5
@@ -395,6 +571,50 @@ bool c = not 3
 print c
 del c
 
+print "Logical operators on integer variables vs. integer literals"
+num a = 3
+bool c = a && 5
+print c
+del c
+bool c = a and 5
+print c
+del c
+bool c = a || 5
+print c
+del c
+bool c = a or 5
+print c
+del c
+bool c = ! a
+print c
+del c
+bool c = not a
+print c
+del c
+del a
+
+print "Logical operators on integer literals vs. integer variables"
+num b = 5
+bool c = 3 && b
+print c
+del c
+bool c = 3 and b
+print c
+del c
+bool c = 3 || b
+print c
+del c
+bool c = 3 or b
+print c
+del c
+bool c = ! 3
+print c
+del c
+bool c = not 3
+print c
+del c
+del b
+
 print "Logical operators on float variables"
 num a = 13.5
 num b = 763.78
@@ -438,6 +658,50 @@ del c
 bool c = not 13.5
 print c
 del c
+
+print "Logical operators on float variables vs. float literals"
+num a = 13.5
+bool c = a && 763.78
+print c
+del c
+bool c = a and 763.78
+print c
+del c
+bool c = a || 763.78
+print c
+del c
+bool c = a or 763.78
+print c
+del c
+bool c = ! a
+print c
+del c
+bool c = not a
+print c
+del c
+del a
+
+print "Logical operators on float literals vs. float variables"
+num b = 763.78
+bool c = 13.5 && b
+print c
+del c
+bool c = 13.5 and b
+print c
+del c
+bool c = 13.5 || b
+print c
+del c
+bool c = 13.5 or b
+print c
+del c
+bool c = ! 13.5
+print c
+del c
+bool c = not 13.5
+print c
+del c
+del b
 
 print "Logical operators on a mix of integer and boolean variables"
 bool a = true

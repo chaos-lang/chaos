@@ -12,6 +12,20 @@ true
 false
 true
 false
+Relational operators on boolean variables vs. boolean literals
+false
+true
+true
+false
+true
+false
+Relational operators on boolean literals vs. boolean variables
+false
+true
+true
+false
+true
+false
 Relational operators on integer variables
 false
 true
@@ -26,6 +40,20 @@ false
 true
 false
 true
+Relational operators on integer variables vs. integer literals
+false
+true
+false
+true
+false
+true
+Relational operators on integer literals vs. integer variables
+false
+true
+false
+true
+false
+true
 Relational operators on float variables
 false
 true
@@ -34,6 +62,20 @@ true
 false
 true
 Relational operators on float literals
+false
+true
+false
+true
+false
+true
+Relational operators on float variables vs. float literals
+false
+true
+false
+true
+false
+true
+Relational operators on float literals vs. float variables
 false
 true
 false
@@ -110,6 +152,20 @@ true
 true
 false
 false
+Logical operators on boolean variables vs. boolean literals
+false
+false
+true
+true
+false
+false
+Logical operators on boolean literals vs. boolean variables
+false
+false
+true
+true
+false
+false
 Logical operators on integer variables
 true
 true
@@ -118,6 +174,20 @@ true
 false
 false
 Logical operators on integer literals
+true
+true
+true
+true
+false
+false
+Logical operators on integer variables vs. integer literals
+true
+true
+true
+true
+false
+false
+Logical operators on integer literals vs. integer variables
 true
 true
 true
@@ -134,6 +204,20 @@ false
 Logical operators on float literals
 false
 false
+true
+true
+false
+false
+Logical operators on float variables vs. float literals
+true
+true
+true
+true
+false
+false
+Logical operators on float literals vs. float variables
+true
+true
 true
 true
 false
