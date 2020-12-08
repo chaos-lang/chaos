@@ -762,6 +762,7 @@ eval_node_label:
             break;
         case AST_PARENTHESIS:
             ast_node->value = ast_node->right->value;
+            ast_node->value_type = ast_node->right->value_type;
             break;
         case AST_EXPRESSION_PLUS:
             ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;

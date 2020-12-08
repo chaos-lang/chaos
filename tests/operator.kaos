@@ -926,3 +926,15 @@ print c
 del a
 del b
 del c
+
+
+print "Long mathematical expressions"
+print 3 + 5
+print 145 + 24.8
+print 0.32 + 0.42
+print (3 + 5) * 2
+print 6 * 4 / 12 + 72 / 8 - 9
+print 3 + 6 * (11 + 1 - 4) / 8 * 2
+print 3 + (6 * (11 + 1 - 4)) / 8 * 2
+print 8 / 2 * (2 + 2)
+print (17 - 6 / 2) + 4 * 3

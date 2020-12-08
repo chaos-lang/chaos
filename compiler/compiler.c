@@ -2043,10 +2043,18 @@ transpile_node_label:
             );
             break;
         case AST_PRINT_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%lld\\n\");\n", indent, ' ', ast_node->right->value.i);
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "%*cprintf(\"%s\\n\");\n", indent, ' ', ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "%*cprintf(\"%lld\\n\");\n", indent, ' ', ast_node->right->value.i);
+            }
             break;
         case AST_PRINT_MIXED_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%Lf\\n\");\n", indent, ' ', ast_node->right->value.f);
+            if (ast_node->right->is_transpiled) {
+                fprintf(c_fp, "%*cprintf(\"%s\\n\");\n", indent, ' ', ast_node->right->transpiled);
+            } else {
+                fprintf(c_fp, "%*cprintf(\"%Lg\\n\");\n", indent, ' ', ast_node->right->value.f);
+            }
             break;
         case AST_PRINT_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
@@ -2146,20 +2154,8 @@ transpile_node_label:
             if (ast_node->right->is_transpiled) {
                 setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(%s)", ast_node->right->transpiled));
             } else {
-                switch (ast_node->right->value_type)
-                {
-                    case V_BOOL:
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false"));
-                        break;
-                    case V_INT:
-                        setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i));
-                        break;
-                    case V_FLOAT:
-                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
-                        break;
-                    default:
-                        break;
-                }
+                ast_node->value = ast_node->right->value;
+                ast_node->value_type = ast_node->right->value_type;
             }
             break;
         case AST_EXPRESSION_PLUS:
