@@ -59,13 +59,9 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     cd tests/
 
-    test=$(cat $filename | chaos | tail -n +5 | sed "s|.\[1;41m\s*||g" | sed "s|.\[0;41m\s*||g" \
+    test=$(cat $filename | chaos | sed "s|.\[1;41m\s*||g" | sed "s|.\[0;41m\s*||g" \
     | sed "s|.\[1;44m\s*||g" | sed "s|\s*.\[0m||g" | sed "s|.\[5;42m\s*||g" | sed "s|.\[0;90m.*||g" \
     | sed "s|.*\/chaos|Module: ~/chaos|g")
-
-    if [[ "$testname" == "exit"* || "$testname" == "quit"* ]]; then
-        test=$(echo "$test" | sed '$d')
-    fi
 
     if [ "$test" == "$out" ]
     then

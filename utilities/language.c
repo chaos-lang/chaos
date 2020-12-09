@@ -26,6 +26,14 @@
 extern int kaos_lineno;
 
 void greet() {
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+    if (!isatty(fileno(stdin)))
+        return;
+#else
+    if (!_isatty(_fileno(stdin)))
+        return;
+#endif
+
     char lang[__KAOS_MSG_LINE_LENGTH__];
     char compiler[__KAOS_MSG_LINE_LENGTH__];
     char motto[__KAOS_MSG_LINE_LENGTH__];
@@ -129,6 +137,13 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
 }
 
 void print_bye_bye() {
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+    if (!isatty(fileno(stdin)))
+        return;
+#else
+    if (!_isatty(_fileno(stdin)))
+        return;
+#endif
     int ws_col = (int) strlen(__KAOS_BYE_BYE__) + 8 + 1;
     char bye_bye_msg[ws_col];
     sprintf(bye_bye_msg, "    %s    ", __KAOS_BYE_BYE__);
