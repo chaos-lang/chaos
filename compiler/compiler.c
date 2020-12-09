@@ -2043,21 +2043,21 @@ transpile_node_label:
             break;
         case AST_PRINT_EXPRESSION:
             if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cprintf(\"%s\\n\");\n", indent, ' ', ast_node->right->transpiled);
+                fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', ast_node->right->transpiled);
             } else {
                 fprintf(c_fp, "%*cprintf(\"%lld\\n\");\n", indent, ' ', ast_node->right->value.i);
             }
             break;
         case AST_PRINT_MIXED_EXPRESSION:
             if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cprintf(\"%s\\n\");\n", indent, ' ', ast_node->right->transpiled);
+                fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', ast_node->right->transpiled);
             } else {
                 fprintf(c_fp, "%*cprintf(\"%Lg\\n\");\n", indent, ' ', ast_node->right->value.f);
             }
             break;
         case AST_PRINT_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cprintf(\"%s\\n\");\n", indent, ' ', value_s);
+            fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', value_s);
             free(value_s);
             break;
         case AST_ECHO_VAR:
@@ -2095,7 +2095,7 @@ transpile_node_label:
             break;
         case AST_ECHO_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cprintf(\"%s\");\n", indent, ' ', value_s);
+            fprintf(c_fp, "%*cprintf(\"%%s\", \"%s\");\n", indent, ' ', value_s);
             free(value_s);
             break;
         case AST_PRETTY_PRINT_VAR:

@@ -98,3 +98,10 @@ print a
 del a
 str a = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
 print a
+
+
+// Use C string format specifiers in a Chaos string
+print "abc%s"
+del a
+str a = "12%s3"
+print a
