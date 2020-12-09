@@ -152,7 +152,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         "#include <stdbool.h>\n\n"
         "#include \"interpreter/function.h\"\n"
         "#include \"interpreter/symbol.h\"\n\n"
-        "unsigned long long nested_loop_counter;\n"
         "jmp_buf LoopBreak;\n"
         "jmp_buf LoopContinue;\n\n";
 
@@ -164,7 +163,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     free_transpiled_functions();
     free_transpiled_decisions();
 
-    fprintf(c_fp, "int main(int argc, char** argv) {\n");
+    fprintf(c_fp, "long long main(int argc, char** argv) {\n");
 
     char *fixed_module_orig = fix_bs(module_orig);
     free(module_orig);
@@ -193,7 +192,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
     fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
-    fprintf(c_fp, "%*clong long exit_code;\n", indent, ' ');
+    fprintf(c_fp, "%*clong long exit_code = 0;\n", indent, ' ');
 
     fprintf(c_fp, "%*cphase = PREPARSE;\n", indent, ' ');
     compiler_register_functions(ast_node, module, c_fp, indent);
@@ -203,8 +202,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     fprintf(
         c_fp,
         "%*cfree(argv0);\n"
-        "%*cfreeEverything(argv0);\n"
-        "%*creturn 0;\n",
+        "%*cfreeEverything();\n"
+        "%*creturn exit_code;\n",
         indent,
         ' ',
         indent,
