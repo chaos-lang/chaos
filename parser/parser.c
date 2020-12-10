@@ -27,6 +27,7 @@ extern bool disable_complex_mode;
 extern char *suggestions[1000];
 extern unsigned long long suggestions_length;
 
+#ifndef CHAOS_COMPILER
 static struct option long_options[] =
 {
     {"help", no_argument, NULL, 'h'},
@@ -38,13 +39,15 @@ static struct option long_options[] =
     {"keep", no_argument, NULL, 'k'},
     {NULL, 0, NULL, 0}
 };
+#endif
 
 int initParser(int argc, char** argv) {
     debug_enabled = false;
     bool compiler_mode = false;
-    bool keep = false;
     char *program_file = NULL;
     char *bin_file = NULL;
+#ifndef CHAOS_COMPILER
+    bool keep = false;
     char *extra_flags = NULL;
 
     char opt;
@@ -95,6 +98,7 @@ int initParser(int argc, char** argv) {
                 break;
         }
     }
+#endif
 
     if (bin_file != NULL && !compiler_mode)
         throwMissingCompileOption();

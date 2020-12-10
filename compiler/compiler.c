@@ -30,6 +30,7 @@ struct stat dir_stat = {0};
 unsigned short indent_length = 4;
 unsigned long long compiler_loop_counter = 0;
 unsigned long long compiler_function_counter = 0;
+unsigned long long compiler_symbol_counter = 0;
 unsigned long long extension_counter = 0;
 
 char *type_strings[] = {
@@ -190,8 +191,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     );
 
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
-    fprintf(c_fp, "%*cSymbol* symbol;\n", indent, ' ');
-    fprintf(c_fp, "%*clong long exit_code = 0;\n", indent, ' ');
 
     fprintf(c_fp, "%*cphase = PREPARSE;\n", indent, ' ');
     compiler_register_functions(ast_node, module, c_fp, indent);
@@ -290,11 +289,12 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     sprintf(
         cmd,
 #   if !defined(__clang__)
-        "/c %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
+        "-Werror",
         "-Werror",
         "-pedantic",
         "-fcommon",
@@ -355,7 +355,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     if (extra_flags_count > 0)
         extra_flags_count--;
 
-    unsigned arg_count = 27 + extra_flags_count;
+    unsigned arg_count = 28 + extra_flags_count;
 #   if !defined(__clang__)
     arg_count++;
 #   endif
@@ -363,37 +363,38 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     char *c_compiler_args[arg_count];
     c_compiler_args[0] = c_compiler_path;
     c_compiler_args[1] = "-Werror";
-    c_compiler_args[2] = "-pedantic";
-    c_compiler_args[3] = "-fcommon";
-    c_compiler_args[4] = "-DCHAOS_COMPILER";
-    c_compiler_args[5] = "-o";
-    c_compiler_args[6] = bin_file_path;
-    c_compiler_args[7] = c_file_path;
-    c_compiler_args[8] = "/usr/local/include/chaos/utilities/helpers.c";
-    c_compiler_args[9] = "/usr/local/include/chaos/utilities/language.c";
-    c_compiler_args[10] = "/usr/local/include/chaos/ast/ast.c";
-    c_compiler_args[11] = "/usr/local/include/chaos/interpreter/interpreter.c";
-    c_compiler_args[12] = "/usr/local/include/chaos/interpreter/errors.c";
-    c_compiler_args[13] = "/usr/local/include/chaos/interpreter/extension.c";
-    c_compiler_args[14] = "/usr/local/include/chaos/interpreter/function.c";
-    c_compiler_args[15] = "/usr/local/include/chaos/interpreter/module.c";
-    c_compiler_args[16] = "/usr/local/include/chaos/interpreter/symbol.c";
-    c_compiler_args[17] = "/usr/local/include/chaos/compiler/lib/alternative.c";
-    c_compiler_args[18] = "/usr/local/include/chaos/parser/parser.c";
-    c_compiler_args[19] = "/usr/local/include/chaos/parser.tab.c";
-    c_compiler_args[20] = "/usr/local/include/chaos/lex.yy.c";
-    c_compiler_args[21] = "/usr/local/include/chaos/Chaos.c";
-    c_compiler_args[22] = "-lreadline";
-    c_compiler_args[23] = "-L/usr/local/opt/readline/lib";
-    c_compiler_args[24] = "-ldl";
-    c_compiler_args[25] = "-I/usr/local/include/chaos/";
+    c_compiler_args[2] = "-Wall";
+    c_compiler_args[3] = "-pedantic";
+    c_compiler_args[4] = "-fcommon";
+    c_compiler_args[5] = "-DCHAOS_COMPILER";
+    c_compiler_args[6] = "-o";
+    c_compiler_args[7] = bin_file_path;
+    c_compiler_args[8] = c_file_path;
+    c_compiler_args[9] = "/usr/local/include/chaos/utilities/helpers.c";
+    c_compiler_args[10] = "/usr/local/include/chaos/utilities/language.c";
+    c_compiler_args[11] = "/usr/local/include/chaos/ast/ast.c";
+    c_compiler_args[12] = "/usr/local/include/chaos/interpreter/interpreter.c";
+    c_compiler_args[13] = "/usr/local/include/chaos/interpreter/errors.c";
+    c_compiler_args[14] = "/usr/local/include/chaos/interpreter/extension.c";
+    c_compiler_args[15] = "/usr/local/include/chaos/interpreter/function.c";
+    c_compiler_args[16] = "/usr/local/include/chaos/interpreter/module.c";
+    c_compiler_args[17] = "/usr/local/include/chaos/interpreter/symbol.c";
+    c_compiler_args[18] = "/usr/local/include/chaos/compiler/lib/alternative.c";
+    c_compiler_args[19] = "/usr/local/include/chaos/parser/parser.c";
+    c_compiler_args[20] = "/usr/local/include/chaos/parser.tab.c";
+    c_compiler_args[21] = "/usr/local/include/chaos/lex.yy.c";
+    c_compiler_args[22] = "/usr/local/include/chaos/Chaos.c";
+    c_compiler_args[23] = "-lreadline";
+    c_compiler_args[24] = "-L/usr/local/opt/readline/lib";
+    c_compiler_args[25] = "-ldl";
+    c_compiler_args[26] = "-I/usr/local/include/chaos/";
 
     for (unsigned i = 0; i < (extra_flags_count); i++) {
-        c_compiler_args[26 + i] = extra_flags_arr.arr[i];
+        c_compiler_args[27 + i] = extra_flags_arr.arr[i];
     }
 
 #   if !defined(__clang__)
-    c_compiler_args[26 + extra_flags_count] = "-fcompare-debug-second",
+    c_compiler_args[27 + extra_flags_count] = "-fcompare-debug-second",
 #   endif
 
     c_compiler_args[arg_count - 1] = NULL;
@@ -2801,95 +2802,197 @@ transpile_node_label:
             break;
         case AST_LEFT_RIGHT_BRACKET_EXPRESSION:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
+            compiler_symbol_counter++;
             if (ast_node->right->is_transpiled) {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*csymbol = addSymbolInt(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, %s);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->transpiled
+                    );
                 } else {
-                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, %s);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->transpiled
+                    );
                 }
             } else {
                 if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*csymbol = addSymbolInt(NULL, %lld);\n", indent, ' ', ast_node->right->value.i);
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, %lld);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->value.i
+                    );
                 } else {
-                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, %Lf);\n", indent, ' ', ast_node->right->value.f);
-                }
-            }
-            fprintf(c_fp, "%*csymbol->sign = 1;\n", indent, ' ');
-            fprintf(c_fp, "%*cpushLeftRightBracketStack(symbol->id);\n", indent, ' ');
-            fprintf(c_fp, "%*cdisable_complex_mode = false;\n", indent, ' ');
-            break;
-        case AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            if (ast_node->right->is_transpiled) {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*csymbol = addSymbolInt(NULL, - %s);\n", indent, ' ', ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, - %s);\n", indent, ' ', ast_node->right->transpiled);
-                }
-            } else {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*csymbol = addSymbolInt(NULL, - %lld);\n", indent, ' ', ast_node->right->value.i);
-                } else {
-                    fprintf(c_fp, "%*csymbol = addSymbolFloat(NULL, - %Lf);\n", indent, ' ', ast_node->right->value.f);
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, %Lf);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->value.f
+                    );
                 }
             }
             fprintf(
                 c_fp,
-                "%*csymbol->sign = 1;\n"
-                "%*cpushLeftRightBracketStack(symbol->id);\n"
+                "%*csymbol_%llu->sign = 1;\n",
+                indent,
+                ' ',
+                compiler_symbol_counter
+            );
+            fprintf(
+                c_fp,
+                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n",
+                indent,
+                ' ',
+                compiler_symbol_counter
+            );
+            fprintf(c_fp, "%*cdisable_complex_mode = false;\n", indent, ' ');
+            break;
+        case AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
+            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
+            compiler_symbol_counter++;
+            if (ast_node->right->is_transpiled) {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, - %s);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->transpiled
+                    );
+                } else {
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, - %s);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->transpiled
+                    );
+                }
+            } else {
+                if (ast_node->right->value_type == V_INT) {
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, - %lld);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->value.i
+                    );
+                } else {
+                    fprintf(
+                        c_fp,
+                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, - %Lf);\n",
+                        indent,
+                        ' ',
+                        compiler_symbol_counter,
+                        ast_node->right->value.f
+                    );
+                }
+            }
+            fprintf(
+                c_fp,
+                "%*csymbol_%llu->sign = 1;\n"
+                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
                 "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' '
             );
             break;
         case AST_LEFT_RIGHT_BRACKET_STRING:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            fprintf(c_fp, "%*csymbol = addSymbolString(NULL, \"%s\");\n", indent, ' ', ast_node->value.s);
+            compiler_symbol_counter++;
             fprintf(
                 c_fp,
-                "%*csymbol->sign = 1;\n"
-                "%*cpushLeftRightBracketStack(symbol->id);\n"
+                "%*cSymbol* symbol_%llu = addSymbolString(NULL, \"%s\");\n",
+                indent,
+                ' ',
+                compiler_symbol_counter,
+                ast_node->value.s
+            );
+            fprintf(
+                c_fp,
+                "%*csymbol_%llu->sign = 1;\n"
+                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
                 "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' '
             );
             break;
         case AST_LEFT_RIGHT_BRACKET_VAR:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            fprintf(c_fp, "%*csymbol = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0]);
+            compiler_symbol_counter++;
             fprintf(
                 c_fp,
-                "%*csymbol->sign = 1;\n"
-                "%*cpushLeftRightBracketStack(symbol->id);\n"
+                "%*cSymbol* symbol_%llu = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);\n",
+                indent,
+                ' ',
+                compiler_symbol_counter,
+                ast_node->strings[0]
+            );
+            fprintf(
+                c_fp,
+                "%*csymbol_%llu->sign = 1;\n"
+                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
                 "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' '
             );
             break;
         case AST_LEFT_RIGHT_BRACKET_VAR_MINUS:
             fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            fprintf(c_fp, "%*csymbol = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0]);
+            compiler_symbol_counter++;
             fprintf(
                 c_fp,
-                "%*csymbol->sign = -1;\n"
-                "%*cpushLeftRightBracketStack(symbol->id);\n"
+                "%*cSymbol* symbol_%llu = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);\n",
+                indent,
+                ' ',
+                compiler_symbol_counter,
+                ast_node->strings[0]
+            );
+            fprintf(
+                c_fp,
+                "%*csymbol_%llu->sign = -1;\n"
+                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
                 "%*cdisable_complex_mode = false;\n",
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' '
             );
@@ -2914,7 +3017,7 @@ transpile_node_label:
             if (ast_node->right->is_transpiled) {
                 fprintf(
                     c_fp,
-                    "%*cexit_code = %s;\n"
+                    "%*clong long exit_code = %s;\n"
                     "%*cfreeEverything();\n"
                     "%*cexit(exit_code);\n",
                     indent,
@@ -2928,7 +3031,7 @@ transpile_node_label:
             } else {
                 fprintf(
                     c_fp,
-                    "%*cexit_code = %lld;\n"
+                    "%*clong long exit_code = %lld;\n"
                     "%*cfreeEverything();\n"
                     "%*cexit(exit_code);\n",
                     indent,
@@ -2944,7 +3047,7 @@ transpile_node_label:
         case AST_EXIT_VAR:
             fprintf(
                 c_fp,
-                "%*cexit_code = getSymbolValueInt(\"%s\");\n"
+                "%*clong long exit_code = getSymbolValueInt(\"%s\");\n"
                 "%*cfreeEverything();\n"
                 "%*cexit(exit_code);\n",
                 indent,
@@ -3086,15 +3189,17 @@ transpile_node_label:
             fprintf(c_fp, "%*creverseComplexMode();\n", indent, ' ');
             break;
         case AST_JSON_PARSER:
+            compiler_symbol_counter++;
             fprintf(
                 c_fp,
                 "%*creverseComplexMode();\n"
-                "%*csymbol = finishComplexMode(NULL, K_ANY);\n"
+                "%*cSymbol* symbol_%llu = finishComplexMode(NULL, K_ANY);\n"
                 "%*creturnVariable(symbol);\n",
                 indent,
                 ' ',
                 indent,
                 ' ',
+                compiler_symbol_counter,
                 indent,
                 ' '
             );
