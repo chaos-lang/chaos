@@ -143,6 +143,9 @@ static int custom_input(char *buf, int result, int max_size) {
 #endif
 %}
 
+%option noinput
+%option nounput
+
 %x COMMENT
 
 %%

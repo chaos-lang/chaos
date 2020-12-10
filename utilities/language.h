@@ -74,16 +74,4 @@ void yyerror_msg(char* error_name, char* current_module, char* cause);
 void print_bye_bye();
 void print_help();
 
-static struct option long_options[] =
-{
-    {"help", no_argument, NULL, 'h'},
-    {"version", no_argument, NULL, 'v'},
-    {"debug", no_argument, NULL, 'd'},
-    {"compile", required_argument, NULL, 'c'},
-    {"output", required_argument, NULL, 'o'},
-    {"extra", required_argument, NULL, 'e'},
-    {"keep", no_argument, NULL, 'k'},
-    {NULL, 0, NULL, 0}
-};
-
 #endif

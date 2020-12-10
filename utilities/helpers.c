@@ -659,8 +659,7 @@ void copy_binary_file(char* source_path, char* target_path) {
     fclose(target_fp);
 }
 
-bool in(char *s, char **x) {
-    int len = sizeof(x)/sizeof(x[0]);
+bool in(char *s, char **x, int len) {
     int i;
     for (i = 0; i < len; ++i) {
         if (!strcmp(x[i], s)) {

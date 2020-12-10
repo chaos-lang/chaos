@@ -27,6 +27,18 @@ extern bool disable_complex_mode;
 extern char *suggestions[1000];
 extern unsigned long long suggestions_length;
 
+static struct option long_options[] =
+{
+    {"help", no_argument, NULL, 'h'},
+    {"version", no_argument, NULL, 'v'},
+    {"debug", no_argument, NULL, 'd'},
+    {"compile", required_argument, NULL, 'c'},
+    {"output", required_argument, NULL, 'o'},
+    {"extra", required_argument, NULL, 'e'},
+    {"keep", no_argument, NULL, 'k'},
+    {NULL, 0, NULL, 0}
+};
+
 int initParser(int argc, char** argv) {
     debug_enabled = false;
     bool compiler_mode = false;

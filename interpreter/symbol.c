@@ -850,7 +850,7 @@ Symbol* getListElement(Symbol* symbol, long long i) {
 
 void cloneSymbolToComplex(char *name, char *key) {
     Symbol* symbol = getSymbol(name);
-    Symbol* cloned_symbol = deepCopySymbol(symbol, symbol->type, key);
+    deepCopySymbol(symbol, symbol->type, key);
 }
 
 Symbol* getComplexElement(Symbol* complex, long long i, char *key) {
@@ -923,7 +923,6 @@ void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Ty
         }
 
         if (i < 0 || i > strlen(complex->value.s) - 1) {
-            char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
             throw_error(E_INDEX_OUT_OF_RANGE_STRING, complex->name, NULL, orig_i);
         }
 

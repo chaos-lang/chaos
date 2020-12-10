@@ -42,11 +42,10 @@ char *type_strings[] = {
     "K_VOID"
 };
 
-char* relational_operators[] = {"==", "!=", ">", "<", ">=", "<="};
-char* relational_operators_size[] = {">", "<", ">=", "<="};
+char* relational_operators[] = {">", "<", ">=", "<="};
+int relational_operators_size = 5;
 char* logical_operators[] = {"&&", "||", "!"};
-char* bitwise_operators[] = {"&", "|", "^", "~", "<<", ">>"};
-char* unary_operators[] = {"++", "--"};
+int logical_operators_size = 3;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep) {
     printf("Starting compiling...\n");
@@ -3111,7 +3110,7 @@ transpile_node_label:
 bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type) {
     if ((ast_node->left != NULL && ast_node->left->is_transpiled) || (ast_node->right != NULL && ast_node->right->is_transpiled)) {
         if (ast_node->left != NULL && ast_node->left->is_transpiled) {
-            if (in(operator, relational_operators_size)) {
+            if (in(operator, relational_operators, relational_operators_size)) {
                 setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->left->transpiled));
             } else {
                 setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled));
@@ -3120,21 +3119,21 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
             switch (left_value_type)
             {
                 case V_BOOL:
-                    if (in(operator, relational_operators_size)) {
+                    if (in(operator, relational_operators, relational_operators_size)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.b ? 1 : 0));
                     } else {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.b ? "true" : "false"));
                     }
                     break;
                 case V_INT:
-                    if (in(operator, logical_operators)) {
+                    if (in(operator, logical_operators, logical_operators_size)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.i > 0 ? "true" : "false"));
                     } else {
                         setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i));
                     }
                     break;
                 case V_FLOAT:
-                    if (in(operator, logical_operators)) {
+                    if (in(operator, logical_operators, logical_operators_size)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.f > 0.0 ? "true" : "false"));
                     } else {
                         setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->left->value.f));
@@ -3148,7 +3147,7 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
         setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, operator));
         setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, " "));
         if (ast_node->right != NULL && ast_node->right->is_transpiled) {
-            if (in(operator, relational_operators_size)) {
+            if (in(operator, relational_operators, relational_operators_size)) {
                 setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->right->transpiled));
             } else {
                 setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled));
@@ -3157,21 +3156,21 @@ bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType
             switch (right_value_type)
             {
                 case V_BOOL:
-                    if (in(operator, relational_operators_size)) {
+                    if (in(operator, relational_operators, relational_operators_size)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.b ? 1 : 0));
                     } else {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false"));
                     }
                     break;
                 case V_INT:
-                    if (in(operator, logical_operators)) {
+                    if (in(operator, logical_operators, logical_operators_size)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.i ? "true" : "false"));
                     } else {
                         setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i));
                     }
                     break;
                 case V_FLOAT:
-                    if (in(operator, logical_operators)) {
+                    if (in(operator, logical_operators, logical_operators_size)) {
                         setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.f ? "true" : "false"));
                     } else {
                         setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
