@@ -100,10 +100,9 @@ ASTNode* addASTNodeString(enum ASTNodeType node_type, int lineno, char *strings[
 }
 
 ASTNode* addASTNodeBranch(enum ASTNodeType node_type, int lineno, ASTNode* l_node, ASTNode* r_node) {
-    char *strings[] = {};
     size_t strings_size = 0;
     union Value value;
-    ASTNode* ast_node = addASTNodeBase(node_type, lineno, strings, strings_size, value, V_VOID);
+    ASTNode* ast_node = addASTNodeBase(node_type, lineno, NULL, strings_size, value, V_VOID);
     ast_node->left = l_node;
     ast_node->right = r_node;
     return ast_node;

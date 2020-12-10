@@ -507,10 +507,6 @@ char* escape_the_sequences_in_string_literal(char* string) {
                     new_string[i+1] = '\b';
                     remove_nth_char(new_string, i);
                     break;
-                case 'e':
-                    new_string[i+1] = '\e';
-                    remove_nth_char(new_string, i);
-                    break;
                 case 'f':
                     new_string[i+1] = '\f';
                     remove_nth_char(new_string, i);
@@ -567,10 +563,6 @@ char* escape_string_literal_for_transpiler(char* string) {
             case '\b':
                 new_string = insert_nth_char(new_string, '\\', i);
                 new_string[i+1] = 'b';
-                break;
-            case '\e':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'e';
                 break;
             case '\f':
                 new_string = insert_nth_char(new_string, '\\', i);

@@ -163,7 +163,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     free_transpiled_functions();
     free_transpiled_decisions();
 
-    fprintf(c_fp, "long long main(int argc, char** argv) {\n");
+    fprintf(c_fp, "int main(int argc, char** argv) {\n");
 
     char *fixed_module_orig = fix_bs(module_orig);
     free(module_orig);
@@ -203,7 +203,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         c_fp,
         "%*cfree(argv0);\n"
         "%*cfreeEverything();\n"
-        "%*creturn exit_code;\n",
+        "%*creturn 0;\n",
         indent,
         ' ',
         indent,
@@ -291,11 +291,14 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     sprintf(
         cmd,
 #   if !defined(__clang__)
-        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
+        "-Werror",
+        "-pedantic",
+        "-fcommon",
 #   if !defined(__clang__)
         "-fcompare-debug-second",
         "-D__USE_MINGW_ANSI_STDIO",
@@ -353,43 +356,45 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     if (extra_flags_count > 0)
         extra_flags_count--;
 
-    unsigned arg_count = 25 + extra_flags_count;
+    unsigned arg_count = 27 + extra_flags_count;
 #   if !defined(__clang__)
     arg_count++;
 #   endif
 
     char *c_compiler_args[arg_count];
     c_compiler_args[0] = c_compiler_path;
-    c_compiler_args[1] = "-fcommon";
-    c_compiler_args[2] = "-DCHAOS_COMPILER";
-    c_compiler_args[3] = "-o";
-    c_compiler_args[4] = bin_file_path;
-    c_compiler_args[5] = c_file_path;
-    c_compiler_args[6] = "/usr/local/include/chaos/utilities/helpers.c";
-    c_compiler_args[7] = "/usr/local/include/chaos/utilities/language.c";
-    c_compiler_args[8] = "/usr/local/include/chaos/ast/ast.c";
-    c_compiler_args[9] = "/usr/local/include/chaos/interpreter/interpreter.c";
-    c_compiler_args[10] = "/usr/local/include/chaos/interpreter/errors.c";
-    c_compiler_args[11] = "/usr/local/include/chaos/interpreter/extension.c";
-    c_compiler_args[12] = "/usr/local/include/chaos/interpreter/function.c";
-    c_compiler_args[13] = "/usr/local/include/chaos/interpreter/module.c";
-    c_compiler_args[14] = "/usr/local/include/chaos/interpreter/symbol.c";
-    c_compiler_args[15] = "/usr/local/include/chaos/compiler/lib/alternative.c";
-    c_compiler_args[16] = "/usr/local/include/chaos/parser/parser.c";
-    c_compiler_args[17] = "/usr/local/include/chaos/parser.tab.c";
-    c_compiler_args[18] = "/usr/local/include/chaos/lex.yy.c";
-    c_compiler_args[19] = "/usr/local/include/chaos/Chaos.c";
-    c_compiler_args[20] = "-lreadline";
-    c_compiler_args[21] = "-L/usr/local/opt/readline/lib";
-    c_compiler_args[22] = "-ldl";
-    c_compiler_args[23] = "-I/usr/local/include/chaos/";
+    c_compiler_args[1] = "-Werror";
+    c_compiler_args[2] = "-pedantic";
+    c_compiler_args[3] = "-fcommon";
+    c_compiler_args[4] = "-DCHAOS_COMPILER";
+    c_compiler_args[5] = "-o";
+    c_compiler_args[6] = bin_file_path;
+    c_compiler_args[7] = c_file_path;
+    c_compiler_args[8] = "/usr/local/include/chaos/utilities/helpers.c";
+    c_compiler_args[9] = "/usr/local/include/chaos/utilities/language.c";
+    c_compiler_args[10] = "/usr/local/include/chaos/ast/ast.c";
+    c_compiler_args[11] = "/usr/local/include/chaos/interpreter/interpreter.c";
+    c_compiler_args[12] = "/usr/local/include/chaos/interpreter/errors.c";
+    c_compiler_args[13] = "/usr/local/include/chaos/interpreter/extension.c";
+    c_compiler_args[14] = "/usr/local/include/chaos/interpreter/function.c";
+    c_compiler_args[15] = "/usr/local/include/chaos/interpreter/module.c";
+    c_compiler_args[16] = "/usr/local/include/chaos/interpreter/symbol.c";
+    c_compiler_args[17] = "/usr/local/include/chaos/compiler/lib/alternative.c";
+    c_compiler_args[18] = "/usr/local/include/chaos/parser/parser.c";
+    c_compiler_args[19] = "/usr/local/include/chaos/parser.tab.c";
+    c_compiler_args[20] = "/usr/local/include/chaos/lex.yy.c";
+    c_compiler_args[21] = "/usr/local/include/chaos/Chaos.c";
+    c_compiler_args[22] = "-lreadline";
+    c_compiler_args[23] = "-L/usr/local/opt/readline/lib";
+    c_compiler_args[24] = "-ldl";
+    c_compiler_args[25] = "-I/usr/local/include/chaos/";
 
     for (unsigned i = 0; i < (extra_flags_count); i++) {
-        c_compiler_args[24 + i] = extra_flags_arr.arr[i];
+        c_compiler_args[26 + i] = extra_flags_arr.arr[i];
     }
 
 #   if !defined(__clang__)
-    c_compiler_args[24 + extra_flags_count] = "-fcompare-debug-second",
+    c_compiler_args[26 + extra_flags_count] = "-fcompare-debug-second",
 #   endif
 
     c_compiler_args[arg_count - 1] = NULL;

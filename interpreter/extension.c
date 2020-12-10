@@ -109,7 +109,11 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
         fprintf(stderr, "Unable to open lib: %s\n", dlerror());
 #endif
     }
-    dylib.func = LIBFUNC(dylib.handle, function_name);
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    *(long long **) (&dylib.func) = LIBFUNC(dylib.handle, function_name);
+#else
+    *(void **) (&dylib.func) = LIBFUNC(dylib.handle, function_name);
+#endif
 
     if (dylib.func == NULL) {
         fprintf(stderr, "Unable to get symbol\n");

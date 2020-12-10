@@ -119,7 +119,7 @@ win_bison -d parser\parser.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-%compiler% -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c parser/*.c utilities/*.c utilities/windows/*.c ast/*.c interpreter/*.c compiler/*.c Chaos.c %extra_flags%
+%compiler% -Werror -pedantic -fcommon -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c parser/*.c utilities/*.c utilities/windows/*.c ast/*.c interpreter/*.c compiler/*.c Chaos.c %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )
