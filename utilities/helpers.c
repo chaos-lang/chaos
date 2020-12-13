@@ -84,7 +84,7 @@ char *fileGetContents(char *file_path) {
 }
 #else
 char *fileGetContents(char *file_path) {
-    char *file_buffer;
+    char *file_buffer = NULL;
     long length;
     FILE * f = fopen(file_path, "rb");
     if (f) {

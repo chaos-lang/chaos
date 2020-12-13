@@ -446,6 +446,7 @@ void startFunctionParameters() {
 
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type) {
     union Value value;
+    value.i = 0;
     Symbol* symbol = addSymbol(NULL, type, value, V_VOID);
     symbol->secondary_name = malloc(1 + strlen(secondary_name));
     strcpy(symbol->secondary_name, secondary_name);

@@ -62,6 +62,7 @@ ASTNode* addASTNodeBase(enum ASTNodeType node_type, int lineno, char *strings[],
 
 ASTNode* addASTNode(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size) {
     union Value value;
+    value.i = 0;
     return addASTNodeBase(node_type, lineno, strings, strings_size, value, V_VOID);
 }
 
@@ -102,6 +103,7 @@ ASTNode* addASTNodeString(enum ASTNodeType node_type, int lineno, char *strings[
 ASTNode* addASTNodeBranch(enum ASTNodeType node_type, int lineno, ASTNode* l_node, ASTNode* r_node) {
     size_t strings_size = 0;
     union Value value;
+    value.i = 0;
     ASTNode* ast_node = addASTNodeBase(node_type, lineno, NULL, strings_size, value, V_VOID);
     ast_node->left = l_node;
     ast_node->right = r_node;
@@ -116,6 +118,7 @@ ASTNode* addASTNodeAssign(enum ASTNodeType node_type, int lineno, char *strings[
 
 ASTNode* addASTNodeFull(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, ASTNode* l_node, ASTNode* r_node) {
     union Value value;
+    value.i = 0;
     ASTNode* ast_node = addASTNodeBase(node_type, lineno, strings, strings_size, value, V_VOID);
     ast_node->left = l_node;
     ast_node->right = r_node;

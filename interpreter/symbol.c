@@ -346,7 +346,7 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
     if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         return 0;
     }
-    long long value;
+    long long value = 0;
     switch (symbol->value_type)
     {
         case V_BOOL:
@@ -622,6 +622,7 @@ void updateSymbolString(char *name, char *s) {
 
 void addSymbolList(char *name) {
     union Value value;
+    value.i = 0;
     Symbol* complex_mode = addSymbol(name, K_LIST, value, V_VOID);
     pushComplexModeStack(complex_mode);
 }
@@ -855,7 +856,7 @@ void cloneSymbolToComplex(char *name, char *key) {
 
 Symbol* getComplexElement(Symbol* complex, long long i, char *key) {
 
-    Symbol* symbol;
+    Symbol* symbol = NULL;
     if (complex->type == K_LIST || complex->type == K_STRING) {
         symbol = getListElement(complex, i);
     } else if (complex->type == K_DICT) {
@@ -873,7 +874,7 @@ Symbol* getComplexElementBySymbolId(Symbol* complex, unsigned long long symbol_i
     char *key = getSymbolValueString_NullIfNotString(access_symbol);
     removeSymbol(access_symbol);
 
-    Symbol* symbol;
+    Symbol* symbol = NULL;
     if (complex->type == K_LIST || complex->type == K_STRING) {
         symbol = getListElement(complex, i);
     } else if (complex->type == K_DICT) {
@@ -1022,7 +1023,7 @@ void removeComplexElement(Symbol* complex, unsigned long long symbol_id) {
     char *key = getSymbolValueString_NullIfNotString(access_symbol);
     removeSymbol(access_symbol);
 
-    Symbol* symbol;
+    Symbol* symbol = NULL;
     if (complex->type == K_STRING) {
         long long orig_i = i;
 
@@ -1084,6 +1085,7 @@ void removeComplexElementByLeftRightBracketStack(char *name) {
 
 void addSymbolDict(char *name) {
     union Value value;
+    value.i = 0;
     Symbol* complex_mode = addSymbol(name, K_DICT, value, V_VOID);
     pushComplexModeStack(complex_mode);
 }
@@ -1296,9 +1298,11 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
     switch (type)
     {
         case K_BOOL:
+            value.b = false;
             value_type = V_BOOL;
             break;
         case K_NUMBER:
+            value.f = 0.0;
             value_type = V_FLOAT;
             break;
         case K_STRING:
@@ -1307,6 +1311,8 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
             value_type = V_STRING;
             break;
         default:
+            value.i = 0;
+            value_type = V_INT;
             append_to_array_without_malloc(&free_string_stack, name);
             throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
             break;
