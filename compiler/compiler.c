@@ -44,7 +44,7 @@ char *type_strings[] = {
 };
 
 char* relational_operators[] = {">", "<", ">=", "<="};
-int relational_operators_size = 5;
+int relational_operators_size = 4;
 char* logical_operators[] = {"&&", "||", "!"};
 int logical_operators_size = 3;
 
