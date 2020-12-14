@@ -30,22 +30,18 @@
 #   define OPENLIB(libname) LoadLibrary(libname)
 #   define CLOSELIB(handle) FreeLibrary(handle)
 #   define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
+typedef FARPROC lib_func;
 #else
 #   include <dlfcn.h>
 #   define LIBTYPE void*
 #   define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_NODELETE)
 #   define CLOSELIB(handle) dlclose(handle)
 #   define LIBFUNC(lib, fn) dlsym((lib), (fn))
+typedef void (*lib_func)();
 #endif
 
 #include "function.h"
 #include "../Chaos.h"
-
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-typedef FARPROC lib_func;
-#else
-typedef void (*lib_func)();
-#endif
 
 typedef struct dynamic_library {
     void     *handle;

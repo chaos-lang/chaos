@@ -109,11 +109,10 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
         fprintf(stderr, "Unable to open lib: %s\n", dlerror());
 #endif
     }
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
     dylib.func = LIBFUNC(dylib.handle, function_name);
-#else
-    *(void **) (&dylib.func) = LIBFUNC(dylib.handle, function_name);
-#endif
+#pragma GCC diagnostic pop
 
     if (dylib.func == NULL) {
         fprintf(stderr, "Unable to get symbol\n");
