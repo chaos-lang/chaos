@@ -59,7 +59,7 @@ int initParser(int argc, char** argv) {
                 print_help();
                 exit(0);
             case 'v':
-                printf("%s\n", __KAOS_LANGUAGE_VERSION__);
+                printf("%d.%d.%d\n", __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__, __KAOS_VERSION_PATCHLEVEL__);
                 exit(0);
             case 'd':
                 debug_enabled = true;

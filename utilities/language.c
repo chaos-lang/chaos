@@ -38,11 +38,34 @@ void greet() {
     char compiler[__KAOS_MSG_LINE_LENGTH__];
     char motto[__KAOS_MSG_LINE_LENGTH__];
 
-    sprintf(lang, "    %s Language %s (%s %s) ", __KAOS_LANGUAGE_NAME__, __KAOS_LANGUAGE_VERSION__, __DATE__, __TIME__);
+    sprintf(
+        lang,
+        "    %s Language %d.%d.%d (%s %s) ",
+        __KAOS_LANGUAGE_NAME__,
+        __KAOS_VERSION_MAJOR__,
+        __KAOS_VERSION_MINOR__,
+        __KAOS_VERSION_PATCHLEVEL__,
+        __DATE__,
+        __TIME__
+    );
 #if defined(__clang__)
-    sprintf(compiler, "    Clang version: %d.%d.%d on %s ", __clang_major__, __clang_minor__, __clang_patchlevel__, __KAOS_PLATFORM_NAME__);
+    sprintf(
+        compiler,
+        "    Clang version: %d.%d.%d on %s ",
+        __clang_major__,
+        __clang_minor__,
+        __clang_patchlevel__,
+        __KAOS_PLATFORM_NAME__
+    );
 #elif defined(__GNUC__) || defined(__GNUG__)
-    sprintf(compiler, "    GCC version: %d.%d.%d on %s ", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, __KAOS_PLATFORM_NAME__);
+    sprintf(
+        compiler,
+        "    GCC version: %d.%d.%d on %s ",
+        __GNUC__,
+        __GNUC_MINOR__,
+        __GNUC_PATCHLEVEL__,
+        __KAOS_PLATFORM_NAME__
+    );
 #endif
     sprintf(motto, "    %s", __KAOS_LANGUAGE_MOTTO__);
 
@@ -213,7 +236,16 @@ unsigned int help_txt_len = 542;
 
 void print_help() {
     char lang[__KAOS_MSG_LINE_LENGTH__];
-    sprintf(lang, "%s Language %s (%s %s) ", __KAOS_LANGUAGE_NAME__, __KAOS_LANGUAGE_VERSION__, __DATE__, __TIME__);
+    sprintf(
+        lang,
+        "%s Language %d.%d.%d (%s %s) ",
+        __KAOS_LANGUAGE_NAME__,
+        __KAOS_VERSION_MAJOR__,
+        __KAOS_VERSION_MINOR__,
+        __KAOS_VERSION_PATCHLEVEL__,
+        __DATE__,
+        __TIME__
+    );
     printf("%s\n\n", lang);
     printf("%s", help_txt);
 }
