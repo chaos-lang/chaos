@@ -291,14 +291,14 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 #   if !defined(__clang__)
         "/c %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
-        "-Werror",
-        "-Werror",
-        "-pedantic",
         "-fcommon",
 #   if !defined(__clang__)
+        "-Werror",
+        "-Wall",
+        "-pedantic",
         "-fcompare-debug-second",
         "-D__USE_MINGW_ANSI_STDIO",
 #   else
