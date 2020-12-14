@@ -174,4 +174,6 @@ int add_suggestion(char *suggestion) {
     suggestions_length++;
     return 0;
 }
+#else
+typedef int make_iso_compilers_happy;
 #endif

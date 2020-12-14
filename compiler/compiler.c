@@ -477,7 +477,7 @@ transpile_functions_label:
 
     if (debug_enabled)
         printf(
-            "(TranspileF)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(TranspileF)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
@@ -579,7 +579,7 @@ transpile_decisions_label:
 
     if (debug_enabled)
         printf(
-            "(TranspileD)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(TranspileD)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
@@ -805,7 +805,7 @@ compiler_register_functions_label:
 
     if (debug_enabled)
         printf(
-            "(TranspileR)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(TranspileR)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
@@ -1237,7 +1237,7 @@ transpile_node_label:
 
     if (debug_enabled)
         printf(
-            "(Transpile)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(Transpile)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,

@@ -110,7 +110,7 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
 #endif
     }
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    *(long long **) (&dylib.func) = LIBFUNC(dylib.handle, function_name);
+    dylib.func = LIBFUNC(dylib.handle, function_name);
 #else
     *(void **) (&dylib.func) = LIBFUNC(dylib.handle, function_name);
 #endif

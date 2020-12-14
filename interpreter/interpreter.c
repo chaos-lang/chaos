@@ -104,7 +104,7 @@ register_functions_label:
 
     if (debug_enabled)
         printf(
-            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
@@ -310,7 +310,7 @@ eval_node_label:
 
     if (debug_enabled)
         printf(
-            "(Execute)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %lu}\n",
+            "(Execute)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,

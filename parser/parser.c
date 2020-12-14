@@ -175,7 +175,7 @@ int initParser(int argc, char** argv) {
         }
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        !is_interactive ?: printf("%s ", __KAOS_SHELL_INDICATOR__);
+        !is_interactive ? is_interactive : printf("%s ", __KAOS_SHELL_INDICATOR__);
 #endif
         main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
