@@ -87,7 +87,7 @@ Type "apropos word" to search for commands related to "word".
 Reading symbols from chaos...done.
 (gdb) run
 Starting program: /home/mertyildiran/Documents/chaos/chaos
-    Chaos Language 0.1.0 (Nov 30 2020 04:39:36)
+    Chaos Language 0.1.1 (Dec 16 2020 00:59:03)
     GCC version: 9.3.0 on linux
     Turn chaos into magic!
 
@@ -113,7 +113,7 @@ the parsing and execution order using the Abstract Syntax Tree (AST):
 
 ```
 $ chaos -d
-    Chaos Language 0.1.0 (Nov 30 2020 04:39:36)
+    Chaos Language 0.1.1 (Dec 16 2020 00:59:03)
     GCC version: 9.3.0 on linux
     Turn chaos into magic!
 

@@ -26,7 +26,7 @@
 #define __KAOS_LANGUAGE_NAME__ "Chaos"
 #define __KAOS_VERSION_MAJOR__ 0
 #define __KAOS_VERSION_MINOR__ 1
-#define __KAOS_VERSION_PATCHLEVEL__ 0
+#define __KAOS_VERSION_PATCHLEVEL__ 1
 #define __KAOS_LANGUAGE_FILE_EXTENSION__ "kaos"
 #define __KAOS_LANGUAGE_MOTTO__ "Turn chaos into magic!"
 #define __KAOS_LANGUAGE_KEYWORD_COUNT__ 33
