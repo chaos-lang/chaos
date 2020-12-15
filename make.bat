@@ -105,10 +105,25 @@ IF [%1]==[] (
     CALL make.bat test-extensions-windows-gcc
     chaos -c tests\extensions\test.kaos
     build\main
+    IF errorlevel 1 (
+        EXIT /B 1
+    )
+    EXIT /B 0
 ) ELSE IF [%1]==[test-compiler-extensions-windows-clang] (
     CALL make.bat test-extensions-windows-clang
     chaos -c tests\extensions\test.kaos
     build\main
+    IF errorlevel 1 (
+        EXIT /B 1
+    )
+    EXIT /B 0
+) ELSE IF [%1]==[test-official-spells] (
+    CALL tests\official_spells.bat
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
 )
 
 win_flex --wincompat lexer\lexer.l

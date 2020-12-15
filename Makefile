@@ -147,6 +147,9 @@ test-compiler-extensions-macos-clang: test-extensions-macos-clang
 test-cli-args:
 	./tests/cli_args.sh
 
+test-official-spells:
+	./tests/official_spells.sh
+
 memcheck:
 	./tests/memcheck.sh
 
