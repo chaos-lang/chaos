@@ -132,6 +132,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         fprintf(h_fp, "#define MAIN_H\n\n");
     }
 
+    fprintf(c_fp, "#include <math.h>\n\n");
+
     if (bin_file != NULL) {
         fprintf(c_fp, "#include \"%s.h\"\n\n", bin_file);
     } else {
@@ -144,8 +146,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         "extern bool disable_complex_mode;\n\n"
         "int kaos_lineno;\n"
         "bool is_interactive = false;\n"
-        "unsigned long long nested_loop_counter = 0;\n"
-        "const long double inf = 1.0 / 0.0;\n\n";
+        "unsigned long long nested_loop_counter = 0;\n\n";
 
     const char *h_file_base =
         "#include <stdio.h>\n"
@@ -2299,6 +2300,10 @@ transpile_node_label:
                     r_value = (long double) ast_node->right->value.i;
                 } else {
                     r_value = ast_node->right->value.f;
+                }
+                if (r_value == 0.0) {
+                    setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", "INFINITY"));
+                    break;
                 }
                 ast_node->value.f = l_value / r_value;
             }
