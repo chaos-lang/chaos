@@ -1,8 +1,6 @@
 name: "[release] Test the Official Spells"
 
-on:
-  release:
-    types: [published, prereleased, released]
+on: [push, pull_request, release]
 
 jobs:
   linux:
