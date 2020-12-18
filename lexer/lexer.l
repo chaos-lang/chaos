@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "ast/ast.h"
 #include "lexer/lexer.h"
@@ -247,12 +248,25 @@ switch (phase)
     return T_STRING;
 }
 
+0[xX][0-9a-fA-F]+ {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#if UINTPTR_MAX == 0xffffffff
+    yylval.ptrval = (void *) strtol(yytext, NULL, 0);
+#else
+    yylval.ptrval = (void *) strtoll(yytext, NULL, 0);
+#endif
+#pragma GCC diagnostic pop
+    return T_PTR;
+}
+
 "bool"                          {return T_VAR_BOOL;}
 "num"                           {return T_VAR_NUMBER;}
 "str"                           {return T_VAR_STRING;}
 "list"                          {return T_VAR_LIST;}
 "dict"                          {return T_VAR_DICT;}
 "any"                           {return T_VAR_ANY;}
+"ptr"                           {return T_VAR_PTR;}
 "null"                          {return T_NULL;}
 "void"                          {return T_VOID;}
 "def"                           {return T_FUNCTION;}

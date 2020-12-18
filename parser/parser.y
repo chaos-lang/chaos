@@ -50,6 +50,7 @@ extern bool is_complex_parsing;
     long long ival;
     long double fval;
     char *sval;
+    void *ptrval;
     unsigned long long lluval;
     ASTNode* ast_node_type;
 }
@@ -59,12 +60,13 @@ extern bool is_complex_parsing;
 %token<ival> T_INT T_TIMES_DO_INT
 %token<fval> T_FLOAT
 %token<sval> T_STRING T_VAR
+%token<ptrval> T_PTR
 %token<lluval> T_UNSIGNED_LONG_LONG_INT
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
 %token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_DOT T_COLON
 %token T_NEWLINE T_QUIT
 %token T_PRINT T_ECHO T_PRETTY
-%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_LIST T_VAR_DICT T_VAR_ANY T_NULL
+%token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_LIST T_VAR_DICT T_VAR_ANY T_VAR_PTR T_NULL
 %token T_DEL T_RETURN T_VOID T_DEFAULT T_BREAK T_CONTINUE
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM T_BACKSLASH T_INFINITE
@@ -78,6 +80,7 @@ extern bool is_complex_parsing;
 %type<ast_node_type> expression
 %type<ast_node_type> mixed_expression
 %type<ast_node_type> boolean_expression
+%type<ast_node_type> ptr_expression
 %type<ast_node_type> left_right_bracket
 %type<ast_node_type> variable_complex_element
 %type<ast_node_type> function_parameters_start
@@ -443,6 +446,9 @@ expression: T_INT                                                               
     | T_LEFT T_RIGHT                                                                                                    { yyerror(__KAOS_SYNTAX_ERROR__); }
 ;
 
+ptr_expression: T_PTR                                                                                                   {                                     ASTNode* ast_node = addASTNodePtr(AST_PTR_VALUE, yylineno, NULL, 0, $1, NULL);                                                                                                                                                                                                                                               $$ = ast_node; }
+;
+
 boolean_expression: T_TRUE                                                                                              {                                     ASTNode* ast_node = addASTNodeBool(AST_BOOLEAN_EXPRESSION_VALUE, yylineno, NULL, 0, $1, NULL);                                                                                                                                                                                                                                                      $$ = ast_node; }
     | boolean_expression T_REL_EQUAL boolean_expression                                                                 {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_EQUAL, yylineno, $1, $3);                                                                                                                                                                                                                                                           $$ = ast_node; }
     | boolean_expression T_REL_NOT_EQUAL boolean_expression                                                             {                                     ASTNode* ast_node = addASTNodeBranch(AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL, yylineno, $1, $3);                                                                                                                                                                                                                                                       $$ = ast_node; }
@@ -716,6 +722,7 @@ variable:                                                                       
     | T_VAR_NUMBER T_VAR_LIST T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                     { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN, yylineno, strings, 3, $9);                   ASTNodeNext(ast_node); }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_LEFT function_call_parameters_start                                 { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN, yylineno, strings, 2, $7);                   ASTNodeNext(ast_node); }
     | T_VAR_NUMBER T_VAR_DICT T_VAR T_EQUAL T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                     { char *strings[] = {$3, $5, $7};     ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN, yylineno, strings, 3, $9);                   ASTNodeNext(ast_node); }
+    | T_VAR_PTR T_VAR T_EQUAL ptr_expression                                                                            { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_PTR, yylineno, strings, 1, $4);                                       ASTNodeNext(ast_node); }
     | T_VAR_STRING T_VAR T_EQUAL T_NEWLINE                                                                              { free($2); yyerror(__KAOS_SYNTAX_ERROR__); }
     | T_VAR_STRING T_VAR T_EQUAL T_STRING                                                                               { char *strings[] = {$2};             ASTNode* ast_node = addASTNodeString(AST_VAR_CREATE_STRING, yylineno, strings, 1, $4, NULL);                              ASTNodeNext(ast_node); }
     | T_VAR_STRING T_VAR T_EQUAL T_VAR                                                                                  { char *strings[] = {$2, $4};         ASTNode* ast_node = addASTNode(AST_VAR_CREATE_STRING_VAR, yylineno, strings, 2);                                          ASTNodeNext(ast_node); }

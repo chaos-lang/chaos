@@ -90,6 +90,14 @@ ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[]
     return ast_node;
 }
 
+ASTNode* addASTNodePtr(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, void* ptr, ASTNode* node) {
+    union Value value;
+    value.ptr = ptr;
+    ASTNode* ast_node = addASTNodeBase(node_type, lineno, strings, strings_size, value, V_PTR);
+    ast_node->right = node;
+    return ast_node;
+}
+
 ASTNode* addASTNodeString(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, char *s, ASTNode* node) {
     union Value value;
     value.s = malloc(1 + strlen(s));
@@ -199,6 +207,7 @@ char *ast_node_type_names[] = {
     "AST_VAR_CREATE_NUMBER_VAR",
     "AST_VAR_CREATE_NUMBER_VAR_EL",
     "AST_VAR_CREATE_NUMBER_FUNC_RETURN",
+    "AST_VAR_CREATE_PTR",
     "AST_VAR_CREATE_STRING",
     "AST_VAR_CREATE_STRING_VAR",
     "AST_VAR_CREATE_STRING_VAR_EL",
@@ -290,6 +299,7 @@ char *ast_node_type_names[] = {
     "AST_MIXED_EXPRESSION_MULTIPLY",
     "AST_MIXED_EXPRESSION_DIVIDE",
     "AST_VAR_MIXED_EXPRESSION_VALUE",
+    "AST_PTR_VALUE",
     "AST_BOOLEAN_EXPRESSION_VALUE",
     "AST_BOOLEAN_EXPRESSION_REL_EQUAL",
     "AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL",

@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 typedef struct Symbol Symbol;
 
@@ -51,6 +52,7 @@ typedef struct Symbol {
         long long i;
         char *s;
         long double f;
+        void *ptr;
     } value;
     short sign;
     enum ValueType value_type;
@@ -120,6 +122,7 @@ Symbol* addSymbolInt(char *name, long long i);
 void updateSymbolInt(char *name, long long i);
 Symbol* addSymbolFloat(char *name, long double f);
 void updateSymbolFloat(char *name, long double f);
+Symbol* addSymbolPtr(char *name, void *ptr);
 Symbol* addSymbolString(char *name, char *s);
 void updateSymbolString(char *name, char *s);
 void addSymbolList(char *name);

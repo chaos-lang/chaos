@@ -1,0 +1,2 @@
+ptr a = 0x7fffb1d7ec80
+print a

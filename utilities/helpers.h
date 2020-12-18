@@ -47,6 +47,7 @@ char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
 char *snprintf_concat_int(char *s1, char *format, long long i);
 char *snprintf_concat_float(char *s1, char *format, long double f);
+char *snprintf_concat_ptr(char *s1, char *format, void *ptr);
 char *snprintf_concat_string(char *s1, char *format, char *s2);
 void prepend_to_array(string_array *array, char *str);
 void append_to_array(string_array *array, char *str);

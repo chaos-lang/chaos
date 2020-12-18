@@ -43,6 +43,7 @@ enum ASTNodeType {
     AST_VAR_CREATE_NUMBER_VAR,
     AST_VAR_CREATE_NUMBER_VAR_EL,
     AST_VAR_CREATE_NUMBER_FUNC_RETURN,
+    AST_VAR_CREATE_PTR,
     AST_VAR_CREATE_STRING,
     AST_VAR_CREATE_STRING_VAR,
     AST_VAR_CREATE_STRING_VAR_EL,
@@ -134,6 +135,7 @@ enum ASTNodeType {
     AST_MIXED_EXPRESSION_MULTIPLY,
     AST_MIXED_EXPRESSION_DIVIDE,
     AST_VAR_MIXED_EXPRESSION_VALUE,
+    AST_PTR_VALUE,
     AST_BOOLEAN_EXPRESSION_VALUE,
     AST_BOOLEAN_EXPRESSION_REL_EQUAL,
     AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL,
@@ -341,6 +343,7 @@ ASTNode* addASTNode(enum ASTNodeType node_type, int lineno, char *strings[], siz
 ASTNode* addASTNodeBool(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, bool b, ASTNode* node);
 ASTNode* addASTNodeInt(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long long i, ASTNode* node);
 ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long double f, ASTNode* node);
+ASTNode* addASTNodePtr(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, void *ptr, ASTNode* node);
 ASTNode* addASTNodeString(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, char *s, ASTNode* node);
 ASTNode* addASTNodeBranch(enum ASTNodeType node_type, int lineno, ASTNode* l_node, ASTNode* r_node);
 ASTNode* addASTNodeAssign(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, ASTNode* node);

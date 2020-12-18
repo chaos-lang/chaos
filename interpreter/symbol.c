@@ -392,6 +392,9 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                     break;
             }
             return encoded;
+        case K_PTR:
+            encoded = snprintf_concat_ptr(encoded, "0x%016"PRIxPTR, symbol->value.ptr);
+            return encoded;
         case K_STRING:
             if (is_complex) {
                 if (double_quotes) {
@@ -604,6 +607,12 @@ void updateSymbolFloat(char *name, long double f) {
     union Value value;
     value.f = f;
     updateSymbol(name, K_NUMBER, value, V_FLOAT);
+}
+
+Symbol* addSymbolPtr(char *name, void *ptr) {
+    union Value value;
+    value.ptr = ptr;
+    return addSymbol(name, K_PTR, value, V_PTR);
 }
 
 Symbol* addSymbolString(char *name, char *s) {

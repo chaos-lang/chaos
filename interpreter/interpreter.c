@@ -402,6 +402,9 @@ eval_node_label:
                     break;
             }
             break;
+        case AST_VAR_CREATE_PTR:
+            addSymbolPtr(ast_node->strings[0], ast_node->value.ptr);
+            break;
         case AST_VAR_CREATE_STRING:
             addSymbolString(ast_node->strings[0], ast_node->value.s);
             break;

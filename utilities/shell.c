@@ -46,6 +46,7 @@ char *suggestions[1000] = {
     "list",
     "dict",
     "any",
+    "ptr",
     "void",
     "null",
     "def",

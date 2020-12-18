@@ -159,6 +159,23 @@ char *snprintf_concat_float(char *s1, char *format, long double f)
     return s1;
 }
 
+char *snprintf_concat_ptr(char *s1, char *format, void *ptr)
+{
+    char *tmp;
+    size_t len;
+
+    // 1st pass gets needed size
+    len = (size_t) snprintf(NULL, 0, format, ptr) + 1;
+    tmp = malloc(len);
+
+    // Safely write to tmp with known length 'len'
+    snprintf(tmp, len, format, ptr);
+
+    s1 = strcat_ext(s1, tmp);
+    free(tmp);
+    return s1;
+}
+
 char *snprintf_concat_string(char *s1, char *format, char *s2)
 {
     char *tmp;

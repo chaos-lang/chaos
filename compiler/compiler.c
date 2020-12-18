@@ -1246,6 +1246,7 @@ transpile_node_label:
         );
 
     unsigned long long current_loop_counter = 0;
+    char *encoded = NULL;
     switch (ast_node->node_type)
     {
         case AST_START_TIMES_DO:
@@ -1575,6 +1576,23 @@ transpile_node_label:
             break;
         case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
             transpile_function_call_create_var(c_fp, ast_node, module, K_NUMBER, K_ANY, indent);
+            break;
+        case AST_VAR_CREATE_PTR:
+            if (ast_node->right->is_transpiled) {
+                if (ast_node->strings[0] == NULL) {
+                    fprintf(c_fp, "%*caddSymbolPtr(NULL, (void *) %s);\n", indent, ' ', ast_node->right->transpiled);
+                } else {
+                    fprintf(c_fp, "%*caddSymbolPtr(\"%s\", (void *) %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                }
+            } else {
+                encoded = snprintf_concat_ptr(encoded, "0x%016"PRIxPTR, ast_node->right->value.ptr);
+                if (ast_node->strings[0] == NULL) {
+                    fprintf(c_fp, "%*caddSymbolPtr(NULL, (void *) %s);\n", indent, ' ', encoded);
+                } else {
+                    fprintf(c_fp, "%*caddSymbolPtr(\"%s\", (void *) %s);\n", indent, ' ', ast_node->strings[0], encoded);
+                }
+                free(encoded);
+            }
             break;
         case AST_VAR_CREATE_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
