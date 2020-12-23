@@ -1,8 +1,37 @@
 // Fibonacci number generators
 
+// Dynamic programming
+
+import array
+
+num def fibo2(num n)
+    num list f = [0, 1]
+
+    num i = 2
+    num a = 0
+    num b = 0
+    n - 1 times do
+        a = f[i - 1]
+        b = f[i - 2]
+        f = array.insert(f, a + b)
+        i++
+    end
+
+    num r = f[n]
+    return r
+end
+
+
+num x = 1
+20 times do
+    print fibo2(x)
+    x++
+end
+del x
+
 // Space optimized method
 
-num def fibo1(num n)
+num def fibo3(num n)
     num a = 0
     num b = 1
     num c = 0
@@ -20,6 +49,6 @@ end {
 
 num x = 1
 20 times do
-    print fibo1(x)
+    print fibo3(x)
     x++
 end
