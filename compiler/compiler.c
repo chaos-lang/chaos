@@ -572,8 +572,12 @@ transpile_decisions_label:
         }
     }
 
-    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_BOOLEAN_CONTINUE) {
+    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_CONTINUE) {
         transpile_node(ast_node->right, module, c_fp, indent);
+    }
+
+    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_CONTINUE) {
+        transpile_node(ast_node->left, module, c_fp, indent);
     }
 
     kaos_lineno = ast_node->lineno;
@@ -625,7 +629,13 @@ transpile_decisions_label:
             fprintf(
                 c_fp,
                 "%*creturn;\n"
+                "%*c} else {\n"
+                "%*cfreeFunctionParametersMode();\n"
                 "%*c}\n",
+                indent + indent_length,
+                ' ',
+                indent,
+                ' ',
                 indent + indent_length,
                 ' ',
                 indent,
@@ -716,7 +726,18 @@ transpile_decisions_label:
                 ast_node->strings[0]
             );
             transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
-            fprintf(c_fp, "%*c}\n", indent, ' ');
+            fprintf(
+                c_fp,
+                "%*c} else {\n"
+                "%*cfreeFunctionParametersMode();\n"
+                "%*c}\n",
+                indent,
+                ' ',
+                indent + indent_length,
+                ' ',
+                indent,
+                ' '
+            );
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:
             fprintf(
@@ -1199,6 +1220,11 @@ transpile_node_label:
             goto transpile_node_label;
         }
 
+    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_CONTINUE) {
+        ast_node = ast_node->next;
+        goto transpile_node_label;
+    }
+
     if (ast_node->depend != NULL) {
         transpile_node(ast_node->depend, module, c_fp, indent);
     }
@@ -1307,7 +1333,7 @@ transpile_node_label:
             fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
             fprintf(
                 c_fp,
-                "%*cfor (int i = 0; i < (unsigned) getSymbolValueInt(\"%s\"); i++)\n"
+                "%*cfor (int i = 0; i < getSymbolValueInt(\"%s\"); i++)\n"
                 "%*c{\n",
                 indent,
                 ' ',

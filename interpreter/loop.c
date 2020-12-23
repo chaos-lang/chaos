@@ -32,7 +32,10 @@ bool interactive_shell_loop_error_absorbed = false;
 bool is_loop_breaked = false;
 extern int yyparse();
 
-ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_node) {
+ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
+    if (iter < 0) {
+        throw_error(E_NEGATIVE_ITERATION_COUNT, NULL, NULL, iter);
+    }
     ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
 
     if (is_interactive) {
@@ -52,7 +55,7 @@ ASTNode* startTimesDo(unsigned long long iter, bool is_infinite, ASTNode* ast_no
                 next_node = eval_node(ast_node->next, ast_node->module);
             }
         } else {
-            for (unsigned long long i = 0; i < iter; i++) {
+            for (unsigned long long i = 0; i < (unsigned) iter; i++) {
                 if (setjmp(LoopBreak))
                     break;
                 if (setjmp(LoopContinue))

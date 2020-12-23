@@ -331,7 +331,7 @@ eval_node_label:
             return startTimesDo(0, true, ast_node);
             break;
         case AST_START_TIMES_DO_VAR:
-            return startTimesDo((unsigned) getSymbolValueInt(ast_node->strings[0]), false, ast_node);
+            return startTimesDo(getSymbolValueInt(ast_node->strings[0]), false, ast_node);
             break;
         case AST_START_FOREACH:
             return startForeach(ast_node->strings[0], ast_node->strings[1], ast_node);
@@ -1315,6 +1315,8 @@ eval_node_label:
             if (ast_node->right->value.b) {
                 callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
                 stop_ast_evaluation = true;
+            } else {
+                freeFunctionParametersMode();
             }
             break;
         case AST_DECISION_MAKE_BOOLEAN_BREAK:
@@ -1331,6 +1333,8 @@ eval_node_label:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
                 stop_ast_evaluation = true;
+            } else {
+                freeFunctionParametersMode();
             }
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:

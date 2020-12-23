@@ -133,6 +133,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_UNEXPECTED_ACCESSOR_DATA_TYPE:
             sprintf(error_msg, "Unexpected accessor data type: %s for variable: %s", str1, str2);
             break;
+        case E_NEGATIVE_ITERATION_COUNT:
+            sprintf(error_msg, "Negative iteration count: %lld", lld1);
+            break;
         default:
             sprintf(error_msg, "Unkown error.");
             break;
