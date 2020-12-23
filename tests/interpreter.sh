@@ -76,9 +76,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 done
 
 if [ "$SHELL" = true ] ; then
-    for dirpath in $(find $DIR -mindepth 1 -maxdepth 1 -type d); do
-        $dirpath/interpreter.sh
-    done
+    $DIR/shell/interpreter.sh
 fi
 
 if [ "$failed" = true ] ; then

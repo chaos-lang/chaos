@@ -124,6 +124,27 @@ IF [%1]==[] (
     ) ELSE (
         EXIT /B 0
     )
+) ELSE IF [%1]==[rosetta-install] (
+    CALL tests\rosetta\install.bat
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
+) ELSE IF [%1]==[rosetta-test] (
+    CALL tests\rosetta\interpreter.bat
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
+) ELSE IF [%1]==[rosetta-test-compiler] (
+    CALL tests\rosetta\compiler.bat
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
 )
 
 win_flex --wincompat lexer\lexer.l

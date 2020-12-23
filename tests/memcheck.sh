@@ -19,6 +19,4 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     fi
 done
 
-for dirpath in $(find $DIR -mindepth 1 -maxdepth 1 -type d); do
-    $dirpath/memcheck.sh
-done
+$DIR/shell/memcheck.sh
