@@ -724,8 +724,10 @@ eval_node_label:
                 printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, false);
             break;
         case AST_PRINT_INTERACTIVE_EXPRESSION:
-            if (is_interactive)
-                printf("%lld\n", ast_node->right->value.i);
+            if (is_interactive) {
+                if (ast_node->right->node_type < AST_VAR_EXPRESSION_INCREMENT || ast_node->right->node_type > AST_VAR_EXPRESSION_ASSIGN_INCREMENT)
+                    printf("%lld\n", ast_node->right->value.i);
+            }
             break;
         case AST_PRINT_INTERACTIVE_MIXED_EXPRESSION:
             if (is_interactive)
@@ -813,11 +815,11 @@ eval_node_label:
             ast_node->value_type = V_INT;
             break;
         case AST_VAR_EXPRESSION_INCREMENT_ASSIGN:
-            ast_node->value.i = incrementThenAssign(ast_node->strings[0], ast_node->value.i);
+            ast_node->value.i = incrementThenAssign(ast_node->strings[0], ast_node->right->value.i);
             ast_node->value_type = V_INT;
             break;
         case AST_VAR_EXPRESSION_ASSIGN_INCREMENT:
-            ast_node->value.i = assignThenIncrement(ast_node->strings[0], ast_node->value.i);
+            ast_node->value.i = assignThenIncrement(ast_node->strings[0], ast_node->right->value.i);
             ast_node->value_type = V_INT;
             break;
         case AST_MIXED_EXPRESSION_PLUS:

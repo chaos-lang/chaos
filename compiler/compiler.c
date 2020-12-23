@@ -2066,6 +2066,10 @@ transpile_node_label:
             fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', value_s);
             free(value_s);
             break;
+        case AST_PRINT_INTERACTIVE_EXPRESSION:
+            if (ast_node->right->node_type >= AST_VAR_EXPRESSION_INCREMENT && ast_node->right->node_type <= AST_VAR_EXPRESSION_ASSIGN_INCREMENT)
+                fprintf(c_fp, "%*c%s;\n", indent, ' ', ast_node->right->transpiled);
+            break;
         case AST_ECHO_VAR:
             fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", false, true);\n", indent, ' ', ast_node->strings[0]);
             break;
@@ -2233,12 +2237,12 @@ transpile_node_label:
             break;
         case AST_VAR_EXPRESSION_INCREMENT_ASSIGN:
             setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "incrementThenAssign(\"%s\"", ast_node->strings[0]));
-            setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->value.i));
+            setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->right->value.i));
             ast_node->value_type = V_INT;
             break;
         case AST_VAR_EXPRESSION_ASSIGN_INCREMENT:
             setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "assignThenIncrement(\"%s\"", ast_node->strings[0]));
-            setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->value.i));
+            setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->right->value.i));
             ast_node->value_type = V_INT;
             break;
         case AST_MIXED_EXPRESSION_PLUS:

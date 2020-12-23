@@ -156,3 +156,19 @@ end
 3 + 5 times do
     print "eight times"
 end
+
+
+// Increment/Decrement inside a loop
+del a
+num a = 0
+10 times do
+    a++
+    ++a
+    print a
+end
+
+10 times do
+    a--
+    --a
+    print a
+end
