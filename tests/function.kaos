@@ -426,3 +426,30 @@ void def test_call_inside_loop_inside_function()
 end
 
 test_call_inside_loop_inside_function()
+
+// Call parameters in decision block
+
+num def multi_three(num x, num y, num z)
+    num r = x * y * z
+    return r
+end
+
+num def sum_two(num x, num y)
+    num r = x + y
+    return r
+end
+
+num def decision_params(num n)
+    num a = 2
+    num b = 3
+    num c = 5
+end {
+    n == 0  : sum_two(a, b),
+    n == 1  : sum_two(b, c),
+    default : multi_three(a, b, c)
+}
+
+print decision_params(0)
+print decision_params(1)
+print decision_params(2)
+

@@ -572,11 +572,8 @@ transpile_decisions_label:
         }
     }
 
-    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_CONTINUE) {
+    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_RETURN) {
         transpile_node(ast_node->right, module, c_fp, indent);
-    }
-
-    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_CONTINUE) {
         transpile_node(ast_node->left, module, c_fp, indent);
     }
 
@@ -710,6 +707,44 @@ transpile_decisions_label:
                 ' '
             );
             break;
+        case AST_DECISION_MAKE_BOOLEAN_RETURN:
+            if (ast_node->right->is_transpiled) {
+                fprintf(
+                    c_fp,
+                    "%*cif (%s)\n"
+                    "%*c{\n",
+                    indent,
+                    ' ',
+                    ast_node->right->transpiled,
+                    indent,
+                    ' '
+                );
+            } else {
+                fprintf(
+                    c_fp,
+                    "%*cif (%s)\n"
+                    "%*c{\n",
+                    indent,
+                    ' ',
+                    ast_node->right->value.b ? "true" : "false",
+                    indent,
+                    ' '
+                );
+            }
+            fprintf(
+                c_fp,
+                "%*creturnSymbol(\"%s\");\n"
+                "%*creturn;\n"
+                "%*c}\n",
+                indent + indent_length,
+                ' ',
+                ast_node->strings[0],
+                indent + indent_length,
+                ' ',
+                indent,
+                ' '
+            );
+            break;
         case AST_DECISION_MAKE_DEFAULT:
             fprintf(
                 c_fp,
@@ -769,6 +804,24 @@ transpile_decisions_label:
                 ' ',
                 indent + indent_length,
                 ' ',
+                indent,
+                ' '
+            );
+            break;
+        case AST_DECISION_MAKE_DEFAULT_RETURN:
+            fprintf(
+                c_fp,
+                "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
+                "%*c{\n"
+                "%*creturnSymbol(\"%s\");\n"
+                "%*c}\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                indent + indent_length,
+                ' ',
+                ast_node->strings[0],
                 indent,
                 ' '
             );
@@ -1220,7 +1273,7 @@ transpile_node_label:
             goto transpile_node_label;
         }
 
-    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_CONTINUE) {
+    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_RETURN) {
         ast_node = ast_node->next;
         goto transpile_node_label;
     }

@@ -2,10 +2,6 @@
 
 // Space optimized method
 
-num def return_var(num x)
-    return x
-end
-
 num def fibo1(num n)
     num a = 0
     num b = 1
@@ -16,9 +12,9 @@ num def fibo1(num n)
         b = c
     end
 end {
-    n == 0  : return_var(a),
-    n == 1  : return_var(b),
-    default : return_var(b)
+    n == 0  : return a,
+    n == 1  : return b,
+    default : return b
 }
 
 
