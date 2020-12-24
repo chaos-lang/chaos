@@ -120,6 +120,7 @@ jobs:
 
     - name: Run the tests (gcc)
       run: |
+        source ~/.bash_profile
         make rosetta-install
         make rosetta-test
         make rosetta-test-compiler
@@ -133,6 +134,7 @@ jobs:
 
     - name: Run the tests (clang)
       run: |
+        source ~/.bash_profile
         make rosetta-install
         make rosetta-test
         make rosetta-test-compiler

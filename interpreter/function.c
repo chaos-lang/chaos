@@ -164,7 +164,7 @@ void resetFunctionParametersMode() {
     freeFunctionParametersMode();
 }
 
-_Function* callFunction(char *name, char *module) {
+FunctionCall* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
     FunctionCall* function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
     function_call->function = function;
@@ -283,8 +283,10 @@ _Function* callFunction(char *name, char *module) {
 
 #ifndef CHAOS_COMPILER
     callFunctionCleanUp(function_call, name);
+    return NULL;
+#else
+    return function_call;
 #endif
-    return function;
 }
 
 #ifndef CHAOS_COMPILER
@@ -858,6 +860,7 @@ void freeFunctionReturn(char *name, char *module) {
 void decisionBreakLoop() {
 #ifdef CHAOS_COMPILER
     callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+    free(function_call_stack.arr[function_call_stack.size - 1]);
     callFunctionCleanUpCommon();
     longjmp(LoopBreak, 1);
 #else
@@ -868,6 +871,7 @@ void decisionBreakLoop() {
 void decisionContinueLoop() {
 #ifdef CHAOS_COMPILER
     callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+    free(function_call_stack.arr[function_call_stack.size - 1]);
     callFunctionCleanUpCommon();
     longjmp(LoopContinue, 1);
 #else
