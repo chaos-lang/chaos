@@ -822,8 +822,8 @@ transpile_decisions_label:
                 c_fp,
                 "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
                 "%*c{\n"
-                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
                 "%*creturnSymbol(\"%s\");\n"
+                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
                 "%*c}\n",
                 indent,
                 ' ',
@@ -831,9 +831,9 @@ transpile_decisions_label:
                 ' ',
                 indent + indent_length,
                 ' ',
+                ast_node->strings[0],
                 indent + indent_length,
                 ' ',
-                ast_node->strings[0],
                 indent,
                 ' '
             );

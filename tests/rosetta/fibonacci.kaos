@@ -1,5 +1,42 @@
 // Fibonacci number generators
 
+
+// Recursion
+
+num def fibo_error()
+    print "Incorrect input"
+    num r = 0
+    return r
+end
+
+num def sum(num j)
+    num x = fibo1(j - 1)
+    num y = fibo1(j - 2)
+    num z = x + y
+    return z
+end
+
+num def fibo1(num n)
+    num zero = 0
+    num one = 1
+    num c = n
+end {
+    n < 0   : fibo_error(),
+    n == 0  : return zero,
+    n == 1  : return one,
+    default : sum(c)
+}
+
+print fibo1(-1) // Incorrect input
+
+num x = 1
+12 times do
+    print fibo1(x)
+    x++
+end
+del x
+
+
 // Dynamic programming
 
 import array
@@ -28,6 +65,7 @@ num x = 1
     x++
 end
 del x
+
 
 // Space optimized method
 
