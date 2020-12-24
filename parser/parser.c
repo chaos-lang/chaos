@@ -198,7 +198,6 @@ int initParser(int argc, char** argv) {
 }
 
 void freeEverything() {
-    free(main_function);
     free(scopeless);
     freeAllSymbols();
     freeAllFunctions();

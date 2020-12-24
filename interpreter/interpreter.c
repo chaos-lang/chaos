@@ -1313,7 +1313,8 @@ eval_node_label:
             break;
         case AST_DECISION_MAKE_BOOLEAN:
             if (ast_node->right->value.b) {
-                callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
+                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+                callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
                 stop_ast_evaluation = true;
             } else {
                 freeFunctionParametersMode();
@@ -1333,11 +1334,13 @@ eval_node_label:
             if (ast_node->right->value.b) {
                 returnSymbol(ast_node->strings[0]);
                 stop_ast_evaluation = true;
+                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
             }
             break;
         case AST_DECISION_MAKE_DEFAULT:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
-                callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->module);
+                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+                callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
                 stop_ast_evaluation = true;
             } else {
                 freeFunctionParametersMode();
@@ -1357,6 +1360,7 @@ eval_node_label:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 returnSymbol(ast_node->strings[0]);
                 stop_ast_evaluation = true;
+                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
             }
             break;
         case AST_JSON_PARSER:

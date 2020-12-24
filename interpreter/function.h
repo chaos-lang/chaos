@@ -28,6 +28,7 @@
 #include <setjmp.h>
 
 typedef struct _Function _Function;
+typedef struct FunctionCall FunctionCall;
 
 #include "symbol.h"
 #include "errors.h"
@@ -54,7 +55,7 @@ typedef struct _Function {
     struct Symbol* symbol;
     struct _Function* previous;
     struct _Function* next;
-    struct _Function* parent_scope;
+    struct FunctionCall* parent_scope;
     string_array decision_expressions;
     string_array decision_functions;
     char *decision_default;
@@ -71,17 +72,19 @@ _Function* function_mode;
 
 _Function* function_parameters_mode;
 
-typedef struct function_array {
-    _Function** arr;
+typedef struct FunctionCall {
+    struct _Function* function;
+} FunctionCall;
+
+typedef struct function_call_array {
+    FunctionCall** arr;
     unsigned capacity, size;
-} function_array;
+} function_call_array;
 
-function_array function_call_stack;
+function_call_array function_call_stack;
 
-_Function* main_function;
-_Function* scopeless;
-
-_Function* scope_override;
+FunctionCall* scopeless;
+FunctionCall* scope_override;
 
 _Function* decision_mode;
 _Function* decision_expression_mode;
@@ -114,12 +117,13 @@ void printFunctionTable();
 _Function* callFunction(char *name, char *module);
 
 #ifndef CHAOS_COMPILER
-void callFunctionCleanUp(_Function* function, char *name);
+void callFunctionCleanUp(FunctionCall* function_call, char *name);
 #else
-void callFunctionCleanUp(_Function* function, char *name, bool has_decision);
+void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decision);
 #endif
 
-void callFunctionCleanUpCommon(_Function* function);
+void callFunctionCleanUpSymbols(FunctionCall* function_call);
+void callFunctionCleanUpCommon();
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type);
 void addFunctionOptionalParameterBool(char *secondary_name, bool b);
@@ -153,7 +157,7 @@ void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
 bool isFunctionType(char *name, char *module, enum Type type);
 void setScopeless(Symbol* symbol);
-void pushExecutedFunctionStack(_Function* executed_function);
+void pushExecutedFunctionStack(FunctionCall* function_call);
 void popExecutedFunctionStack();
 void freeFunctionReturn(char *name, char *module);
 void decisionBreakLoop();

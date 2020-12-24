@@ -166,6 +166,8 @@ void resetFunctionParametersMode() {
 
 _Function* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
+    FunctionCall* function_call = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));
+    function_call->function = function;
 
     if (function_parameters_mode != NULL &&
         function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count))
@@ -179,7 +181,7 @@ _Function* callFunction(char *name, char *module) {
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
     }
 
-    scope_override = function;
+    scope_override = function_call;
     for (unsigned short i = 0; i < function->parameter_count; i++) {
         Symbol* parameter = function->parameters[i];
 
@@ -200,7 +202,7 @@ _Function* callFunction(char *name, char *module) {
                 parameter,
                 parameter->secondary_type
             );
-            parameter_call->scope = function;
+            parameter_call->scope = function_call;
             parameter_call->recursion_depth = recursion_depth + 1;
             parameter_call->param_of = function;
 
@@ -225,7 +227,7 @@ _Function* callFunction(char *name, char *module) {
 
             parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
             strcpy(parameter_call->name, parameter->secondary_name);
-            parameter_call->scope = function;
+            parameter_call->scope = function_call;
             parameter_call->recursion_depth = recursion_depth + 1;
             parameter_call->param_of = function;
             parameter_call->secondary_type = parameter->secondary_type;
@@ -235,11 +237,11 @@ _Function* callFunction(char *name, char *module) {
 
     freeFunctionParametersMode();
 
-    _Function* parent_scope = getCurrentScope();
-    pushExecutedFunctionStack(function);
-    function_call_stack.arr[function_call_stack.size - 1]->parent_scope = parent_scope;
+    FunctionCall* parent_scope = getCurrentScope();
+    pushExecutedFunctionStack(function_call);
+    function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope = parent_scope;
 
-    pushModuleStack(function_call_stack.arr[function_call_stack.size - 1]->module_context, "");
+    pushModuleStack(function_call_stack.arr[function_call_stack.size - 1]->function->module_context, "");
 
     recursion_depth++;
 
@@ -271,15 +273,15 @@ _Function* callFunction(char *name, char *module) {
     }
 
 #ifndef CHAOS_COMPILER
-    callFunctionCleanUp(function, name);
+    callFunctionCleanUp(function_call, name);
 #endif
     return function;
 }
 
 #ifndef CHAOS_COMPILER
-void callFunctionCleanUp(_Function* function, char *name) {
+void callFunctionCleanUp(FunctionCall* function_call, char *name) {
 #else
-void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
+void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decision) {
 #endif
     reset_line_no_to = 0;
 
@@ -300,14 +302,17 @@ void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
     if (!interactive_shell_function_error_absorbed &&
         !is_loop_breaked &&
         !is_loop_continued
-    )
-        executeDecision(function);
+    ) {
+        executeDecision(function_call->function);
+    } else {
+        callFunctionCleanUpSymbols(function_call);
+    }
 #ifdef CHAOS_COMPILER
     }
 #endif
 
-    if (function->type != K_VOID &&
-        function->symbol == NULL &&
+    if (function_call->function->type != K_VOID &&
+        function_call->function->symbol == NULL &&
         !interactive_shell_function_error_absorbed &&
         !is_loop_breaked &&
         !is_loop_continued
@@ -317,7 +322,7 @@ void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
         return;
     }
 
-    callFunctionCleanUpCommon(function);
+    callFunctionCleanUpCommon();
 
     if (is_loop_breaked) {
         breakLoop();
@@ -336,18 +341,18 @@ void callFunctionCleanUp(_Function* function, char *name, bool has_decision) {
     }
 }
 
-void callFunctionCleanUpCommon(_Function* function) {
-    for (unsigned short i = 0; i < function->parameter_count; i++) {
-        Symbol* parameter = function->parameters[i];
+void callFunctionCleanUpSymbols(FunctionCall* function_call) {
+    for (unsigned short i = 0; i < function_call->function->parameter_count; i++) {
+        Symbol* parameter = function_call->function->parameters[i];
         removeSymbolByName(parameter->secondary_name);
     }
 
+    removeSymbolsByScope(function_call);
+}
+
+void callFunctionCleanUpCommon() {
     recursion_depth--;
-
-    removeSymbolsByScope(function);
-
     popModuleStack();
-
     popExecutedFunctionStack();
 }
 
@@ -567,20 +572,20 @@ void addFunctionCallParameterList(enum Type type) {
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != K_ANY &&
-        function_call_stack.arr[function_call_stack.size - 1]->type != K_ANY &&
-        symbol->type != function_call_stack.arr[function_call_stack.size - 1]->type
+        function_call_stack.arr[function_call_stack.size - 1]->function->type != K_ANY &&
+        symbol->type != function_call_stack.arr[function_call_stack.size - 1]->function->type
     ) {
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), function_call_stack.arr[function_call_stack.size - 1]->name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), function_call_stack.arr[function_call_stack.size - 1]->function->name);
     }
     if (symbol->secondary_type != K_ANY &&
-        function_call_stack.arr[function_call_stack.size - 1]->secondary_type != K_ANY &&
-        symbol->secondary_type != function_call_stack.arr[function_call_stack.size - 1]->secondary_type
+        function_call_stack.arr[function_call_stack.size - 1]->function->secondary_type != K_ANY &&
+        symbol->secondary_type != function_call_stack.arr[function_call_stack.size - 1]->function->secondary_type
     ) {
-        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function_call_stack.arr[function_call_stack.size - 1]->name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function_call_stack.arr[function_call_stack.size - 1]->function->name);
     }
 
-    scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
-    function_call_stack.arr[function_call_stack.size - 1]->symbol = createCloneFromSymbol(
+    scope_override = function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope;
+    function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
         symbol,
@@ -641,10 +646,6 @@ void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
 }
 
 void initMainFunction() {
-    main_function = (struct _Function*)malloc(sizeof(_Function));
-    main_function->name = "main";
-    main_function->type = K_ANY;
-    main_function->parameter_count = 0;
     recursion_depth = 0;
     function_names_buffer.capacity = 0;
     function_names_buffer.size = 0;
@@ -655,10 +656,12 @@ void initMainFunction() {
 }
 
 void initScopeless() {
-    scopeless = (struct _Function*)malloc(sizeof(_Function));
-    scopeless->name = "N/A";
-    scopeless->type = K_ANY;
-    scopeless->parameter_count = 0;
+    _Function* scopeless_function = (struct _Function*)malloc(sizeof(_Function));
+    scopeless_function->name = "N/A";
+    scopeless_function->type = K_ANY;
+    scopeless_function->parameter_count = 0;
+    scopeless = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+    scopeless->function = scopeless_function;
 }
 
 void removeFunction(_Function* function) {
@@ -770,14 +773,14 @@ void executeDecision(_Function* function) {
     if (decision_symbol_chain == NULL)
         return;
 
-    if (function_call_stack.arr[function_call_stack.size - 1]->type != K_VOID && function_call_stack.arr[function_call_stack.size - 1]->symbol == NULL) {
-        function_call_stack.arr[function_call_stack.size - 1]->symbol = createCloneFromSymbol(
+    if (function_call_stack.arr[function_call_stack.size - 1]->function->type != K_VOID && function_call_stack.arr[function_call_stack.size - 1]->function->symbol == NULL) {
+        function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
             NULL,
             decision_symbol_chain->type,
             decision_symbol_chain,
             decision_symbol_chain->secondary_type
         );
-        function_call_stack.arr[function_call_stack.size - 1]->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
+        function_call_stack.arr[function_call_stack.size - 1]->function->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope;
     }
     if (decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
@@ -814,14 +817,14 @@ void setScopeless(Symbol* symbol) {
     }
 }
 
-void pushExecutedFunctionStack(_Function* executed_function) {
+void pushExecutedFunctionStack(FunctionCall* function_call) {
     if (function_call_stack.capacity == 0) {
-        function_call_stack.arr = (_Function**)malloc((function_call_stack.capacity = 2) * sizeof(_Function));
+        function_call_stack.arr = (FunctionCall**)malloc((function_call_stack.capacity = 2) * sizeof(FunctionCall));
     } else if (function_call_stack.capacity == function_call_stack.size) {
-        function_call_stack.arr = (_Function**)realloc(function_call_stack.arr, (function_call_stack.capacity *= 2) * sizeof(_Function));
+        function_call_stack.arr = (FunctionCall**)realloc(function_call_stack.arr, (function_call_stack.capacity *= 2) * sizeof(FunctionCall));
     }
 
-    function_call_stack.arr[function_call_stack.size] = executed_function;
+    function_call_stack.arr[function_call_stack.size] = function_call;
     function_call_stack.size++;
 }
 
@@ -840,11 +843,8 @@ void freeFunctionReturn(char *name, char *module) {
 
 void decisionBreakLoop() {
 #ifdef CHAOS_COMPILER
-    _Function* function = getFunction(
-        function_call_stack.arr[function_call_stack.size - 1]->name,
-        function_call_stack.arr[function_call_stack.size - 1]->module
-    );
-    callFunctionCleanUpCommon(function);
+    callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+    callFunctionCleanUpCommon();
     longjmp(LoopBreak, 1);
 #else
     longjmp(LoopBreakDecision, 1);
@@ -853,11 +853,8 @@ void decisionBreakLoop() {
 
 void decisionContinueLoop() {
 #ifdef CHAOS_COMPILER
-    _Function* function = getFunction(
-        function_call_stack.arr[function_call_stack.size - 1]->name,
-        function_call_stack.arr[function_call_stack.size - 1]->module
-    );
-    callFunctionCleanUpCommon(function);
+    callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+    callFunctionCleanUpCommon();
     longjmp(LoopContinue, 1);
 #else
     longjmp(LoopContinueDecision, 1);

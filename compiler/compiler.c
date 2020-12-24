@@ -616,7 +616,10 @@ transpile_decisions_label:
             }
             fprintf(
                 c_fp,
-                "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);\n",
+                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
+                "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
+                indent + indent_length,
+                ' ',
                 indent + indent_length,
                 ' ',
                 compiler_function_counter,
@@ -734,11 +737,14 @@ transpile_decisions_label:
             fprintf(
                 c_fp,
                 "%*creturnSymbol(\"%s\");\n"
+                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
                 "%*creturn;\n"
                 "%*c}\n",
                 indent + indent_length,
                 ' ',
                 ast_node->strings[0],
+                indent + indent_length,
+                ' ',
                 indent + indent_length,
                 ' ',
                 indent,
@@ -750,10 +756,13 @@ transpile_decisions_label:
                 c_fp,
                 "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
                 "%*c{\n"
-                "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->module);\n",
+                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
+                "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
                 indent,
                 ' ',
                 indent,
+                ' ',
+                indent + indent_length,
                 ' ',
                 indent + indent_length,
                 ' ',
@@ -813,11 +822,14 @@ transpile_decisions_label:
                 c_fp,
                 "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
                 "%*c{\n"
+                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
                 "%*creturnSymbol(\"%s\");\n"
                 "%*c}\n",
                 indent,
                 ' ',
                 indent,
+                ' ',
+                indent + indent_length,
                 ' ',
                 indent + indent_length,
                 ' ',
@@ -3425,7 +3437,16 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
     free(module_context);
     fprintf(
         c_fp,
-        "%*ccallFunctionCleanUp(function_%llu, \"%s\", %s);\n",
+        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));\n"
+        "%*cfunction_call_%llu->function = function_%llu;\n"
+        "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
+        indent,
+        ' ',
+        compiler_function_counter,
+        indent,
+        ' ',
+        compiler_function_counter,
+        compiler_function_counter,
         indent,
         ' ',
         compiler_function_counter,
@@ -3443,7 +3464,16 @@ void transpile_function_call_decision(FILE *c_fp, char *module_context, char* mo
     }
     fprintf(
         c_fp,
-        "%*ccallFunctionCleanUp(function_%llu, \"%s\", %s);\n",
+        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));\n"
+        "%*cfunction_call_%llu->function = function_%llu;\n"
+        "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
+        indent,
+        ' ',
+        compiler_function_counter,
+        indent,
+        ' ',
+        compiler_function_counter,
+        compiler_function_counter,
         indent,
         ' ',
         compiler_function_counter,

@@ -550,14 +550,14 @@ void printSymbolTable() {
     Symbol *symbol = start_symbol;
     printf("[start] =>\n");
     while(symbol != NULL) {
-        _Function* scope = symbol->scope;
+        FunctionCall* scope = symbol->scope;
         printf(
             "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, depth: %hu, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s} =>\n",
             symbol->id,
             symbol->name,
             symbol->secondary_name,
             symbol->key,
-            scope->name,
+            scope->function->name,
             symbol->recursion_depth,
             symbol->type,
             symbol->secondary_type,
@@ -1132,15 +1132,17 @@ void addSymbolAnyBool(char *name, bool b) {
     addSymbol(name, K_ANY, value, V_BOOL);
 }
 
-_Function* getCurrentScope() {
+FunctionCall* getCurrentScope() {
     if (scope_override != NULL) return scope_override;
 
     if (function_call_stack.size > 0) {
         return function_call_stack.arr[function_call_stack.size - 1];
     } else if (function_parameters_mode != NULL) {
-        return function_parameters_mode;
+        FunctionCall* function_call = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));
+        function_call->function = function_parameters_mode;
+        return function_call;
     } else {
-        return main_function;
+        return scopeless;
     }
 }
 
@@ -1148,7 +1150,7 @@ Symbol* getSymbolFunctionParameter(char *name) {
     if (function_call_stack.size > 0) {
         scope_override = function_call_stack.arr[function_call_stack.size - 1];
     } else {
-        scope_override = main_function;
+        scope_override = scopeless;
     }
 
     Symbol* symbol = getSymbol(name);
@@ -1321,12 +1323,12 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
     return addSymbol(name, type, value, value_type);
 }
 
-void removeSymbolsByScope(_Function* scope) {
+void removeSymbolsByScope(FunctionCall* scope) {
     symbol_cursor = start_symbol;
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
-        if (strcmp(symbol->scope->name, scope->name) == 0) {
+        if (symbol->scope == scope) {
             removeSymbol(symbol);
             removeSymbolsByScope(scope);
         }

@@ -11,4 +11,4 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     echo "Updated: ${testname}"
 done
 
-$DIR/shell/interpreter.sh
+$DIR/shell/update.sh
