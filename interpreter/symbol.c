@@ -1138,9 +1138,8 @@ FunctionCall* getCurrentScope() {
     if (function_call_stack.size > 0) {
         return function_call_stack.arr[function_call_stack.size - 1];
     } else if (function_parameters_mode != NULL) {
-        FunctionCall* function_call = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));
-        function_call->function = function_parameters_mode;
-        return function_call;
+        dummy_scope->function = function_parameters_mode;
+        return dummy_scope;
     } else {
         return scopeless;
     }

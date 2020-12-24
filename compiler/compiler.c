@@ -3437,7 +3437,7 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
     free(module_context);
     fprintf(
         c_fp,
-        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));\n"
+        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)malloc(sizeof(FunctionCall));\n"
         "%*cfunction_call_%llu->function = function_%llu;\n"
         "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
         indent,
@@ -3464,7 +3464,7 @@ void transpile_function_call_decision(FILE *c_fp, char *module_context, char* mo
     }
     fprintf(
         c_fp,
-        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));\n"
+        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)malloc(sizeof(FunctionCall));\n"
         "%*cfunction_call_%llu->function = function_%llu;\n"
         "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
         indent,

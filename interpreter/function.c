@@ -166,18 +166,23 @@ void resetFunctionParametersMode() {
 
 _Function* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
-    FunctionCall* function_call = (struct FunctionCall*)calloc(1, sizeof(FunctionCall));
+    FunctionCall* function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
     function_call->function = function;
 
     if (function_parameters_mode != NULL &&
-        function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count))
+        function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count)) {
+            free(function_call);
             throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+    }
 
-    if (function->parameter_count > 0 && function_parameters_mode == NULL)
+    if (function->parameter_count > 0 && function_parameters_mode == NULL) {
+        free(function_call);
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+    }
 
     if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count) {
         freeFunctionParametersMode();
+        free(function_call);
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
     }
 
@@ -193,6 +198,7 @@ _Function* callFunction(char *name, char *module) {
 
             if (function_parameters_mode->parameters == NULL) {
                 freeFunctionParametersMode();
+                free(function_call);
                 throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
             }
 
@@ -212,6 +218,7 @@ _Function* callFunction(char *name, char *module) {
 
             if (parameter->type != K_ANY && parameter->type != parameter_call->type) {
                 freeFunctionParametersMode();
+                free(function_call);
                 throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
             }
 
@@ -220,6 +227,7 @@ _Function* callFunction(char *name, char *module) {
                     Symbol* child = parameter_call->children[i];
                     if (child->type != parameter->secondary_type) {
                         freeFunctionParametersMode();
+                        free(function_call);
                         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
                     }
                 }
@@ -246,6 +254,7 @@ _Function* callFunction(char *name, char *module) {
     recursion_depth++;
 
     if (recursion_depth > __KAOS_MAX_RECURSION_DEPTH__) {
+        free(function_call);
         throw_error(E_MAXIMUM_RECURSION_DEPTH_EXCEEDED, NULL);
     }
 
@@ -303,7 +312,7 @@ void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decis
         !is_loop_breaked &&
         !is_loop_continued
     ) {
-        executeDecision(function_call->function);
+        executeDecision(function_call);
     } else {
         callFunctionCleanUpSymbols(function_call);
     }
@@ -325,10 +334,12 @@ void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decis
     callFunctionCleanUpCommon();
 
     if (is_loop_breaked) {
+        free(function_call);
         breakLoop();
     }
 
     if (is_loop_continued) {
+        free(function_call);
         continueLoop();
     }
 
@@ -339,6 +350,7 @@ void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decis
         yyparse();
 #endif
     }
+    free(function_call);
 }
 
 void callFunctionCleanUpSymbols(FunctionCall* function_call) {
@@ -650,6 +662,7 @@ void initMainFunction() {
     function_names_buffer.capacity = 0;
     function_names_buffer.size = 0;
     decision_buffer = "";
+    dummy_scope = (struct FunctionCall*)malloc(sizeof(FunctionCall));
     initScopeless();
     initMainContext();
     initKaosApi();
@@ -756,17 +769,18 @@ void addDefaultDecision() {
     decision_function_mode = NULL;
 }
 
-void executeDecision(_Function* function) {
+void executeDecision(FunctionCall* function_call) {
 #ifndef CHAOS_COMPILER
-    if (function->decision_node == NULL) {
+    if (function_call->function->decision_node == NULL) {
         if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
             removeSymbol(decision_symbol_chain);
             decision_symbol_chain = NULL;
         }
+        callFunctionCleanUpSymbols(function_call);
         return;
     }
 
-    eval_node(function->decision_node, function->module_context);
+    eval_node(function_call->function->decision_node, function_call->function->module_context);
     stop_ast_evaluation = false;
 #endif
 

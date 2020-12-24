@@ -85,6 +85,7 @@ function_call_array function_call_stack;
 
 FunctionCall* scopeless;
 FunctionCall* scope_override;
+FunctionCall* dummy_scope;
 
 _Function* decision_mode;
 _Function* decision_expression_mode;
@@ -151,7 +152,7 @@ void freeAllFunctions();
 bool block(enum BlockType type);
 void addBooleanDecision();
 void addDefaultDecision();
-void executeDecision(_Function* function);
+void executeDecision(FunctionCall* function);
 void addFunctionNameToFunctionNamesBuffer(char *name);
 void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
