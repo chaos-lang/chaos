@@ -90,7 +90,7 @@ jobs:
 
     - name: Run the tests (clang)
       run: |
-        make rosetta-install
+        make rosetta-install-clang
         make rosetta-test
         make rosetta-test-compiler
 
@@ -135,7 +135,7 @@ jobs:
     - name: Run the tests (clang)
       run: |
         source ~/.bash_profile
-        make rosetta-install
+        make rosetta-install-clang
         make rosetta-test
         make rosetta-test-compiler
 

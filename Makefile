@@ -162,6 +162,9 @@ compile-dev:
 rosetta-install:
 	./tests/rosetta/install.sh
 
+rosetta-install-clang:
+	./tests/rosetta/install.sh clang
+
 rosetta-test:
 	./tests/rosetta/interpreter.sh
 

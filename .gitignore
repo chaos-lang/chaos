@@ -36,3 +36,6 @@ help.h
 
 # Chaos build directory
 build
+
+# Rosetta spells directory
+tests/rosetta/spells

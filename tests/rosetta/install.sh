@@ -7,7 +7,11 @@ install_spell() {
     fi
     git clone https://github.com/chaos-lang/$1.git --depth 1 && \
     cd $1/ && \
-    make && \
+    if [ "$2" == "clang" ]; then
+        make clang
+    else
+        make
+    fi
     cd ..
 }
 
@@ -20,6 +24,6 @@ cd tests/rosetta/spells && \
 
 for spell in ${SPELL_LIST[*]}
 do
-    install_spell $spell || exit 1
+    install_spell $spell $1 || exit 1
 done
 
