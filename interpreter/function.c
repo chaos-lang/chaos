@@ -164,7 +164,7 @@ void resetFunctionParametersMode() {
     freeFunctionParametersMode();
 }
 
-FunctionCall* callFunction(char *name, char *module) {
+_Function* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
     FunctionCall* function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
     function_call->function = function;
@@ -283,10 +283,8 @@ FunctionCall* callFunction(char *name, char *module) {
 
 #ifndef CHAOS_COMPILER
     callFunctionCleanUp(function_call, name);
-    return NULL;
-#else
-    return function_call;
 #endif
+    return function;
 }
 
 #ifndef CHAOS_COMPILER

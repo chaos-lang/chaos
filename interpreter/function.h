@@ -115,7 +115,7 @@ _Function* getFunction(char *name, char *module);
 _Function* getFunctionByModuleContext(char *name, char *module_context);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
-FunctionCall* callFunction(char *name, char *module);
+_Function* callFunction(char *name, char *module);
 
 #ifndef CHAOS_COMPILER
 void callFunctionCleanUp(FunctionCall* function_call, char *name);
