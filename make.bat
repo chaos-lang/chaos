@@ -131,6 +131,13 @@ IF [%1]==[] (
     ) ELSE (
         EXIT /B 0
     )
+) ELSE IF [%1]==[rosetta-install-clang] (
+    CALL tests\rosetta\install.bat clang
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
 ) ELSE IF [%1]==[rosetta-test] (
     CALL tests\rosetta\interpreter.bat
     IF errorlevel 1 (

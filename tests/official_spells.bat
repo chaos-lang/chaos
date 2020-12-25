@@ -7,7 +7,7 @@ IF not exist "build\" MKDIR build
 CD build
 
 FOR %%a in (math string array json) do (
-    IF exist %%a\ DEL %%a\
+    IF exist %%a\ RD /q /s %%a\
     git clone https://github.com/chaos-lang/%%a.git --depth 1
     CD %%a\
     CALL make.bat

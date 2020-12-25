@@ -182,7 +182,7 @@ jobs:
       shell: cmd
       run: |
         call RefreshEnv.cmd
-        call make.bat rosetta-install
+        call make.bat rosetta-install-clang
         call make.bat rosetta-test
         call make.bat rosetta-test-compiler
 
