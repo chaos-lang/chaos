@@ -281,6 +281,7 @@ print a
 b['f'] = dict_f1()
 print b
 b['f'] = lib.dict_f1()
+print b
 
 
 // Direct assignments to typed lists
@@ -452,4 +453,3 @@ end {
 print decision_params(0)
 print decision_params(1)
 print decision_params(2)
-

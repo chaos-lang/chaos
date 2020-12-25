@@ -617,7 +617,7 @@ transpile_decisions_label:
             fprintf(
                 c_fp,
                 "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
-                "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
+                "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
                 indent + indent_length,
                 ' ',
                 indent + indent_length,
@@ -757,7 +757,7 @@ transpile_decisions_label:
                 "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
                 "%*c{\n"
                 "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
-                "%*c_Function* function_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
+                "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
                 indent,
                 ' ',
                 indent,
@@ -1933,7 +1933,7 @@ transpile_node_label:
                 case 2:
                     fprintf(
                         c_fp,
-                        "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n",
+                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n",
                         indent,
                         ' ',
                         compiler_function_counter,
@@ -1952,7 +1952,7 @@ transpile_node_label:
                 case 3:
                     fprintf(
                         c_fp,
-                        "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n",
+                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
                         indent,
                         ' ',
                         compiler_function_counter,
@@ -2075,7 +2075,7 @@ transpile_node_label:
                 case 1:
                     fprintf(
                         c_fp,
-                        "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n",
+                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n",
                         indent,
                         ' ',
                         compiler_function_counter,
@@ -2093,7 +2093,7 @@ transpile_node_label:
                 case 2:
                     fprintf(
                         c_fp,
-                        "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n",
+                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
                         indent,
                         ' ',
                         compiler_function_counter,
@@ -3216,11 +3216,11 @@ transpile_node_label:
             }
             compiler_function_counter++;
             if (_module == NULL) {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", false, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
@@ -3231,11 +3231,11 @@ transpile_node_label:
             }
             compiler_function_counter++;
             if (_module == NULL) {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", false, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", false, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
@@ -3246,11 +3246,11 @@ transpile_node_label:
             }
             compiler_function_counter++;
             if (_module == NULL) {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", true, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
@@ -3261,11 +3261,11 @@ transpile_node_label:
             }
             compiler_function_counter++;
             if (_module == NULL) {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", true, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", true, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
@@ -3276,11 +3276,11 @@ transpile_node_label:
             }
             compiler_function_counter++;
             if (_module == NULL) {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
             } else {
-                fprintf(c_fp, "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
+                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
                 transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
                 fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], _module);
             }
@@ -3437,16 +3437,7 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
     free(module_context);
     fprintf(
         c_fp,
-        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)malloc(sizeof(FunctionCall));\n"
-        "%*cfunction_call_%llu->function = function_%llu;\n"
         "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
-        indent,
-        ' ',
-        compiler_function_counter,
-        indent,
-        ' ',
-        compiler_function_counter,
-        compiler_function_counter,
         indent,
         ' ',
         compiler_function_counter,
@@ -3464,16 +3455,7 @@ void transpile_function_call_decision(FILE *c_fp, char *module_context, char* mo
     }
     fprintf(
         c_fp,
-        "%*cFunctionCall* function_call_%llu = (struct FunctionCall*)malloc(sizeof(FunctionCall));\n"
-        "%*cfunction_call_%llu->function = function_%llu;\n"
         "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
-        indent,
-        ' ',
-        compiler_function_counter,
-        indent,
-        ' ',
-        compiler_function_counter,
-        compiler_function_counter,
         indent,
         ' ',
         compiler_function_counter,
@@ -3489,7 +3471,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
         case 2:
             fprintf(
                 c_fp,
-                "%*c_Function* function_%llu = callFunction(\"%s\", NULL);\n",
+                "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n",
                 indent,
                 ' ',
                 compiler_function_counter,
@@ -3510,7 +3492,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
         case 3:
             fprintf(
                 c_fp,
-                "%*c_Function* function_%llu = callFunction(\"%s\", \"%s\");\n",
+                "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
                 indent,
                 ' ',
                 compiler_function_counter,
