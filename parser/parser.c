@@ -44,6 +44,7 @@ static struct option long_options[] =
 int initParser(int argc, char** argv) {
     debug_enabled = false;
     bool compiler_mode = false;
+    bool compiler_fopen_fail = false;
     char *program_file = NULL;
     char *bin_file = NULL;
 #ifndef CHAOS_COMPILER
@@ -68,6 +69,8 @@ int initParser(int argc, char** argv) {
                 compiler_mode = true;
                 program_file = optarg;
                 fp = fopen(program_file, "r");
+                if (fp == NULL)
+                    compiler_fopen_fail = true;
                 break;
             case 'o':
                 bin_file = optarg;
@@ -108,7 +111,7 @@ int initParser(int argc, char** argv) {
             fp = stdin;
         } else if (debug_enabled && argc == 2) {
             fp = stdin;
-        } else {
+        } else if (!compiler_fopen_fail) {
             program_file = argv[argc - 1];
             fp = fopen (program_file, "r");
         }
@@ -123,10 +126,12 @@ int initParser(int argc, char** argv) {
         strcpy(program_file_path, program_file);
 
         if (!is_file_exists(program_file_path)) {
+            program_file_path = realloc(program_file_path, strlen("N/A") + 1);
+            strcpy(program_file_path, "N/A");
             initMainFunction();
             is_interactive = false;
             fp_opened = false;
-            throw_error(E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH, program_file_path);
+            throw_error(E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH, program_file);
         }
 
         program_file_dir = malloc(strlen(program_file_path) + 1);
