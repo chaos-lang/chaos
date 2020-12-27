@@ -798,7 +798,7 @@ void executeDecision(FunctionCall* function_call) {
         );
         function_call_stack.arr[function_call_stack.size - 1]->function->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope;
     }
-    if (decision_symbol_chain != NULL) {
+    if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
     }
 }

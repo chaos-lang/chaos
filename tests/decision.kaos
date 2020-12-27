@@ -47,3 +47,22 @@ end {
 }
 
 print f4(3, 5)
+
+num def f7()
+    num x = 42
+    return x
+end
+
+num def f6(num x)
+    num y = x - 1
+end {
+    y == 1 : f7()
+}
+
+num def f5(num x)
+    num y = x - 1
+end {
+    y == 2 : f6(y)
+}
+
+print f5(3)
