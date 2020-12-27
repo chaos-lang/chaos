@@ -387,12 +387,18 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                 case V_FLOAT:
                     encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
                     break;
+                case V_VOID:
+                    encoded = strcat_ext(encoded, "N/A");
+                    break;
                 default:
                     throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
                     break;
             }
             return encoded;
         case K_STRING:
+            if (symbol->value_type == V_VOID) {
+                return strcat_ext(encoded, "N/A");
+            }
             if (is_complex) {
                 if (double_quotes) {
                     encoded = snprintf_concat_string(encoded, "\"%s\"", symbol->value.s);
@@ -492,8 +498,11 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                 case V_BOOL:
                     encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
                     break;
+                case V_VOID:
+                    encoded = strcat_ext(encoded, "N/A");
+                    break;
                 default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getTypeName(symbol->value_type), symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
                     break;
             }
             return encoded;
@@ -550,9 +559,11 @@ void printSymbolTable() {
     Symbol *symbol = start_symbol;
     printf("[start] =>\n");
     while(symbol != NULL) {
+        char *encoded = NULL;
+        encoded = encodeSymbolValueToString(symbol, false, true, true, 0, encoded, false);
         FunctionCall* scope = symbol->scope;
         printf(
-            "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, depth: %hu, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s} =>\n",
+            "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, depth: %hu, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
             symbol->id,
             symbol->name,
             symbol->secondary_name,
@@ -563,9 +574,11 @@ void printSymbolTable() {
             symbol->secondary_type,
             symbol->value_type,
             symbol->role,
-            symbol->param_of != NULL ? symbol->param_of->name : ""
+            symbol->param_of != NULL ? symbol->param_of->name : "",
+            encoded
         );
         symbol = symbol->next;
+        free(encoded);
     }
     printf("[end]\n");
 }
