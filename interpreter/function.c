@@ -282,15 +282,15 @@ FunctionCall* callFunction(char *name, char *module) {
     }
 
 #ifndef CHAOS_COMPILER
-    callFunctionCleanUp(function_call, name);
+    callFunctionCleanUp(function_call);
 #endif
     return function_call;
 }
 
 #ifndef CHAOS_COMPILER
-void callFunctionCleanUp(FunctionCall* function_call, char *name) {
+void callFunctionCleanUp(FunctionCall* function_call) {
 #else
-void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decision) {
+void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 #endif
     reset_line_no_to = 0;
 
@@ -328,8 +328,8 @@ void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decis
         !is_loop_breaked &&
         !is_loop_continued
     ) {
-        append_to_array_without_malloc(&free_string_stack, name);
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+        append_to_array_without_malloc(&free_string_stack, function_call->function->name);
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
         return;
     }
 
@@ -352,7 +352,6 @@ void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decis
         yyparse();
 #endif
     }
-    free(function_call);
 }
 
 void callFunctionCleanUpSymbols(FunctionCall* function_call) {
@@ -616,47 +615,40 @@ void returnSymbol(char *name) {
     scope_override = NULL;
 }
 
-void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped) {
-    _Function* function = getFunction(name, module);
-    if (function->symbol == NULL) {
-        append_to_array_without_malloc(&free_string_stack, name);
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+void printFunctionReturn(FunctionCall* function_call, char *end, bool pretty, bool escaped) {
+    if (function_call->function->symbol == NULL) {
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
         return;
     }
-    printSymbolValueEndWith(function->symbol, end, pretty, escaped);
-    freeFunctionReturn(name, module);
+    printSymbolValueEndWith(function_call->function->symbol, end, pretty, escaped);
+    freeFunctionReturn(function_call);
 }
 
-void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name, char *module, enum Type extra_type) {
-    _Function* function = getFunction(name, module);
-    if (function->symbol == NULL) {
-        append_to_array_without_malloc(&free_string_stack, name);
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+void createCloneFromFunctionReturn(char *clone_name, enum Type type, FunctionCall* function_call, enum Type extra_type) {
+    if (function_call->function->symbol == NULL) {
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
         return;
     }
-    createCloneFromSymbol(clone_name, type, function->symbol, extra_type);
-    freeFunctionReturn(name, module);
+    createCloneFromSymbol(clone_name, type, function_call->function->symbol, extra_type);
+    freeFunctionReturn(function_call);
 }
 
-void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module) {
-    _Function* function = getFunction(name, module);
-    if (function->symbol == NULL) {
-        append_to_array_without_malloc(&free_string_stack, name);
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* function_call) {
+    if (function_call->function->symbol == NULL) {
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
         return;
     }
-    updateSymbolByClonning(clone_name, function->symbol);
-    freeFunctionReturn(name, module);
+    updateSymbolByClonning(clone_name, function_call->function->symbol);
+    freeFunctionReturn(function_call);
 }
 
-void updateComplexSymbolByClonningFunctionReturn(char *name, char*module) {
-    _Function* function = getFunction(name, module);
-    if (function->symbol == NULL) {
-        append_to_array_without_malloc(&free_string_stack, name);
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, name);
+void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call) {
+    if (function_call->function->symbol == NULL) {
+        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
         return;
     }
-    updateComplexElementSymbol(function->symbol);
+    updateComplexElementSymbol(function_call->function->symbol);
+    freeFunctionReturn(function_call);
 }
 
 void initMainFunction() {
@@ -800,6 +792,7 @@ void executeDecision(FunctionCall* function_call) {
     }
     if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
+        decision_symbol_chain = NULL;
     }
 }
 
@@ -849,11 +842,10 @@ void popExecutedFunctionStack() {
     function_call_stack.size--;
 }
 
-void freeFunctionReturn(char *name, char *module) {
-    _Function* function = getFunction(name, module);
-    if (function->symbol != NULL) {
-        removeSymbol(function->symbol);
-        function->symbol = NULL;
+void freeFunctionReturn(FunctionCall* function_call) {
+    if (function_call->function->symbol != NULL) {
+        removeSymbol(function_call->function->symbol);
+        function_call->function->symbol = NULL;
     }
 }
 
