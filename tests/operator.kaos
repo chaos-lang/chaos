@@ -938,3 +938,10 @@ print 3 + 6 * (11 + 1 - 4) / 8 * 2
 print 3 + (6 * (11 + 1 - 4)) / 8 * 2
 print 8 / 2 * (2 + 2)
 print (17 - 6 / 2) + 4 * 3
+
+print "Operator precedence for variables"
+num n = 3
+num a = 2 * n - 2
+print a
+del n
+del a

@@ -118,9 +118,9 @@ void printFunctionTable();
 FunctionCall* callFunction(char *name, char *module);
 
 #ifndef CHAOS_COMPILER
-void callFunctionCleanUp(FunctionCall* function_call, char *name);
+void callFunctionCleanUp(FunctionCall* function_call);
 #else
-void callFunctionCleanUp(FunctionCall* function_call, char *name, bool has_decision);
+void callFunctionCleanUp(FunctionCall* function_call, bool has_decision);
 #endif
 
 void callFunctionCleanUpSymbols(FunctionCall* function_call);
@@ -140,10 +140,10 @@ void addFunctionCallParameterString(char *s);
 void addFunctionCallParameterSymbol(char *name);
 void addFunctionCallParameterList(enum Type type);
 void returnSymbol(char *name);
-void printFunctionReturn(char *name, char *module, char *end, bool pretty, bool escaped);
-void createCloneFromFunctionReturn(char *clone_name, enum Type type, char *name, char *module, enum Type extra_type);
-void updateSymbolByClonningFunctionReturn(char *clone_name, char *name, char*module);
-void updateComplexSymbolByClonningFunctionReturn(char *name, char*module);
+void printFunctionReturn(FunctionCall* function_call, char *end, bool pretty, bool escaped);
+void createCloneFromFunctionReturn(char *clone_name, enum Type type, FunctionCall* function_call, enum Type extra_type);
+void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* function_call);
+void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call);
 void initMainFunction();
 void initScopeless();
 void removeFunction(_Function* function);
@@ -160,7 +160,7 @@ bool isFunctionType(char *name, char *module, enum Type type);
 void setScopeless(Symbol* symbol);
 void pushExecutedFunctionStack(FunctionCall* function_call);
 void popExecutedFunctionStack();
-void freeFunctionReturn(char *name, char *module);
+void freeFunctionReturn(FunctionCall* function_call);
 void decisionBreakLoop();
 void decisionContinueLoop();
 

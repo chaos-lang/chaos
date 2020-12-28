@@ -628,10 +628,18 @@ transpile_decisions_label:
             transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
+                "%*cfreeFunctionReturn(function_call_%llu);\n"
+                "%*cfree(function_call_%llu);\n"
                 "%*creturn;\n"
                 "%*c} else {\n"
                 "%*cfreeFunctionParametersMode();\n"
                 "%*c}\n",
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
                 indent + indent_length,
                 ' ',
                 indent,
@@ -772,9 +780,13 @@ transpile_decisions_label:
             transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
+                "%*cfree(function_call_%llu);\n"
                 "%*c} else {\n"
                 "%*cfreeFunctionParametersMode();\n"
                 "%*c}\n",
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
                 indent,
                 ' ',
                 indent + indent_length,
@@ -1940,14 +1952,6 @@ transpile_node_label:
                         ast_node->strings[1]
                     );
                     transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
-                    fprintf(
-                        c_fp,
-                        "%*cupdateSymbolByClonningFunctionReturn(\"%s\", \"%s\", NULL);\n",
-                        indent,
-                        ' ',
-                        ast_node->strings[0],
-                        ast_node->strings[1]
-                    );
                     break;
                 case 3:
                     fprintf(
@@ -1960,19 +1964,22 @@ transpile_node_label:
                         ast_node->strings[1]
                     );
                     transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
-                    fprintf(
-                        c_fp,
-                        "%*cupdateSymbolByClonningFunctionReturn(\"%s\", \"%s\", \"%s\");\n",
-                        indent,
-                        ' ',
-                        ast_node->strings[0],
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
                     break;
                 default:
                     break;
             }
+            fprintf(
+                c_fp,
+                "%*cupdateSymbolByClonningFunctionReturn(\"%s\", function_call_%llu);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                ast_node->strings[0],
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_RETURN_VAR:
             fprintf(c_fp, "%*creturnSymbol(\"%s\");\n", indent, ' ', ast_node->strings[0]);
@@ -2082,13 +2089,6 @@ transpile_node_label:
                         ast_node->strings[0]
                     );
                     transpile_function_call(c_fp, NULL, ast_node->strings[0], indent);
-                    fprintf(
-                        c_fp,
-                        "%*cupdateComplexSymbolByClonningFunctionReturn(\"%s\", NULL);\n",
-                        indent,
-                        ' ',
-                        ast_node->strings[0]
-                    );
                     break;
                 case 2:
                     fprintf(
@@ -2101,18 +2101,21 @@ transpile_node_label:
                         ast_node->strings[0]
                     );
                     transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1], indent);
-                    fprintf(
-                        c_fp,
-                        "%*cupdateComplexSymbolByClonningFunctionReturn(\"%s\", \"%s\");\n",
-                        indent,
-                        ' ',
-                        ast_node->strings[1],
-                        ast_node->strings[0]
-                    );
                     break;
                 default:
                     break;
             }
+            fprintf(
+                c_fp,
+                "%*cupdateComplexSymbolByClonningFunctionReturn(function_call_%llu);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_PRINT_VAR:
             fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);\n", indent, ' ', ast_node->strings[0]);
@@ -3217,13 +3220,21 @@ transpile_node_label:
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", false, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", false, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
+            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            fprintf(
+                c_fp,
+                "%*cprintFunctionReturn(function_call_%llu, \"\\n\", false, true);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
@@ -3232,13 +3243,21 @@ transpile_node_label:
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", false, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", false, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
+            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            fprintf(
+                c_fp,
+                "%*cprintFunctionReturn(function_call_%llu, \"\", false, true);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
@@ -3247,13 +3266,21 @@ transpile_node_label:
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\\n\", true, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\\n\", true, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
+            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            fprintf(
+                c_fp,
+                "%*cprintFunctionReturn(function_call_%llu, \"\\n\", true, true);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
@@ -3262,13 +3289,21 @@ transpile_node_label:
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", NULL, \"\", true, true);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cprintFunctionReturn(\"%s\", \"%s\", \"\", true, true);\n", indent, ' ', ast_node->strings[0], _module);
             }
+            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            fprintf(
+                c_fp,
+                "%*cprintFunctionReturn(function_call_%llu, \"\", true, true);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_FUNCTION_RETURN:
             if (ast_node->strings_size > 1) {
@@ -3277,13 +3312,21 @@ transpile_node_label:
             compiler_function_counter++;
             if (_module == NULL) {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-                transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-                fprintf(c_fp, "%*cfreeFunctionReturn(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], _module);
             }
+            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            fprintf(
+                c_fp,
+                "%*cfreeFunctionReturn(function_call_%llu);\n"
+                "%*cfree(function_call_%llu);\n",
+                indent,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                compiler_function_counter
+            );
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
             fprintf(c_fp, "%*creverseComplexMode();\n", indent, ' ');
@@ -3437,11 +3480,10 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
     free(module_context);
     fprintf(
         c_fp,
-        "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
+        "%*ccallFunctionCleanUp(function_call_%llu, %s);\n",
         indent,
         ' ',
         compiler_function_counter,
-        name,
         function->decision_node != NULL ? "true" : "false"
     );
 }
@@ -3455,11 +3497,10 @@ void transpile_function_call_decision(FILE *c_fp, char *module_context, char* mo
     }
     fprintf(
         c_fp,
-        "%*ccallFunctionCleanUp(function_call_%llu, \"%s\", %s);\n",
+        "%*ccallFunctionCleanUp(function_call_%llu, %s);\n",
         indent,
         ' ',
         compiler_function_counter,
-        name,
         function->decision_node != NULL ? "true" : "false"
     );
 }
@@ -3478,16 +3519,6 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 ast_node->strings[1]
             );
             transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
-            fprintf(
-                c_fp,
-                "%*ccreateCloneFromFunctionReturn(\"%s\", %s, \"%s\", NULL, %s);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                type_strings[type1],
-                ast_node->strings[1],
-                type_strings[type2]
-            );
             break;
         case 3:
             fprintf(
@@ -3500,21 +3531,24 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 ast_node->strings[1]
             );
             transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
-            fprintf(
-                c_fp,
-                "%*ccreateCloneFromFunctionReturn(\"%s\", %s, \"%s\", \"%s\", %s);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                type_strings[type1],
-                ast_node->strings[2],
-                ast_node->strings[1],
-                type_strings[type2]
-            );
             break;
         default:
             break;
     }
+    fprintf(
+        c_fp,
+        "%*ccreateCloneFromFunctionReturn(\"%s\", %s, function_call_%llu, %s);\n"
+        "%*cfree(function_call_%llu);\n",
+        indent,
+        ' ',
+        ast_node->strings[0],
+        type_strings[type1],
+        compiler_function_counter,
+        type_strings[type2],
+        indent,
+        ' ',
+        compiler_function_counter
+    );
 }
 
 void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp) {

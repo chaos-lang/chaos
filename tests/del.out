@@ -1,5 +1,5 @@
 [start] =>
-	{id: 0, name: var1, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: } =>
-	{id: 2, name: var3, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: } =>
-	{id: 3, name: var4, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: } =>
+	{id: 0, name: var1, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
+	{id: 2, name: var3, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string1} =>
+	{id: 3, name: var4, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 45.6} =>
 [end]
