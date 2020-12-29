@@ -282,6 +282,7 @@ void absorbError() {
     freeComplexModeStack();
     freeLeftRightBracketStackSymbols();
     resetFunctionParametersMode();
+    freeFunctionNamesBuffer();
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     printf("\033[1;44m");
