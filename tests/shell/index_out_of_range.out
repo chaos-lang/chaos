@@ -54,11 +54,7 @@ Index out of range: -123400 for string: b
 Absorbed by Interactive Shell
 []
 [start] =>
-	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [
-    1,
-    2,
-    3
-]} =>
+	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [1, 2, 3]} =>
 	{id: 1, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
 	{id: 2, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
 	{id: 3, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
@@ -71,9 +67,7 @@ Absorbed by Interactive Shell
 	{id: 28, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: k} =>
 	{id: 30, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: i} =>
 	{id: 32, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
-	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: [
-
-]} =>
+	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
 [end]
 Chaos Error:
 Module: ~/chaos/__interactive__.kaos
@@ -87,11 +81,7 @@ Index out of range: 0 for list: f
 Absorbed by Interactive Shell
 []
 [start] =>
-	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [
-    1,
-    2,
-    3
-]} =>
+	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [1, 2, 3]} =>
 	{id: 1, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
 	{id: 2, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
 	{id: 3, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
@@ -104,9 +94,7 @@ Absorbed by Interactive Shell
 	{id: 28, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: k} =>
 	{id: 30, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: i} =>
 	{id: 32, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
-	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: [
-
-]} =>
+	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
 [end]
 [1, 2]
 Chaos Error:

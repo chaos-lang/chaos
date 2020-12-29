@@ -560,7 +560,7 @@ void printSymbolTable() {
     printf("[start] =>\n");
     while(symbol != NULL) {
         char *encoded = NULL;
-        encoded = encodeSymbolValueToString(symbol, false, true, true, 0, encoded, false);
+        encoded = encodeSymbolValueToString(symbol, false, false, true, 0, encoded, false);
         FunctionCall* scope = symbol->scope;
         printf(
             "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, depth: %hu, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
