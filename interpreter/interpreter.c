@@ -86,16 +86,19 @@ register_functions_label:
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
             eval_node(ast_node->depend, module);
+            phase = PREPARSE;
             register_functions(ast_node->depend, module);
         }
 
         if (ast_node->right != NULL) {
             eval_node(ast_node->right, module);
+            phase = PREPARSE;
             register_functions(ast_node->right, module);
         }
 
         if (ast_node->left != NULL) {
             eval_node(ast_node->left, module);
+            phase = PREPARSE;
             register_functions(ast_node->left, module);
         }
     }
@@ -1381,7 +1384,7 @@ eval_node_label:
                 free(function_call);
                 stop_ast_evaluation = true;
             } else {
-                freeFunctionParametersMode();
+                resetFunctionParametersMode();
             }
             break;
         case AST_DECISION_MAKE_BOOLEAN_BREAK:
@@ -1405,10 +1408,11 @@ eval_node_label:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
                 function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                freeFunctionReturn(function_call);
                 free(function_call);
                 stop_ast_evaluation = true;
             } else {
-                freeFunctionParametersMode();
+                resetFunctionParametersMode();
             }
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:

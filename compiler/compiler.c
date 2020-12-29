@@ -632,7 +632,7 @@ transpile_decisions_label:
                 "%*cfree(function_call_%llu);\n"
                 "%*creturn;\n"
                 "%*c} else {\n"
-                "%*cfreeFunctionParametersMode();\n"
+                "%*cresetFunctionParametersMode();\n"
                 "%*c}\n",
                 indent + indent_length,
                 ' ',
@@ -780,10 +780,14 @@ transpile_decisions_label:
             transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
+                "%*cfreeFunctionReturn(function_call_%llu);\n"
                 "%*cfree(function_call_%llu);\n"
                 "%*c} else {\n"
-                "%*cfreeFunctionParametersMode();\n"
+                "%*cresetFunctionParametersMode();\n"
                 "%*c}\n",
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
                 indent + indent_length,
                 ' ',
                 compiler_function_counter,

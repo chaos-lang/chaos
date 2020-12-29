@@ -48,21 +48,34 @@ end {
 
 print f4(3, 5)
 
-num def f7()
-    num x = 42
-    return x
+
+num def f8()
+    num z = 999
+    return z
 end
 
-num def f6(num x)
-    num y = x - 1
+num def f7()
+    num z = 42
+    return z
+end
+
+num def f6(num b)
+    num y = b - 1
 end {
+    y > 1  : return y,
     y == 1 : f7()
 }
 
-num def f5(num x)
-    num y = x - 1
+num def f5(num a)
+    num y = a - 1
 end {
+    y > 3  : f8(),
+    y == 3 : f6(y),
     y == 2 : f6(y)
 }
 
 print f5(3)
+print f5(4)
+print f5(5)
+
+symbol_table

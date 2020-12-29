@@ -318,6 +318,10 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
     }
 #ifdef CHAOS_COMPILER
     } else {
+        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
+            removeSymbol(decision_symbol_chain);
+            decision_symbol_chain = NULL;
+        }
         callFunctionCleanUpSymbols(function_call);
     }
 #endif

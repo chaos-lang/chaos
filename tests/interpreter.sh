@@ -51,7 +51,9 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
-    if [[ "$testname" == 'nonewline' || "$testname" == 'function' || "$testname" == 'everything' ]]; then
+    SKIP_TESTS="nonewline function decision everything"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
         continue
     fi
 

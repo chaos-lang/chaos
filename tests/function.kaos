@@ -453,3 +453,5 @@ end {
 print decision_params(0)
 print decision_params(1)
 print decision_params(2)
+
+symbol_table
