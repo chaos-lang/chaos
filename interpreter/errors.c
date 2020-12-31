@@ -88,9 +88,6 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
         case E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED:
             sprintf(error_msg, "Memory allocation for the function is failed!");
             break;
-        case E_MAXIMUM_RECURSION_DEPTH_EXCEEDED:
-            sprintf(error_msg, "Maximum recursion depth %d exceeded!", __KAOS_MAX_RECURSION_DEPTH__);
-            break;
         case E_UNEXPECTED_VALUE_TYPE:
             sprintf(error_msg, "Unexpected value type: %s for variable: %s", str1, str2);
             break;

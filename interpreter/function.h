@@ -74,6 +74,7 @@ _Function* function_parameters_mode;
 
 typedef struct FunctionCall {
     struct _Function* function;
+    struct ASTNode* trigger;
 } FunctionCall;
 
 typedef struct function_call_array {

@@ -26,6 +26,7 @@
 #include "../ast/ast.h"
 
 extern unsigned long long nested_loop_counter;
+extern ASTNode* loop_end_ast_node;
 
 void interpret(char *module, enum Phase phase_arg, bool is_interactive);
 ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node);
@@ -37,5 +38,9 @@ ASTNode* eval_node(ASTNode* ast_node, char *module);
 ASTNode* walk_until_end(ASTNode* ast_node, char *module);
 void breakLoop();
 void continueLoop();
+
+#ifndef CHAOS_COMPILER
+ASTNode* eval_node_after_function_call(ASTNode* end_node);
+#endif
 
 #endif

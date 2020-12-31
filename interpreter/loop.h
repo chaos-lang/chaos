@@ -57,6 +57,8 @@ jmp_buf InteractiveShellLoopErrorAbsorber;
 jmp_buf LoopBreak;
 jmp_buf LoopContinue;
 
+ASTNode* loop_end_ast_node;
+
 ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node);
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
 ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_value, ASTNode* ast_node);

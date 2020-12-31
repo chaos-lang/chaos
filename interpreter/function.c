@@ -253,37 +253,19 @@ FunctionCall* callFunction(char *name, char *module) {
 
     recursion_depth++;
 
-    if (recursion_depth > __KAOS_MAX_RECURSION_DEPTH__) {
-        free(function_call);
-        throw_error(E_MAXIMUM_RECURSION_DEPTH_EXCEEDED, NULL);
-    }
-
     reset_line_no_to = function->line_no;
 
-    if (is_interactive) {
-        if (setjmp(InteractiveShellFunctionErrorAbsorber)) {
-            interactive_shell_function_error_absorbed = true;
-        }
+    if (
+        !interactive_shell_function_error_absorbed
+        &&
+        strcmp(
+            get_filename_ext(function->module_context),
+            __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+        ) == 0
+    ) {
+        callFunctionFromDynamicLibrary(function);
     }
 
-    if (!interactive_shell_function_error_absorbed) {
-        if (
-            strcmp(
-                get_filename_ext(function->module_context),
-                __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-            ) == 0
-        ) {
-            callFunctionFromDynamicLibrary(function);
-        } else {
-#ifndef CHAOS_COMPILER
-            eval_node(function->node->child, function->module_context);
-#endif
-        }
-    }
-
-#ifndef CHAOS_COMPILER
-    callFunctionCleanUp(function_call);
-#endif
     return function_call;
 }
 

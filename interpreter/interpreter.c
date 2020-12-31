@@ -321,7 +321,18 @@ eval_node_label:
         );
 
     if (ast_node->node_type == AST_END) {
-        return ast_node;
+#ifndef CHAOS_COMPILER
+        ASTNode* ast_node_prev = eval_node_after_function_call(ast_node);
+        if (ast_node_prev != NULL) {
+            ast_node = ast_node_prev->next;
+            module = ast_node_prev->module;
+            goto eval_node_label;
+        } else {
+#endif
+            return ast_node;
+#ifndef CHAOS_COMPILER
+        }
+#endif
     }
 
 #ifndef CHAOS_COMPILER
@@ -349,7 +360,7 @@ eval_node_label:
 
 
     Symbol* symbol;
-    FunctionCall* function_call;
+    FunctionCall* function_call = NULL;
     long double l_value;
     long double r_value;
     long long exit_code;
@@ -372,17 +383,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_BOOL, function_call, K_ANY);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_BOOL, function_call, K_ANY);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_NUMBER:
             if (ast_node->right->value_type == V_INT) {
@@ -402,17 +413,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_NUMBER, function_call, K_ANY);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_NUMBER, function_call, K_ANY);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_STRING:
             addSymbolString(ast_node->strings[0], ast_node->value.s);
@@ -428,17 +439,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_STRING, function_call, K_ANY);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_STRING, function_call, K_ANY);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_ANY_BOOL:
             addSymbolAnyBool(ast_node->strings[0], ast_node->right->value.b);
@@ -464,17 +475,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_ANY, function_call, K_ANY);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_ANY, function_call, K_ANY);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_LIST:
             reverseComplexMode();
@@ -488,17 +499,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_ANY);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_ANY);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_DICT:
             reverseComplexMode();
@@ -512,17 +523,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_ANY);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_ANY);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_BOOL_LIST:
             reverseComplexMode();
@@ -536,17 +547,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_BOOL);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_BOOL);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_BOOL_DICT:
             reverseComplexMode();
@@ -560,17 +571,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_BOOL);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_BOOL);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_NUMBER_LIST:
             reverseComplexMode();
@@ -584,17 +595,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_NUMBER);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_NUMBER);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_NUMBER_DICT:
             reverseComplexMode();
@@ -608,17 +619,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_NUMBER);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_NUMBER);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_STRING_LIST:
             reverseComplexMode();
@@ -632,17 +643,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_STRING);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_STRING);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_CREATE_STRING_DICT:
             reverseComplexMode();
@@ -656,17 +667,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_STRING);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_STRING);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_VAR_UPDATE_BOOL:
             updateSymbolBool(ast_node->strings[0], ast_node->right->value.b);
@@ -700,17 +711,17 @@ eval_node_label:
             {
                 case 2:
                     function_call = callFunction(ast_node->strings[1], NULL);
-                    updateSymbolByClonningFunctionReturn(ast_node->strings[0], function_call);
-                    free(function_call);
                     break;
                 case 3:
                     function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    updateSymbolByClonningFunctionReturn(ast_node->strings[0], function_call);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_RETURN_VAR:
             returnSymbol(ast_node->strings[0]);
@@ -750,17 +761,17 @@ eval_node_label:
             {
                 case 1:
                     function_call = callFunction(ast_node->strings[0], NULL);
-                    updateComplexSymbolByClonningFunctionReturn(function_call);
-                    free(function_call);
                     break;
                 case 2:
                     function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
-                    updateComplexSymbolByClonningFunctionReturn(function_call);
-                    free(function_call);
                     break;
                 default:
                     break;
             }
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_PRINT_VAR:
             printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, true);
@@ -1330,48 +1341,49 @@ eval_node_label:
             addFunctionCallParameterList(K_ANY);
             break;
         case AST_PRINT_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
+            if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            }
             function_call = callFunction(ast_node->strings[0], _module);
-            printFunctionReturn(function_call, "\n", false, true);
-            free(function_call);
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_ECHO_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
+            if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            }
             function_call = callFunction(ast_node->strings[0], _module);
-            printFunctionReturn(function_call, "", false, true);
-            free(function_call);
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
+            if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            }
             function_call = callFunction(ast_node->strings[0], _module);
-            printFunctionReturn(function_call, "\n", true, true);
-            free(function_call);
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
+            if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            }
             function_call = callFunction(ast_node->strings[0], _module);
-            printFunctionReturn(function_call, "", true, true);
-            free(function_call);
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
+            if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            }
             function_call = callFunction(ast_node->strings[0], _module);
-            if (is_interactive && !isFunctionType(ast_node->strings[0], _module, K_VOID) && !inject_mode && !decision_execution_mode) {
-                printFunctionReturn(function_call, "\n", false, false);
-            } else {
-                freeFunctionReturn(function_call);
-            }
-            free(function_call);
+            function_call->trigger = ast_node;
+            ast_node = function_call->function->node->child;
+            module = function_call->function->module_context;
+            goto eval_node_label;
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
             reverseComplexMode();
@@ -1380,9 +1392,10 @@ eval_node_label:
             if (ast_node->right->value.b) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
                 function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
-                freeFunctionReturn(function_call);
-                free(function_call);
-                stop_ast_evaluation = true;
+                function_call->trigger = ast_node;
+                ast_node = function_call->function->node->child;
+                module = function_call->function->module_context;
+                goto eval_node_label;
             } else {
                 resetFunctionParametersMode();
             }
@@ -1408,9 +1421,10 @@ eval_node_label:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
                 function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
-                freeFunctionReturn(function_call);
-                free(function_call);
-                stop_ast_evaluation = true;
+                function_call->trigger = ast_node;
+                ast_node = function_call->function->node->child;
+                module = function_call->function->module_context;
+                goto eval_node_label;
             } else {
                 resetFunctionParametersMode();
             }
@@ -1466,3 +1480,106 @@ walk_until_end_label:
     }
     return ast_node;
 }
+
+#ifndef CHAOS_COMPILER
+ASTNode* eval_node_after_function_call(ASTNode* end_node) {
+    if (function_call_stack.size == 0 || (loop_end_ast_node != NULL && loop_end_ast_node == end_node))
+        return NULL;
+
+    FunctionCall* function_call = function_call_stack.arr[function_call_stack.size - 1];
+    ASTNode* ast_node = function_call->trigger;
+
+    if (debug_enabled)
+        printf(
+            "(Execute[AFC])\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            ast_node->id,
+            getAstNodeTypeName(ast_node->node_type),
+            ast_node->module,
+            ast_node->strings_size
+        );
+
+    callFunctionCleanUp(function_call);
+
+    char *_module = NULL;
+    switch (ast_node->node_type)
+    {
+        case AST_VAR_CREATE_BOOL_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_BOOL, function_call, K_ANY);
+            break;
+        case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_NUMBER, function_call, K_ANY);
+            break;
+        case AST_VAR_CREATE_STRING_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_STRING, function_call, K_ANY);
+            break;
+        case AST_VAR_CREATE_ANY_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_ANY, function_call, K_ANY);
+            break;
+        case AST_VAR_CREATE_LIST_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_ANY);
+            break;
+        case AST_VAR_CREATE_DICT_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_ANY);
+            break;
+        case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_BOOL);
+            break;
+        case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_BOOL);
+            break;
+        case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_NUMBER);
+            break;
+        case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_NUMBER);
+            break;
+        case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_LIST, function_call, K_STRING);
+            break;
+        case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
+            createCloneFromFunctionReturn(ast_node->strings[0], K_DICT, function_call, K_STRING);
+            break;
+        case AST_VAR_UPDATE_FUNC_RETURN:
+            updateSymbolByClonningFunctionReturn(ast_node->strings[0], function_call);
+            break;
+        case AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
+            updateComplexSymbolByClonningFunctionReturn(function_call);
+            break;
+        case AST_PRINT_FUNCTION_RETURN:
+            printFunctionReturn(function_call, "\n", false, true);
+            break;
+        case AST_ECHO_FUNCTION_RETURN:
+            printFunctionReturn(function_call, "", false, true);
+            break;
+        case AST_PRETTY_PRINT_FUNCTION_RETURN:
+            printFunctionReturn(function_call, "\n", true, true);
+            break;
+        case AST_PRETTY_ECHO_FUNCTION_RETURN:
+            printFunctionReturn(function_call, "", true, true);
+            break;
+        case AST_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1)
+                _module = ast_node->strings[1];
+            if (is_interactive && !isFunctionType(ast_node->strings[0], _module, K_VOID) && !inject_mode && !decision_execution_mode) {
+                printFunctionReturn(function_call, "\n", false, false);
+            } else {
+                freeFunctionReturn(function_call);
+            }
+            break;
+        case AST_DECISION_MAKE_BOOLEAN:
+            freeFunctionReturn(function_call);
+            stop_ast_evaluation = true;
+            break;
+        case AST_DECISION_MAKE_DEFAULT:
+            freeFunctionReturn(function_call);
+            stop_ast_evaluation = true;
+            break;
+        default:
+            break;
+    }
+
+    free(function_call);
+
+    return ast_node;
+}
+#endif

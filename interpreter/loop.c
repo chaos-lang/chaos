@@ -30,6 +30,7 @@
 unsigned long long nested_loop_counter = 0;
 bool interactive_shell_loop_error_absorbed = false;
 bool is_loop_breaked = false;
+ASTNode* loop_end_ast_node = NULL;
 extern int yyparse();
 
 ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
@@ -37,6 +38,7 @@ ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
         throw_error(E_NEGATIVE_ITERATION_COUNT, NULL, NULL, iter);
     }
     ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
+    loop_end_ast_node = next_node;
 
     if (is_interactive) {
         if (setjmp(InteractiveShellLoopErrorAbsorber)) {
@@ -71,6 +73,7 @@ ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
 
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
     ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
+    loop_end_ast_node = next_node;
 
     Symbol* list = getSymbol(list_name);
     if (list->type != K_LIST)
@@ -106,6 +109,7 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
 
 ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_value, ASTNode* ast_node) {
     ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
+    loop_end_ast_node = next_node;
 
     Symbol* dict = getSymbol(dict_name);
     if (dict->type != K_DICT)
