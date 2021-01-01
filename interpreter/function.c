@@ -23,7 +23,6 @@
 #include "function.h"
 
 extern int kaos_lineno;
-bool interactive_shell_function_error_absorbed = false;
 extern int yyparse();
 
 int reset_line_no_to = 0;
@@ -88,6 +87,22 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #ifdef CHAOS_COMPILER
     }
 #endif
+
+    function_mode->is_dynamic = strcmp(
+        get_filename_ext(function_mode->module_context),
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+    ) == 0;
+
+    if (function_mode->is_dynamic) {
+        ASTNode* fake_ast_end;
+        fake_ast_end = (struct ASTNode*)calloc(1, sizeof(ASTNode) + 0 * sizeof *fake_ast_end->strings);
+        fake_ast_end->id = 0;
+        fake_ast_end->node_type = AST_END;
+        fake_ast_end->lineno = 0;
+        fake_ast_end->module = function_mode->module_context;
+        fake_ast_end->child = fake_ast_end;
+        function_mode->node = fake_ast_end;
+    }
 
     if (start_function == NULL) {
         start_function = function_mode;
@@ -255,14 +270,7 @@ FunctionCall* callFunction(char *name, char *module) {
 
     reset_line_no_to = function->line_no;
 
-    if (
-        !interactive_shell_function_error_absorbed
-        &&
-        strcmp(
-            get_filename_ext(function->module_context),
-            __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-        ) == 0
-    ) {
+    if (function->is_dynamic) {
         callFunctionFromDynamicLibrary(function);
     }
 
@@ -290,8 +298,7 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 #ifdef CHAOS_COMPILER
     if (has_decision) {
 #endif
-    if (!interactive_shell_function_error_absorbed &&
-        !is_loop_breaked &&
+    if (!is_loop_breaked &&
         !is_loop_continued
     ) {
         executeDecision(function_call);
@@ -310,7 +317,6 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 
     if (function_call->function->type != K_VOID &&
         function_call->function->symbol == NULL &&
-        !interactive_shell_function_error_absorbed &&
         !is_loop_breaked &&
         !is_loop_continued
     ) {
@@ -329,14 +335,6 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
     if (is_loop_continued) {
         free(function_call);
         continueLoop();
-    }
-
-    if (is_interactive && interactive_shell_function_error_absorbed) {
-        interactive_shell_function_error_absorbed = false;
-#ifndef CHAOS_COMPILER
-        yyrestart_interactive();
-        yyparse();
-#endif
     }
 }
 
@@ -693,6 +691,8 @@ void freeFunction(_Function* function) {
     free(function->context);
     free(function->module_context);
     free(function->module);
+    if (function->is_dynamic)
+        free(function->node);
     free(function);
 }
 

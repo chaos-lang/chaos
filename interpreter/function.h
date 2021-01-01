@@ -62,6 +62,7 @@ typedef struct _Function {
     char *context;
     char *module_context;
     char *module;
+    bool is_dynamic;
 } _Function;
 
 _Function* function_cursor;
