@@ -295,7 +295,7 @@ eval_node_label:
         if (is_node_function_related(ast_node)) {
             ast_node = ast_node->next;
             goto eval_node_label;
-    }
+        }
 
     if (ast_node->depend != NULL) {
         eval_node(ast_node->depend, module);

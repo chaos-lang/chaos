@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+#include <sys/resource.h>
+#include <limits.h>
 
 typedef struct _Function _Function;
 typedef struct FunctionCall FunctionCall;
@@ -76,6 +78,9 @@ _Function* function_parameters_mode;
 typedef struct FunctionCall {
     struct _Function* function;
     struct ASTNode* trigger;
+#ifndef CHAOS_COMPILER
+    bool dont_pop_module_stack;
+#endif
 } FunctionCall;
 
 typedef struct function_call_array {
@@ -148,6 +153,7 @@ void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* functi
 void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call);
 void initMainFunction();
 void initScopeless();
+void increaseStackSize();
 void removeFunction(_Function* function);
 void freeFunction(_Function* function);
 void freeAllFunctions();

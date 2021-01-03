@@ -183,6 +183,9 @@ FunctionCall* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
     FunctionCall* function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
     function_call->function = function;
+#ifndef CHAOS_COMPILER
+    function_call->dont_pop_module_stack = false;
+#endif
 
     if (function_parameters_mode != NULL &&
         function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count)) {
@@ -264,7 +267,25 @@ FunctionCall* callFunction(char *name, char *module) {
     pushExecutedFunctionStack(function_call);
     function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope = parent_scope;
 
-    pushModuleStack(function_call_stack.arr[function_call_stack.size - 1]->function->module_context, "");
+#ifndef CHAOS_COMPILER
+    if (
+        strcmp(
+            module_path_stack.arr[module_path_stack.size - 1],
+            function_call_stack.arr[function_call_stack.size - 1]->function->module_context
+        ) == 0
+        &&
+        strcmp(
+            module_stack.arr[module_stack.size - 1],
+            ""
+        ) == 0
+    ) {
+        function_call->dont_pop_module_stack = true;
+    } else {
+#endif
+        pushModuleStack(function_call_stack.arr[function_call_stack.size - 1]->function->module_context, "");
+#ifndef CHAOS_COMPILER
+    }
+#endif
 
     recursion_depth++;
 
@@ -325,7 +346,16 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
         return;
     }
 
-    callFunctionCleanUpCommon();
+#ifndef CHAOS_COMPILER
+    if (function_call->dont_pop_module_stack) {
+        recursion_depth--;
+        popExecutedFunctionStack();
+    } else {
+#endif
+        callFunctionCleanUpCommon();
+#ifndef CHAOS_COMPILER
+    }
+#endif
 
     if (is_loop_breaked) {
         free(function_call);
@@ -644,6 +674,7 @@ void initMainFunction() {
     initScopeless();
     initMainContext();
     initKaosApi();
+    increaseStackSize();
 }
 
 void initScopeless() {
@@ -653,6 +684,23 @@ void initScopeless() {
     scopeless_function->parameter_count = 0;
     scopeless = (struct FunctionCall*)malloc(sizeof(FunctionCall));
     scopeless->function = scopeless_function;
+}
+
+void increaseStackSize() {
+    const rlim_t stack_size = LONG_MAX; // Maximum possible stack size
+    struct rlimit rl;
+    int result;
+
+    result = getrlimit(RLIMIT_STACK, &rl);
+    if (result == 0) {
+        if (rl.rlim_cur < stack_size) {
+            rl.rlim_cur = stack_size;
+            result = setrlimit(RLIMIT_STACK, &rl);
+            // if (result != 0) {
+            //     fprintf(stderr, "setrlimit returned result = %d\n", result);
+            // }
+        }
+    }
 }
 
 void removeFunction(_Function* function) {
