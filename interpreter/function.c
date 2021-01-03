@@ -690,7 +690,7 @@ void initScopeless() {
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 void increaseStackSize() {
-    const rlim_t stack_size = LONG_MAX; // Maximum possible stack size
+    const rlim_t stack_size = ULONG_MAX; // Maximum possible stack size
     struct rlimit rl;
     int result;
 
