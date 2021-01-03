@@ -674,7 +674,9 @@ void initMainFunction() {
     initScopeless();
     initMainContext();
     initKaosApi();
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     increaseStackSize();
+#endif
 }
 
 void initScopeless() {
@@ -686,6 +688,7 @@ void initScopeless() {
     scopeless->function = scopeless_function;
 }
 
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 void increaseStackSize() {
     const rlim_t stack_size = LONG_MAX; // Maximum possible stack size
     struct rlimit rl;
@@ -702,6 +705,7 @@ void increaseStackSize() {
         }
     }
 }
+#endif
 
 void removeFunction(_Function* function) {
     _Function* previous_function = function->previous;

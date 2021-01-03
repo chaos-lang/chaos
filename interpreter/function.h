@@ -26,8 +26,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #include <sys/resource.h>
 #include <limits.h>
+#endif
 
 typedef struct _Function _Function;
 typedef struct FunctionCall FunctionCall;
@@ -153,7 +156,11 @@ void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* functi
 void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call);
 void initMainFunction();
 void initScopeless();
+
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 void increaseStackSize();
+#endif
+
 void removeFunction(_Function* function);
 void freeFunction(_Function* function);
 void freeAllFunctions();
