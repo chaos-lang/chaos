@@ -31,6 +31,7 @@ unsigned short indent_length = 4;
 unsigned long long compiler_loop_counter = 0;
 unsigned long long compiler_function_counter = 0;
 unsigned long long compiler_symbol_counter = 0;
+unsigned long long compiler_return_jumper_counter = 0;
 unsigned long long extension_counter = 0;
 
 char *type_strings[] = {
@@ -47,6 +48,12 @@ char* relational_operators[] = {">", "<", ">=", "<="};
 int relational_operators_size = 4;
 char* logical_operators[] = {"&&", "||", "!"};
 int logical_operators_size = 3;
+
+char *transpiled_function_name = NULL;
+char *transpiled_function_module = NULL;
+
+char *transpiled_decision_name = NULL;
+char *transpiled_decision_module = NULL;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep) {
     printf("Starting compiling...\n");
@@ -194,9 +201,9 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
 
     fprintf(c_fp, "%*cphase = PREPARSE;\n", indent, ' ');
-    compiler_register_functions(ast_node, module, c_fp, indent);
+    compiler_register_functions(ast_node, module, c_fp, indent, h_fp);
     fprintf(c_fp, "%*cphase = PROGRAM;\n", indent, ' ');
-    transpile_node(ast_node, module, c_fp, indent);
+    transpile_node(ast_node, module, c_fp, indent, h_fp);
 
     fprintf(
         c_fp,
@@ -492,8 +499,35 @@ transpile_functions_label:
         if (!ast_node->dont_transpile && !is_in_array(&transpiled_functions, function_name)) {
             append_to_array(&transpiled_functions, function_name);
             fprintf(h_fp, "void %s();\n", function_name);
+            fprintf(h_fp, "jmp_buf %s_tail_call_jumper;\n", function_name);
             fprintf(c_fp, "void %s() {\n", function_name);
-            transpile_node(ast_node->child, module, c_fp, indent);
+            fprintf(
+                c_fp,
+                "%*cbool function_call_jumped = false;\n"
+                "%*cif (__builtin_setjmp(%s_tail_call_jumper))\n"
+                "%*cfunction_call_jumped = true;\n",
+                indent,
+                ' ',
+                indent,
+                ' ',
+                function_name,
+                indent + indent_length,
+                ' '
+            );
+            transpiled_function_name = ast_node->strings[0];
+            transpiled_function_module = module;
+            transpile_node(ast_node->child, module, c_fp, indent, h_fp);
+            transpiled_function_name = NULL;
+            transpiled_function_module = NULL;
+            fprintf(
+                c_fp,
+                "%*cif (function_call_jumped)\n"
+                "%*c__builtin_longjmp(function_call_stack.arr[function_call_stack.size - 1]->return_jumper, 1);\n",
+                indent,
+                ' ',
+                indent + indent_length,
+                ' '
+            );
             fprintf(c_fp, "}\n\n");
         }
         free(function_name);
@@ -528,8 +562,35 @@ transpile_functions_label:
             if (!ast_node->dont_transpile && !is_in_array(&transpiled_decisions, decision_name)) {
                 append_to_array(&transpiled_decisions, decision_name);
                 fprintf(h_fp, "void %s();\n", decision_name);
+                fprintf(h_fp, "jmp_buf %s_tail_call_jumper;\n", decision_name);
                 fprintf(c_fp, "void %s() {\n", decision_name);
-                transpile_decisions(ast_node->right, module, c_fp, indent);
+                fprintf(
+                    c_fp,
+                    "%*cbool decision_call_jumped = false;\n"
+                    "%*cif (__builtin_setjmp(%s_tail_call_jumper))\n"
+                    "%*cdecision_call_jumped = true;\n",
+                    indent,
+                    ' ',
+                    indent,
+                    ' ',
+                    decision_name,
+                    indent + indent_length,
+                    ' '
+                );
+                transpiled_decision_name = last_function_name;
+                transpiled_decision_module = module;
+                transpile_decisions(ast_node->right, module, c_fp, indent, h_fp);
+                transpiled_decision_name = NULL;
+                transpiled_decision_module = NULL;
+                fprintf(
+                    c_fp,
+                    "%*cif (decision_call_jumped)\n"
+                    "%*c__builtin_longjmp(function_call_stack.arr[function_call_stack.size - 1]->return_jumper, 1);\n",
+                    indent,
+                    ' ',
+                    indent + indent_length,
+                    ' '
+                );
                 fprintf(c_fp, "}\n\n");
             }
             free(decision_name);
@@ -542,7 +603,7 @@ transpile_functions_label:
     goto transpile_functions_label;
 }
 
-ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
 transpile_decisions_label:
     if (ast_node == NULL) {
         return ast_node;
@@ -560,21 +621,21 @@ transpile_decisions_label:
 
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
-            transpile_decisions(ast_node->depend, module, c_fp, indent);
+            transpile_decisions(ast_node->depend, module, c_fp, indent, h_fp);
         }
 
         if (ast_node->right != NULL) {
-            transpile_decisions(ast_node->right, module, c_fp, indent);
+            transpile_decisions(ast_node->right, module, c_fp, indent, h_fp);
         }
 
         if (ast_node->left != NULL) {
-            transpile_decisions(ast_node->left, module, c_fp, indent);
+            transpile_decisions(ast_node->left, module, c_fp, indent, h_fp);
         }
     }
 
     if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_RETURN) {
-        transpile_node(ast_node->right, module, c_fp, indent);
-        transpile_node(ast_node->left, module, c_fp, indent);
+        transpile_node(ast_node->right, module, c_fp, indent, h_fp);
+        transpile_node(ast_node->left, module, c_fp, indent, h_fp);
     }
 
     kaos_lineno = ast_node->lineno;
@@ -625,11 +686,13 @@ transpile_decisions_label:
                 compiler_function_counter,
                 ast_node->strings[0]
             );
-            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
+            transpile_function_call_decision(c_fp, h_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
                 "%*cfree(function_call_%llu);\n"
+                "%*cif (decision_call_jumped)\n"
+                "%*c__builtin_longjmp(function_call_stack.arr[function_call_stack.size - 1]->return_jumper, 1);\n"
                 "%*creturn;\n"
                 "%*c} else {\n"
                 "%*cresetFunctionParametersMode();\n"
@@ -640,6 +703,10 @@ transpile_decisions_label:
                 indent + indent_length,
                 ' ',
                 compiler_function_counter,
+                indent + indent_length,
+                ' ',
+                indent + indent_length * 2,
+                ' ',
                 indent + indent_length,
                 ' ',
                 indent,
@@ -746,12 +813,18 @@ transpile_decisions_label:
                 c_fp,
                 "%*creturnSymbol(\"%s\");\n"
                 "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
+                "%*cif (decision_call_jumped)\n"
+                "%*c__builtin_longjmp(function_call_stack.arr[function_call_stack.size - 1]->return_jumper, 1);\n"
                 "%*creturn;\n"
                 "%*c}\n",
                 indent + indent_length,
                 ' ',
                 ast_node->strings[0],
                 indent + indent_length,
+                ' ',
+                indent + indent_length,
+                ' ',
+                indent + indent_length * 2,
                 ' ',
                 indent + indent_length,
                 ' ',
@@ -777,7 +850,7 @@ transpile_decisions_label:
                 compiler_function_counter,
                 ast_node->strings[0]
             );
-            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
+            transpile_function_call_decision(c_fp, h_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
@@ -862,7 +935,7 @@ transpile_decisions_label:
     goto transpile_decisions_label;
 }
 
-ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
 compiler_register_functions_label:
     if (ast_node == NULL) {
         return ast_node;
@@ -880,18 +953,18 @@ compiler_register_functions_label:
 
     if (is_node_function_related(ast_node)) {
         if (ast_node->depend != NULL) {
-            transpile_node(ast_node->depend, module, c_fp, indent);
-            compiler_register_functions(ast_node->depend, module, c_fp, indent);
+            transpile_node(ast_node->depend, module, c_fp, indent, h_fp);
+            compiler_register_functions(ast_node->depend, module, c_fp, indent, h_fp);
         }
 
         if (ast_node->right != NULL) {
-            transpile_node(ast_node->right, module, c_fp, indent);
-            compiler_register_functions(ast_node->right, module, c_fp, indent);
+            transpile_node(ast_node->right, module, c_fp, indent, h_fp);
+            compiler_register_functions(ast_node->right, module, c_fp, indent, h_fp);
         }
 
         if (ast_node->left != NULL) {
-            transpile_node(ast_node->left, module, c_fp, indent);
-            compiler_register_functions(ast_node->left, module, c_fp, indent);
+            transpile_node(ast_node->left, module, c_fp, indent, h_fp);
+            compiler_register_functions(ast_node->left, module, c_fp, indent, h_fp);
         }
     }
 
@@ -924,9 +997,12 @@ compiler_register_functions_label:
         compiler_current_module = compiler_getCurrentModule();
     }
 
+    _Function* function;
     switch (ast_node->node_type)
     {
         case AST_DEFINE_FUNCTION_BOOL:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_BOOL, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -937,8 +1013,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_NUMBER:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_NUMBER, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -949,8 +1028,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_STRING:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_STRING, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -961,8 +1043,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_ANY:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_ANY, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -973,8 +1058,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_LIST:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_LIST, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -985,8 +1073,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_DICT:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_DICT, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -997,8 +1088,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_BOOL_LIST:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_LIST, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1009,8 +1103,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_BOOL_DICT:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_DICT, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1021,8 +1118,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_NUMBER_LIST:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_LIST, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1033,8 +1133,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_NUMBER_DICT:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_DICT, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1045,8 +1148,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_STRING_LIST:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_LIST, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1057,8 +1163,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_STRING_DICT:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_DICT, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1069,8 +1178,11 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_DEFINE_FUNCTION_VOID:
+            function = getFunctionByModuleContext(ast_node->strings[0], module_path_stack.arr[module_path_stack.size - 1]);
+            if (function == NULL) break;
             fprintf(
                 c_fp,
                 "%*cstartFunction(\"%s\", K_VOID, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
@@ -1081,6 +1193,7 @@ compiler_register_functions_label:
                 compiler_current_module_context,
                 compiler_current_module
             );
+            transpile_jumper_assignments(c_fp, function, indent);
             break;
         case AST_FUNCTION_PARAMETERS_START:
             fprintf(
@@ -1257,13 +1370,13 @@ compiler_register_functions_label:
             prependModuleToModuleBuffer(ast_node->strings[0]);
             break;
         case AST_MODULE_IMPORT:
-            compiler_handleModuleImportRegister(NULL, false, c_fp, indent);
+            compiler_handleModuleImportRegister(NULL, false, c_fp, indent, h_fp);
             break;
         case AST_MODULE_IMPORT_AS:
-            compiler_handleModuleImportRegister(ast_node->strings[0], false, c_fp, indent);
+            compiler_handleModuleImportRegister(ast_node->strings[0], false, c_fp, indent, h_fp);
             break;
         case AST_MODULE_IMPORT_PARTIAL:
-            compiler_handleModuleImportRegister(NULL, true, c_fp, indent);
+            compiler_handleModuleImportRegister(NULL, true, c_fp, indent, h_fp);
             break;
         default:
             break;
@@ -1279,7 +1392,7 @@ compiler_register_functions_label:
     goto compiler_register_functions_label;
 }
 
-ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
+ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
 transpile_node_label:
     if (ast_node == NULL) {
         return ast_node;
@@ -1307,15 +1420,15 @@ transpile_node_label:
     }
 
     if (ast_node->depend != NULL) {
-        transpile_node(ast_node->depend, module, c_fp, indent);
+        transpile_node(ast_node->depend, module, c_fp, indent, h_fp);
     }
 
     if (ast_node->right != NULL) {
-        transpile_node(ast_node->right, module, c_fp, indent);
+        transpile_node(ast_node->right, module, c_fp, indent, h_fp);
     }
 
     if (ast_node->left != NULL) {
-        transpile_node(ast_node->left, module, c_fp, indent);
+        transpile_node(ast_node->left, module, c_fp, indent, h_fp);
     }
 
     if (ast_node->node_type == AST_END) {
@@ -1384,7 +1497,7 @@ transpile_node_label:
             indent += indent_length;
             fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
             fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent, h_fp);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
             fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
@@ -1404,7 +1517,7 @@ transpile_node_label:
             indent += indent_length;
             fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
             fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent, h_fp);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
             fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
@@ -1425,7 +1538,7 @@ transpile_node_label:
             indent += indent_length;
             fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
             fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent, h_fp);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
             fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
@@ -1506,7 +1619,7 @@ transpile_node_label:
                 indent,
                 ' '
             );
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
+            ast_node = transpile_node(ast_node->next, module, c_fp, indent, h_fp);
             indent -= indent_length;
             fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent + indent_length, ' ', current_loop_counter);
             fprintf(c_fp, "%*c}\n", indent, ' ');
@@ -1601,7 +1714,7 @@ transpile_node_label:
                 indent,
                 ' '
             );
-            ASTNode* next_node = transpile_node(ast_node->next, module, c_fp, indent);
+            ASTNode* next_node = transpile_node(ast_node->next, module, c_fp, indent, h_fp);
             indent -= indent_length;
             fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent + indent_length, ' ', current_loop_counter);
             fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent + indent_length, ' ', ast_node->strings[1]);
@@ -1641,7 +1754,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_BOOL, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_BOOL, K_ANY, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_BOOL, K_ANY, indent);
             break;
         case AST_VAR_CREATE_NUMBER:
             if (ast_node->right->is_transpiled) {
@@ -1681,7 +1794,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_NUMBER, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_NUMBER, K_ANY, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_NUMBER, K_ANY, indent);
             break;
         case AST_VAR_CREATE_STRING:
             value_s = escape_string_literal_for_transpiler(ast_node->value.s);
@@ -1699,7 +1812,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_STRING, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_STRING, K_ANY, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_STRING, K_ANY, indent);
             break;
         case AST_VAR_CREATE_ANY_BOOL:
             if (ast_node->strings[0] == NULL) {
@@ -1739,7 +1852,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_ANY_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_ANY, K_ANY, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_ANY, K_ANY, indent);
             break;
         case AST_VAR_CREATE_LIST:
             fprintf(
@@ -1757,7 +1870,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_ANY, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_LIST, K_ANY, indent);
             break;
         case AST_VAR_CREATE_DICT:
             fprintf(
@@ -1775,7 +1888,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_ANY, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_DICT, K_ANY, indent);
             break;
         case AST_VAR_CREATE_BOOL_LIST:
             fprintf(
@@ -1793,7 +1906,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_BOOL);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_BOOL, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_LIST, K_BOOL, indent);
             break;
         case AST_VAR_CREATE_BOOL_DICT:
             fprintf(
@@ -1811,7 +1924,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_BOOL);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_BOOL, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_DICT, K_BOOL, indent);
             break;
         case AST_VAR_CREATE_NUMBER_LIST:
             fprintf(
@@ -1829,7 +1942,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_NUMBER);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_NUMBER, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_LIST, K_NUMBER, indent);
             break;
         case AST_VAR_CREATE_NUMBER_DICT:
             fprintf(
@@ -1847,7 +1960,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_NUMBER);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_NUMBER, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_DICT, K_NUMBER, indent);
             break;
         case AST_VAR_CREATE_STRING_LIST:
             fprintf(
@@ -1865,7 +1978,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_STRING);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_STRING, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_LIST, K_STRING, indent);
             break;
         case AST_VAR_CREATE_STRING_DICT:
             fprintf(
@@ -1883,7 +1996,7 @@ transpile_node_label:
             fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_STRING);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
             break;
         case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_STRING, indent);
+            transpile_function_call_create_var(c_fp, h_fp, ast_node, module, K_DICT, K_STRING, indent);
             break;
         case AST_VAR_UPDATE_BOOL:
             if (ast_node->right->is_transpiled) {
@@ -1955,7 +2068,7 @@ transpile_node_label:
                         compiler_function_counter,
                         ast_node->strings[1]
                     );
-                    transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
+                    transpile_function_call(c_fp, h_fp, NULL, ast_node->strings[1], indent);
                     break;
                 case 3:
                     fprintf(
@@ -1967,7 +2080,7 @@ transpile_node_label:
                         ast_node->strings[2],
                         ast_node->strings[1]
                     );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
+                    transpile_function_call(c_fp, h_fp, ast_node->strings[1], ast_node->strings[2], indent);
                     break;
                 default:
                     break;
@@ -2092,7 +2205,7 @@ transpile_node_label:
                         compiler_function_counter,
                         ast_node->strings[0]
                     );
-                    transpile_function_call(c_fp, NULL, ast_node->strings[0], indent);
+                    transpile_function_call(c_fp, h_fp, NULL, ast_node->strings[0], indent);
                     break;
                 case 2:
                     fprintf(
@@ -2104,7 +2217,7 @@ transpile_node_label:
                         ast_node->strings[1],
                         ast_node->strings[0]
                     );
-                    transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1], indent);
+                    transpile_function_call(c_fp, h_fp, ast_node->strings[0], ast_node->strings[1], indent);
                     break;
                 default:
                     break;
@@ -3227,7 +3340,7 @@ transpile_node_label:
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
             }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            transpile_function_call(c_fp, h_fp, _module, ast_node->strings[0], indent);
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\\n\", false, true);\n"
@@ -3250,7 +3363,7 @@ transpile_node_label:
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
             }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            transpile_function_call(c_fp, h_fp, _module, ast_node->strings[0], indent);
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\", false, true);\n"
@@ -3273,7 +3386,7 @@ transpile_node_label:
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
             }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            transpile_function_call(c_fp, h_fp, _module, ast_node->strings[0], indent);
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\\n\", true, true);\n"
@@ -3296,7 +3409,7 @@ transpile_node_label:
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
             }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            transpile_function_call(c_fp, h_fp, _module, ast_node->strings[0], indent);
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\", true, true);\n"
@@ -3319,7 +3432,7 @@ transpile_node_label:
             } else {
                 fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
             }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
+            transpile_function_call(c_fp, h_fp, _module, ast_node->strings[0], indent);
             fprintf(
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
@@ -3473,13 +3586,126 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
     return false;
 }
 
-void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned short indent) {
+void transpile_function_call(FILE *c_fp, FILE *h_fp, char *module, char *name, unsigned short indent) {
     char *module_context = compiler_getFunctionModuleContext(name, module);
-    if (!isFunctionFromDynamicLibrary(name, module))
-        fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module_context, name);
+    if (!isFunctionFromDynamicLibrary(name, module)) {
+        if (
+            transpiled_function_name == NULL
+            ||
+            transpiled_function_module == NULL
+            ||
+            (
+                strcmp(transpiled_function_module, module_context) == 0
+                &&
+                strcmp(transpiled_function_name, name) == 0
+            )
+        ) {
+            fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module_context, name);
+        } else {
+            compiler_return_jumper_counter++;
+            fprintf(h_fp, "jmp_buf return_jumper_%llu;\n", compiler_return_jumper_counter);
+            fprintf(
+                c_fp,
+                "%*cif (__builtin_setjmp(return_jumper_%llu)) {\n"
+                "%*cfunction_call_%llu = function_call_stack.arr[function_call_stack.size - 1];\n"
+                "%*c} else {\n"
+                "%*cif (isFunctionInFunctionCallStack(function_call_%llu->function)) {\n"
+                "%*cfunction_call_%llu->return_jumper = return_jumper_%llu;\n"
+                "%*c__builtin_longjmp(function_call_%llu->function->function_jumper, 1);\n"
+                "%*c} else {\n"
+                "%*ckaos_function_%s_%s();\n"
+                "%*c}\n"
+                "%*c}\n",
+                indent,
+                ' ',
+                compiler_return_jumper_counter,
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                compiler_return_jumper_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length,
+                ' ',
+                indent + indent_length * 2,
+                ' ',
+                module_context,
+                name,
+                indent + indent_length,
+                ' ',
+                indent,
+                ' '
+            );
+        }
+    }
     _Function* function = getFunction(name, module);
     if (function->decision_node != NULL) {
-        fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module_context, name);
+        if (
+            transpiled_function_name == NULL
+            ||
+            transpiled_function_module == NULL
+            ||
+            (
+                strcmp(transpiled_function_module, module_context) == 0
+                &&
+                strcmp(transpiled_function_name, name) == 0
+            )
+        ) {
+            fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module_context, name);
+        } else {
+            compiler_return_jumper_counter++;
+            fprintf(h_fp, "jmp_buf return_jumper_%llu;\n", compiler_return_jumper_counter);
+            fprintf(
+                c_fp,
+                "%*cif (__builtin_setjmp(return_jumper_%llu)) {\n"
+                "%*cfunction_call_%llu = function_call_stack.arr[function_call_stack.size - 1];\n"
+                "%*c} else {\n"
+                "%*cif (isFunctionInFunctionCallStack(function_call_%llu->function)) {\n"
+                "%*cfunction_call_%llu->return_jumper = return_jumper_%llu;\n"
+                "%*c__builtin_longjmp(function_call_%llu->function->decision_jumper, 1);\n"
+                "%*c} else {\n"
+                "%*ckaos_decision_%s_%s();\n"
+                "%*c}\n"
+                "%*c}\n",
+                indent,
+                ' ',
+                compiler_return_jumper_counter,
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                compiler_return_jumper_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length,
+                ' ',
+                indent + indent_length * 2,
+                ' ',
+                module_context,
+                name,
+                indent + indent_length,
+                ' ',
+                indent,
+                ' '
+            );
+        }
     }
     free(module_context);
     fprintf(
@@ -3492,12 +3718,125 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
     );
 }
 
-void transpile_function_call_decision(FILE *c_fp, char *module_context, char* module, char *name, unsigned short indent) {
-    if (!isFunctionFromDynamicLibraryByModuleContext(name, module_context))
-        fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module, name);
+void transpile_function_call_decision(FILE *c_fp, FILE *h_fp, char *module_context, char* module, char *name, unsigned short indent) {
+    if (!isFunctionFromDynamicLibraryByModuleContext(name, module_context)) {
+        if (
+            transpiled_decision_name == NULL
+            ||
+            transpiled_decision_module == NULL
+            ||
+            (
+                strcmp(transpiled_decision_module, module) == 0
+                &&
+                strcmp(transpiled_decision_name, name) == 0
+            )
+        ) {
+            fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module, name);
+        } else {
+            compiler_return_jumper_counter++;
+            fprintf(h_fp, "jmp_buf return_jumper_%llu;\n", compiler_return_jumper_counter);
+            fprintf(
+                c_fp,
+                "%*cif (__builtin_setjmp(return_jumper_%llu)) {\n"
+                "%*cfunction_call_%llu = function_call_stack.arr[function_call_stack.size - 1];\n"
+                "%*c} else {\n"
+                "%*cif (isFunctionInFunctionCallStack(function_call_%llu->function)) {\n"
+                "%*cfunction_call_%llu->return_jumper = return_jumper_%llu;\n"
+                "%*c__builtin_longjmp(function_call_%llu->function->function_jumper, 1);\n"
+                "%*c} else {\n"
+                "%*ckaos_function_%s_%s();\n"
+                "%*c}\n"
+                "%*c}\n",
+                indent,
+                ' ',
+                compiler_return_jumper_counter,
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                compiler_return_jumper_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length,
+                ' ',
+                indent + indent_length * 2,
+                ' ',
+                module,
+                name,
+                indent + indent_length,
+                ' ',
+                indent,
+                ' '
+            );
+        }
+    }
     _Function* function = getFunctionByModuleContext(name, module_context);
     if (function->decision_node != NULL) {
-        fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module, name);
+        if (
+            transpiled_decision_name == NULL
+            ||
+            transpiled_decision_module == NULL
+            ||
+            (
+                strcmp(transpiled_decision_module, module) == 0
+                &&
+                strcmp(transpiled_decision_name, name) == 0
+            )
+        ) {
+            fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module, name);
+        } else {
+            compiler_return_jumper_counter++;
+            fprintf(h_fp, "jmp_buf return_jumper_%llu;\n", compiler_return_jumper_counter);
+            fprintf(
+                c_fp,
+                "%*cif (__builtin_setjmp(return_jumper_%llu)) {\n"
+                "%*cfunction_call_%llu = function_call_stack.arr[function_call_stack.size - 1];\n"
+                "%*c} else {\n"
+                "%*cif (isFunctionInFunctionCallStack(function_call_%llu->function)) {\n"
+                "%*cfunction_call_%llu->return_jumper = return_jumper_%llu;\n"
+                "%*c__builtin_longjmp(function_call_%llu->function->decision_jumper, 1);\n"
+                "%*c} else {\n"
+                "%*ckaos_decision_%s_%s();\n"
+                "%*c}\n"
+                "%*c}\n",
+                indent,
+                ' ',
+                compiler_return_jumper_counter,
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent,
+                ' ',
+                indent + indent_length,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                compiler_return_jumper_counter,
+                indent + indent_length * 2,
+                ' ',
+                compiler_function_counter,
+                indent + indent_length,
+                ' ',
+                indent + indent_length * 2,
+                ' ',
+                module,
+                name,
+                indent + indent_length,
+                ' ',
+                indent,
+                ' '
+            );
+        }
     }
     fprintf(
         c_fp,
@@ -3509,7 +3848,7 @@ void transpile_function_call_decision(FILE *c_fp, char *module_context, char* mo
     );
 }
 
-void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2, unsigned short indent) {
+void transpile_function_call_create_var(FILE *c_fp, FILE *h_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2, unsigned short indent) {
     compiler_function_counter++;
     switch (ast_node->strings_size)
     {
@@ -3522,7 +3861,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 compiler_function_counter,
                 ast_node->strings[1]
             );
-            transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
+            transpile_function_call(c_fp, h_fp, NULL, ast_node->strings[1], indent);
             break;
         case 3:
             fprintf(
@@ -3534,7 +3873,7 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
                 ast_node->strings[2],
                 ast_node->strings[1]
             );
-            transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
+            transpile_function_call(c_fp, h_fp, ast_node->strings[1], ast_node->strings[2], indent);
             break;
         default:
             break;
@@ -3555,6 +3894,17 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
     );
 }
 
+void transpile_jumper_assignments(FILE *c_fp, _Function* function, unsigned short indent) {
+    char *module_context_escaped = malloc(strlen(function->module_context) + 1);
+    strcpy(module_context_escaped, function->module_context);
+    compiler_escape_module(module_context_escaped);
+    fprintf(c_fp, "%*cfunction_mode->function_jumper = kaos_function_%s_%s_tail_call_jumper;\n", indent, ' ', module_context_escaped, function->name);
+    if (function->decision_node != NULL) {
+        fprintf(c_fp, "%*cfunction_mode->decision_jumper = kaos_decision_%s_%s_tail_call_jumper;\n", indent, ' ', module_context_escaped, function->name);
+    }
+    free(module_context_escaped);
+}
+
 void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp) {
     char *module_path = resolveModulePath(module_name, directly_import);
 
@@ -3568,7 +3918,7 @@ void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *
     moduleImportCleanUp(module_path);
 }
 
-void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
+void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp) {
     char *module_path = resolveModulePath(module_name, directly_import);
     if (
         strcmp(
@@ -3643,7 +3993,7 @@ void compiler_handleModuleImportRegister(char *module_name, bool directly_import
         strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
         compiler_escape_module(compiled_module);
         ASTNode* ast_node = ast_root_node;
-        compiler_register_functions(ast_node, compiled_module, c_fp, indent);
+        compiler_register_functions(ast_node, compiled_module, c_fp, indent, h_fp);
         free(compiled_module);
     }
 

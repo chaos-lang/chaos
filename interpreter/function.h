@@ -63,6 +63,10 @@ typedef struct _Function {
     char *module_context;
     char *module;
     bool is_dynamic;
+#ifdef CHAOS_COMPILER
+    void* function_jumper;
+    void* decision_jumper;
+#endif
 } _Function;
 
 _Function* function_cursor;
@@ -76,6 +80,9 @@ _Function* function_parameters_mode;
 typedef struct FunctionCall {
     struct _Function* function;
     struct ASTNode* trigger;
+#ifdef CHAOS_COMPILER
+    void* return_jumper;
+#endif
 } FunctionCall;
 
 typedef struct function_call_array {
@@ -165,5 +172,9 @@ void popExecutedFunctionStack();
 void freeFunctionReturn(FunctionCall* function_call);
 void decisionBreakLoop();
 void decisionContinueLoop();
+
+#ifdef CHAOS_COMPILER
+bool isFunctionInFunctionCallStack(_Function* function);
+#endif
 
 #endif

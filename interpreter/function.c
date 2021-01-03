@@ -856,3 +856,12 @@ void decisionContinueLoop() {
     longjmp(LoopContinueDecision, 1);
 #endif
 }
+
+#ifdef CHAOS_COMPILER
+bool isFunctionInFunctionCallStack(_Function* function) {
+    for (unsigned i = 0; i < function_call_stack.size - 1; i++) {
+        if (function_call_stack.arr[i]->function == function) return true;
+    }
+    return false;
+}
+#endif
