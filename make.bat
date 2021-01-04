@@ -3,10 +3,10 @@ setlocal EnableDelayedExpansion
 
 IF [%1]==[] (
     SET compiler=gcc
-    SET extra_flags=-D__USE_MINGW_ANSI_STDIO -Werror -Wall -pedantic
+    SET extra_flags=-D__USE_MINGW_ANSI_STDIO -Werror -Wall -pedantic -Wl,--stack,4294967296
 ) ELSE IF [%1]==[dev] (
     SET compiler=gcc
-    SET extra_flags=-D__USE_MINGW_ANSI_STDIO -Werror -Wall -pedantic -ggdb
+    SET extra_flags=-D__USE_MINGW_ANSI_STDIO -Werror -Wall -pedantic -Wl,--stack,4294967296 -ggdb
 ) ELSE IF [%1]==[clang] (
     SET compiler=clang
 ) ELSE IF [%1]==[clang-dev] (
@@ -162,7 +162,7 @@ win_bison -d parser\parser.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-%compiler% -fcommon -Wl,-stack_size,0x100000000 -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c parser/*.c utilities/*.c utilities/windows/*.c ast/*.c interpreter/*.c compiler/*.c Chaos.c %extra_flags%
+%compiler% -fcommon -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c parser/*.c utilities/*.c utilities/windows/*.c ast/*.c interpreter/*.c compiler/*.c Chaos.c %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )

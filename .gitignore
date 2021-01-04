@@ -1,5 +1,8 @@
+# Chaos binaries
 chaos
 chaos.exe
+
+# Flex & Bison intermediate files
 parser.tab.c
 parser.tab.h
 lex.yy.c
@@ -16,10 +19,8 @@ bison_*
 # Ignore local history
 .history
 
-# Ignore folder generate via mac os
+# macOS specific
 chaos.dSYM/
-
-# Ignore generate via mac os
 .DS_Store
 
 # Ignore the dynamic library files
@@ -30,6 +31,10 @@ chaos.dSYM/
 *.dll
 *.exp
 *.lib
+
+# Windows LLVM
+*.ilk
+*.pdb
 
 # help.txt header
 help.h
