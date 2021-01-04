@@ -71,7 +71,10 @@ lex.yy.c:
 	flex lexer/lexer.l
 
 chaos: lex.yy.c parser.tab.c parser.tab.h
-	${CHAOS_COMPILER} -Werror -Wall -pedantic -fcommon -DCHAOS_INTERPRETER -o chaos parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c interpreter/*.c compiler/*.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
+ifeq ($(UNAME_S), Darwin)
+	export CHAOS_STACK_SIZE=-Wl,-stack_size,0x100000000
+endif
+	${CHAOS_COMPILER} -Werror -Wall -pedantic -fcommon ${CHAOS_STACK_SIZE} -DCHAOS_INTERPRETER -o chaos parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c interpreter/*.c compiler/*.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
 	rm -rf chaos parser.tab.c lex.yy.c parser.tab.h

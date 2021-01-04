@@ -290,12 +290,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     sprintf(
         cmd,
 #   if !defined(__clang__)
-        "/c %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
         "-fcommon",
+        "-Wl,-stack_size,0x100000000",
 #   if !defined(__clang__)
         "-Werror",
         "-Wall",
@@ -361,6 +362,10 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     arg_count++;
 #   endif
 
+#   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    arg_count++;
+#   endif
+
     char *c_compiler_args[arg_count];
     c_compiler_args[0] = c_compiler_path;
     c_compiler_args[1] = "-Werror";
@@ -396,6 +401,10 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
 #   if !defined(__clang__)
     c_compiler_args[27 + extra_flags_count] = "-fcompare-debug-second",
+#   endif
+
+#   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    c_compiler_args[28 + extra_flags_count] = "-Wl,-stack_size,0x100000000",
 #   endif
 
     c_compiler_args[arg_count - 1] = NULL;
