@@ -211,6 +211,7 @@ COPY parser.tab.c "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\
 COPY enums.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
 COPY Chaos.c "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
 COPY Chaos.h "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\"
+COPY LICENSE "%programdata%\Chocolatey\lib\mingw\tools\install\mingw64\lib\gcc\x86_64-w64-mingw32\!GCC_VERSION!\include\chaos\"
 IF errorlevel 1 (
     EXIT /B 1
 )
@@ -231,6 +232,7 @@ COPY parser.tab.c "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY enums.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY Chaos.c "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 COPY Chaos.h "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\"
+COPY LICENSE "%programfiles%\LLVM\lib\clang\!CLANG_VERSION!\include\chaos\"
 IF errorlevel 1 (
     EXIT /B 1
 )

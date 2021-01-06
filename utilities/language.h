@@ -33,9 +33,10 @@
 #define __KAOS_INTERACTIVE_MODULE_NAME__ "__interactive__."__KAOS_LANGUAGE_FILE_EXTENSION__
 #define __KAOS_MAX_RECURSION_DEPTH__ 1000
 #define __KAOS_MSG_LINE_LENGTH__ 1000
-#define __KAOS_BYE_BYE__ "You have chosen the order! "
+#define __KAOS_BYE_BYE__ "Bye bye!"
 #define __KAOS_SPELLS__ "spells"
 #define __KAOS_SYNTAX_ERROR__ "Syntax error"
+#define __KAOS_INDENT_LENGTH__ 4
 
 #if defined(__APPLE__) || defined(__MACH__)
 #   define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dylib"
@@ -69,11 +70,18 @@
 #   include <getopt.h>
 #endif
 
+#if defined(__APPLE__) && defined(__MACH__)
+#   include <sys/syslimits.h>
+#elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+#   include <linux/limits.h>
+#endif
+
 #include "platform.h"
 
 void greet();
 void yyerror_msg(char* error_name, char* current_module, char* cause);
 void print_bye_bye();
 void print_help();
+void print_license();
 
 #endif

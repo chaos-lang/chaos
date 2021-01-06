@@ -25,6 +25,7 @@ requirements-dev:
 	cp enums.h /usr/local/include/chaos/
 	cp Chaos.c /usr/local/include/chaos/
 	cp Chaos.h /usr/local/include/
+	cp LICENSE /usr/local/include/chaos/
 ifeq ($(UNAME_S), Darwin)
 	echo 'export C_INCLUDE_PATH="/usr/local/include"' >> ~/.bash_profile
 	source ~/.bash_profile

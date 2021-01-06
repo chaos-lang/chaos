@@ -2,6 +2,7 @@ Usage: chaos [options] <file> [--] [args...]
 
     -h, --help          Print this help text.
     -v, --version       Version number.
+    -l, --license       Print the license.
     -d, --debug         Debug the execution of a program using AST nodes.
     -c, --compile       Compile a Chaos program into machine code.
     -o, --output        Binary output filename. Must be used with the -c / --compile option.

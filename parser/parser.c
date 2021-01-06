@@ -32,6 +32,7 @@ static struct option long_options[] =
 {
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'v'},
+    {"license", no_argument, NULL, 'l'},
     {"debug", no_argument, NULL, 'd'},
     {"compile", required_argument, NULL, 'c'},
     {"output", required_argument, NULL, 'o'},
@@ -52,7 +53,7 @@ int initParser(int argc, char** argv) {
     char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvdc:o:e:k", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvldc:o:e:k", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -61,6 +62,9 @@ int initParser(int argc, char** argv) {
                 exit(0);
             case 'v':
                 printf("%d.%d.%d\n", __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__, __KAOS_VERSION_PATCHLEVEL__);
+                exit(0);
+            case 'l':
+                print_license();
                 exit(0);
             case 'd':
                 debug_enabled = true;

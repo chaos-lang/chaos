@@ -27,7 +27,7 @@ extern int kaos_lineno;
 
 struct stat dir_stat = {0};
 
-unsigned short indent_length = 4;
+unsigned short indent_length = __KAOS_INDENT_LENGTH__;
 unsigned long long compiler_loop_counter = 0;
 unsigned long long compiler_function_counter = 0;
 unsigned long long compiler_symbol_counter = 0;
