@@ -348,15 +348,20 @@ void print_help() {
 void print_license() {
     char license_path[PATH_MAX];
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+    PWSTR szPath = NULL;
 #   if defined(__clang__)
-    sprintf(license_path, "%%programfiles%%/LLVM/lib/clang/%d.%d.%d/include/chaos/LICENSE", __clang_major__, __clang_minor__, __clang_patchlevel__);
+    SHGetKnownFolderPath(&FOLDERID_ProgramFiles, 0, NULL, &szPath);
+    sprintf(license_path, "%ls/LLVM/lib/clang/%d.%d.%d/include/chaos/LICENSE", szPath, __clang_major__, __clang_minor__, __clang_patchlevel__);
 #   elif defined(__GNUC__) || defined(__GNUG__)
-    sprintf(license_path, "%%programdata%%/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos/LICENSE", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+    SHGetKnownFolderPath(&FOLDERID_ProgramData, 0, NULL, &szPath);
+    sprintf(license_path, "%ls/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos/LICENSE", szPath, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 #   endif
+    CoTaskMemFree(szPath);
 #else
     sprintf(license_path, "/usr/local/include/chaos/LICENSE");
 #endif
 
+    printf("license_path: %s\n", license_path);
     char *license_text = fileGetContents(license_path);
     printf("%s", license_text);
     free(license_text);
