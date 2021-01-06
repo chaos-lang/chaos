@@ -100,6 +100,15 @@ void greet() {
     sprintf(motto, "%*c%s", ws_col / 2 - 12, ' ', __KAOS_LANGUAGE_MOTTO__);
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;45m");
+#endif
+    printf("%-*s", ws_col, "");
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
+    printf("\n");
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     printf("\033[1;45m");
 #endif
     printf("%-*s", ws_col, lang_compiler);
@@ -174,6 +183,16 @@ void greet() {
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     printf("\033[0m");
 #endif
+    printf("\n");
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0;45m");
+#endif
+    printf("%-*s", ws_col, "");
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    printf("\033[0m");
+#endif
+
     printf("\n\n");
 }
 
