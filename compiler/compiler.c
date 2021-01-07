@@ -145,7 +145,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     const char *c_file_base =
         "extern bool disable_complex_mode;\n\n"
         "int kaos_lineno;\n"
-        "bool is_interactive = false;\n"
         "unsigned long long nested_loop_counter = 0;\n\n";
 
     const char *h_file_base =

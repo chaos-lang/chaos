@@ -37,7 +37,10 @@ extern FILE* yyin;
 extern int yylineno;
 extern char *yytext;
 
+#ifndef CHAOS_COMPILER
 extern bool is_interactive;
+#endif
+
 bool inject_mode = false;
 
 extern char *main_interpreted_module;
@@ -129,7 +132,11 @@ function:
     | T_PRETTY T_PRINT T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                          { char *strings[] = {$5, $3};         ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_PRINT_FUNCTION_RETURN, yylineno, strings, 2, $7);                            ASTNodeNext(ast_node); }
     | T_PRETTY T_ECHO T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                           { char *strings[] = {$5, $3};         ASTNode* ast_node = addASTNodeAssign(AST_PRETTY_ECHO_FUNCTION_RETURN, yylineno, strings, 2, $7);                             ASTNodeNext(ast_node); }
     | T_VAR T_DOT T_VAR T_LEFT function_call_parameters_start                                                           { char *strings[] = {$3, $1};         ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_RETURN, yylineno, strings, 2, $5);                                         ASTNodeNext(ast_node); }
-    | error T_NEWLINE                                                                                                   { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE                                                                                                   {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
     | T_TIMES_DO_INT function                                                                                           { }
     | T_VAR_BOOL T_FUNCTION T_VAR                                                                                       { yyerror(__KAOS_SYNTAX_ERROR__); }
     | T_VAR_NUMBER T_FUNCTION T_VAR                                                                                     { yyerror(__KAOS_SYNTAX_ERROR__); }
@@ -152,14 +159,22 @@ function_parameters_start:                                                      
 
 function_call_parameters_start:                                                                                         { }
     | function_parameters T_RIGHT                                                                                       {                                     ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETERS_START, yylineno, NULL, 0, $1);                             $$ = ast_node; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
 ;
 
 function_parameters:                                                                                                    {                                     ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETERS_START, yylineno, NULL, 0);                                            $$ = ast_node; }
     | T_NEWLINE function_parameters                                                                                     { $$ = $2; }
     | function_parameters T_COMMA function_parameters                                                                   {                                     ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, yylineno, NULL, 0);                                                        $$ = ast_node; $$->right = $3; $$->left = $1; }
     | function_parameters T_NEWLINE                                                                                     { $$ = $1; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
 ;
 function_parameters: T_VAR_BOOL T_VAR                                                                                   { char *strings[] = {$2};             ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETER_BOOL, yylineno, strings, 1);                                           $$ = ast_node; }
 ;
@@ -228,10 +243,9 @@ parser:
         if (setjmp(InteractiveShellFunctionErrorAbsorber)) {
             eval_node_after_function_call(function_call_stack.arr[function_call_stack.size - 1]->trigger);
         }
-#endif
         if (is_interactive && loops_inside_function_counter == 0)
             interpret(main_interpreted_module, INIT_PREPARSE, true);
-        #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
             if (is_interactive) {
                 if (loops_inside_function_counter > 0 || is_complex_parsing) {
                     printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__);
@@ -239,7 +253,8 @@ parser:
                     printf("%s ", __KAOS_SHELL_INDICATOR__);
                 }
             }
-        #endif
+#   endif
+#endif
     }
 ;
 
@@ -268,7 +283,11 @@ line: T_NEWLINE
     | T_IMPORT module T_AS T_VAR T_NEWLINE                                                                              { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_MODULE_IMPORT_AS, yylineno, strings, 1, $2);                                       ASTNodeNext(ast_node); }
     | T_FROM module T_IMPORT T_MULTIPLY                                                                                 {                                     ASTNode* ast_node = addASTNodeAssign(AST_MODULE_IMPORT_PARTIAL, yylineno, NULL, 0, $2);                                     ASTNodeNext(ast_node); }
     | T_FROM module T_IMPORT function_name                                                                              {                                     ASTNode* ast_node = addASTNodeBranch(AST_MODULE_IMPORT_PARTIAL, yylineno, $2, $4);                                          ASTNodeNext(ast_node); }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
 ;
 
 print: T_VAR left_right_bracket                                                                                         { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_PRINT_VAR_EL, yylineno, strings, 1, $2);                                ASTNodeNext(ast_node); }
@@ -339,7 +358,11 @@ mixed_expression: T_FLOAT                                                       
     | T_VAR T_MULTIPLY expression                                                                                       { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, yylineno, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_MULTIPLY, yylineno, ast_node_l, $3);           $$ = ast_node; }
     | T_VAR T_DIVIDE expression                                                                                         { char *strings_l[] = {$1};           ASTNode* ast_node_l = addASTNode(AST_VAR_MIXED_EXPRESSION_VALUE, yylineno, strings_l, 1);                                                                                                                                      ASTNode* ast_node = addASTNodeBranch(AST_MIXED_EXPRESSION_DIVIDE, yylineno, ast_node_l, $3);             $$ = ast_node; }
     | T_LEFT mixed_expression T_RIGHT                                                                                   {                                     ASTNode* ast_node = addASTNodeBranch(AST_PARENTHESIS, yylineno, NULL, $2);                                                                                                                                                                                                                                                    $$ = ast_node; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
     | T_MINUS                                                                                                           { yyerror(__KAOS_SYNTAX_ERROR__); }
     | mixed_expression T_PLUS                                                                                           { yyerror(__KAOS_SYNTAX_ERROR__); }
     | mixed_expression T_MINUS                                                                                          { yyerror(__KAOS_SYNTAX_ERROR__); }
@@ -410,7 +433,11 @@ expression: T_INT                                                               
     | T_DECREMENT T_VAR                                                                                                 { char *strings[] = {$2};             ASTNode* ast_node_l = addASTNodeInt(AST_STEP, yylineno, NULL, 0, -1, NULL);                                                            ASTNode* ast_node = addASTNodeAssign(AST_VAR_EXPRESSION_INCREMENT_ASSIGN, yylineno, strings, 1, ast_node_l);                                                                                 $$ = ast_node; }
     | T_VAR T_DECREMENT                                                                                                 { char *strings[] = {$1};             ASTNode* ast_node_l = addASTNodeInt(AST_STEP, yylineno, NULL, 0, -1, NULL);                                                            ASTNode* ast_node = addASTNodeAssign(AST_VAR_EXPRESSION_ASSIGN_INCREMENT, yylineno, strings, 1, ast_node_l);                                                                                 $$ = ast_node; }
     | T_LEFT expression T_RIGHT                                                                                         {                                     ASTNode* ast_node = addASTNodeBranch(AST_PARENTHESIS, yylineno, NULL, $2);                                                                                                                                                                                                                                                          $$ = ast_node; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
     | T_MINUS                                                                                                           { yyerror(__KAOS_SYNTAX_ERROR__); }
     | expression T_PLUS                                                                                                 { yyerror(__KAOS_SYNTAX_ERROR__); }
     | expression T_MINUS                                                                                                { yyerror(__KAOS_SYNTAX_ERROR__); }
@@ -765,7 +792,11 @@ variable_complex_element:                                                       
 liststart:                                                                                                              {                                     ASTNode* ast_node = addASTNode(AST_LIST_START, yylineno, NULL, 0);                                                        $$ = ast_node; is_complex_parsing = true; }
     | liststart T_LEFT_BRACKET T_RIGHT_BRACKET                                                                          { }
     | liststart T_LEFT_BRACKET list T_RIGHT_BRACKET                                                                     {                                     ASTNode* ast_node = addASTNode(AST_LIST_NESTED_FINISH, yylineno, NULL, 0);                                                ast_node->left = $3; $3->depend = $1; $$ = ast_node; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
 ;
 
 list:                                                                                                                   { }
@@ -800,7 +831,11 @@ list: T_VAR left_right_bracket                                                  
 dictionarystart:                                                                                                        {                                     ASTNode* ast_node = addASTNode(AST_DICT_START, yylineno, NULL, 0);                                                        $$ = ast_node; is_complex_parsing = true; }
     | dictionarystart T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET                                                        { }
     | dictionarystart T_LEFT_CURLY_BRACKET dictionary T_RIGHT_CURLY_BRACKET                                             {                                     ASTNode* ast_node = addASTNode(AST_DICT_NESTED_FINISH, yylineno, NULL, 0);                                                ast_node->left = $3; $3->depend = $1; $$ = ast_node; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
 ;
 
 dictionary:                                                                                                             { }
@@ -811,7 +846,11 @@ dictionary:                                                                     
     | T_STRING T_COLON liststart                                                                                        { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_POP_NESTED_COMPLEX_STACK, yylineno, strings, 1);                                       $$ = ast_node; $$->left = $3; }
     | dictionary T_COMMA dictionary                                                                                     {                                     ASTNode* ast_node = addASTNode(AST_STEP, yylineno, NULL, 0);                                                              $$ = ast_node; $$->right = $3; $$->left = $1; }
     | dictionary T_NEWLINE                                                                                              { $$ = $1; }
-    | error T_NEWLINE parser                                                                                            { if (is_interactive) { yyerrok; yyclearin; } }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
 ;
 dictionary: T_STRING T_COLON boolean_expression                                                                         { char *strings[] = {$1};             ASTNode* ast_node = addASTNodeAssign(AST_VAR_CREATE_BOOL, yylineno, strings, 1, $3);                                      $$ = ast_node; }
 ;

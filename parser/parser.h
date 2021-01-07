@@ -43,7 +43,11 @@ extern FILE* yyin;
 extern char *yytext;
 FILE *fp;
 bool fp_opened;
+
+#ifndef CHAOS_COMPILER
 bool is_interactive;
+#endif
+
 char *program_file_path;
 char *program_file_dir;
 char *program_code;

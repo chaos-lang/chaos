@@ -252,6 +252,7 @@ void yyerror(const char* s) {
 
     yyerror_msg(capitalize(s), getCurrentModule(), yytext);
 
+#ifndef CHAOS_COMPILER
     if (is_interactive) {
         loop_mode = NULL;
         function_mode = NULL;
@@ -269,9 +270,12 @@ void yyerror(const char* s) {
         reset_line_no_to = 0;
         yyparse();
     } else {
+#endif
         freeEverything();
         exit(E_SYNTAX_ERROR);
+#ifndef CHAOS_COMPILER
     }
+#endif
 }
 
 #ifndef CHAOS_COMPILER

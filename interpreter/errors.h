@@ -73,7 +73,10 @@ extern void freeEverything();
 extern void absorbError();
 #endif
 
+#ifndef CHAOS_COMPILER
 extern bool is_interactive;
+#endif
+
 extern jmp_buf InteractiveShellErrorAbsorber;
 
 void throw_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1);

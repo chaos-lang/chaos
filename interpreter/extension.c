@@ -85,9 +85,10 @@ void initKaosApi() {
 void callRegisterInDynamicLibrary(char* dynamic_library_path) {
     dynamic_library dylib = getFunctionFromDynamicLibrary(dynamic_library_path, __KAOS_EXTENSION_REGISTER_FUNCTION__);
     dylib.func(kaos);
-    if (is_interactive) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
         phase = PROGRAM;
-    }
+#endif
 }
 
 void callFunctionFromDynamicLibrary(_Function* function) {

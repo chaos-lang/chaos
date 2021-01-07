@@ -40,11 +40,11 @@ ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
     ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
     loop_end_ast_node = next_node;
 
-    if (is_interactive) {
-        if (setjmp(InteractiveShellLoopErrorAbsorber)) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        if (setjmp(InteractiveShellLoopErrorAbsorber))
             interactive_shell_loop_error_absorbed = true;
-        }
-    }
+#endif
 
     nested_loop_counter++;
     if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
@@ -79,11 +79,11 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
     if (list->type != K_LIST)
         throw_error(E_NOT_A_LIST, list_name);
 
-    if (is_interactive) {
-        if (setjmp(InteractiveShellLoopErrorAbsorber)) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        if (setjmp(InteractiveShellLoopErrorAbsorber))
             interactive_shell_loop_error_absorbed = true;
-        }
-    }
+#endif
 
     nested_loop_counter++;
     if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
@@ -115,11 +115,11 @@ ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_valu
     if (dict->type != K_DICT)
         throw_error(E_NOT_A_DICT, dict_name);
 
-    if (is_interactive) {
-        if (setjmp(InteractiveShellLoopErrorAbsorber)) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        if (setjmp(InteractiveShellLoopErrorAbsorber))
             interactive_shell_loop_error_absorbed = true;
-        }
-    }
+#endif
 
     nested_loop_counter++;
     if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {

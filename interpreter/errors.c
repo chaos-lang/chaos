@@ -187,14 +187,13 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     printf("\n");
     free(new_error_msg_out);
 
-    if (!is_interactive)
-    {
+#ifndef CHAOS_COMPILER
+    if (!is_interactive) {
+#endif
         freeEverything();
         exit(code);
-    }
 #ifndef CHAOS_COMPILER
-    else
-    {
+    } else {
         absorbError();
     }
 #endif

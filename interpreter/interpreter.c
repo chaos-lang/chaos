@@ -30,9 +30,14 @@ extern unsigned long long nested_loop_counter;
 
 int kaos_lineno = 0;
 
+#ifndef CHAOS_COMPILER
 void interpret(char *module, enum Phase phase_arg, bool is_interactive) {
+#else
+void interpret(char *module, enum Phase phase_arg) {
+#endif
     ASTNode* ast_node = ast_root_node;
 
+#ifndef CHAOS_COMPILER
     if (is_interactive) {
         if (ast_interactive_cursor != NULL) {
             ast_node = ast_interactive_cursor->next;
@@ -40,6 +45,7 @@ void interpret(char *module, enum Phase phase_arg, bool is_interactive) {
             ast_interactive_cursor = ast_node;
         }
     }
+#endif
 
     switch (phase_arg)
     {
@@ -791,18 +797,23 @@ eval_node_label:
             free(out);
             break;
         case AST_PRINT_INTERACTIVE_VAR:
+#ifndef CHAOS_COMPILER
             if (ast_node->strings[0][0] != '\0' && is_interactive)
                 printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, false);
+#endif
             break;
         case AST_PRINT_INTERACTIVE_EXPRESSION:
-            if (is_interactive) {
+#ifndef CHAOS_COMPILER
+            if (is_interactive)
                 if (ast_node->right->node_type < AST_VAR_EXPRESSION_INCREMENT || ast_node->right->node_type > AST_VAR_EXPRESSION_ASSIGN_INCREMENT)
                     printf("%lld\n", ast_node->right->value.i);
-            }
+#endif
             break;
         case AST_PRINT_INTERACTIVE_MIXED_EXPRESSION:
+#ifndef CHAOS_COMPILER
             if (is_interactive)
                 printf("%Lg\n", ast_node->right->value.f);
+#endif
             break;
         case AST_ECHO_VAR:
             printSymbolValueEndWith(getSymbol(ast_node->strings[0]), "", false, true);
@@ -1290,18 +1301,16 @@ eval_node_label:
             break;
         case AST_EXIT_SUCCESS:
 #ifndef CHAOS_COMPILER
-            if (is_interactive) {
+            if (is_interactive)
                 print_bye_bye();
-            }
 #endif
             freeEverything();
             exit(E_SUCCESS);
             break;
         case AST_EXIT_EXPRESSION:
 #ifndef CHAOS_COMPILER
-            if (is_interactive) {
+            if (is_interactive)
                 print_bye_bye();
-            }
 #endif
             exit_code = ast_node->right->value.i;
             freeEverything();
@@ -1309,9 +1318,8 @@ eval_node_label:
             break;
         case AST_EXIT_VAR:
 #ifndef CHAOS_COMPILER
-            if (is_interactive) {
+            if (is_interactive)
                 print_bye_bye();
-            }
 #endif
             exit_code = getSymbolValueInt(ast_node->strings[0]);
             freeEverything();
@@ -1566,11 +1574,15 @@ ASTNode* eval_node_after_function_call(ASTNode* end_node) {
         case AST_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
+#ifndef CHAOS_COMPILER
             if (is_interactive && !isFunctionType(ast_node->strings[0], _module, K_VOID) && !inject_mode && !decision_execution_mode) {
                 printFunctionReturn(function_call, "\n", false, false);
             } else {
+#endif
                 freeFunctionReturn(function_call);
+#ifndef CHAOS_COMPILER
             }
+#endif
             break;
         case AST_DECISION_MAKE_BOOLEAN:
             freeFunctionReturn(function_call);

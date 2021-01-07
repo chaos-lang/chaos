@@ -66,9 +66,10 @@ void moduleImportParse(char *module_path) {
 }
 
 char* resolveModulePath(char *module_name, bool directly_import) {
-    if (is_interactive) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
         ast_interactive_cursor = ast_node_cursor;
-    }
+#endif
     char *module_path;
     char *relative_path = "";
 

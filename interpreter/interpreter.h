@@ -28,7 +28,12 @@
 extern unsigned long long nested_loop_counter;
 extern ASTNode* loop_end_ast_node;
 
+#ifndef CHAOS_COMPILER
 void interpret(char *module, enum Phase phase_arg, bool is_interactive);
+#else
+void interpret(char *module, enum Phase phase_arg);
+#endif
+
 ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node);
 ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
 ASTNode* startForeachDict(char *list_name, char *element_key, char *element_value, ASTNode* ast_node);

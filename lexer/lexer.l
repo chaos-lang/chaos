@@ -60,7 +60,11 @@ void injectCode(char *code, enum Phase phase_arg) {
 
     char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
+#ifndef CHAOS_COMPILER
     interpret(interpreted_module, phase_arg, false);
+#else
+    interpret(interpreted_module, phase_arg);
+#endif
     free(interpreted_module);
 
     yy_delete_buffer(new_buffer);
@@ -78,6 +82,7 @@ void switchBuffer(char *code, enum Phase phase_arg) {
     yy_delete_buffer(old_buffer);
 }
 
+#ifndef CHAOS_COMPILER
 void yyrestart_interactive() {
     if (!YY_CURRENT_BUFFER){
         yyensure_buffer_stack();
@@ -91,6 +96,7 @@ void yyrestart_interactive() {
 void flushLexer() {
     yy_flush_buffer(YY_CURRENT_BUFFER);
 }
+#endif
 
 void parseTheModuleContent(char *module_path) {
     char *code = fileGetContents(module_path);
@@ -105,9 +111,10 @@ void parseTheModuleContent(char *module_path) {
         module_parsing--;
         free(code);
 
-        if (is_interactive) {
+#ifndef CHAOS_COMPILER
+        if (is_interactive)
             phase = PROGRAM;
-        }
+#endif
     } else {
         append_to_array_without_malloc(&free_string_stack, module_path);
         throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, module_path);
@@ -122,11 +129,11 @@ int yywrap() { if (phase == PREPARSE && module_parsing == 0) { switchBuffer(prog
 #   define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
 
 static int custom_input(char *buf, int result, int max_size) {
-    if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
 #   ifndef CHAOS_COMPILER
+    if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
         return shell_readline(buf);
-#   endif
     } else {
+#   endif
         errno = 0;
         while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) {
             if( errno != EINTR) {
@@ -137,7 +144,9 @@ static int custom_input(char *buf, int result, int max_size) {
             clearerr(yyin);
         }
         return result;
+#   ifndef CHAOS_COMPILER
     }
+#   endif
     return -1;
 }
 #endif

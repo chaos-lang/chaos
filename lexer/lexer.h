@@ -34,8 +34,12 @@ extern bool inject_mode;
 
 void injectCode(char *code, enum Phase phase_arg);
 void switchBuffer(char *code, enum Phase phase_arg);
+
+#ifndef CHAOS_COMPILER
 void yyrestart_interactive();
 void flushLexer();
+#endif
+
 void parseTheModuleContent(char *module_path);
 
 #endif

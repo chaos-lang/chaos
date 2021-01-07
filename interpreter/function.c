@@ -38,9 +38,10 @@ void startFunction(char *name, enum Type type, enum Type secondary_type, char* c
 #else
 void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
-    if (is_interactive) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
         phase = PREPARSE;
-    }
+#endif
 
     if (function_names_buffer.size > 0) {
         if (!isInFunctionNamesBuffer(name)) {
@@ -149,9 +150,10 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 
     freeFunctionParametersMode();
 
-    if (is_interactive) {
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
         phase = PROGRAM;
-    }
+#endif
 }
 
 void endFunction() {
