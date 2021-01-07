@@ -1289,24 +1289,30 @@ eval_node_label:
             disable_complex_mode = false;
             break;
         case AST_EXIT_SUCCESS:
+#ifndef CHAOS_COMPILER
             if (is_interactive) {
                 print_bye_bye();
             }
+#endif
             freeEverything();
             exit(E_SUCCESS);
             break;
         case AST_EXIT_EXPRESSION:
+#ifndef CHAOS_COMPILER
             if (is_interactive) {
                 print_bye_bye();
             }
+#endif
             exit_code = ast_node->right->value.i;
             freeEverything();
             exit(exit_code);
             break;
         case AST_EXIT_VAR:
+#ifndef CHAOS_COMPILER
             if (is_interactive) {
                 print_bye_bye();
             }
+#endif
             exit_code = getSymbolValueInt(ast_node->strings[0]);
             freeEverything();
             exit(exit_code);

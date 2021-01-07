@@ -1,5 +1,5 @@
 /*
- * Description: Parser of the Chaos Programming Language's source
+ * Description: Messages module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,13 +20,25 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_PARSER_H
-#define KAOS_PARSER_H
+#ifndef KAOS_MESSAGES_H
+#define KAOS_MESSAGES_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#   if !defined(__clang__)
+#      undef NTDDI_VERSION
+#      define NTDDI_VERSION 0x06000000
+#   endif
+#   include <windows.h>
+#   include <initguid.h>
+#   include <KnownFolders.h>
+#   include <Shlobj.h>
+#endif
+
+#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+#   include "windows/getopt.h"
+#else
+#   include <getopt.h>
+#endif
 
 #if defined(__APPLE__) && defined(__MACH__)
 #   include <sys/syslimits.h>
@@ -34,32 +46,9 @@
 #   include <linux/limits.h>
 #endif
 
-#include "../interpreter/loop.h"
-#include "../compiler/compiler.h"
-
-extern int yyparse();
-extern int yylex_destroy();
-extern FILE* yyin;
-extern char *yytext;
-FILE *fp;
-bool fp_opened;
-bool is_interactive;
-char *program_file_path;
-char *program_file_dir;
-char *program_code;
-char *main_interpreted_module;
-jmp_buf InteractiveShellErrorAbsorber;
-
-int initParser(int argc, char** argv);
-void freeEverything();
-void yyerror(const char* s);
-
-#ifndef CHAOS_COMPILER
-void absorbError();
-void throwCompilerInteractiveError();
-void throwMissingOutputName();
-void throwMissingCompileOption();
-void throwMissingExtraFlags();
-#endif
+void greet();
+void print_bye_bye();
+void print_help();
+void print_license();
 
 #endif

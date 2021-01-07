@@ -27,6 +27,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "language.h"
+#include "messages.h"
 #include "helpers.h"
 #include "../interpreter/function.h"
 

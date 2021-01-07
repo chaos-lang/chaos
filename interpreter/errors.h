@@ -68,7 +68,11 @@ enum ExitCode {
 };
 
 extern void freeEverything();
+
+#ifndef CHAOS_COMPILER
 extern void absorbError();
+#endif
+
 extern bool is_interactive;
 extern jmp_buf InteractiveShellErrorAbsorber;
 

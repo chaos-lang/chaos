@@ -64,35 +64,8 @@
 
 #include <stdio.h>
 
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   if !defined(__clang__)
-#      undef NTDDI_VERSION
-#      define NTDDI_VERSION 0x06000000
-#   endif
-#   include <windows.h>
-#   include <initguid.h>
-#   include <KnownFolders.h>
-#   include <Shlobj.h>
-#endif
-
-#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
-#   include "windows/getopt.h"
-#else
-#   include <getopt.h>
-#endif
-
-#if defined(__APPLE__) && defined(__MACH__)
-#   include <sys/syslimits.h>
-#elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#   include <linux/limits.h>
-#endif
-
 #include "platform.h"
 
-void greet();
 void yyerror_msg(char* error_name, char* current_module, char* cause);
-void print_bye_bye();
-void print_help();
-void print_license();
 
 #endif
