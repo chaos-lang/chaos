@@ -242,11 +242,15 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     char include_path[PATH_MAX];
+    PWSTR szPath = NULL;
 #   if defined(__clang__)
-    sprintf(include_path, "%%programfiles%%/LLVM/lib/clang/%d.%d.%d/include/chaos", __clang_major__, __clang_minor__, __clang_patchlevel__);
+    SHGetKnownFolderPath(&FOLDERID_ProgramFiles, 0, NULL, &szPath);
+    sprintf(include_path, "%ls/LLVM/lib/clang/%d.%d.%d/include/chaos", szPath, __clang_major__, __clang_minor__, __clang_patchlevel__);
 #   elif defined(__GNUC__) || defined(__GNUG__)
-    sprintf(include_path, "%%programdata%%/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+    SHGetKnownFolderPath(&FOLDERID_ProgramData, 0, NULL, &szPath);
+    sprintf(include_path, "%ls/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos", szPath, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 #   endif
+    CoTaskMemFree(szPath);
 
     char include_path_helpers[PATH_MAX];
     sprintf(include_path_helpers, "\"%s/utilities/helpers.c\"", include_path);
