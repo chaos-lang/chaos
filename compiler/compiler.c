@@ -159,6 +159,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     fprintf(h_fp, "%s", h_file_base);
 
     register_functions(ast_node, module_orig);
+    preemptive_check();
     transpile_functions(ast_node, module, c_fp, indent, h_fp);
     free_transpiled_functions();
     free_transpiled_decisions();

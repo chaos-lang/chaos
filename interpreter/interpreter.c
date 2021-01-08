@@ -52,6 +52,9 @@ void interpret(char *module, enum Phase phase_arg) {
         case PREPARSE:
             phase = PREPARSE;
             register_functions(ast_node, module);
+#ifndef CHAOS_COMPILER
+            preemptive_check();
+#endif
             phase = PROGRAM;
             break;
         case PROGRAM:
@@ -65,6 +68,9 @@ void interpret(char *module, enum Phase phase_arg) {
     if (phase_arg == INIT_PREPARSE) {
         phase = PREPARSE;
         register_functions(ast_node, module);
+#ifndef CHAOS_COMPILER
+        preemptive_check();
+#endif
         phase = PROGRAM;
         eval_node(ast_node, module);
     }

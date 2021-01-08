@@ -29,6 +29,10 @@
 
 #include "../ast/ast.h"
 
+#ifndef CHAOS_COMPILER
+#include "../preemptive/preemptive.h"
+#endif
+
 extern unsigned long long nested_loop_counter;
 extern ASTNode* loop_end_ast_node;
 

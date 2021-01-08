@@ -1,5 +1,5 @@
 /*
- * Description: Parser of the Chaos Programming Language's source
+ * Description: Preemptive Errors module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,51 +20,34 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_PARSER_H
-#define KAOS_PARSER_H
+#ifndef KAOS_PREEMPTIVE_ERRORS_H
+#define KAOS_PREEMPTIVE_ERRORS_H
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <setjmp.h>
+#include <string.h>
 
-#ifndef CHAOS_COMPILER
-#include "../utilities/messages.h"
-#endif
+#include "../utilities/language.h"
+#include "../interpreter/errors.h"
 
-#include "../interpreter/loop.h"
+extern void freeEverything();
 
-#ifndef CHAOS_COMPILER
-#include "../compiler/compiler.h"
-#endif
+void throw_preemptive_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1);
 
-extern int yyparse();
-extern int yylex_destroy();
-extern FILE* yyin;
-extern char *yytext;
-FILE *fp;
-bool fp_opened;
+typedef struct {
+    unsigned short code;
+    char *str1;
+    char *str2;
+    long long lld1;
+    unsigned long long llu1;
+} throw_preemptive_error_args;
 
-#ifndef CHAOS_COMPILER
-bool is_interactive;
-#endif
+void throw_preemptive_error_var(throw_preemptive_error_args in);
 
-char *program_file_path;
-char *program_file_dir;
-char *program_code;
-char *main_interpreted_module;
-jmp_buf InteractiveShellErrorAbsorber;
+#define throw_preemptive_error(...) throw_preemptive_error_var((throw_preemptive_error_args){__VA_ARGS__});
 
-int initParser(int argc, char** argv);
-void freeEverything();
-void yyerror(const char* s);
-
-#ifndef CHAOS_COMPILER
-void absorbError();
-void throwCompilerInteractiveError();
-void throwMissingOutputName();
-void throwMissingCompileOption();
-void throwMissingExtraFlags();
-#endif
+int InteractiveShellErrorAbsorber_ws_col;
 
 #endif

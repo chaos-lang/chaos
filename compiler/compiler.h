@@ -40,6 +40,7 @@
 #include <errno.h>
 
 #include "../ast/ast.h"
+#include "../preemptive/preemptive.h"
 
 string_array transpiled_functions;
 string_array transpiled_decisions;
