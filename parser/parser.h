@@ -28,10 +28,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#if defined(__APPLE__) && defined(__MACH__)
-#   include <sys/syslimits.h>
-#elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#   include <linux/limits.h>
+#ifndef CHAOS_COMPILER
+#include "../utilities/messages.h"
 #endif
 
 #include "../interpreter/loop.h"

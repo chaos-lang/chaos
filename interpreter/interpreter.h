@@ -23,6 +23,10 @@
 #ifndef KAOS_INTERPRETER_H
 #define KAOS_INTERPRETER_H
 
+#ifndef CHAOS_COMPILER
+#include "../utilities/messages.h"
+#endif
+
 #include "../ast/ast.h"
 
 extern unsigned long long nested_loop_counter;
