@@ -30,7 +30,9 @@ Symbol* preemptive_start_symbol;
 Symbol* preemptive_end_symbol;
 
 Symbol* preemptive_addSymbol(char *name, enum Type type, enum ValueType value_type);
-Symbol* preemptive_findSymbol(char *name);
-Symbol* preemptive_getSymbol(char *name);
+Symbol* preemptive_findSymbol(char *name, _Function* function);
+Symbol* preemptive_getSymbol(char *name, _Function* function);
+void preemptive_freeAllSymbols();
+void preemptive_removeSymbol(Symbol* symbol);
 
 #endif

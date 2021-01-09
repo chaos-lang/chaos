@@ -28,6 +28,10 @@ Symbol* preemptive_addSymbol(char *name, enum Type type, enum ValueType value_ty
     Symbol* symbol;
     symbol = (struct Symbol*)calloc(1, sizeof(Symbol));
 
+    if (name != NULL) {
+        symbol->name = malloc(1 + strlen(name));
+        strcpy(symbol->name, name);
+    }
     symbol->type = type;
     symbol->value_type = value_type;
 
@@ -44,8 +48,8 @@ Symbol* preemptive_addSymbol(char *name, enum Type type, enum ValueType value_ty
     return symbol;
 }
 
-Symbol* preemptive_findSymbol(char *name) {
-    symbol_cursor = start_symbol;
+Symbol* preemptive_findSymbol(char *name, _Function* function) {
+    symbol_cursor = preemptive_start_symbol;
     while (symbol_cursor != NULL) {
         if (
             symbol_cursor->name != NULL &&
@@ -56,13 +60,63 @@ Symbol* preemptive_findSymbol(char *name) {
         }
         symbol_cursor = symbol_cursor->next;
     }
+
+    symbol_cursor = start_symbol;
+    while (symbol_cursor != NULL) {
+        if (
+            symbol_cursor->secondary_name != NULL &&
+            strcmp(symbol_cursor->secondary_name, name) == 0 &&
+            symbol_cursor->param_of == function
+        ) {
+            Symbol* symbol = symbol_cursor;
+            return symbol;
+        }
+        symbol_cursor = symbol_cursor->next;
+    }
+
     return NULL;
 }
 
-Symbol* preemptive_getSymbol(char *name) {
-    Symbol* symbol = preemptive_findSymbol(name);
+Symbol* preemptive_getSymbol(char *name, _Function* function) {
+    Symbol* symbol = preemptive_findSymbol(name, function);
     if (symbol != NULL)
         return symbol;
     throw_preemptive_error(E_UNDEFINED_VARIABLE, name);
     return NULL;
+}
+
+void preemptive_freeAllSymbols() {
+    symbol_cursor = preemptive_start_symbol;
+    while (symbol_cursor != NULL) {
+        Symbol* symbol = symbol_cursor;
+        symbol_cursor = symbol_cursor->next;
+        preemptive_removeSymbol(symbol);
+    }
+    preemptive_start_symbol = NULL;
+    preemptive_end_symbol = NULL;
+}
+
+void preemptive_removeSymbol(Symbol* symbol) {
+    removeChildrenOfComplex(symbol);
+
+    Symbol* previous_symbol = symbol->previous;
+    Symbol* next_symbol = symbol->next;
+
+    if (previous_symbol == NULL && next_symbol == NULL) {
+        preemptive_start_symbol = NULL;
+        preemptive_end_symbol = NULL;
+        freeSymbol(symbol);
+        return;
+    } else if (previous_symbol == NULL) {
+        preemptive_start_symbol = next_symbol;
+        preemptive_start_symbol->previous = NULL;
+    } else if (next_symbol == NULL) {
+        preemptive_end_symbol = previous_symbol;
+        preemptive_end_symbol->next = NULL;
+    } else {
+        previous_symbol->next = next_symbol;
+        next_symbol->previous = previous_symbol;
+    }
+
+    freeSymbol(symbol);
 }

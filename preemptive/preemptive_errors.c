@@ -34,6 +34,9 @@ void throw_preemptive_error_var(throw_preemptive_error_args in) {
 }
 
 void throw_preemptive_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1) {
+    if (is_interactive)
+        removeFunction(end_function);
+
     char title_msg[__KAOS_MSG_LINE_LENGTH__];
     char current_module_msg[__KAOS_MSG_LINE_LENGTH__];
     char line_no_msg[__KAOS_MSG_LINE_LENGTH__];

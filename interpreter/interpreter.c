@@ -53,7 +53,12 @@ void interpret(char *module, enum Phase phase_arg) {
             phase = PREPARSE;
             register_functions(ast_node, module);
 #ifndef CHAOS_COMPILER
-            preemptive_check();
+            if (is_interactive) {
+                if (end_function != NULL)
+                    preemptive_check();
+            } else {
+                preemptive_check();
+            }
 #endif
             phase = PROGRAM;
             break;
@@ -69,7 +74,12 @@ void interpret(char *module, enum Phase phase_arg) {
         phase = PREPARSE;
         register_functions(ast_node, module);
 #ifndef CHAOS_COMPILER
-        preemptive_check();
+        if (is_interactive) {
+            if (end_function != NULL)
+                preemptive_check();
+        } else {
+            preemptive_check();
+        }
 #endif
         phase = PROGRAM;
         eval_node(ast_node, module);

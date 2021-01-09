@@ -27,6 +27,6 @@
 #include "preemptive_symbol.h"
 
 void preemptive_check();
-ASTNode* check_function(ASTNode* ast_node, char *module);
+ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function);
 
 #endif

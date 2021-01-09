@@ -1,0 +1,29 @@
+void def a()
+    print b
+end
+
+function_table
+
+
+num def f4(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(),
+    n1 > 10 : f2(),
+    default : f3()
+}
+
+function_table
+
+
+num def f4(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(),
+    z > 10  : f2(n2),
+    default : f3()
+}
+
+function_table

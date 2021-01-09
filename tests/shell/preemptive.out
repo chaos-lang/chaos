@@ -1,0 +1,21 @@
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 2
+[0;43m    Undefined variable: b
+Absorbed by Interactive Shell
+[start] =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 9
+[0;43m    Undefined variable: n1
+Absorbed by Interactive Shell
+[start] =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 9
+[0;43m    Undefined variable: n2
+Absorbed by Interactive Shell
+[start] =>
+[end]
