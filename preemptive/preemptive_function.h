@@ -1,5 +1,5 @@
 /*
- * Description: Preemptive module of the Chaos Programming Language's source
+ * Description: Preemptive Function module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,14 +20,15 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_PREEMPTIVE_H
-#define KAOS_PREEMPTIVE_H
+#ifndef KAOS_PREEMPTIVE_FUNCTION_H
+#define KAOS_PREEMPTIVE_FUNCTION_H
 
-#include "../ast/ast.h"
-#include "preemptive_symbol.h"
-#include "preemptive_function.h"
+#include "../interpreter/symbol.h"
+#include "preemptive_errors.h"
 
-void preemptive_check();
-ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function);
+_Function* preemptive_function_cursor;
+
+void preemptive_callFunction(char *name, char *module);
+_Function* preemptive_getFunction(char *name, char *module);
 
 #endif

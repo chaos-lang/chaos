@@ -7,10 +7,13 @@ Absorbed by Interactive Shell
 [end]
 [1;43m  Preemptive Error:
 Module: ~/chaos/__interactive__.kaos
-[0;43m    Line: 9
+[0;43m    Line: 23
 [0;43m    Undefined variable: n1
 Absorbed by Interactive Shell
 [start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
 [end]
 [1;43m  Preemptive Error:
 Module: ~/chaos/__interactive__.kaos
@@ -18,4 +21,27 @@ Module: ~/chaos/__interactive__.kaos
 [0;43m    Undefined variable: n2
 Absorbed by Interactive Shell
 [start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 5
+[0;43m    Undefined function: f5
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 9
+[0;43m    Undefined function: f6
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
 [end]

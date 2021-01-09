@@ -4,6 +4,20 @@ end
 
 function_table
 
+num def f1()
+    num a = 101
+    return a
+end
+
+num def f2()
+    num b = 102
+    return b
+end
+
+num def f3()
+    num c = 103
+    return c
+end
 
 num def f4(num x, num y)
     num z = x + y
@@ -23,6 +37,25 @@ num def f4(num x, num y)
 end {
     z == 8  : f1(),
     z > 10  : f2(n2),
+    default : f3()
+}
+
+function_table
+
+
+void def a()
+    num b = f5()
+end
+
+function_table
+
+
+num def f4(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(),
+    z > 10  : f6(),
     default : f3()
 }
 

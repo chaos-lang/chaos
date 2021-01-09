@@ -81,6 +81,7 @@ check_function_label:
         );
 
     Symbol* symbol;
+    char *_module = NULL;
 
     switch (ast_node->node_type)
     {
@@ -94,6 +95,17 @@ check_function_label:
             preemptive_addSymbol(ast_node->strings[0], K_BOOL, V_BOOL);
             break;
         case AST_VAR_CREATE_BOOL_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             preemptive_addSymbol(ast_node->strings[0], K_BOOL, V_BOOL);
             break;
         case AST_VAR_CREATE_NUMBER:
@@ -106,6 +118,17 @@ check_function_label:
             preemptive_addSymbol(ast_node->strings[0], K_NUMBER, V_INT);
             break;
         case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             preemptive_addSymbol(ast_node->strings[0], K_NUMBER, V_INT);
             break;
         case AST_VAR_CREATE_STRING:
@@ -118,6 +141,17 @@ check_function_label:
             preemptive_addSymbol(ast_node->strings[0], K_STRING, V_STRING);
             break;
         case AST_VAR_CREATE_STRING_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             preemptive_addSymbol(ast_node->strings[0], K_STRING, V_STRING);
             break;
         case AST_VAR_CREATE_ANY_BOOL:
@@ -136,6 +170,17 @@ check_function_label:
             preemptive_addSymbol(ast_node->strings[0], K_ANY, V_VOID);
             break;
         case AST_VAR_CREATE_ANY_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             preemptive_addSymbol(ast_node->strings[0], K_ANY, V_VOID);
             break;
         case AST_VAR_CREATE_LIST:
@@ -147,6 +192,17 @@ check_function_label:
             symbol->secondary_type = K_ANY;
             break;
         case AST_VAR_CREATE_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_LIST, V_VOID);
             symbol->secondary_type = K_ANY;
             break;
@@ -159,6 +215,17 @@ check_function_label:
             symbol->secondary_type = K_ANY;
             break;
         case AST_VAR_CREATE_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_DICT, V_VOID);
             symbol->secondary_type = K_ANY;
             break;
@@ -171,6 +238,17 @@ check_function_label:
             symbol->secondary_type = K_BOOL;
             break;
         case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_LIST, V_VOID);
             symbol->secondary_type = K_BOOL;
             break;
@@ -183,6 +261,17 @@ check_function_label:
             symbol->secondary_type = K_BOOL;
             break;
         case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_DICT, V_VOID);
             symbol->secondary_type = K_BOOL;
             break;
@@ -195,6 +284,17 @@ check_function_label:
             symbol->secondary_type = K_NUMBER;
             break;
         case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_LIST, V_VOID);
             symbol->secondary_type = K_NUMBER;
             break;
@@ -207,6 +307,17 @@ check_function_label:
             symbol->secondary_type = K_NUMBER;
             break;
         case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_DICT, V_VOID);
             symbol->secondary_type = K_NUMBER;
             break;
@@ -219,6 +330,17 @@ check_function_label:
             symbol->secondary_type = K_STRING;
             break;
         case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_LIST, V_VOID);
             symbol->secondary_type = K_STRING;
             break;
@@ -231,6 +353,17 @@ check_function_label:
             symbol->secondary_type = K_STRING;
             break;
         case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
             symbol = preemptive_addSymbol(ast_node->strings[0], K_DICT, V_VOID);
             symbol->secondary_type = K_STRING;
             break;
@@ -257,11 +390,37 @@ check_function_label:
             preemptive_getSymbol(ast_node->strings[0], function);
             preemptive_getSymbol(ast_node->strings[1], function);
             break;
+        case AST_VAR_UPDATE_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    break;
+                case 3:
+                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    break;
+                default:
+                    break;
+            }
+            break;
         case AST_COMPLEX_EL_UPDATE_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
         case AST_COMPLEX_EL_UPDATE_VAR_EL:
             preemptive_getSymbol(ast_node->strings[0], function);
+            break;
+        case AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
+            switch (ast_node->strings_size)
+            {
+                case 1:
+                    preemptive_callFunction(ast_node->strings[0], NULL);
+                    break;
+                case 2:
+                    preemptive_callFunction(ast_node->strings[1], ast_node->strings[0]);
+                    break;
+                default:
+                    break;
+            }
             break;
         case AST_PRINT_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
@@ -358,6 +517,37 @@ check_function_label:
             break;
         case AST_FUNCTION_CALL_PARAMETER_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
+            break;
+        case AST_PRINT_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1)
+                _module = ast_node->strings[1];
+            preemptive_callFunction(ast_node->strings[0], _module);
+            break;
+        case AST_ECHO_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1)
+                _module = ast_node->strings[1];
+            preemptive_callFunction(ast_node->strings[0], _module);
+            break;
+        case AST_PRETTY_PRINT_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1)
+                _module = ast_node->strings[1];
+            preemptive_callFunction(ast_node->strings[0], _module);
+            break;
+        case AST_PRETTY_ECHO_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1)
+                _module = ast_node->strings[1];
+            preemptive_callFunction(ast_node->strings[0], _module);
+            break;
+        case AST_FUNCTION_RETURN:
+            if (ast_node->strings_size > 1)
+                _module = ast_node->strings[1];
+            preemptive_callFunction(ast_node->strings[0], _module);
+            break;
+        case AST_DECISION_MAKE_BOOLEAN:
+            preemptive_callFunction(ast_node->strings[0], function->module);
+            break;
+        case AST_DECISION_MAKE_DEFAULT:
+            preemptive_callFunction(ast_node->strings[0], function->module);
             break;
         default:
             break;
