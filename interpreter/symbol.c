@@ -118,6 +118,9 @@ void removeSymbolByName(char *name) {
 }
 
 void removeSymbol(Symbol* symbol) {
+    // TODO: Somehow this fixes a double free or corruption on `free(symbol->name);` below.
+    getTypeName(symbol->type);
+
     removeChildrenOfComplex(symbol);
 
     Symbol* previous_symbol = symbol->previous;

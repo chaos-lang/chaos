@@ -301,3 +301,14 @@ void def f12(num list a)
 end
 
 function_table
+
+
+void def f13(num list a)
+    foreach a as el
+        print f9(el, 1)
+    end
+end
+
+list a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+f13(a)
