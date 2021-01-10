@@ -62,6 +62,10 @@ void preemptive_callFunction(char *name, char *module) {
         }
     }
 
+    if (function->decision_node != NULL) {
+        check_break_continue(function->decision_node, function);
+    }
+
     freeFunctionParametersMode();
 }
 

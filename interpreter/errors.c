@@ -147,6 +147,12 @@ void throw_error_base(
         case E_NEGATIVE_ITERATION_COUNT:
             sprintf(error_msg, "Negative iteration count: %lld", lld1);
             break;
+        case E_BREAK_CALL_OUTSIDE_LOOP:
+            sprintf(error_msg, "Call to a function with `break` from outside a loop: %s", str1);
+            break;
+        case E_CONTINUE_CALL_OUTSIDE_LOOP:
+            sprintf(error_msg, "Call to a function with `continue` from outside a loop: %s", str1);
+            break;
         default:
             sprintf(error_msg, "Unkown error.");
             break;

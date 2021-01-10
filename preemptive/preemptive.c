@@ -88,15 +88,29 @@ check_function_label:
             ast_node->strings_size
         );
 
+    if (ast_node->node_type == AST_END) {
+        if (nested_loop_counter > 0) {
+            nested_loop_counter--;
+        }
+    }
+
     Symbol* symbol;
     char *_module = NULL;
 
     switch (ast_node->node_type)
     {
+        case AST_START_TIMES_DO:
+            nested_loop_counter++;
+            break;
+        case AST_START_TIMES_DO_INFINITE:
+            nested_loop_counter++;
+            break;
         case AST_START_TIMES_DO_VAR:
+            nested_loop_counter++;
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
         case AST_START_FOREACH:
+            nested_loop_counter++;
             symbol = preemptive_getSymbol(ast_node->strings[0], function);
             if (symbol->type != K_LIST) {
                 if (symbol->name != NULL) {
@@ -108,6 +122,7 @@ check_function_label:
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
             break;
         case AST_START_FOREACH_DICT:
+            nested_loop_counter++;
             symbol = preemptive_getSymbol(ast_node->strings[0], function);
             if (symbol->type != K_DICT) {
                 if (symbol->name != NULL) {
@@ -645,4 +660,70 @@ check_function_label:
     ast_node = ast_node->next;
     goto check_function_label;
     return ast_node;
+}
+
+void check_break_continue(ASTNode* ast_node, _Function* function) {
+check_break_continue_label:
+    if (ast_node == NULL || ast_node->node_type == AST_END) {
+        return;
+    }
+
+    if (ast_node->node_type == AST_DECISION_DEFINE) {
+        ast_node = ast_node->next;
+        goto check_break_continue_label;
+    }
+
+    if (ast_node->node_type != AST_FUNCTION_STEP)
+        if (is_node_function_related(ast_node)) {
+            ast_node = ast_node->next;
+            goto check_break_continue_label;
+        }
+
+    if (ast_node->depend != NULL) {
+        check_break_continue(ast_node->depend, function);
+    }
+
+    if (ast_node->right != NULL) {
+        check_break_continue(ast_node->right, function);
+    }
+
+    if (ast_node->left != NULL) {
+        check_break_continue(ast_node->left, function);
+    }
+
+    kaos_lineno = ast_node->lineno;
+
+    if (debug_enabled)
+        printf(
+            "(CheckBC)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            ast_node->id,
+            getAstNodeTypeName(ast_node->node_type),
+            ast_node->module,
+            ast_node->strings_size
+        );
+
+    switch (ast_node->node_type)
+    {
+        case AST_DECISION_MAKE_BOOLEAN_BREAK:
+            if (nested_loop_counter == 0)
+                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function->name);
+            break;
+        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
+            if (nested_loop_counter == 0)
+                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function->name);
+            break;
+        case AST_DECISION_MAKE_DEFAULT_BREAK:
+            if (nested_loop_counter == 0)
+                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function->name);
+            break;
+        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
+            if (nested_loop_counter == 0)
+                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function->name);
+            break;
+        default:
+            break;
+    }
+
+    ast_node = ast_node->next;
+    goto check_break_continue_label;
 }

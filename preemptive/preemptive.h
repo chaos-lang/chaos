@@ -29,5 +29,6 @@
 
 void preemptive_check();
 ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function);
+void check_break_continue(ASTNode* ast_node, _Function* function);
 
 #endif

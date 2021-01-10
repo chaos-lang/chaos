@@ -310,3 +310,25 @@ Module: ~/chaos/__interactive__.kaos, module: } =>
 Module: ~/chaos/__interactive__.kaos, module: } =>
 Module: ~/chaos/__interactive__.kaos, module: } =>
 [end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 8
+[0;43m    Call to a function with `break` from outside a loop: f9
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]

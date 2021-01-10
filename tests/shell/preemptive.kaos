@@ -284,3 +284,20 @@ void def f4(num a)
 end
 
 function_table
+
+
+num def f4(num x, num y)
+    num r = f9(x, y)
+    return r
+end
+
+function_table
+
+void def f12(num list a)
+    foreach a as el
+        print el
+        print f9(el, 1)
+    end
+end
+
+function_table
