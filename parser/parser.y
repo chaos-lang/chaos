@@ -86,6 +86,8 @@ extern bool is_complex_parsing;
 %type<ast_node_type> function_parameters_start
 %type<ast_node_type> function_call_parameters_start
 %type<ast_node_type> function_parameters
+%type<ast_node_type> decision_call_parameters_start
+%type<ast_node_type> decision_parameters
 %type<ast_node_type> function_name
 %type<ast_node_type> module
 %type<ast_node_type> liststart
@@ -235,6 +237,28 @@ function_parameters: T_VAR                                                      
 function_parameters: liststart                                                                                          {                                     ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_LIST, yylineno, NULL, 0, $1);                               $$ = ast_node; is_complex_parsing = false; }
 ;
 function_parameters: dictionarystart                                                                                    {                                     ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETER_DICT, yylineno, NULL, 0, $1);                               $$ = ast_node; is_complex_parsing = false; }
+;
+
+decision_call_parameters_start:                                                                                         { }
+    | decision_parameters T_RIGHT                                                                                       {                                     ASTNode* ast_node = addASTNodeAssign(AST_FUNCTION_CALL_PARAMETERS_START, yylineno, NULL, 0, $1);                             $$ = ast_node; }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
+;
+
+decision_parameters:                                                                                                    {                                     ASTNode* ast_node = addASTNode(AST_FUNCTION_PARAMETERS_START, yylineno, NULL, 0);                                            $$ = ast_node; }
+    | T_NEWLINE decision_parameters                                                                                     { $$ = $2; }
+    | decision_parameters T_COMMA decision_parameters                                                                   {                                     ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, yylineno, NULL, 0);                                                        $$ = ast_node; $$->right = $3; $$->left = $1; }
+    | decision_parameters T_NEWLINE                                                                                     { $$ = $1; }
+    | error T_NEWLINE parser                                                                                            {
+#ifndef CHAOS_COMPILER
+        if (is_interactive) { yyerrok; yyclearin; }
+#endif
+}
+;
+decision_parameters: T_VAR                                                                                              { char *strings[] = {$1};             ASTNode* ast_node = addASTNode(AST_FUNCTION_CALL_PARAMETER_VAR, yylineno, strings, 1);                                       $$ = ast_node; }
 ;
 
 parser:
@@ -875,7 +899,7 @@ decision:                                                                       
     | decision T_COMMA decision                                                                                         {                                     ASTNode* ast_node = addASTNode(AST_FUNCTION_STEP, yylineno, NULL, 0);                                                     $$ = ast_node; $$->right = $1; $$->left = $3; }
     | decision T_NEWLINE                                                                                                { $$ = $1; }
 ;
-decision: boolean_expression T_COLON T_VAR T_LEFT function_call_parameters_start                                        { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeFull(AST_DECISION_MAKE_BOOLEAN, yylineno, strings, 1, $5, $1);                              $$ = ast_node; }
+decision: boolean_expression T_COLON T_VAR T_LEFT decision_call_parameters_start                                        { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeFull(AST_DECISION_MAKE_BOOLEAN, yylineno, strings, 1, $5, $1);                              $$ = ast_node; }
 ;
 decision: boolean_expression T_COLON T_BREAK                                                                            {                                     ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_BREAK, yylineno, NULL, 0, $1);                             $$ = ast_node; }
 ;
@@ -883,7 +907,7 @@ decision: boolean_expression T_COLON T_CONTINUE                                 
 ;
 decision: boolean_expression T_COLON T_RETURN T_VAR                                                                     { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_RETURN, yylineno, strings, 1, $1);                         $$ = ast_node; }
 ;
-decision: T_DEFAULT T_COLON T_VAR T_LEFT function_call_parameters_start                                                 { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_DEFAULT, yylineno, strings, 1, $5);                                $$ = ast_node; }
+decision: T_DEFAULT T_COLON T_VAR T_LEFT decision_call_parameters_start                                                 { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_DEFAULT, yylineno, strings, 1, $5);                                $$ = ast_node; }
 ;
 decision: T_DEFAULT T_COLON T_BREAK                                                                                     {                                     ASTNode* ast_node = addASTNode(AST_DECISION_MAKE_DEFAULT_BREAK, yylineno, NULL, 0);                                       $$ = ast_node; }
 ;
