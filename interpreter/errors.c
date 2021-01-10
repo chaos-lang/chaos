@@ -29,18 +29,32 @@ void throw_error_var(throw_error_args in) {
     char *str1 = in.str1 ? in.str1 : "";
     char *str2 = in.str2 ? in.str2 : "";
     long long lld1 = in.lld1 ? in.lld1 : 0;
-    unsigned long long llu = in.llu1 ? in.llu1 : 0;
-    throw_error_base(code, str1, str2, lld1, llu);
+    unsigned long long llu1 = in.llu1 ? in.llu1 : 0;
+    bool is_preemptive = in.is_preemptive ? in.is_preemptive : false;
+    throw_error_base(code, str1, str2, lld1, llu1, is_preemptive);
 }
 
-void throw_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1) {
+void throw_error_base(
+    unsigned short code,
+    char *str1, char *str2,
+    long long lld1,
+    unsigned long long llu1,
+    bool is_preemptive
+) {
     char title_msg[__KAOS_MSG_LINE_LENGTH__];
     char current_module_msg[__KAOS_MSG_LINE_LENGTH__];
     char line_no_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg_out[__KAOS_MSG_LINE_LENGTH__ + 4];
+    char bg_color[3];
 
-    sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
+    if (is_preemptive) {
+        sprintf(bg_color, "43");
+        sprintf(title_msg, "  Preemptive Error:");
+    } else {
+        sprintf(bg_color, "41");
+        sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
+    }
     sprintf(current_module_msg, "    Module: %s", getCurrentModule());
     sprintf(line_no_msg, "    Line: %d", kaos_lineno);
 
@@ -151,7 +165,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     InteractiveShellErrorAbsorber_ws_col = ws_col;
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;41m");
+    printf("\033[1;%sm", bg_color);
 #endif
     printf("%-*s", ws_col, title_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -160,7 +174,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;41m");
+    printf("\033[0;%sm", bg_color);
 #endif
     printf("%-*s", ws_col, current_module_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -169,7 +183,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;41m");
+    printf("\033[0;%sm", bg_color);
 #endif
     printf("%-*s", ws_col, line_no_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -178,7 +192,7 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
     printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;41m");
+    printf("\033[0;%sm", bg_color);
 #endif
     printf("%-*s", ws_col, new_error_msg_out);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -186,6 +200,9 @@ void throw_error_base(unsigned short code, char *str1, char *str2, long long lld
 #endif
     printf("\n");
     free(new_error_msg_out);
+
+    if (is_preemptive && is_interactive)
+        removeFunction(end_function);
 
 #ifndef CHAOS_COMPILER
     if (!is_interactive) {

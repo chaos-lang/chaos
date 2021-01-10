@@ -79,7 +79,14 @@ extern bool is_interactive;
 
 extern jmp_buf InteractiveShellErrorAbsorber;
 
-void throw_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1);
+void throw_error_base(
+    unsigned short code,
+    char *str1,
+    char *str2,
+    long long lld1,
+    unsigned long long llu1,
+    bool is_preemptive
+);
 
 typedef struct {
     unsigned short code;
@@ -87,6 +94,7 @@ typedef struct {
     char *str2;
     long long lld1;
     unsigned long long llu1;
+    bool is_preemptive;
 } throw_error_args;
 
 void throw_error_var(throw_error_args in);

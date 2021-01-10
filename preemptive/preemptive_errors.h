@@ -32,9 +32,13 @@
 #include "../utilities/language.h"
 #include "../interpreter/errors.h"
 
-extern void freeEverything();
-
-void throw_preemptive_error_base(unsigned short code, char *str1, char *str2, long long lld1, unsigned long long llu1);
+void throw_preemptive_error_base(
+    unsigned short code,
+    char *str1,
+    char *str2,
+    long long lld1,
+    unsigned long long llu1
+);
 
 typedef struct {
     unsigned short code;
@@ -47,7 +51,5 @@ typedef struct {
 void throw_preemptive_error_var(throw_preemptive_error_args in);
 
 #define throw_preemptive_error(...) throw_preemptive_error_var((throw_preemptive_error_args){__VA_ARGS__});
-
-int InteractiveShellErrorAbsorber_ws_col;
 
 #endif
