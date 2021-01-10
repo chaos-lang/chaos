@@ -201,10 +201,10 @@ void throw_error_base(
     printf("\n");
     free(new_error_msg_out);
 
+#ifndef CHAOS_COMPILER
     if (is_preemptive && is_interactive)
         removeFunction(end_function);
 
-#ifndef CHAOS_COMPILER
     if (!is_interactive) {
 #endif
         freeEverything();
