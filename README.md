@@ -36,17 +36,17 @@
     </a>
 </p>
 <p align="center">
-    Chaos is a purely functional programming language that achieves zero cyclomatic complexity.
+    Chaos is a statically-typed, test-oriented procedural programming language that achieves zero cyclomatic complexity.
 </p>
 
 ### Influenced by
 
  - TypeScript's type safety
  - Python's syntax, modules and extensibility
- - JavaScript's availability
+ - JavaScript's cross-platform support
  - Ruby's loops and blocks, Rexx's `FOREVER` keyword
  - PHP's dedication to server-side
- - Haskell's immutability
+ - Haskell's pure functions
  - C's speed and interoperability
  - NumPy's matrix arithmetics
  - Perl's regex engine
@@ -66,7 +66,7 @@
  - A single unit test is enough to have 100% coverage on functions, always.
  - Warns you about untested functions in the executed program.
  - Chaos language is not object-oriented. So everything is done by functions and data types.
- - Immutability everywhere.
+ - Unique function call system that combines procedures with some aspects of functional programming paradigm.
  - No `while` or `when` keywords. Loops are predetermined. Infinite loops can only be achievable through the `INFINITE` keyword.
  - Single source of errors and unique exit codes for each one of them. So the errors are catchable by other programs.
  - Language's itself forces you to write less error-prone code.
