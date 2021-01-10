@@ -263,3 +263,50 @@ Module: ~/chaos/__interactive__.kaos, module: } =>
 Module: ~/chaos/__interactive__.kaos, module: } =>
 Module: ~/chaos/__interactive__.kaos, module: } =>
 [end]
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 19
+[0;43m    Undefined function: f11
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 5
+[0;43m    'a' is not a list!
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 4
+[0;43m    'a' is not a dictionary!
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]

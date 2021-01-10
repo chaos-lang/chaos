@@ -88,26 +88,40 @@ check_function_label:
             ast_node->strings_size
         );
 
+    Symbol* symbol;
+    char *_module = NULL;
+
     switch (ast_node->node_type)
     {
         case AST_START_TIMES_DO_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
         case AST_START_FOREACH:
-            preemptive_getSymbol(ast_node->strings[0], function);
-            preemptive_addSymbol(ast_node->strings[1], K_ANY, V_VOID);
+            symbol = preemptive_getSymbol(ast_node->strings[0], function);
+            if (symbol->type != K_LIST) {
+                if (symbol->name != NULL) {
+                    throw_preemptive_error(E_NOT_A_LIST, symbol->name);
+                } else {
+                    throw_preemptive_error(E_NOT_A_LIST, symbol->secondary_name);
+                }
+            }
+            preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
             break;
         case AST_START_FOREACH_DICT:
-            preemptive_getSymbol(ast_node->strings[0], function);
-            preemptive_addSymbol(ast_node->strings[1], K_ANY, V_VOID);
-            preemptive_addSymbol(ast_node->strings[2], K_ANY, V_VOID);
+            symbol = preemptive_getSymbol(ast_node->strings[0], function);
+            if (symbol->type != K_DICT) {
+                if (symbol->name != NULL) {
+                    throw_preemptive_error(E_NOT_A_DICT, symbol->name);
+                } else {
+                    throw_preemptive_error(E_NOT_A_DICT, symbol->secondary_name);
+                }
+            }
+            preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
+            preemptive_addSymbol(ast_node->strings[2], symbol->secondary_type, V_VOID);
             break;
         default:
             break;
     }
-
-    Symbol* symbol;
-    char *_module = NULL;
 
     switch (ast_node->node_type)
     {

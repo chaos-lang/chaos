@@ -91,9 +91,9 @@ Symbol* preemptive_getSymbol(char *name, _Function* function) {
 }
 
 void preemptive_freeAllSymbols() {
-    symbol_cursor = preemptive_start_symbol;
-    if (symbol_cursor != NULL)
+    if (preemptive_start_symbol != NULL)
         preemptive_resetFunctionParametersMode();
+    symbol_cursor = preemptive_start_symbol;
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;

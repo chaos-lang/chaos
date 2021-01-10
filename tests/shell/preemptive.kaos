@@ -244,3 +244,43 @@ void def f4()
 end
 
 function_table
+
+
+num def f9(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z > 5   : break,
+    z == 8  : f1(),
+    z > 10  : f2(),
+    default : f3()
+}
+
+function_table
+
+void def f4(num list a)
+    foreach a as el
+        print el
+        print f11(el, 1)
+    end
+end
+
+function_table
+
+void def f4(num a)
+    foreach a as el
+        print el
+        print f9(el, 1)
+    end
+end
+
+function_table
+
+void def f4(num a)
+    foreach a as key : val
+        print key
+        print f9(val, 1)
+    end
+end
+
+function_table
