@@ -27,8 +27,11 @@
 #include "preemptive_symbol.h"
 #include "preemptive_function.h"
 
+int preemptive_loop_length;
+
 void preemptive_check();
 ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function);
 void check_break_continue(ASTNode* ast_node, _Function* function);
+ASTNode* preemptive_walk_until_end(ASTNode* ast_node, char *module);
 
 #endif

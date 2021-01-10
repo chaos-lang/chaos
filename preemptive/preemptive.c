@@ -24,6 +24,8 @@
 
 extern int kaos_lineno;
 
+int preemptive_loop_length = 0;
+
 void preemptive_check() {
     function_cursor = start_function;
     while (function_cursor != NULL) {
@@ -96,18 +98,25 @@ check_function_label:
 
     Symbol* symbol;
     char *_module = NULL;
+    ASTNode* end_node;
 
     switch (ast_node->node_type)
     {
         case AST_START_TIMES_DO:
             nested_loop_counter++;
+            end_node = preemptive_walk_until_end(ast_node->next, ast_node->module);
+            preemptive_loop_length = end_node->lineno - ast_node->lineno;
             break;
         case AST_START_TIMES_DO_INFINITE:
             nested_loop_counter++;
+            end_node = preemptive_walk_until_end(ast_node->next, ast_node->module);
+            preemptive_loop_length = end_node->lineno - ast_node->lineno;
             break;
         case AST_START_TIMES_DO_VAR:
             nested_loop_counter++;
             preemptive_getSymbol(ast_node->strings[0], function);
+            end_node = preemptive_walk_until_end(ast_node->next, ast_node->module);
+            preemptive_loop_length = end_node->lineno - ast_node->lineno;
             break;
         case AST_START_FOREACH:
             nested_loop_counter++;
@@ -120,6 +129,8 @@ check_function_label:
                 }
             }
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
+            end_node = preemptive_walk_until_end(ast_node->next, ast_node->module);
+            preemptive_loop_length = end_node->lineno - ast_node->lineno;
             break;
         case AST_START_FOREACH_DICT:
             nested_loop_counter++;
@@ -133,6 +144,8 @@ check_function_label:
             }
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
             preemptive_addSymbol(ast_node->strings[2], symbol->secondary_type, V_VOID);
+            end_node = preemptive_walk_until_end(ast_node->next, ast_node->module);
+            preemptive_loop_length = end_node->lineno - ast_node->lineno;
             break;
         default:
             break;
@@ -707,18 +720,26 @@ check_break_continue_label:
         case AST_DECISION_MAKE_BOOLEAN_BREAK:
             if (nested_loop_counter == 0)
                 throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function->name);
+            if (preemptive_loop_length > 2)
+                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function->name);
             break;
         case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
             if (nested_loop_counter == 0)
                 throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function->name);
+            if (preemptive_loop_length > 2)
+                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function->name);
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:
             if (nested_loop_counter == 0)
                 throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function->name);
+            if (preemptive_loop_length > 2)
+                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function->name);
             break;
         case AST_DECISION_MAKE_DEFAULT_CONTINUE:
             if (nested_loop_counter == 0)
                 throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function->name);
+            if (preemptive_loop_length > 2)
+                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function->name);
             break;
         default:
             break;
@@ -726,4 +747,20 @@ check_break_continue_label:
 
     ast_node = ast_node->next;
     goto check_break_continue_label;
+}
+
+ASTNode* preemptive_walk_until_end(ASTNode* ast_node, char *module) {
+preemptive_walk_until_end_label:
+    if (ast_node == NULL) {
+        return ast_node;
+    }
+
+    if (strcmp(ast_node->module, module) != 0) return preemptive_walk_until_end(ast_node->next, module);
+
+    if (ast_node->node_type == AST_END) {
+        return ast_node;
+    }
+
+    ast_node = ast_node->next;
+    goto preemptive_walk_until_end_label;
 }
