@@ -31,6 +31,9 @@ void preemptive_check() {
         function_cursor = function_cursor->next;
         check_function(function->node->child, function->module_context, function);
         check_function(function->decision_node, function->module_context, function);
+        if (function->type != K_VOID && function->symbol == NULL && function->decision_node == NULL)
+            throw_preemptive_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function->name);
+        function->symbol = NULL;
         preemptive_freeAllSymbols();
     }
 }
@@ -403,6 +406,9 @@ check_function_label:
                     break;
             }
             break;
+        case AST_RETURN_VAR:
+            preemptive_returnSymbol(ast_node->strings[0], function);
+            break;
         case AST_COMPLEX_EL_UPDATE_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
@@ -491,17 +497,29 @@ check_function_label:
         case AST_DELETE_VAR_EL:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
+        case AST_LIST_START:
+            preemptive_nested_complex_counter++;
+            break;
         case AST_LIST_ADD_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
         case AST_LIST_ADD_VAR_EL:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
+        case AST_LIST_NESTED_FINISH:
+            preemptive_nested_complex_counter--;
+            break;
+        case AST_DICT_START:
+            preemptive_nested_complex_counter++;
+            break;
         case AST_DICT_ADD_VAR:
             preemptive_getSymbol(ast_node->strings[1], function);
             break;
         case AST_DICT_ADD_VAR_EL:
             preemptive_getSymbol(ast_node->strings[1], function);
+            break;
+        case AST_DICT_NESTED_FINISH:
+            preemptive_nested_complex_counter--;
             break;
         case AST_LEFT_RIGHT_BRACKET_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
@@ -574,8 +592,14 @@ check_function_label:
         case AST_DECISION_MAKE_BOOLEAN:
             preemptive_callFunction(ast_node->strings[0], function->module);
             break;
+        case AST_DECISION_MAKE_BOOLEAN_RETURN:
+            preemptive_returnSymbol(ast_node->strings[0], function);
+            break;
         case AST_DECISION_MAKE_DEFAULT:
             preemptive_callFunction(ast_node->strings[0], function->module);
+            break;
+        case AST_DECISION_MAKE_DEFAULT_RETURN:
+            preemptive_returnSymbol(ast_node->strings[0], function);
             break;
         default:
             break;

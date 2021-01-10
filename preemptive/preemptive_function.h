@@ -37,5 +37,7 @@ void preemptive_addFunctionCallParameterFloat();
 void preemptive_addFunctionCallParameterString();
 void preemptive_addFunctionCallParameterSymbol(char *name, _Function* function);
 void preemptive_addFunctionCallParameterList(Symbol* symbol);
+void preemptive_returnSymbol(char *name, _Function* function);
+void preemptive_resetFunctionParametersMode();
 
 #endif

@@ -142,3 +142,29 @@ void preemptive_addFunctionCallParameterSymbol(char *name, _Function* function) 
 void preemptive_addFunctionCallParameterList(Symbol* symbol) {
     preemptive_addSymbolToFunctionParameters(symbol, false);
 }
+
+void preemptive_returnSymbol(char *name, _Function* function) {
+    Symbol* symbol = preemptive_getSymbol(name, function);
+    if (symbol->type != K_ANY &&
+        function->type != K_ANY &&
+        symbol->type != function->type
+    ) {
+        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), function->name);
+    }
+    if (symbol->secondary_type != K_ANY &&
+        function->secondary_type != K_ANY &&
+        symbol->secondary_type != function->secondary_type
+    ) {
+        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function->name);
+    }
+    function->symbol = symbol;
+}
+
+void preemptive_resetFunctionParametersMode() {
+    if (function_parameters_mode == NULL) return;
+
+    for (unsigned short i = 0; i < function_parameters_mode->parameter_count; i++) {
+        preemptive_removeSymbol(function_parameters_mode->parameters[i]);
+    }
+    freeFunctionParametersMode();
+}

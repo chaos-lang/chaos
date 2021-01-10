@@ -284,6 +284,7 @@ void absorbError() {
 
     phase = INIT_PROGRAM;
     disable_complex_mode = false;
+    preemptive_freeAllSymbols();
     freeComplexModeStack();
     freeLeftRightBracketStackSymbols();
     resetFunctionParametersMode();

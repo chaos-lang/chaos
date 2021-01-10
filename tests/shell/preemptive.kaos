@@ -134,3 +134,45 @@ void def f4()
 end
 
 function_table
+
+
+list def f4()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    return a
+end
+
+function_table
+
+dict def f4()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    return b
+end
+
+function_table
+
+
+list def f4()
+    num x = 5
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+end {
+    x == 5  : return a,
+    default : return a
+}
+
+function_table
+
+dict def f4()
+    num x = 5
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+end {
+    x == 5  : return b,
+    default : return b
+}
+
+function_table
+
+dict def f4()
+    num x = 5
+end
+
+function_table

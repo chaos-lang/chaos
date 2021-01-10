@@ -22,7 +22,12 @@
 
 #include "preemptive_symbol.h"
 
+unsigned long long preemptive_nested_complex_counter = 0;
+
 Symbol* preemptive_addSymbol(char *name, enum Type type, enum ValueType value_type) {
+    if (preemptive_nested_complex_counter != 0)
+        return NULL;
+
     symbol_cursor = preemptive_start_symbol;
 
     Symbol* symbol;
@@ -87,6 +92,8 @@ Symbol* preemptive_getSymbol(char *name, _Function* function) {
 
 void preemptive_freeAllSymbols() {
     symbol_cursor = preemptive_start_symbol;
+    if (symbol_cursor != NULL)
+        preemptive_resetFunctionParametersMode();
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
