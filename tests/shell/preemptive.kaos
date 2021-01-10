@@ -60,3 +60,77 @@ end {
 }
 
 function_table
+
+
+num def f4(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(z),
+    z > 10  : f2(),
+    default : f3()
+}
+
+function_table
+
+
+num def f4()
+    num c = 103
+    num x = f1(c)
+    return c
+end
+
+function_table
+
+
+num def f8(num a, str b)
+    print a
+    print b
+    num c = a + 5
+    return c
+end
+
+function_table
+
+void def f4()
+    num a = 3
+    num b = 5
+    f8(a, b)
+end
+
+function_table
+
+void def f4()
+    f8(3, 5)
+end
+
+function_table
+
+void def f4()
+    list a = [1, 2, 3]
+    str b = 'hello'
+    f8(a, b)
+end
+
+function_table
+
+void def f4()
+    f8([1, 2, 3], 'hello')
+end
+
+function_table
+
+void def f4()
+    num a = 3
+    str b = 'hello'
+    bool c = true
+    f8(a, b, c)
+end
+
+function_table
+
+void def f4()
+    f8(3, 'hello', true)
+end
+
+function_table

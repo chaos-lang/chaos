@@ -515,33 +515,61 @@ check_function_label:
         case AST_EXIT_VAR:
             preemptive_getSymbol(ast_node->strings[0], function);
             break;
+        case AST_FUNCTION_CALL_PARAMETER_BOOL:
+            preemptive_addFunctionCallParameterBool();
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_NUMBER:
+            if (ast_node->right->value_type == V_INT) {
+                preemptive_addFunctionCallParameterInt();
+            } else {
+                preemptive_addFunctionCallParameterFloat();
+            }
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_STRING:
+            preemptive_addFunctionCallParameterString();
+            break;
         case AST_FUNCTION_CALL_PARAMETER_VAR:
-            preemptive_getSymbol(ast_node->strings[0], function);
+            preemptive_addFunctionCallParameterSymbol(ast_node->strings[0], function);
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_LIST:
+            symbol = preemptive_addSymbol(ast_node->strings[0], K_LIST, V_VOID);
+            symbol->secondary_type = K_ANY;
+            preemptive_addFunctionCallParameterList(symbol);
+            break;
+        case AST_FUNCTION_CALL_PARAMETER_DICT:
+            symbol = preemptive_addSymbol(ast_node->strings[0], K_DICT, V_VOID);
+            symbol->secondary_type = K_ANY;
+            preemptive_addFunctionCallParameterList(symbol);
             break;
         case AST_PRINT_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            preemptive_callFunction(ast_node->strings[0], _module);
+            if (ast_node->strings_size > 0)
+                preemptive_callFunction(ast_node->strings[0], _module);
             break;
         case AST_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            preemptive_callFunction(ast_node->strings[0], _module);
+            if (ast_node->strings_size > 0)
+                preemptive_callFunction(ast_node->strings[0], _module);
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            preemptive_callFunction(ast_node->strings[0], _module);
+            if (ast_node->strings_size > 0)
+                preemptive_callFunction(ast_node->strings[0], _module);
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            preemptive_callFunction(ast_node->strings[0], _module);
+            if (ast_node->strings_size > 0)
+                preemptive_callFunction(ast_node->strings[0], _module);
             break;
         case AST_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
-            preemptive_callFunction(ast_node->strings[0], _module);
+            if (ast_node->strings_size > 0)
+                preemptive_callFunction(ast_node->strings[0], _module);
             break;
         case AST_DECISION_MAKE_BOOLEAN:
             preemptive_callFunction(ast_node->strings[0], function->module);

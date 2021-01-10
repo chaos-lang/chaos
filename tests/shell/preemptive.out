@@ -45,3 +45,95 @@ Module: ~/chaos/__interactive__.kaos, module: } =>
 Module: ~/chaos/__interactive__.kaos, module: } =>
 Module: ~/chaos/__interactive__.kaos, module: } =>
 [end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 8
+[0;43m    Incorrect argument count for function: f1
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 6
+[0;43m    Incorrect argument count for function: f1
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 16
+[0;43m    Illegal variable type for function parameter: b of function: f8
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 4
+[0;43m    Illegal variable type for function parameter: b of function: f8
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 6
+[0;43m    Illegal variable type for function parameter: a of function: f8
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 4
+[0;43m    Illegal variable type for function parameter: a of function: f8
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 7
+[0;43m    Incorrect argument count for function: f8
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
+[1;43m  Preemptive Error:
+Module: ~/chaos/__interactive__.kaos
+[0;43m    Line: 4
+[0;43m    Incorrect argument count for function: f8
+Absorbed by Interactive Shell
+[start] =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+Module: ~/chaos/__interactive__.kaos, module: } =>
+[end]
