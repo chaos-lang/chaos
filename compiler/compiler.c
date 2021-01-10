@@ -49,11 +49,14 @@ char* logical_operators[] = {"&&", "||", "!"};
 int logical_operators_size = 3;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep) {
+    ASTNode* ast_node = ast_root_node;
+    register_functions(ast_node, module);
+    preemptive_check();
+
     printf("Starting compiling...\n");
     char *module_orig = malloc(strlen(module) + 1);
     strcpy(module_orig, module);
     compiler_escape_module(module);
-    ASTNode* ast_node = ast_root_node;
 
     if (stat(__KAOS_BUILD_DIRECTORY__, &dir_stat) == -1) {
         printf("Creating %s directory...\n", __KAOS_BUILD_DIRECTORY__);
@@ -158,8 +161,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
 
-    register_functions(ast_node, module_orig);
-    preemptive_check();
     transpile_functions(ast_node, module, c_fp, indent, h_fp);
     free_transpiled_functions();
     free_transpiled_decisions();
