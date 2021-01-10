@@ -31,7 +31,7 @@ extern unsigned long long nested_loop_counter;
 int kaos_lineno = 0;
 
 #ifndef CHAOS_COMPILER
-void interpret(char *module, enum Phase phase_arg, bool is_interactive) {
+void interpret(char *module, enum Phase phase_arg, bool is_interactive, bool unsafe) {
 #else
 void interpret(char *module, enum Phase phase_arg) {
 #endif
@@ -53,11 +53,13 @@ void interpret(char *module, enum Phase phase_arg) {
             phase = PREPARSE;
             register_functions(ast_node, module);
 #ifndef CHAOS_COMPILER
-            if (is_interactive) {
-                if (end_function != NULL)
+            if (!unsafe) {
+                if (is_interactive) {
+                    if (end_function != NULL)
+                        preemptive_check();
+                } else {
                     preemptive_check();
-            } else {
-                preemptive_check();
+                }
             }
 #endif
             phase = PROGRAM;
@@ -74,11 +76,13 @@ void interpret(char *module, enum Phase phase_arg) {
         phase = PREPARSE;
         register_functions(ast_node, module);
 #ifndef CHAOS_COMPILER
-        if (is_interactive) {
-            if (end_function != NULL)
+        if (!unsafe) {
+            if (is_interactive) {
+                if (end_function != NULL)
+                    preemptive_check();
+            } else {
                 preemptive_check();
-        } else {
-            preemptive_check();
+            }
         }
 #endif
         phase = PROGRAM;

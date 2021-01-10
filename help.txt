@@ -8,4 +8,5 @@ Usage: chaos [options] <file> [--] [args...]
     -o, --output        Binary output filename. Must be used with the -c / --compile option.
     -e, --extra         Extra flags to inject into C compiler command.
     -k, --keep          Don't remove the C source and header files (temporary files) after compilation.
+    -u, --unsafe        Unsafe mode (fast warm up). Disables the preemptive error checks.
 

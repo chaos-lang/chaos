@@ -37,7 +37,7 @@ extern unsigned long long nested_loop_counter;
 extern ASTNode* loop_end_ast_node;
 
 #ifndef CHAOS_COMPILER
-void interpret(char *module, enum Phase phase_arg, bool is_interactive);
+void interpret(char *module, enum Phase phase_arg, bool is_interactive, bool unsafe);
 #else
 void interpret(char *module, enum Phase phase_arg);
 #endif

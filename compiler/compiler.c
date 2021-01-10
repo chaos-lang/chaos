@@ -48,10 +48,11 @@ int relational_operators_size = 4;
 char* logical_operators[] = {"&&", "||", "!"};
 int logical_operators_size = 3;
 
-void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep) {
+void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep, bool unsafe) {
     ASTNode* ast_node = ast_root_node;
     register_functions(ast_node, module);
-    preemptive_check();
+    if (!unsafe)
+        preemptive_check();
 
     printf("Starting compiling...\n");
     char *module_orig = malloc(strlen(module) + 1);

@@ -55,6 +55,8 @@ char *program_code;
 char *main_interpreted_module;
 jmp_buf InteractiveShellErrorAbsorber;
 
+bool global_unsafe;
+
 int initParser(int argc, char** argv);
 void freeEverything();
 void yyerror(const char* s);

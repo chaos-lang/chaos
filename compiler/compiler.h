@@ -45,7 +45,7 @@
 string_array transpiled_functions;
 string_array transpiled_decisions;
 
-void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep);
+void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep, bool unsafe);
 ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp);
 ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
 ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);

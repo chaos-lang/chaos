@@ -27,6 +27,8 @@ extern bool disable_complex_mode;
 extern char *suggestions[1000];
 extern unsigned long long suggestions_length;
 
+bool global_unsafe = false;
+
 #ifndef CHAOS_COMPILER
 static struct option long_options[] =
 {
@@ -38,6 +40,7 @@ static struct option long_options[] =
     {"output", required_argument, NULL, 'o'},
     {"extra", required_argument, NULL, 'e'},
     {"keep", no_argument, NULL, 'k'},
+    {"unsafe", no_argument, NULL, 'u'},
     {NULL, 0, NULL, 0}
 };
 
@@ -48,10 +51,11 @@ int initParser(int argc, char** argv) {
     char *program_file = NULL;
     char *bin_file = NULL;
     bool keep = false;
+    bool unsafe = false;
     char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvldc:o:e:k", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvldc:o:e:ku", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -82,6 +86,10 @@ int initParser(int argc, char** argv) {
                 break;
             case 'k':
                 keep = true;
+                break;
+            case 'u':
+                unsafe = true;
+                global_unsafe = true;
                 break;
             case '?':
                 switch (optopt)
@@ -188,9 +196,9 @@ int initParser(int argc, char** argv) {
         yyparse();
         if (!is_interactive) {
             if (compiler_mode) {
-                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep);
+                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep, unsafe);
             } else {
-                interpret(main_interpreted_module, INIT_PREPARSE, false);
+                interpret(main_interpreted_module, INIT_PREPARSE, false, unsafe);
             }
         }
         if (!is_interactive) break;
