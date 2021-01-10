@@ -88,6 +88,24 @@ check_function_label:
             ast_node->strings_size
         );
 
+    switch (ast_node->node_type)
+    {
+        case AST_START_TIMES_DO_VAR:
+            preemptive_getSymbol(ast_node->strings[0], function);
+            break;
+        case AST_START_FOREACH:
+            preemptive_getSymbol(ast_node->strings[0], function);
+            preemptive_addSymbol(ast_node->strings[1], K_ANY, V_VOID);
+            break;
+        case AST_START_FOREACH_DICT:
+            preemptive_getSymbol(ast_node->strings[0], function);
+            preemptive_addSymbol(ast_node->strings[1], K_ANY, V_VOID);
+            preemptive_addSymbol(ast_node->strings[2], K_ANY, V_VOID);
+            break;
+        default:
+            break;
+    }
+
     Symbol* symbol;
     char *_module = NULL;
 

@@ -1,4 +1,4 @@
-void def a()
+void def f4()
     print b
 end
 
@@ -173,6 +173,74 @@ function_table
 
 dict def f4()
     num x = 5
+end
+
+function_table
+
+
+void def f4()
+    3 times do
+        print b
+        2 times do
+            print c
+        end
+    end
+end
+
+function_table
+
+void def f4()
+    n times do
+        print "hello world"
+    end
+end
+
+function_table
+
+void def f4()
+    foreach a as el
+        print el
+    end
+end
+
+function_table
+
+void def f7()
+    list a = [1, 2, 3]
+    foreach a as el
+        print el
+    end
+end
+
+function_table
+
+void def f4()
+    list a = [1, 2, 3]
+    foreach a as el
+        print el
+        print b
+    end
+end
+
+function_table
+
+void def f8()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    foreach a as key : val
+        print key
+        print val
+    end
+end
+
+function_table
+
+void def f4()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    foreach a as key : val
+        print key
+        print val
+        print b
+    end
 end
 
 function_table
