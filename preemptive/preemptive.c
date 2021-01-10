@@ -31,7 +31,12 @@ void preemptive_check() {
         function_cursor = function_cursor->next;
         check_function(function->node->child, function->module_context, function);
         check_function(function->decision_node, function->module_context, function);
-        if (function->type != K_VOID && function->symbol == NULL && function->decision_node == NULL)
+        if (
+            function->type != K_VOID &&
+            function->symbol == NULL &&
+            function->decision_node == NULL &&
+            !function->is_dynamic
+        )
             throw_preemptive_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function->name);
         function->symbol = NULL;
         preemptive_freeAllSymbols();
