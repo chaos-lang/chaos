@@ -62,6 +62,11 @@ clang-dev-sanitizer-undefined_behavior:
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
+free-debug:
+	export CHAOS_COMPILER=gcc
+	export CHAOS_EXTRA_FLAGS=-DCHAOS_DEBUG -ggdb
+	${MAKE} chaos
+
 help.h:
 	xxd -i help.txt > help.h
 

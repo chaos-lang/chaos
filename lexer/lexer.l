@@ -29,6 +29,8 @@
 #include "ast/ast.h"
 #include "lexer/lexer.h"
 
+#undef free
+
 #define YY_DECL int yylex()
 
 extern void recordToken(char *token, int length);

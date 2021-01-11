@@ -64,6 +64,12 @@
 
 #include <stdio.h>
 
+#ifdef CHAOS_DEBUG
+#   include <stdlib.h>
+
+#   define free(p) do{ printf( "%s(%d):freeing %p &%p\n", __FILE__, __LINE__, (void*)p, (void*)&p ); free(p);  }while(0)
+#endif
+
 #include "platform.h"
 
 void yyerror_msg(char* error_name, char* current_module, char* cause);
