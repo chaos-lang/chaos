@@ -1102,10 +1102,10 @@ eval_node_label:
             ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP:
-            ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
+            ast_node->value.b = ast_node->left->value.i && ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP:
-            ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
+            ast_node->value.b = ast_node->left->value.i || ast_node->right->value.i;
             break;
         case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP:
             ast_node->value.b = ! ast_node->right->value.i;
