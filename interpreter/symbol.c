@@ -1359,17 +1359,11 @@ long long assignThenIncrement(char *name, long long i) {
 }
 
 char* getTypeName(unsigned i) {
-    char *name = malloc(1 + strlen(type_names[i]));
-    strcpy(name, type_names[i]);
-    append_to_array_without_malloc(&free_string_stack, name);
-    return name;
+    return type_names[i];
 }
 
 char* getValueTypeName(unsigned i) {
-    char *name = malloc(1 + strlen(value_type_names[i]));
-    strcpy(name, value_type_names[i]);
-    append_to_array_without_malloc(&free_string_stack, name);
-    return name;
+    return value_type_names[i];
 }
 
 void pushComplexModeStack(Symbol* complex_mode) {
