@@ -48,17 +48,17 @@ clang-dev:
 	${MAKE} chaos
 
 clang-dev-sanitizer-memory:
-	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -O1 -fno-optimize-sibling-calls'
+	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -g -O0 -fno-optimize-sibling-calls'
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
 clang-dev-sanitizer-address:
-	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g'
+	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g -O0'
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
 clang-dev-sanitizer-undefined_behavior:
-	export CHAOS_COMPILER='clang -fsanitize=undefined'
+	export CHAOS_COMPILER='clang -fsanitize=undefined -g -O0'
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 

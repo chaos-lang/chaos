@@ -470,8 +470,5 @@ char *ast_node_type_names[] = {
 };
 
 char* getAstNodeTypeName(unsigned i) {
-    char *name = malloc(1 + strlen(ast_node_type_names[i]));
-    strcpy(name, ast_node_type_names[i]);
-    append_to_array_without_malloc(&free_string_stack, name);
-    return name;
+    return ast_node_type_names[i];
 }

@@ -118,9 +118,6 @@ void removeSymbolByName(char *name) {
 }
 
 void removeSymbol(Symbol* symbol) {
-    // TODO: Somehow this fixes a double free or corruption on `free(symbol->name);` below.
-    getTypeName(symbol->type);
-
     removeChildrenOfComplex(symbol);
 
     Symbol* previous_symbol = symbol->previous;
@@ -1343,7 +1340,7 @@ void removeSymbolsByScope(FunctionCall* scope) {
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
-        if (symbol->scope == scope) {
+        if (symbol->scope == scope && symbol != decision_symbol_chain) {
             removeSymbol(symbol);
             removeSymbolsByScope(scope);
         }
