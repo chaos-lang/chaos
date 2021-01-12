@@ -7,7 +7,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
     rm "$DIR/$testname.out"
-    cat "$DIR/$filename" | chaos > "$DIR/$testname.out"
+    cat "$DIR/$filename" | chaos > "$DIR/$testname.out" 2>&1
     sed -i "s|.\[1;41m\s*||g" "$DIR/$testname.out"
     sed -i "s|.\[0;41m\s*||g" "$DIR/$testname.out"
     sed -i "s|.\[1;44m\s*||g" "$DIR/$testname.out"

@@ -298,14 +298,16 @@ void absorbError() {
     resetFunctionParametersMode();
     freeFunctionNamesBuffer();
 
+    fflush(stdout);
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;44m");
+    fprintf(stderr, "\033[1;44m");
 #   endif
-    printf("%-*s", InteractiveShellErrorAbsorber_ws_col, "    Absorbed by Interactive Shell");
+    fprintf(stderr, "%-*s", InteractiveShellErrorAbsorber_ws_col, "    Absorbed by Interactive Shell");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #   endif
-    printf("\n");
+    fprintf(stderr, "\n");
+    fflush(stderr);
 
     if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
     if (function_call_stack.size > 0) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
@@ -319,79 +321,87 @@ void absorbError() {
 }
 
 void throwCompilerInteractiveError() {
-    printf("Compile option '-c' cannot be used with the interactive mode.\n\n");
-    printf("Specify a Chaos program file with: ");
+    fflush(stdout);
+    fprintf(stderr, "Compile option '-c' cannot be used with the interactive mode.\n\n");
+    fprintf(stderr, "Specify a Chaos program file with: ");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
+    fprintf(stderr, "\033[1;45m");
 #   endif
-    printf(" chaos -c hello.kaos ");
+    fprintf(stderr, " chaos -c hello.kaos ");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #   endif
-    printf("\n\n");
+    fprintf(stderr, "\n\n");
+    fflush(stderr);
     print_help();
     exit(E_INVALID_OPTION);
 }
 
 void throwMissingOutputName() {
-    printf("You have to supply an output filename while using the option '-o'.\n\n");
-    printf("Correct command should look like this: ");
+    fflush(stdout);
+    fprintf(stderr, "You have to supply an output filename while using the option '-o'.\n\n");
+    fprintf(stderr, "Correct command should look like this: ");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
+    fprintf(stderr, "\033[1;45m");
 #   endif
 
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    printf(" chaos -c hello.kaos -o hello.exe ");
+    fprintf(stderr, " chaos -c hello.kaos -o hello.exe ");
 #   else
-    printf(" chaos -c hello.kaos -o hello ");
+    fprintf(stderr, " chaos -c hello.kaos -o hello ");
 #   endif
 
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #   endif
-    printf("\n\n");
+    fprintf(stderr, "\n\n");
+    fflush(stderr);
     print_help();
     exit(E_INVALID_OPTION);
 }
 
 void throwMissingCompileOption() {
-    printf("You have to give the path of Chaos program file with the option '-c'.\n\n");
-    printf("Correct command should look like this: ");
+    fflush(stdout);
+    fprintf(stderr, "You have to give the path of Chaos program file with the option '-c'.\n\n");
+    fprintf(stderr, "Correct command should look like this: ");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
+    fprintf(stderr, "\033[1;45m");
 #   endif
 
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    printf(" chaos -c hello.kaos -o hello.exe ");
+    fprintf(stderr, " chaos -c hello.kaos -o hello.exe ");
 #   else
-    printf(" chaos -c hello.kaos -o hello ");
+    fprintf(stderr, " chaos -c hello.kaos -o hello ");
 #   endif
 
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #   endif
-    printf("\n\n");
+    fprintf(stderr, "\n\n");
+    fflush(stderr);
     print_help();
     exit(E_INVALID_OPTION);
 }
 
 void throwMissingExtraFlags() {
-    printf("You have to specify a string that contains the extra flags with the option '-e'.\n\n");
-    printf("Correct command should look like this: ");
+    fflush(stdout);
+    fprintf(stderr, "You have to specify a string that contains the extra flags with the option '-e'.\n\n");
+    fprintf(stderr, "Correct command should look like this: ");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
+    fprintf(stderr, "\033[1;45m");
 #   endif
 
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    printf(" chaos -c hello.kaos -o hello.exe -e \"-ggdb\" ");
+    fprintf(stderr, " chaos -c hello.kaos -o hello.exe -e \"-ggdb\" ");
 #   else
-    printf(" chaos -c hello.kaos -o hello -e \"-ggdb\" ");
+    fprintf(stderr, " chaos -c hello.kaos -o hello -e \"-ggdb\" ");
 #   endif
 
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #   endif
-    printf("\n\n");
+    fprintf(stderr, "\n\n");
+    fflush(stderr);
     print_help();
     exit(E_INVALID_OPTION);
 }

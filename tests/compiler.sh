@@ -31,9 +31,9 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     echo "(compiler) Compiling test: ${testname}"
 
     if [ "$EXTRA_FLAGS_ENABLED" = true ] ; then
-        cout=$(chaos -c tests/$filename -o $testname -e "$extra_flags")
+        cout=$(chaos -c tests/$filename -o $testname -e "$extra_flags" 2>&1)
     else
-        cout=$(chaos -c tests/$filename -o $testname)
+        cout=$(chaos -c tests/$filename -o $testname 2>&1)
     fi
     status=$?
 
@@ -54,7 +54,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     echo "(compiler) Running test: ${testname}"
 
-    test=$(build/$testname)
+    test=$(build/$testname 2>&1)
     if [ "$test" == "$out" ]
     then
         echo "OK"

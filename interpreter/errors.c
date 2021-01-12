@@ -176,41 +176,43 @@ void throw_error_base(
     int ws_col = largest(cols, 4) + 4;
     InteractiveShellErrorAbsorber_ws_col = ws_col;
 
+    fflush(stdout);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;%sm", bg_color);
+    fprintf(stderr, "\033[1;%sm", bg_color);
 #endif
-    printf("%-*s", ws_col, title_msg);
+    fprintf(stderr, "%-*s", ws_col, title_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;%sm", bg_color);
+    fprintf(stderr, "\033[0;%sm", bg_color);
 #endif
-    printf("%-*s", ws_col, current_module_msg);
+    fprintf(stderr, "%-*s", ws_col, current_module_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;%sm", bg_color);
+    fprintf(stderr, "\033[0;%sm", bg_color);
 #endif
-    printf("%-*s", ws_col, line_no_msg);
+    fprintf(stderr, "%-*s", ws_col, line_no_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;%sm", bg_color);
+    fprintf(stderr, "\033[0;%sm", bg_color);
 #endif
-    printf("%-*s", ws_col, new_error_msg_out);
+    fprintf(stderr, "%-*s", ws_col, new_error_msg_out);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
+    fflush(stderr);
     free(new_error_msg_out);
 
 #ifndef CHAOS_COMPILER

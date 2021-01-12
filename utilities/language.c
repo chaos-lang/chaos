@@ -45,40 +45,42 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     cols[3] = (int) strlen(new_cause_msg) + 1;
     int ws_col = largest(cols, 3) + 4;
 
+    fflush(stdout);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;46m");
+    fprintf(stderr, "\033[1;46m");
 #endif
-    printf("%-*s", ws_col, error_name_msg);
+    fprintf(stderr, "%-*s", ws_col, error_name_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;46m");
+    fprintf(stderr, "\033[0;46m");
 #endif
-    printf("%-*s", ws_col, current_module_msg);
+    fprintf(stderr, "%-*s", ws_col, current_module_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;46m");
+    fprintf(stderr, "\033[0;46m");
 #endif
-    printf("%-*s", ws_col, line_no_msg);
+    fprintf(stderr, "%-*s", ws_col, line_no_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;46m");
+    fprintf(stderr, "\033[0;46m");
 #endif
-    printf("%-*s", ws_col, new_cause_msg);
+    fprintf(stderr, "%-*s", ws_col, new_cause_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+    fprintf(stderr, "\033[0m");
 #endif
-    printf("\n");
+    fprintf(stderr, "\n");
+    fflush(stderr);
     free(new_cause_msg);
 }
