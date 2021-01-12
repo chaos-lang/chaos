@@ -53,7 +53,7 @@ char *program_file_path;
 char *program_file_dir;
 char *program_code;
 char *main_interpreted_module;
-jmp_buf InteractiveShellErrorAbsorber;
+void* InteractiveShellErrorAbsorber[5];
 
 bool global_unsafe;
 

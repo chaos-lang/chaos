@@ -184,7 +184,7 @@ int initParser(int argc, char** argv) {
 
     do {
         if (is_interactive) {
-            if (setjmp(InteractiveShellErrorAbsorber)) {
+            if (__builtin_setjmp(InteractiveShellErrorAbsorber)) {
             }
         }
 
@@ -307,15 +307,15 @@ void absorbError() {
 #   endif
     printf("\n");
 
-    if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
-    if (function_call_stack.size > 0) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
+    if (loop_execution_mode) __builtin_longjmp(InteractiveShellLoopErrorAbsorber, 1);
+    if (function_call_stack.size > 0) __builtin_longjmp(InteractiveShellFunctionErrorAbsorber, 1);
 
     if (main_interpreted_module != NULL) {
         free(main_interpreted_module);
         main_interpreted_module = NULL;
     }
 
-    longjmp(InteractiveShellErrorAbsorber, 1);
+    __builtin_longjmp(InteractiveShellErrorAbsorber, 1);
 }
 
 void throwCompilerInteractiveError() {

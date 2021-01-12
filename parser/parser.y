@@ -264,7 +264,7 @@ decision_parameters: T_VAR                                                      
 parser:
     | parser line                                                   {
 #ifndef CHAOS_COMPILER
-        if (setjmp(InteractiveShellFunctionErrorAbsorber)) {
+        if (__builtin_setjmp(InteractiveShellFunctionErrorAbsorber)) {
             eval_node_after_function_call(function_call_stack.arr[function_call_stack.size - 1]->trigger);
         }
         if (is_interactive && loops_inside_function_counter == 0)

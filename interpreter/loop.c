@@ -42,7 +42,7 @@ ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
 
 #ifndef CHAOS_COMPILER
     if (is_interactive)
-        if (setjmp(InteractiveShellLoopErrorAbsorber))
+        if (__builtin_setjmp(InteractiveShellLoopErrorAbsorber))
             interactive_shell_loop_error_absorbed = true;
 #endif
 
@@ -50,17 +50,17 @@ ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
     if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
         if (is_infinite) {
             while (true) {
-                if (setjmp(LoopBreak))
+                if (__builtin_setjmp(LoopBreak))
                     break;
-                if (setjmp(LoopContinue))
+                if (__builtin_setjmp(LoopContinue))
                     continue;
                 next_node = eval_node(ast_node->next, ast_node->module);
             }
         } else {
             for (unsigned long long i = 0; i < (unsigned) iter; i++) {
-                if (setjmp(LoopBreak))
+                if (__builtin_setjmp(LoopBreak))
                     break;
-                if (setjmp(LoopContinue))
+                if (__builtin_setjmp(LoopContinue))
                     continue;
                 next_node = eval_node(ast_node->next, ast_node->module);
             }
@@ -81,7 +81,7 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
 
 #ifndef CHAOS_COMPILER
     if (is_interactive)
-        if (setjmp(InteractiveShellLoopErrorAbsorber))
+        if (__builtin_setjmp(InteractiveShellLoopErrorAbsorber))
             interactive_shell_loop_error_absorbed = true;
 #endif
 
@@ -90,11 +90,11 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
         for (unsigned long i = 0; i < list->children_count; i++) {
             Symbol* child = list->children[i];
             Symbol* clone_symbol = createCloneFromSymbol(element_name, child->type, child, child->secondary_type);
-            if (setjmp(LoopBreak)) {
+            if (__builtin_setjmp(LoopBreak)) {
                 removeSymbol(clone_symbol);
                 break;
             }
-            if (setjmp(LoopContinue)) {
+            if (__builtin_setjmp(LoopContinue)) {
                 removeSymbol(clone_symbol);
                 continue;
             }
@@ -117,7 +117,7 @@ ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_valu
 
 #ifndef CHAOS_COMPILER
     if (is_interactive)
-        if (setjmp(InteractiveShellLoopErrorAbsorber))
+        if (__builtin_setjmp(InteractiveShellLoopErrorAbsorber))
             interactive_shell_loop_error_absorbed = true;
 #endif
 
@@ -128,12 +128,12 @@ ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_valu
 
             addSymbolString(element_key, child->key);
             Symbol* clone_symbol = createCloneFromSymbol(element_value, child->type, child, child->secondary_type);
-            if (setjmp(LoopBreak)) {
+            if (__builtin_setjmp(LoopBreak)) {
                 removeSymbol(clone_symbol);
                 removeSymbolByName(element_key);
                 break;
             }
-            if (setjmp(LoopContinue)) {
+            if (__builtin_setjmp(LoopContinue)) {
                 removeSymbol(clone_symbol);
                 removeSymbolByName(element_key);
                 continue;
@@ -149,9 +149,9 @@ ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_valu
 }
 
 void breakLoop() {
-    longjmp(LoopBreak, 1);
+    __builtin_longjmp(LoopBreak, 1);
 }
 
 void continueLoop() {
-    longjmp(LoopContinue, 1);
+    __builtin_longjmp(LoopContinue, 1);
 }

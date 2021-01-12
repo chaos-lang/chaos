@@ -29,8 +29,8 @@ int reset_line_no_to = 0;
 bool decision_execution_mode = false;
 
 #ifdef CHAOS_COMPILER
-extern jmp_buf LoopBreak;
-extern jmp_buf LoopContinue;
+extern void* LoopBreak[5];
+extern void* LoopContinue[5];
 #endif
 
 #ifdef CHAOS_COMPILER
@@ -311,10 +311,10 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
     bool is_loop_continued = false;
 
 #ifndef CHAOS_COMPILER
-    if (setjmp(LoopBreakDecision))
+    if (__builtin_setjmp(LoopBreakDecision))
         is_loop_breaked = true;
 
-    if (setjmp(LoopContinueDecision))
+    if (__builtin_setjmp(LoopContinueDecision))
         is_loop_continued = true;
 #endif
 
@@ -894,9 +894,9 @@ void decisionBreakLoop() {
     callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
     free(function_call_stack.arr[function_call_stack.size - 1]);
     callFunctionCleanUpCommon();
-    longjmp(LoopBreak, 1);
+    __builtin_longjmp(LoopBreak, 1);
 #else
-    longjmp(LoopBreakDecision, 1);
+    __builtin_longjmp(LoopBreakDecision, 1);
 #endif
 }
 
@@ -905,8 +905,8 @@ void decisionContinueLoop() {
     callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
     free(function_call_stack.arr[function_call_stack.size - 1]);
     callFunctionCleanUpCommon();
-    longjmp(LoopContinue, 1);
+    __builtin_longjmp(LoopContinue, 1);
 #else
-    longjmp(LoopContinueDecision, 1);
+    __builtin_longjmp(LoopContinueDecision, 1);
 #endif
 }

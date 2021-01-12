@@ -156,8 +156,8 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
         "#include <stdbool.h>\n\n"
         "#include \"interpreter/function.h\"\n"
         "#include \"interpreter/symbol.h\"\n\n"
-        "jmp_buf LoopBreak;\n"
-        "jmp_buf LoopContinue;\n\n";
+        "void* LoopBreak[5];\n"
+        "void* LoopContinue[5];\n\n";
 
     fprintf(c_fp, "%s", c_file_base);
     fprintf(h_fp, "%s", h_file_base);
@@ -1397,8 +1397,8 @@ transpile_node_label:
                 );
             }
             indent += indent_length;
-            fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
-            fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
+            fprintf(c_fp, "%*cif (__builtin_setjmp(LoopBreak)) break;\n", indent, ' ');
+            fprintf(c_fp, "%*cif (__builtin_setjmp(LoopContinue)) continue;\n", indent, ' ');
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
@@ -1417,8 +1417,8 @@ transpile_node_label:
                 ' '
             );
             indent += indent_length;
-            fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
-            fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
+            fprintf(c_fp, "%*cif (__builtin_setjmp(LoopBreak)) break;\n", indent, ' ');
+            fprintf(c_fp, "%*cif (__builtin_setjmp(LoopContinue)) continue;\n", indent, ' ');
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
@@ -1438,8 +1438,8 @@ transpile_node_label:
                 ' '
             );
             indent += indent_length;
-            fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
-            fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
+            fprintf(c_fp, "%*cif (__builtin_setjmp(LoopBreak)) break;\n", indent, ' ');
+            fprintf(c_fp, "%*cif (__builtin_setjmp(LoopContinue)) continue;\n", indent, ' ');
             ast_node = transpile_node(ast_node->next, module, c_fp, indent);
             indent -= indent_length;
             fprintf(c_fp, "%*c}\n", indent, ' ');
@@ -1485,7 +1485,7 @@ transpile_node_label:
             indent += indent_length;
             fprintf(
                 c_fp,
-                "%*cif (setjmp(LoopBreak))\n"
+                "%*cif (__builtin_setjmp(LoopBreak))\n"
                 "%*c{\n"
                 "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
                 "%*cbreak;\n"
@@ -1504,7 +1504,7 @@ transpile_node_label:
             );
             fprintf(
                 c_fp,
-                "%*cif (setjmp(LoopContinue))\n"
+                "%*cif (__builtin_setjmp(LoopContinue))\n"
                 "%*c{\n"
                 "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
                 "%*ccontinue;\n"
@@ -1572,7 +1572,7 @@ transpile_node_label:
             indent += indent_length;
             fprintf(
                 c_fp,
-                "%*cif (setjmp(LoopBreak))\n"
+                "%*cif (__builtin_setjmp(LoopBreak))\n"
                 "%*c{\n"
                 "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
                 "%*cremoveSymbolByName(\"%s\");\n"
@@ -1595,7 +1595,7 @@ transpile_node_label:
             );
             fprintf(
                 c_fp,
-                "%*cif (setjmp(LoopContinue))\n"
+                "%*cif (__builtin_setjmp(LoopContinue))\n"
                 "%*c{\n"
                 "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
                 "%*cremoveSymbolByName(\"%s\");\n"

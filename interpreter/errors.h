@@ -81,7 +81,7 @@ extern void absorbError();
 extern bool is_interactive;
 #endif
 
-extern jmp_buf InteractiveShellErrorAbsorber;
+extern void* InteractiveShellErrorAbsorber[5];
 
 void throw_error_base(
     unsigned short code,

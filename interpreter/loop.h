@@ -52,10 +52,10 @@ typedef struct {
 Loop* loop_mode;
 bool loop_execution_mode;
 
-jmp_buf InteractiveShellLoopErrorAbsorber;
+void* InteractiveShellLoopErrorAbsorber[5];
 
-jmp_buf LoopBreak;
-jmp_buf LoopContinue;
+void* LoopBreak[5];
+void* LoopContinue[5];
 
 ASTNode* loop_end_ast_node;
 

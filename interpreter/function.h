@@ -107,10 +107,10 @@ string_array function_names_buffer;
 
 unsigned short recursion_depth;
 
-jmp_buf InteractiveShellFunctionErrorAbsorber;
+void* InteractiveShellFunctionErrorAbsorber[5];
 
-jmp_buf LoopBreakDecision;
-jmp_buf LoopContinueDecision;
+void* LoopBreakDecision[5];
+void* LoopContinueDecision[5];
 
 #ifdef CHAOS_COMPILER
 void startFunction(char *name, enum Type type, enum Type secondary_type, char* context, char* module_context, char* module, bool is_dynamic);
