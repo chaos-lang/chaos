@@ -1,12 +1,10 @@
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 14
+Module: ~/chaos/__interactive__.kaos", line 14, in <module>
 Undefined function: asdasd1
 Absorbed by Interactive Shell
 hey
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 3
+Module: ~/chaos/__interactive__.kaos", line 3, in <module>
 Undefined function: asdasd2
 Absorbed by Interactive Shell
 5

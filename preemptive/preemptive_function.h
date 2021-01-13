@@ -28,8 +28,8 @@
 
 _Function* preemptive_function_cursor;
 
-void preemptive_callFunction(char *name, char *module);
-_Function* preemptive_getFunction(char *name, char *module);
+void preemptive_callFunction(_Function* _function, char *name, char *module);
+_Function* preemptive_getFunction(_Function* _function, char *name, char *module);
 void preemptive_addSymbolToFunctionParameters(Symbol* symbol, bool is_optional);
 void preemptive_addFunctionCallParameterBool();
 void preemptive_addFunctionCallParameterInt();

@@ -70,6 +70,10 @@ char* replace_char(char* str, char find, char replace);
 void copy_binary_file(char* source_path, char* target_path);
 bool in(char *s, char **x, int len);
 string_array str_split(char* a_str, const char a_delim);
+char *get_nth_line( FILE *f, int line_no );
+char *ltrim(char *s);
+char *rtrim(char *s);
+char *trim(char *s);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 #   include <direct.h>

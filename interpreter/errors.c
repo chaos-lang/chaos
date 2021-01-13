@@ -31,7 +31,8 @@ void throw_error_var(throw_error_args in) {
     long long lld1 = in.lld1 ? in.lld1 : 0;
     unsigned long long llu1 = in.llu1 ? in.llu1 : 0;
     bool is_preemptive = in.is_preemptive ? in.is_preemptive : false;
-    throw_error_base(code, str1, str2, lld1, llu1, is_preemptive);
+    _Function* function = in.function ? in.function : NULL;
+    throw_error_base(code, str1, str2, lld1, llu1, is_preemptive, function);
 }
 
 void throw_error_base(
@@ -39,14 +40,14 @@ void throw_error_base(
     char *str1, char *str2,
     long long lld1,
     unsigned long long llu1,
-    bool is_preemptive
+    bool is_preemptive,
+    _Function* function
 ) {
     char title_msg[__KAOS_MSG_LINE_LENGTH__];
-    char current_module_msg[__KAOS_MSG_LINE_LENGTH__];
-    char line_no_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg[__KAOS_MSG_LINE_LENGTH__];
     char error_msg_out[__KAOS_MSG_LINE_LENGTH__ + 4];
     char bg_color[3];
+    int indent = 2;
 
     if (is_preemptive) {
         sprintf(bg_color, "43");
@@ -55,8 +56,6 @@ void throw_error_base(
         sprintf(bg_color, "41");
         sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
     }
-    sprintf(current_module_msg, "    Module: %s", getCurrentModule());
-    sprintf(line_no_msg, "    Line: %d", kaos_lineno);
 
     switch (code)
     {
@@ -168,13 +167,9 @@ void throw_error_base(
 
     char* new_error_msg_out = str_replace(error_msg_out, "\n", "\\n");
 
-    int cols[4];
-    cols[0] = (int) strlen(title_msg) + 1;
-    cols[1] = (int) strlen(current_module_msg) + 1;
-    cols[2] = (int) strlen(line_no_msg) + 1;
-    cols[3] = (int) strlen(new_error_msg_out) + 1;
-    int ws_col = largest(cols, 4) + 4;
+    int ws_col = 80;
     InteractiveShellErrorAbsorber_ws_col = ws_col;
+
 
     fflush(stdout);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
@@ -186,23 +181,59 @@ void throw_error_base(
 #endif
     fprintf(stderr, "\n");
 
+    char traceback_line_msg[__KAOS_MSG_LINE_LENGTH__];
+    char *function_name = NULL;
+    if (is_preemptive) {
+        function_name = function->name;
+    } else {
+        if (function_call_stack.size > 0) {
+            FunctionCall* function_call = function_call_stack.arr[function_call_stack.size - 1];
+            function_name = function_call->function->name;
+        }
+    }
+    char *module_path = getCurrentModule();
+    sprintf(
+        traceback_line_msg,
+        "%*cFile: \"%s\", line %d, in %s",
+        indent * 2,
+        ' ',
+        module_path,
+        kaos_lineno,
+        function_name != NULL ? function_name : "<module>"
+    );
+
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;%sm", bg_color);
 #endif
-    fprintf(stderr, "%-*s", ws_col, current_module_msg);
+    fprintf(stderr, "%-*s", ws_col, traceback_line_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0m");
 #endif
     fprintf(stderr, "\n");
 
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+#ifndef CHAOS_COMPILER
+if (!is_interactive) {
+    char traceback_line[__KAOS_MSG_LINE_LENGTH__];
+    FILE* fp_module = fopen(module_path, "r");
+    sprintf(
+        traceback_line,
+        "%*c%s",
+        indent * 3,
+        ' ',
+        trim(get_nth_line(fp_module, kaos_lineno))
+    );
+    fclose(fp_module);
+
+#   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;%sm", bg_color);
-#endif
-    fprintf(stderr, "%-*s", ws_col, line_no_msg);
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+#   endif
+    fprintf(stderr, "%-*s", ws_col, traceback_line);
+#   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0m");
-#endif
+#   endif
     fprintf(stderr, "\n");
+}
+#endif
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;%sm", bg_color);

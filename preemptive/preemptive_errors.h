@@ -34,6 +34,7 @@
 
 void throw_preemptive_error_base(
     unsigned short code,
+    _Function* function,
     char *str1,
     char *str2,
     long long lld1,
@@ -42,6 +43,7 @@ void throw_preemptive_error_base(
 
 typedef struct {
     unsigned short code;
+    _Function* function;
     char *str1;
     char *str2;
     long long lld1;

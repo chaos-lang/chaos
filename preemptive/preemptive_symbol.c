@@ -86,7 +86,7 @@ Symbol* preemptive_getSymbol(char *name, _Function* function) {
     Symbol* symbol = preemptive_findSymbol(name, function);
     if (symbol != NULL)
         return symbol;
-    throw_preemptive_error(E_UNDEFINED_VARIABLE, name);
+    throw_preemptive_error(E_UNDEFINED_VARIABLE, function, name);
     return NULL;
 }
 

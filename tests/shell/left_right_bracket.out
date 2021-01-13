@@ -1,6 +1,5 @@
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 3
+Module: ~/chaos/__interactive__.kaos", line 3, in <module>
 Unexpected accessor data type: List for variable: a
 Absorbed by Interactive Shell
 [0]
@@ -16,8 +15,7 @@ Absorbed by Interactive Shell
 	{id: 7, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
 [end]
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 4
+Module: ~/chaos/__interactive__.kaos", line 4, in <module>
 Undefined variable: k
 Absorbed by Interactive Shell
 [start] =>

@@ -22,21 +22,21 @@
 
 #include "preemptive_function.h"
 
-void preemptive_callFunction(char *name, char *module) {
-    _Function* function = preemptive_getFunction(name, module);
+void preemptive_callFunction(_Function* _function, char *name, char *module) {
+    _Function* function = preemptive_getFunction(_function, name, module);
 
     if (function_parameters_mode != NULL &&
         function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count)) {
-            throw_preemptive_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+            throw_preemptive_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, function, name);
     }
 
     if (function->parameter_count > 0 && function_parameters_mode == NULL) {
-        throw_preemptive_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+        throw_preemptive_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, function, name);
     }
 
     if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count) {
         freeFunctionParametersMode();
-        throw_preemptive_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
+        throw_preemptive_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, function, name);
     }
 
     for (unsigned short i = 0; i < function->parameter_count; i++) {
@@ -47,7 +47,7 @@ void preemptive_callFunction(char *name, char *module) {
 
             if (parameter->type != K_ANY && parameter->type != parameter_call->type) {
                 freeFunctionParametersMode();
-                throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
+                throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, function, parameter->secondary_name, function->name);
             }
 
             if ((parameter->type == K_LIST || parameter->type == K_DICT) && parameter->secondary_type != K_ANY) {
@@ -55,7 +55,7 @@ void preemptive_callFunction(char *name, char *module) {
                     Symbol* child = parameter_call->children[i];
                     if (child->type != parameter->secondary_type) {
                         freeFunctionParametersMode();
-                        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
+                        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, function, parameter->secondary_name, function->name);
                     }
                 }
             }
@@ -69,7 +69,7 @@ void preemptive_callFunction(char *name, char *module) {
     freeFunctionParametersMode();
 }
 
-_Function* preemptive_getFunction(char *name, char *module) {
+_Function* preemptive_getFunction(_Function* _function, char *name, char *module) {
     preemptive_function_cursor = start_function;
     while (preemptive_function_cursor != NULL) {
         if (module == NULL && strcmp(preemptive_function_cursor->module, "") != 0) {
@@ -84,7 +84,7 @@ _Function* preemptive_getFunction(char *name, char *module) {
         }
         preemptive_function_cursor = preemptive_function_cursor->next;
     }
-    throw_preemptive_error(E_UNDEFINED_FUNCTION, name);
+    throw_preemptive_error(E_UNDEFINED_FUNCTION, _function, name);
     return NULL;
 }
 
@@ -109,7 +109,7 @@ void preemptive_addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) 
         ++function_parameters_mode->optional_parameter_count;
 
     if (function_parameters_mode->parameters == NULL) {
-        throw_preemptive_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
+        throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
     }
 
     for (unsigned short i = function_parameters_mode->parameter_count - 1; i > 0; i--) {
@@ -153,13 +153,13 @@ void preemptive_returnSymbol(char *name, _Function* function) {
         function->type != K_ANY &&
         symbol->type != function->type
     ) {
-        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->type), function->name);
+        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, function, getTypeName(symbol->type), function->name);
     }
     if (symbol->secondary_type != K_ANY &&
         function->secondary_type != K_ANY &&
         symbol->secondary_type != function->secondary_type
     ) {
-        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function->name);
+        throw_preemptive_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, function, getTypeName(symbol->secondary_type), function->name);
     }
     function->symbol = symbol;
 }

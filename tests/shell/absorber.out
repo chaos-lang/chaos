@@ -1,25 +1,21 @@
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 Undefined variable: asdas
 Absorbed by Interactive Shell
 hey
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 2
+Module: ~/chaos/__interactive__.kaos", line 2, in <module>
 Undefined variable: a
 Absorbed by Interactive Shell
 5
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 3
+Module: ~/chaos/__interactive__.kaos", line 3, in <module>
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 5
 print b
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 5
+Module: ~/chaos/__interactive__.kaos", line 5, in <module>
 Undefined function: b
 Absorbed by Interactive Shell
 print b

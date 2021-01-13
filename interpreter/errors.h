@@ -89,7 +89,8 @@ void throw_error_base(
     char *str2,
     long long lld1,
     unsigned long long llu1,
-    bool is_preemptive
+    bool is_preemptive,
+    _Function* function
 );
 
 typedef struct {
@@ -99,6 +100,7 @@ typedef struct {
     long long lld1;
     unsigned long long llu1;
     bool is_preemptive;
+    _Function* function;
 } throw_error_args;
 
 void throw_error_var(throw_error_args in);

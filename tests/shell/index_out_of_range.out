@@ -2,26 +2,22 @@
 2
 3
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 5
+Module: ~/chaos/__interactive__.kaos", line 5, in <module>
 Index out of range: 3 for list: a
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 Index out of range: 123400 for list: a
 Absorbed by Interactive Shell
 3
 2
 1
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 4
+Module: ~/chaos/__interactive__.kaos", line 4, in <module>
 Index out of range: -4 for list: a
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 Index out of range: -123400 for list: a
 Absorbed by Interactive Shell
 m
@@ -29,13 +25,11 @@ i
 k
 e
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 7
+Module: ~/chaos/__interactive__.kaos", line 7, in <module>
 Index out of range: 4 for string: b
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 Index out of range: 123400 for string: b
 Absorbed by Interactive Shell
 e
@@ -43,13 +37,11 @@ k
 i
 m
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 5
+Module: ~/chaos/__interactive__.kaos", line 5, in <module>
 Index out of range: -5 for string: b
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 Index out of range: -123400 for string: b
 Absorbed by Interactive Shell
 []
@@ -70,13 +62,11 @@ Absorbed by Interactive Shell
 	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
 [end]
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 7
+Module: ~/chaos/__interactive__.kaos", line 7, in <module>
 The variable name 'f' is already defined!
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 Index out of range: 0 for list: f
 Absorbed by Interactive Shell
 []
@@ -98,7 +88,6 @@ Absorbed by Interactive Shell
 [end]
 [1, 2]
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 8
+Module: ~/chaos/__interactive__.kaos", line 8, in <module>
 Index out of range: 2 for list: a
 Absorbed by Interactive Shell

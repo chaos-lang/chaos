@@ -1,11 +1,9 @@
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 2
+Module: ~/chaos/__interactive__.kaos", line 2, in <module>
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 [start] =>
@@ -15,30 +13,25 @@ Absorbed by Interactive Shell
 [start] =>
 [end]
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 5
+Module: ~/chaos/__interactive__.kaos", line 5, in <module>
 Undefined variable: a
 Absorbed by Interactive Shell
 [start] =>
 [end]
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 2
+Module: ~/chaos/__interactive__.kaos", line 2, in <module>
 Undefined variable: a
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 2
+Module: ~/chaos/__interactive__.kaos", line 2, in <module>
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 1
+Module: ~/chaos/__interactive__.kaos", line 1, in <module>
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos
-Line: 0
+Module: ~/chaos/__interactive__.kaos", line 0, in <module>
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 [1]

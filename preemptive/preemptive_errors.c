@@ -26,19 +26,21 @@ extern int kaos_lineno;
 
 void throw_preemptive_error_var(throw_preemptive_error_args in) {
     unsigned short code = in.code ? in.code : 0;
+    _Function* function = in.function ? in.function : NULL;
     char *str1 = in.str1 ? in.str1 : "";
     char *str2 = in.str2 ? in.str2 : "";
     long long lld1 = in.lld1 ? in.lld1 : 0;
     unsigned long long llu = in.llu1 ? in.llu1 : 0;
-    throw_preemptive_error_base(code, str1, str2, lld1, llu);
+    throw_preemptive_error_base(code, function, str1, str2, lld1, llu);
 }
 
 void throw_preemptive_error_base(
     unsigned short code,
+    _Function* function,
     char *str1,
     char *str2,
     long long lld1,
     unsigned long long llu1
 ) {
-    throw_error_base(code, str1, str2, lld1, llu1, true);
+    throw_error_base(code, str1, str2, lld1, llu1, true, function);
 }

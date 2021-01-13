@@ -39,7 +39,7 @@ void preemptive_check() {
             function->decision_node == NULL &&
             !function->is_dynamic
         )
-            throw_preemptive_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function->name);
+            throw_preemptive_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function, function->name);
         function->symbol = NULL;
         preemptive_freeAllSymbols();
     }
@@ -123,9 +123,9 @@ check_function_label:
             symbol = preemptive_getSymbol(ast_node->strings[0], function);
             if (symbol->type != K_LIST) {
                 if (symbol->name != NULL) {
-                    throw_preemptive_error(E_NOT_A_LIST, symbol->name);
+                    throw_preemptive_error(E_NOT_A_LIST, function, symbol->name);
                 } else {
-                    throw_preemptive_error(E_NOT_A_LIST, symbol->secondary_name);
+                    throw_preemptive_error(E_NOT_A_LIST, function, symbol->secondary_name);
                 }
             }
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
@@ -137,9 +137,9 @@ check_function_label:
             symbol = preemptive_getSymbol(ast_node->strings[0], function);
             if (symbol->type != K_DICT) {
                 if (symbol->name != NULL) {
-                    throw_preemptive_error(E_NOT_A_DICT, symbol->name);
+                    throw_preemptive_error(E_NOT_A_DICT, function, symbol->name);
                 } else {
-                    throw_preemptive_error(E_NOT_A_DICT, symbol->secondary_name);
+                    throw_preemptive_error(E_NOT_A_DICT, function, symbol->secondary_name);
                 }
             }
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
@@ -166,10 +166,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -189,10 +189,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -212,10 +212,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -241,10 +241,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -263,10 +263,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -286,10 +286,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -309,10 +309,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -332,10 +332,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -355,10 +355,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -378,10 +378,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -401,10 +401,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -424,10 +424,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -462,10 +462,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], NULL);
+                    preemptive_callFunction(function, ast_node->strings[1], NULL);
                     break;
                 case 3:
-                    preemptive_callFunction(ast_node->strings[2], ast_node->strings[1]);
+                    preemptive_callFunction(function, ast_node->strings[2], ast_node->strings[1]);
                     break;
                 default:
                     break;
@@ -484,10 +484,10 @@ check_function_label:
             switch (ast_node->strings_size)
             {
                 case 1:
-                    preemptive_callFunction(ast_node->strings[0], NULL);
+                    preemptive_callFunction(function, ast_node->strings[0], NULL);
                     break;
                 case 2:
-                    preemptive_callFunction(ast_node->strings[1], ast_node->strings[0]);
+                    preemptive_callFunction(function, ast_node->strings[1], ast_node->strings[0]);
                     break;
                 default:
                     break;
@@ -628,40 +628,40 @@ check_function_label:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             if (ast_node->strings_size > 0)
-                preemptive_callFunction(ast_node->strings[0], _module);
+                preemptive_callFunction(function, ast_node->strings[0], _module);
             break;
         case AST_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             if (ast_node->strings_size > 0)
-                preemptive_callFunction(ast_node->strings[0], _module);
+                preemptive_callFunction(function, ast_node->strings[0], _module);
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             if (ast_node->strings_size > 0)
-                preemptive_callFunction(ast_node->strings[0], _module);
+                preemptive_callFunction(function, ast_node->strings[0], _module);
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             if (ast_node->strings_size > 0)
-                preemptive_callFunction(ast_node->strings[0], _module);
+                preemptive_callFunction(function, ast_node->strings[0], _module);
             break;
         case AST_FUNCTION_RETURN:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             if (ast_node->strings_size > 0)
-                preemptive_callFunction(ast_node->strings[0], _module);
+                preemptive_callFunction(function, ast_node->strings[0], _module);
             break;
         case AST_DECISION_MAKE_BOOLEAN:
-            preemptive_callFunction(ast_node->strings[0], function->module);
+            preemptive_callFunction(function, ast_node->strings[0], function->module);
             break;
         case AST_DECISION_MAKE_BOOLEAN_RETURN:
             preemptive_returnSymbol(ast_node->strings[0], function);
             break;
         case AST_DECISION_MAKE_DEFAULT:
-            preemptive_callFunction(ast_node->strings[0], function->module);
+            preemptive_callFunction(function, ast_node->strings[0], function->module);
             break;
         case AST_DECISION_MAKE_DEFAULT_RETURN:
             preemptive_returnSymbol(ast_node->strings[0], function);
@@ -719,27 +719,27 @@ check_break_continue_label:
     {
         case AST_DECISION_MAKE_BOOLEAN_BREAK:
             if (nested_loop_counter == 0)
-                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function->name);
+                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function, function->name);
             if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function->name);
+                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function, function->name);
             break;
         case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
             if (nested_loop_counter == 0)
-                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function->name);
+                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function, function->name);
             if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function->name);
+                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function, function->name);
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:
             if (nested_loop_counter == 0)
-                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function->name);
+                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function, function->name);
             if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function->name);
+                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function, function->name);
             break;
         case AST_DECISION_MAKE_DEFAULT_CONTINUE:
             if (nested_loop_counter == 0)
-                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function->name);
+                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function, function->name);
             if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function->name);
+                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function, function->name);
             break;
         default:
             break;
