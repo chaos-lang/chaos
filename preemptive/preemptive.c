@@ -675,7 +675,7 @@ check_function_label:
     return ast_node;
 }
 
-void check_break_continue(ASTNode* ast_node, _Function* function) {
+void check_break_continue(ASTNode* ast_node, _Function* function, int super_kaos_lineno) {
 check_break_continue_label:
     if (ast_node == NULL || ast_node->node_type == AST_END) {
         return;
@@ -693,18 +693,18 @@ check_break_continue_label:
         }
 
     if (ast_node->depend != NULL) {
-        check_break_continue(ast_node->depend, function);
+        check_break_continue(ast_node->depend, function, super_kaos_lineno);
     }
 
     if (ast_node->right != NULL) {
-        check_break_continue(ast_node->right, function);
+        check_break_continue(ast_node->right, function, super_kaos_lineno);
     }
 
     if (ast_node->left != NULL) {
-        check_break_continue(ast_node->left, function);
+        check_break_continue(ast_node->left, function, super_kaos_lineno);
     }
 
-    kaos_lineno = ast_node->lineno;
+    kaos_lineno = super_kaos_lineno;
 
     if (debug_enabled)
         printf(

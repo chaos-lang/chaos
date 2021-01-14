@@ -133,11 +133,12 @@ register_functions_label:
 
     if (debug_enabled)
         printf(
-            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            "(Register)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu, lineno: %d}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
-            ast_node->strings_size
+            ast_node->strings_size,
+            ast_node->lineno
         );
 
     switch (ast_node->node_type)
@@ -339,11 +340,12 @@ eval_node_label:
 
     if (debug_enabled)
         printf(
-            "(Execute)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            "(Execute)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu, lineno: %d}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
-            ast_node->strings_size
+            ast_node->strings_size,
+            ast_node->lineno
         );
 
     if (ast_node->node_type == AST_END) {
@@ -1525,11 +1527,12 @@ ASTNode* eval_node_after_function_call(ASTNode* end_node) {
 
     if (debug_enabled)
         printf(
-            "(Execute[AFC])\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            "(Execute[AFC])\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu, lineno: %d}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
-            ast_node->strings_size
+            ast_node->strings_size,
+            ast_node->lineno
         );
 
     callFunctionCleanUp(function_call);

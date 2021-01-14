@@ -22,7 +22,6 @@
 
 #include "parser.h"
 
-extern int reset_line_no_to;
 extern bool disable_complex_mode;
 extern char *suggestions[1000];
 extern unsigned long long suggestions_length;
@@ -150,6 +149,8 @@ int initParser(int argc, char** argv) {
             *ptr = '\0';
         }
     } else {
+        tmp_stdin = tmpfile();
+
         char buff[PATH_MAX];
         GetCurrentDir(buff, PATH_MAX);
 
@@ -239,6 +240,7 @@ void freeEverything() {
         free(program_file_dir);
     } else {
 #   if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+        fclose(tmp_stdin);
         clear_history();
         for (unsigned long long i = __KAOS_LANGUAGE_KEYWORD_COUNT__; i < suggestions_length; i++) {
             free(suggestions[i]);
@@ -275,7 +277,6 @@ void yyerror(const char* s) {
         yyrestart_interactive();
         freeModulePathStack();
         initMainContext();
-        reset_line_no_to = 0;
         yyparse();
     } else {
 #endif

@@ -38,8 +38,6 @@ extern int oerrno;
 extern void yyerror(const char* s);
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
-extern int reset_line_no_to;
-
 #include "parser.tab.h"
 
 enum Phase phase = INIT_PROGRAM;
@@ -109,7 +107,9 @@ void parseTheModuleContent(char *module_path) {
 
     if (code != NULL) {
         module_parsing++;
+        int yylineno_backup = yylineno;
         injectCode(code, INIT_PROGRAM);
+        yylineno = yylineno_backup;
         module_parsing--;
         free(code);
 
@@ -145,6 +145,9 @@ static int custom_input(char *buf, int result, int max_size) {
             errno = 0;
             clearerr(yyin);
         }
+#   ifndef CHAOS_COMPILER
+        fprintf(tmp_stdin, "%s", buf);
+#   endif
         return result;
 #   ifndef CHAOS_COMPILER
     }
@@ -166,12 +169,10 @@ static int custom_input(char *buf, int result, int max_size) {
 switch (phase)
 {
     case INIT_PREPARSE:
-        yylineno = reset_line_no_to;
         phase = PREPARSE;
         return START_PREPARSE;
         break;
     case INIT_PROGRAM:
-        yylineno = reset_line_no_to;
         phase = PROGRAM;
         return START_PROGRAM;
         break;

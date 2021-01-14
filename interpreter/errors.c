@@ -212,17 +212,26 @@ void throw_error_base(
     fprintf(stderr, "\n");
 
 #ifndef CHAOS_COMPILER
-if (!is_interactive) {
     char traceback_line[__KAOS_MSG_LINE_LENGTH__];
-    FILE* fp_module = fopen(module_path, "r");
+    FILE* fp_module = NULL;
+    if (is_interactive) {
+        fseek(tmp_stdin, 0, SEEK_SET);
+        fp_module = tmp_stdin;
+    } else {
+        fp_module = fopen(module_path, "r");
+    }
+    char *line = get_nth_line(fp_module, kaos_lineno);
     sprintf(
         traceback_line,
         "%*c%s",
         indent * 3,
         ' ',
-        trim(get_nth_line(fp_module, kaos_lineno))
+        trim(line)
     );
-    fclose(fp_module);
+    free(line);
+    if (!is_interactive) {
+        fclose(fp_module);
+    }
 
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;%sm", bg_color);
@@ -232,7 +241,6 @@ if (!is_interactive) {
     fprintf(stderr, "\033[0m");
 #   endif
     fprintf(stderr, "\n");
-}
 #endif
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)

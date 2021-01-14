@@ -123,6 +123,7 @@ int shell_readline(char *buf) {
     } else {
         line = readline(__KAOS_SHELL_INDICATOR__);
     }
+    fprintf(tmp_stdin, "%s\n", line);
 
     if (line == NULL) {
         ctrl_d_key_pressed();

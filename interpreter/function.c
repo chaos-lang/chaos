@@ -25,7 +25,6 @@
 extern int kaos_lineno;
 extern int yyparse();
 
-int reset_line_no_to = 0;
 bool decision_execution_mode = false;
 
 #ifdef CHAOS_COMPILER
@@ -291,8 +290,6 @@ FunctionCall* callFunction(char *name, char *module) {
 
     recursion_depth++;
 
-    reset_line_no_to = function->line_no;
-
     if (function->is_dynamic) {
         callFunctionFromDynamicLibrary(function);
     }
@@ -305,7 +302,6 @@ void callFunctionCleanUp(FunctionCall* function_call) {
 #else
 void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 #endif
-    reset_line_no_to = 0;
 
     bool is_loop_breaked = false;
     bool is_loop_continued = false;

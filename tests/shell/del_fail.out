@@ -1,5 +1,6 @@
 Chaos Error:
-Module: ~/chaos/__interactive__.kaos", line 2, in <module>
+File: "~/chaos/__interactive__.kaos", line 2, in <module>
+del b[1]
 Unrecognized complex data type: Number for variable: b
 Absorbed by Interactive Shell
 4

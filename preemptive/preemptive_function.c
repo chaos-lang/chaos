@@ -22,6 +22,8 @@
 
 #include "preemptive_function.h"
 
+extern int kaos_lineno;
+
 void preemptive_callFunction(_Function* _function, char *name, char *module) {
     _Function* function = preemptive_getFunction(_function, name, module);
 
@@ -63,7 +65,7 @@ void preemptive_callFunction(_Function* _function, char *name, char *module) {
     }
 
     if (function->decision_node != NULL) {
-        check_break_continue(function->decision_node, function);
+        check_break_continue(function->decision_node, function, kaos_lineno);
     }
 
     freeFunctionParametersMode();

@@ -47,6 +47,7 @@ bool fp_opened;
 
 #ifndef CHAOS_COMPILER
 bool is_interactive;
+FILE* tmp_stdin;
 #endif
 
 char *program_file_path;

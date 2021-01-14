@@ -50,11 +50,12 @@ ASTNode* addASTNodeBase(enum ASTNodeType node_type, int lineno, char *strings[],
 
     if (debug_enabled)
         printf(
-            "(Create)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            "(Create)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu, lineno: %d}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
-            ast_node->strings_size
+            ast_node->strings_size,
+            ast_node->lineno
         );
 
     return ast_node;

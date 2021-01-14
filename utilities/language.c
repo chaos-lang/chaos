@@ -32,7 +32,7 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
     char cause_msg[__KAOS_MSG_LINE_LENGTH__];
 
     sprintf(error_name_msg, "  %s:", error_name);
-    sprintf(current_module_msg, "    Module: %s", current_module);
+    sprintf(current_module_msg, "    File: %s", current_module);
     sprintf(line_no_msg, "    Line: %d", kaos_lineno);
     sprintf(cause_msg, "    Cause: %s", cause);
 

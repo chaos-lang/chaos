@@ -14,7 +14,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     sed -i "s|\s*.\[0m||g" "$DIR/$testname.out"
     sed -i "s|.\[5;42m\s*||g" "$DIR/$testname.out"
     sed -i "s|.\[0;90m.*||g" "$DIR/$testname.out"
-    sed -i "s|.*\/chaos|Module: ~/chaos|g" "$DIR/$testname.out"
+    sed -i "s|.*\/chaos|File: \"~/chaos|g" "$DIR/$testname.out"
 
     echo "Updated: ${SUB}/${testname}"
 done

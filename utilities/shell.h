@@ -31,6 +31,8 @@
 #include "helpers.h"
 #include "../interpreter/function.h"
 
+extern FILE* tmp_stdin;
+
 int up_arrow_key_pressed(int count, int key);
 int down_arrow_key_pressed(int count, int key);
 int esc_key_pressed(int count, int key);
