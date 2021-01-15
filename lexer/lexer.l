@@ -145,6 +145,7 @@ static int custom_input(char *buf, int result, int max_size) {
             errno = 0;
             clearerr(yyin);
         }
+        buf[result] = '\0';
 #   ifndef CHAOS_COMPILER
         fprintf(tmp_stdin, "%s", buf);
 #   endif
