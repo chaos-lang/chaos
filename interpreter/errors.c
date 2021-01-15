@@ -168,21 +168,9 @@ void throw_error_base(
 
     char* new_error_msg_out = str_replace(error_msg_out, "\n", "\\n");
 
-    int ws_col = 80;
-    InteractiveShellErrorAbsorber_ws_col = ws_col;
-
-
-    fflush(stdout);
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[1;%sm", bg_color);
-#endif
-    fprintf(stderr, "%-*s", ws_col, title_msg);
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0m");
-#endif
-    fprintf(stderr, "\n");
-
     char traceback_line_msg[__KAOS_MSG_LINE_LENGTH__];
+    char traceback_line[__KAOS_MSG_LINE_LENGTH__];
+
     char *function_name = NULL;
     if (is_preemptive) {
         function_name = function->name;
@@ -203,17 +191,7 @@ void throw_error_base(
         function_name != NULL ? function_name : "<module>"
     );
 
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0;%sm", bg_color);
-#endif
-    fprintf(stderr, "%-*s", ws_col, traceback_line_msg);
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0m");
-#endif
-    fprintf(stderr, "\n");
-
 #ifndef CHAOS_COMPILER
-    char traceback_line[__KAOS_MSG_LINE_LENGTH__];
     FILE* fp_module = NULL;
     if (is_interactive) {
         fseek(tmp_stdin, 0, SEEK_SET);
@@ -233,7 +211,36 @@ void throw_error_base(
     if (!is_interactive) {
         fclose(fp_module);
     }
+#endif
 
+    int cols[4];
+    cols[0] = (int) strlen(title_msg) + 1;
+    cols[1] = (int) strlen(traceback_line_msg) + 1;
+    cols[2] = (int) strlen(traceback_line) + 1;
+    cols[3] = (int) strlen(new_error_msg_out) + 1;
+    int ws_col = largest(cols, 4) + 4;
+    InteractiveShellErrorAbsorber_ws_col = ws_col;
+
+    fflush(stdout);
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    fprintf(stderr, "\033[1;%sm", bg_color);
+#endif
+    fprintf(stderr, "%-*s", ws_col, title_msg);
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    fprintf(stderr, "\033[0m");
+#endif
+    fprintf(stderr, "\n");
+
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    fprintf(stderr, "\033[0;%sm", bg_color);
+#endif
+    fprintf(stderr, "%-*s", ws_col, traceback_line_msg);
+#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    fprintf(stderr, "\033[0m");
+#endif
+    fprintf(stderr, "\n");
+
+#ifndef CHAOS_COMPILER
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;%sm", bg_color);
 #   endif
