@@ -36,6 +36,7 @@
 extern void recordToken(char *token, int length);
 extern int oerrno;
 extern void yyerror(const char* s);
+extern FILE* tmp_stdin;
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
 #include "parser.tab.h"
@@ -126,16 +127,30 @@ void parseTheModuleContent(char *module_path) {
 #define YY_SKIP_YYWRAP 1
 int yywrap() { if (phase == PREPARSE && module_parsing == 0) { switchBuffer(program_code, INIT_PROGRAM); yyparse(); } return 1; }
 
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#   undef YY_INPUT
-#   define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
+#undef YY_INPUT
+#define YY_INPUT(buf,result,max_size) result = custom_input(buf, result, max_size);
 
 static int custom_input(char *buf, int result, int max_size) {
-#   ifndef CHAOS_COMPILER
     if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         return shell_readline(buf);
-    } else {
+#else
+        int c = '*';
+		int n;
+		for ( n = 0; n < max_size && (c = getc( yyin )) != EOF && c != '\n'; ++n )
+			buf[n] = (char) c;
+		if ( c == '\n' )
+			buf[n++] = (char) c;
+		if ( c == EOF && ferror( yyin ) )
+			YY_FATAL_ERROR( "input in flex scanner failed" );
+		result = n;
+        buf[result] = '\0';
+#   ifndef CHAOS_COMPILER
+        fprintf(tmp_stdin, "%s", buf);
 #   endif
+    return result;
+#endif
+    } else {
         errno = 0;
         while ( (result = (int) fread(buf, 1, (yy_size_t) max_size, yyin)) == 0 && ferror(yyin)) {
             if( errno != EINTR) {
@@ -146,16 +161,13 @@ static int custom_input(char *buf, int result, int max_size) {
             clearerr(yyin);
         }
         buf[result] = '\0';
-#   ifndef CHAOS_COMPILER
+#ifndef CHAOS_COMPILER
         fprintf(tmp_stdin, "%s", buf);
-#   endif
+#endif
         return result;
-#   ifndef CHAOS_COMPILER
     }
-#   endif
     return -1;
 }
-#endif
 %}
 
 %option noinput

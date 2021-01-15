@@ -23,6 +23,7 @@
 #include "errors.h"
 
 extern int kaos_lineno;
+extern FILE* tmp_stdin;
 
 void throw_error_var(throw_error_args in) {
     unsigned short code = in.code ? in.code : 0;
