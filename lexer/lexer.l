@@ -132,7 +132,7 @@ int yywrap() { if (phase == PREPARSE && module_parsing == 0) { switchBuffer(prog
 
 static int custom_input(char *buf, int result, int max_size) {
     if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) {
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+#if !defined(CHAOS_COMPILER) && !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
         return shell_readline(buf);
 #else
         int c = '*';
@@ -148,7 +148,7 @@ static int custom_input(char *buf, int result, int max_size) {
 #   ifndef CHAOS_COMPILER
         fprintf(tmp_stdin, "%s", buf);
 #   endif
-    return result;
+        return result;
 #endif
     } else {
         errno = 0;
