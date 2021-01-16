@@ -1,33 +1,37 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 7, in <module>
 list_as_params('foo', 'bar')
 Illegal variable type for function parameter: param2 of function: list_as_params
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 14, in <module>
 dict_as_params('foo', 'bar')
 Illegal variable type for function parameter: param2 of function: dict_as_params
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 25, in <module>
 typed_list_as_params('foo', ['a', 2, 3])
 Illegal variable type for function parameter: param2 of function: typed_list_as_params
 Absorbed by Interactive Shell
 foo
 [1, 2, 3]
-Chaos Error:
+Chaos Error (most recent call last):
+File: "~/chaos/__interactive__.kaos", line 26, in <module>
+typed_list_as_params('foo', [1, 2, 3])
 File: "~/chaos/__interactive__.kaos", line 21, in typed_list_as_params
 param2[0] = 'a'
 Illegal element type: String for the typed list: param2
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 35, in <module>
 typed_dict_as_params('foo', {'a': 'a', 'b': 2, 'c': 3})
 Illegal variable type for function parameter: param2 of function: typed_dict_as_params
 Absorbed by Interactive Shell
 foo
 {'a': 1, 'b': 2, 'c': 3}
-Chaos Error:
+Chaos Error (most recent call last):
+File: "~/chaos/__interactive__.kaos", line 36, in <module>
+typed_dict_as_params('foo', {'a': 1, 'b': 2, 'c': 3})
 File: "~/chaos/__interactive__.kaos", line 31, in typed_dict_as_params
 param2['a'] = 'a'
 Illegal element type: String for the typed list: param2

@@ -55,7 +55,7 @@ void throw_error_base(
         sprintf(title_msg, "  Preemptive Error:");
     } else {
         sprintf(bg_color, "41");
-        sprintf(title_msg, "  %s Error:", __KAOS_LANGUAGE_NAME__);
+        sprintf(title_msg, "  %s Error (most recent call last):", __KAOS_LANGUAGE_NAME__);
     }
 
     switch (code)
@@ -164,12 +164,65 @@ void throw_error_base(
             break;
     }
 
-    sprintf(error_msg_out, "    %s", error_msg);
+    sprintf(error_msg_out, "  %s", error_msg);
 
     char* new_error_msg_out = str_replace(error_msg_out, "\n", "\\n");
 
-    char traceback_line_msg[__KAOS_MSG_LINE_LENGTH__];
-    char traceback_line[__KAOS_MSG_LINE_LENGTH__];
+    unsigned traceback_size = 0;
+    if (is_preemptive) {
+        traceback_size = 1;
+    } else {
+        traceback_size = function_call_stack.size + 1;
+    }
+    int cols[2 + traceback_size * 2];
+    char traceback_line_msg[traceback_size][__KAOS_MSG_LINE_LENGTH__];
+    char traceback_line[traceback_size][__KAOS_MSG_LINE_LENGTH__];
+
+    FILE* fp_module = NULL;
+
+    if (!is_preemptive) {
+        for (unsigned i = 0; i < function_call_stack.size; i++) {
+            sprintf(
+                traceback_line_msg[i],
+                "%*cFile: \"%s\", line %d, in %s",
+                indent * 2,
+                ' ',
+                function_call_stack.arr[i]->function->module_context,
+                function_call_stack.arr[i]->lineno,
+                i != 0 ? function_call_stack.arr[i - 1]->function->name : "<module>"
+            );
+
+#ifndef CHAOS_COMPILER
+            if (is_interactive) {
+                fseek(tmp_stdin, 0, SEEK_SET);
+                fp_module = tmp_stdin;
+            } else {
+#endif
+                fp_module = fopen(function_call_stack.arr[i]->function->module_context, "r");
+#ifndef CHAOS_COMPILER
+            }
+#endif
+            char *line = NULL;
+            if (fp_module == NULL) {
+                line = malloc(4);
+                strcpy(line, "???");
+            } else {
+                line = get_nth_line(fp_module, function_call_stack.arr[i]->lineno);
+#ifndef CHAOS_COMPILER
+                if (!is_interactive)
+#endif
+                    fclose(fp_module);
+            }
+            sprintf(
+                traceback_line[i],
+                "%*c%s",
+                indent * 3,
+                ' ',
+                trim(line)
+            );
+            free(line);
+        }
+    }
 
     char *function_name = NULL;
     if (is_preemptive) {
@@ -182,7 +235,7 @@ void throw_error_base(
     }
     char *module_path = getCurrentModule();
     sprintf(
-        traceback_line_msg,
+        traceback_line_msg[traceback_size - 1],
         "%*cFile: \"%s\", line %d, in %s",
         indent * 2,
         ' ',
@@ -192,33 +245,44 @@ void throw_error_base(
     );
 
 #ifndef CHAOS_COMPILER
-    FILE* fp_module = NULL;
     if (is_interactive) {
         fseek(tmp_stdin, 0, SEEK_SET);
         fp_module = tmp_stdin;
     } else {
+#endif
         fp_module = fopen(module_path, "r");
+#ifndef CHAOS_COMPILER
     }
-    char *line = get_nth_line(fp_module, kaos_lineno);
+#endif
+    char *line = NULL;
+    if (fp_module == NULL) {
+        line = malloc(4);
+        strcpy(line, "???");
+    } else {
+        line = get_nth_line(fp_module, kaos_lineno);
+#ifndef CHAOS_COMPILER
+    if (!is_interactive)
+#endif
+        fclose(fp_module);
+    }
     sprintf(
-        traceback_line,
+        traceback_line[traceback_size - 1],
         "%*c%s",
         indent * 3,
         ' ',
         trim(line)
     );
     free(line);
-    if (!is_interactive) {
-        fclose(fp_module);
-    }
-#endif
 
-    int cols[4];
     cols[0] = (int) strlen(title_msg) + 1;
-    cols[1] = (int) strlen(traceback_line_msg) + 1;
-    cols[2] = (int) strlen(traceback_line) + 1;
-    cols[3] = (int) strlen(new_error_msg_out) + 1;
-    int ws_col = largest(cols, 4) + 4;
+    unsigned j = 0;
+    for (unsigned i = 0; i < traceback_size; i++) {
+        cols[j + 1] = (int) strlen(traceback_line_msg[i]) + 1;
+        cols[j + 2] = (int) strlen(traceback_line[i]) + 1;
+        j++; j++;
+    }
+    cols[1 + traceback_size * 2] = (int) strlen(new_error_msg_out) + 1;
+    int ws_col = largest(cols, (int) (2 + traceback_size * 2)) + 4;
     InteractiveShellErrorAbsorber_ws_col = ws_col;
 
     fflush(stdout);
@@ -231,25 +295,25 @@ void throw_error_base(
 #endif
     fprintf(stderr, "\n");
 
+    for (unsigned i = 0; i < traceback_size; i++) {
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0;%sm", bg_color);
+        fprintf(stderr, "\033[0;%sm", bg_color);
 #endif
-    fprintf(stderr, "%-*s", ws_col, traceback_line_msg);
+        fprintf(stderr, "%-*s", ws_col, traceback_line_msg[i]);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0m");
+        fprintf(stderr, "\033[0m");
 #endif
-    fprintf(stderr, "\n");
+        fprintf(stderr, "\n");
 
-#ifndef CHAOS_COMPILER
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0;%sm", bg_color);
+        fprintf(stderr, "\033[0;%sm", bg_color);
 #   endif
-    fprintf(stderr, "%-*s", ws_col, traceback_line);
+        fprintf(stderr, "%-*s", ws_col, traceback_line[i]);
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0m");
+        fprintf(stderr, "\033[0m");
 #   endif
-    fprintf(stderr, "\n");
-#endif
+        fprintf(stderr, "\n");
+    }
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;%sm", bg_color);

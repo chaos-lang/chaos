@@ -1,10 +1,10 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 7, in <module>
 asdasd1()
 Undefined function: asdasd1
 Absorbed by Interactive Shell
 hey
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 11, in <module>
 asdasd2()
 Undefined function: asdasd2

@@ -1,9 +1,9 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 2, in <module>
 list a = [1]
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 3, in <module>
 dict a = {'a': 1}
 The variable name 'a' is already defined!
@@ -14,29 +14,29 @@ Absorbed by Interactive Shell
 5
 [start] =>
 [end]
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 8, in <module>
 print a
 Undefined variable: a
 Absorbed by Interactive Shell
 [start] =>
 [end]
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 10, in <module>
 del a
 Undefined variable: a
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 12, in <module>
 num a = 5
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 13, in <module>
 bool a = true
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 14, in <module>
 str a = 'hey'
 The variable name 'a' is already defined!

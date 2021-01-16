@@ -1,14 +1,14 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 2, in <module>
 print b
 Undefined variable: b
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 8, in <module>
 foreach n as x
 'n' is not a list!
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 11, in <module>
 foreach n as key : val
 'n' is not a dictionary!

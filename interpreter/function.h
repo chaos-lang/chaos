@@ -81,6 +81,7 @@ _Function* function_parameters_mode;
 typedef struct FunctionCall {
     struct _Function* function;
     struct ASTNode* trigger;
+    int lineno;
 #ifndef CHAOS_COMPILER
     bool dont_pop_module_stack;
 #endif

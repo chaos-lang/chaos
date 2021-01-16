@@ -418,6 +418,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -448,6 +449,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -474,6 +476,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -510,6 +513,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -534,6 +538,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -558,6 +563,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -582,6 +588,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -606,6 +613,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -630,6 +638,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -654,6 +663,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -678,6 +688,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -702,6 +713,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -746,6 +758,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -796,6 +809,7 @@ eval_node_label:
                 default:
                     break;
             }
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -1380,6 +1394,7 @@ eval_node_label:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             function_call = callFunction(ast_node->strings[0], _module);
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -1389,6 +1404,7 @@ eval_node_label:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             function_call = callFunction(ast_node->strings[0], _module);
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -1398,6 +1414,7 @@ eval_node_label:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             function_call = callFunction(ast_node->strings[0], _module);
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -1407,6 +1424,7 @@ eval_node_label:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             function_call = callFunction(ast_node->strings[0], _module);
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -1416,6 +1434,7 @@ eval_node_label:
             if (ast_node->strings_size > 1)
                 _module = ast_node->strings[1];
             function_call = callFunction(ast_node->strings[0], _module);
+            function_call->lineno = kaos_lineno;
             function_call->trigger = ast_node;
             ast_node = function_call->function->node->child;
             module = function_call->function->module_context;
@@ -1428,6 +1447,7 @@ eval_node_label:
             if (ast_node->right->value.b) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
                 function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                function_call->lineno = kaos_lineno;
                 function_call->trigger = ast_node;
                 ast_node = function_call->function->node->child;
                 module = function_call->function->module_context;
@@ -1457,6 +1477,7 @@ eval_node_label:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
                 function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                function_call->lineno = kaos_lineno;
                 function_call->trigger = ast_node;
                 ast_node = function_call->function->node->child;
                 module = function_call->function->module_context;

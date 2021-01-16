@@ -593,6 +593,9 @@ transpile_decisions_label:
     }
 
     kaos_lineno = ast_node->lineno;
+    if (ast_node->node_type != AST_FUNCTION_STEP) {
+        fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
+    }
 
     if (debug_enabled)
         printf(
@@ -3489,6 +3492,13 @@ bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
 }
 
 void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned short indent) {
+    fprintf(
+        c_fp,
+        "%*cfunction_call_%llu->lineno = kaos_lineno;\n",
+        indent,
+        ' ',
+        compiler_function_counter
+    );
     char *module_context = compiler_getFunctionModuleContext(name, module);
     if (!isFunctionFromDynamicLibrary(name, module))
         fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module_context, name);
@@ -3508,6 +3518,13 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
 }
 
 void transpile_function_call_decision(FILE *c_fp, char *module_context, char* module, char *name, unsigned short indent) {
+    fprintf(
+        c_fp,
+        "%*cfunction_call_%llu->lineno = kaos_lineno;\n",
+        indent,
+        ' ',
+        compiler_function_counter
+    );
     if (!isFunctionFromDynamicLibraryByModuleContext(name, module_context))
         fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module, name);
     _Function* function = getFunctionByModuleContext(name, module_context);

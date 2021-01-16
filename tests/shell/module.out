@@ -1,4 +1,4 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 4, in <module>
 asdasd1()
 Undefined function: asdasd1
@@ -7,7 +7,7 @@ module1
 f2
 f3
 f5
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 11, in <module>
 asdasd2()
 Undefined function: asdasd2

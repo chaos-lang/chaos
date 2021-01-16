@@ -1,4 +1,4 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 3, in <module>
 a[f] = a
 Unexpected accessor data type: List for variable: a
@@ -15,7 +15,7 @@ Absorbed by Interactive Shell
 	{id: 6, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
 	{id: 7, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
 [end]
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 8, in <module>
 k[0] = 1
 Undefined variable: k

@@ -1,4 +1,4 @@
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 2, in <module>
 del b[1]
 Unrecognized complex data type: Number for variable: b

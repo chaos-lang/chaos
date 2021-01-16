@@ -1,12 +1,12 @@
 1
 2
 3
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 5, in <module>
 a[3]
 Index out of range: 3 for list: a
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 6, in <module>
 a[123400]
 Index out of range: 123400 for list: a
@@ -14,12 +14,12 @@ Absorbed by Interactive Shell
 3
 2
 1
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 10, in <module>
 a[-4]
 Index out of range: -4 for list: a
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 11, in <module>
 a[-123400]
 Index out of range: -123400 for list: a
@@ -28,12 +28,12 @@ m
 i
 k
 e
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 18, in <module>
 b[4]
 Index out of range: 4 for string: b
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 19, in <module>
 b[123400]
 Index out of range: 123400 for string: b
@@ -42,12 +42,12 @@ e
 k
 i
 m
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 24, in <module>
 b[-5]
 Index out of range: -5 for string: b
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 25, in <module>
 b[-123400]
 Index out of range: -123400 for string: b
@@ -69,12 +69,12 @@ Absorbed by Interactive Shell
 	{id: 32, name: (null), 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
 	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
 [end]
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 32, in <module>
 num f = 5
 The variable name 'f' is already defined!
 Absorbed by Interactive Shell
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 33, in <module>
 f[0] = true
 Index out of range: 0 for list: f
@@ -97,7 +97,7 @@ Absorbed by Interactive Shell
 	{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
 [end]
 [1, 2]
-Chaos Error:
+Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 41, in <module>
 a[1] = a[2]
 Index out of range: 2 for list: a
