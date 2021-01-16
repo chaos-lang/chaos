@@ -1,0 +1,11 @@
+Chaos Error (most recent call last):
+File: "~/chaos/__interactive__.kaos", line 23, in <module>
+print f5(3)
+File: "~/chaos/__interactive__.kaos", line 20, in f5
+y == 2 : f6(y)
+File: "~/chaos/__interactive__.kaos", line 12, in f6
+y == 1 : f7()
+File: "~/chaos/tests/shell/modules/lib.kaos", line 4, in f7
+print a[4]
+Index out of range: 4 for list: a
+Absorbed by Interactive Shell

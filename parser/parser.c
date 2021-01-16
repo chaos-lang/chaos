@@ -311,7 +311,21 @@ void absorbError() {
     fflush(stderr);
 
     if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
-    if (function_call_stack.size > 0) longjmp(InteractiveShellFunctionErrorAbsorber, 1);
+    if (function_call_stack.size > 0) {
+        FunctionCall* function_call = function_call_stack.arr[function_call_stack.size - 1];
+        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
+            removeSymbol(decision_symbol_chain);
+            decision_symbol_chain = NULL;
+        }
+        callFunctionCleanUpSymbols(function_call);
+        if (function_call->dont_pop_module_stack) {
+            recursion_depth--;
+            popExecutedFunctionStack();
+        } else {
+            callFunctionCleanUpCommon();
+        }
+        free(function_call);
+    }
 
     if (main_interpreted_module != NULL) {
         free(main_interpreted_module);

@@ -269,9 +269,6 @@ decision_parameters: T_VAR                                                      
 parser:
     | parser line                                                   {
 #ifndef CHAOS_COMPILER
-        if (setjmp(InteractiveShellFunctionErrorAbsorber)) {
-            eval_node_after_function_call(function_call_stack.arr[function_call_stack.size - 1]->trigger);
-        }
         if (is_interactive && loops_inside_function_counter == 0)
             interpret(main_interpreted_module, INIT_PREPARSE, true, global_unsafe);
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)

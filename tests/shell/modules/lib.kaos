@@ -1,0 +1,7 @@
+num def f7()
+    num z = 42
+    list a = [1, 2, 3]
+    print a[4]
+    // print not_existing_var
+    return z
+end

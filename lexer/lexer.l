@@ -109,6 +109,7 @@ void parseTheModuleContent(char *module_path) {
     if (code != NULL) {
         module_parsing++;
         int yylineno_backup = yylineno;
+        yylineno = 1;
         injectCode(code, INIT_PROGRAM);
         yylineno = yylineno_backup;
         module_parsing--;

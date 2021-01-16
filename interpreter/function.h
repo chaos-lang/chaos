@@ -108,8 +108,6 @@ string_array function_names_buffer;
 
 unsigned short recursion_depth;
 
-jmp_buf InteractiveShellFunctionErrorAbsorber;
-
 jmp_buf LoopBreakDecision;
 jmp_buf LoopContinueDecision;
 

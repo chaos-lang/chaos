@@ -187,18 +187,32 @@ void throw_error_base(
                 "%*cFile: \"%s\", line %d, in %s",
                 indent * 2,
                 ' ',
-                function_call_stack.arr[i]->function->module_context,
+                i != 0 ?
+                    function_call_stack.arr[i - 1]->function->module_context
+                    :
+                    function_call_stack.arr[i]->function->module_context,
                 function_call_stack.arr[i]->lineno,
-                i != 0 ? function_call_stack.arr[i - 1]->function->name : "<module>"
+                i != 0 ?
+                    function_call_stack.arr[i - 1]->function->name
+                    :
+                    "<module>"
             );
 
 #ifndef CHAOS_COMPILER
-            if (is_interactive) {
+            if (is_interactive &&
+                strcmp(
+                    module_path_stack.arr[0],
+                    i != 0 ?
+                        function_call_stack.arr[i - 1]->function->module_context
+                        :
+                        function_call_stack.arr[i]->function->module_context
+                ) == 0
+            ) {
                 fseek(tmp_stdin, 0, SEEK_SET);
                 fp_module = tmp_stdin;
             } else {
 #endif
-                fp_module = fopen(function_call_stack.arr[i]->function->module_context, "r");
+                fp_module = fopen(i != 0 ? function_call_stack.arr[i - 1]->function->module_context : function_call_stack.arr[i]->function->module_context, "r");
 #ifndef CHAOS_COMPILER
             }
 #endif
@@ -212,6 +226,10 @@ void throw_error_base(
                 if (!is_interactive)
 #endif
                     fclose(fp_module);
+                if (line == NULL) {
+                    line = malloc(4);
+                    strcpy(line, "???");
+                }
             }
             sprintf(
                 traceback_line[i],
@@ -245,7 +263,7 @@ void throw_error_base(
     );
 
 #ifndef CHAOS_COMPILER
-    if (is_interactive) {
+    if (is_interactive && module_path_stack.size < 2) {
         fseek(tmp_stdin, 0, SEEK_SET);
         fp_module = tmp_stdin;
     } else {
@@ -261,9 +279,13 @@ void throw_error_base(
     } else {
         line = get_nth_line(fp_module, kaos_lineno);
 #ifndef CHAOS_COMPILER
-    if (!is_interactive)
+        if (!is_interactive)
 #endif
-        fclose(fp_module);
+            fclose(fp_module);
+        if (line == NULL) {
+            line = malloc(4);
+            strcpy(line, "???");
+        }
     }
     sprintf(
         traceback_line[traceback_size - 1],
