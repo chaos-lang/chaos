@@ -23,26 +23,57 @@
 #include "language.h"
 #include "helpers.h"
 
-extern int kaos_lineno;
+extern int yylineno;
 
 void yyerror_msg(char* error_name, char* current_module, char* cause) {
     char error_name_msg[__KAOS_MSG_LINE_LENGTH__];
-    char current_module_msg[__KAOS_MSG_LINE_LENGTH__];
-    char line_no_msg[__KAOS_MSG_LINE_LENGTH__];
-    char cause_msg[__KAOS_MSG_LINE_LENGTH__];
+    char info[__KAOS_MSG_LINE_LENGTH__];
+    char line_msg[__KAOS_MSG_LINE_LENGTH__];
+    int indent = 2;
 
-    sprintf(error_name_msg, "  %s:", error_name);
-    sprintf(current_module_msg, "    File: %s", current_module);
-    sprintf(line_no_msg, "    Line: %d", kaos_lineno);
-    sprintf(cause_msg, "    Cause: %s", cause);
+    sprintf(error_name_msg, "%*c%s:", indent, ' ', error_name);
+    sprintf(info, "%*cFile: \"%s\", line %d, cause: %s", indent * 2, ' ', current_module, yylineno, cause);
+    char* info_msg = str_replace(info, "\n", "\\n");
 
-    char* new_cause_msg = str_replace(cause_msg, "\n", "\\n");
+    FILE* fp_module = NULL;
+#ifndef CHAOS_COMPILER
+    if (is_interactive) {
+        fseek(tmp_stdin, 0, SEEK_SET);
+        fp_module = tmp_stdin;
+    } else {
+#endif
+        fp_module = fopen(current_module, "r");
+#ifndef CHAOS_COMPILER
+    }
+#endif
+    char *line = NULL;
+    if (fp_module == NULL) {
+        line = malloc(4);
+        strcpy(line, "???");
+    } else {
+        line = get_nth_line(fp_module, yylineno);
+#ifndef CHAOS_COMPILER
+        if (fp_module != tmp_stdin)
+#endif
+            fclose(fp_module);
+        if (line == NULL) {
+            line = malloc(4);
+            strcpy(line, "???");
+        }
+    }
+    sprintf(
+        line_msg,
+        "%*c%s",
+        indent * 3,
+        ' ',
+        trim(line)
+    );
+    free(line);
 
-    int cols[4];
+    int cols[3];
     cols[0] = (int) strlen(error_name_msg) + 1;
-    cols[1] = (int) strlen(current_module_msg) + 1;
-    cols[2] = (int) strlen(line_no_msg) + 1;
-    cols[3] = (int) strlen(new_cause_msg) + 1;
+    cols[1] = (int) strlen(info_msg) + 1;
+    cols[2] = (int) strlen(line_msg) + 1;
     int ws_col = largest(cols, 3) + 4;
 
     fflush(stdout);
@@ -58,29 +89,20 @@ void yyerror_msg(char* error_name, char* current_module, char* cause) {
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;46m");
 #endif
-    fprintf(stderr, "%-*s", ws_col, current_module_msg);
+    fprintf(stderr, "%-*s", ws_col, info_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0m");
 #endif
     fprintf(stderr, "\n");
+    free(info_msg);
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0;46m");
 #endif
-    fprintf(stderr, "%-*s", ws_col, line_no_msg);
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0m");
-#endif
-    fprintf(stderr, "\n");
-
-#if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0;46m");
-#endif
-    fprintf(stderr, "%-*s", ws_col, new_cause_msg);
+    fprintf(stderr, "%-*s", ws_col, line_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0m");
 #endif
     fprintf(stderr, "\n");
     fflush(stderr);
-    free(new_cause_msg);
 }

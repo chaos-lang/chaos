@@ -345,8 +345,8 @@ void throw_error_base(
     fprintf(stderr, "\033[0m");
 #endif
     fprintf(stderr, "\n");
-    fflush(stderr);
     free(new_error_msg_out);
+    fflush(stderr);
 
 #ifndef CHAOS_COMPILER
     if (is_preemptive && is_interactive)
