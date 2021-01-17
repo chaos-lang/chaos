@@ -223,7 +223,7 @@ void throw_error_base(
             } else {
                 line = get_nth_line(fp_module, function_call_stack.arr[i]->lineno);
 #ifndef CHAOS_COMPILER
-                if (!is_interactive)
+                if (fp_module != tmp_stdin)
 #endif
                     fclose(fp_module);
                 if (line == NULL) {
@@ -279,7 +279,7 @@ void throw_error_base(
     } else {
         line = get_nth_line(fp_module, kaos_lineno);
 #ifndef CHAOS_COMPILER
-        if (!is_interactive)
+        if (fp_module != tmp_stdin)
 #endif
             fclose(fp_module);
         if (line == NULL) {
