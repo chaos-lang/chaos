@@ -24,6 +24,7 @@
 #include "helpers.h"
 
 extern int yylineno;
+extern FILE* tmp_stdin;
 
 void yyerror_msg(char* error_name, char* current_module, char* cause) {
     char error_name_msg[__KAOS_MSG_LINE_LENGTH__];
