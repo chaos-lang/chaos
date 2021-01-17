@@ -52,10 +52,10 @@ void throw_error_base(
 
     if (is_preemptive) {
         sprintf(bg_color, "43");
-        sprintf(title_msg, "  Preemptive Error:");
+        sprintf(title_msg, "%*cPreemptive Error:", indent, ' ');
     } else {
         sprintf(bg_color, "41");
-        sprintf(title_msg, "  %s Error (most recent call last):", __KAOS_LANGUAGE_NAME__);
+        sprintf(title_msg, "%*c%s Error (most recent call last):", indent, ' ', __KAOS_LANGUAGE_NAME__);
     }
 
     switch (code)
@@ -338,7 +338,7 @@ void throw_error_base(
     }
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    fprintf(stderr, "\033[0;%sm", bg_color);
+    fprintf(stderr, "\033[1;%sm", bg_color);
 #endif
     fprintf(stderr, "%-*s", ws_col, new_error_msg_out);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)

@@ -303,7 +303,7 @@ void absorbError() {
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[1;44m");
 #   endif
-    fprintf(stderr, "%-*s", InteractiveShellErrorAbsorber_ws_col, "    Absorbed by Interactive Shell");
+    fprintf(stderr, "%-*s", InteractiveShellErrorAbsorber_ws_col, "  Absorbed by Interactive Shell");
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
     fprintf(stderr, "\033[0m");
 #   endif

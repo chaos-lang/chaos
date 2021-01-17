@@ -1,14 +1,14 @@
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 2, in f4
 [0;43m      print b
-[0;43m  Undefined variable: b
+[1;43m  Undefined variable: b
 Absorbed by Interactive Shell
 [start] =>
 [end]
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 27, in f4
 [0;43m      n1 > 10 : f2(),
-[0;43m  Undefined variable: n1
+[1;43m  Undefined variable: n1
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -18,7 +18,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 39, in f4
 [0;43m      z > 10  : f2(n2),
-[0;43m  Undefined variable: n2
+[1;43m  Undefined variable: n2
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -28,7 +28,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 47, in a
 [0;43m      num b = f5()
-[0;43m  Undefined function: f5
+[1;43m  Undefined function: f5
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -38,7 +38,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 58, in f4
 [0;43m      z > 10  : f6(),
-[0;43m  Undefined function: f6
+[1;43m  Undefined function: f6
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -48,7 +48,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 69, in f1
 [0;43m      z == 8  : f1(z),
-[0;43m  Incorrect argument count for function: f1
+[1;43m  Incorrect argument count for function: f1
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -58,7 +58,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 79, in f1
 [0;43m      num x = f1(c)
-[0;43m  Incorrect argument count for function: f1
+[1;43m  Incorrect argument count for function: f1
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -74,7 +74,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 98, in f8
 [0;43m      f8(a, b)
-[0;43m  Illegal variable type for function parameter: b of function: f8
+[1;43m  Illegal variable type for function parameter: b of function: f8
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -85,7 +85,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 104, in f8
 [0;43m      f8(3, 5)
-[0;43m  Illegal variable type for function parameter: b of function: f8
+[1;43m  Illegal variable type for function parameter: b of function: f8
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -96,7 +96,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 112, in f8
 [0;43m      f8(a, b)
-[0;43m  Illegal variable type for function parameter: a of function: f8
+[1;43m  Illegal variable type for function parameter: a of function: f8
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -107,7 +107,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 118, in f8
 [0;43m      f8([1, 2, 3], 'hello')
-[0;43m  Illegal variable type for function parameter: a of function: f8
+[1;43m  Illegal variable type for function parameter: a of function: f8
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -118,7 +118,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 127, in f8
 [0;43m      f8(a, b, c)
-[0;43m  Incorrect argument count for function: f8
+[1;43m  Incorrect argument count for function: f8
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -129,7 +129,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 133, in f8
 [0;43m      f8(3, 'hello', true)
-[0;43m  Incorrect argument count for function: f8
+[1;43m  Incorrect argument count for function: f8
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -140,7 +140,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 141, in f4
 [0;43m      return a
-[0;43m  Illegal variable type: Dictionary for function: f4
+[1;43m  Illegal variable type: Dictionary for function: f4
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -151,7 +151,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 148, in f4
 [0;43m      return b
-[0;43m  Undefined variable: b
+[1;43m  Undefined variable: b
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -162,7 +162,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 158, in f4
 [0;43m      x == 5  : return a,
-[0;43m  Illegal variable type: Dictionary for function: f4
+[1;43m  Illegal variable type: Dictionary for function: f4
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -173,7 +173,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 168, in f4
 [0;43m      x == 5  : return b,
-[0;43m  Undefined variable: b
+[1;43m  Undefined variable: b
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -184,7 +184,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 176, in f4
 [0;43m      end
-[0;43m  The function 'f4' did not return anything!
+[1;43m  The function 'f4' did not return anything!
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -195,7 +195,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 183, in f4
 [0;43m      print b
-[0;43m  Undefined variable: b
+[1;43m  Undefined variable: b
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -206,7 +206,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 193, in f4
 [0;43m      n times do
-[0;43m  Undefined variable: n
+[1;43m  Undefined variable: n
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -217,7 +217,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 201, in f4
 [0;43m      foreach a as el
-[0;43m  Undefined variable: a
+[1;43m  Undefined variable: a
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -235,7 +235,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 221, in f4
 [0;43m      print b
-[0;43m  Undefined variable: b
+[1;43m  Undefined variable: b
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -254,7 +254,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 242, in f4
 [0;43m      print b
-[0;43m  Undefined variable: b
+[1;43m  Undefined variable: b
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -274,7 +274,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 264, in f4
 [0;43m      print f11(el, 1)
-[0;43m  Undefined function: f11
+[1;43m  Undefined function: f11
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -287,7 +287,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 271, in f4
 [0;43m      foreach a as el
-[0;43m  'a' is not a list!
+[1;43m  'a' is not a list!
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -300,7 +300,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 280, in f4
 [0;43m      foreach a as key : val
-[0;43m  'a' is not a dictionary!
+[1;43m  'a' is not a dictionary!
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -313,7 +313,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 290, in f9
 [0;43m      num r = f9(x, y)
-[0;43m  Call to a function with `break` from outside a loop: f9
+[1;43m  Call to a function with `break` from outside a loop: f9
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -326,7 +326,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 299, in f9
 [0;43m      print f9(el, 1)
-[0;43m  Call to a function with `break` from a multiline loop: f9
+[1;43m  Call to a function with `break` from a multiline loop: f9
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
