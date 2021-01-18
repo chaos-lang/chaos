@@ -20,6 +20,6 @@ print b
 Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 12, in <module>
 b()
-Undefined function: b
+Undefined function: b in <module>
 Absorbed by Interactive Shell
 print b

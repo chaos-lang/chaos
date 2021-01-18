@@ -398,7 +398,11 @@ _Function* getFunction(char *name, char *module) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
-        throw_error(E_UNDEFINED_FUNCTION, name);
+        throw_error(
+            E_UNDEFINED_FUNCTION,
+            name,
+            (module == NULL || strcmp(module, "") == 0) ? "<module>" : module
+        );
     }
     return NULL;
 }
@@ -418,7 +422,11 @@ _Function* getFunctionByModuleContext(char *name, char *module_context) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
-        throw_error(E_UNDEFINED_FUNCTION, name);
+        throw_error(
+            E_UNDEFINED_FUNCTION,
+            name,
+            (module_context == NULL || strcmp(module_context, "") == 0) ? "<module>" : module_context
+        );
     }
     return NULL;
 }

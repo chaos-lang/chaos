@@ -903,6 +903,8 @@ decision:                                                                       
 ;
 decision: boolean_expression T_COLON T_VAR T_LEFT decision_call_parameters_start                                        { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeFull(AST_DECISION_MAKE_BOOLEAN, yylineno, strings, 1, $5, $1);                              $$ = ast_node; }
 ;
+decision: boolean_expression T_COLON T_VAR T_DOT T_VAR T_LEFT decision_call_parameters_start                            { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeFull(AST_DECISION_MAKE_BOOLEAN, yylineno, strings, 2, $7, $1);                              $$ = ast_node; }
+;
 decision: boolean_expression T_COLON T_BREAK                                                                            {                                     ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_BREAK, yylineno, NULL, 0, $1);                             $$ = ast_node; }
 ;
 decision: boolean_expression T_COLON T_CONTINUE                                                                         {                                     ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_CONTINUE, yylineno, NULL, 0, $1);                          $$ = ast_node; }
@@ -910,6 +912,8 @@ decision: boolean_expression T_COLON T_CONTINUE                                 
 decision: boolean_expression T_COLON T_RETURN T_VAR                                                                     { char *strings[] = {$4};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_BOOLEAN_RETURN, yylineno, strings, 1, $1);                         $$ = ast_node; }
 ;
 decision: T_DEFAULT T_COLON T_VAR T_LEFT decision_call_parameters_start                                                 { char *strings[] = {$3};             ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_DEFAULT, yylineno, strings, 1, $5);                                $$ = ast_node; }
+;
+decision: T_DEFAULT T_COLON T_VAR T_DOT T_VAR T_LEFT decision_call_parameters_start                                     { char *strings[] = {$3, $5};         ASTNode* ast_node = addASTNodeAssign(AST_DECISION_MAKE_DEFAULT, yylineno, strings, 2, $7);                                $$ = ast_node; }
 ;
 decision: T_DEFAULT T_COLON T_BREAK                                                                                     {                                     ASTNode* ast_node = addASTNode(AST_DECISION_MAKE_DEFAULT_BREAK, yylineno, NULL, 0);                                       $$ = ast_node; }
 ;

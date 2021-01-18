@@ -655,13 +655,33 @@ check_function_label:
                 preemptive_callFunction(function, ast_node->strings[0], _module);
             break;
         case AST_DECISION_MAKE_BOOLEAN:
-            preemptive_callFunction(function, ast_node->strings[0], function->module);
+            switch (ast_node->strings_size)
+            {
+                case 1:
+                    preemptive_callFunction(function, ast_node->strings[0], function->module);
+                    break;
+                case 2:
+                    preemptive_callFunction(function, ast_node->strings[1], ast_node->strings[0]);
+                    break;
+                default:
+                    break;
+            }
             break;
         case AST_DECISION_MAKE_BOOLEAN_RETURN:
             preemptive_returnSymbol(ast_node->strings[0], function);
             break;
         case AST_DECISION_MAKE_DEFAULT:
-            preemptive_callFunction(function, ast_node->strings[0], function->module);
+            switch (ast_node->strings_size)
+            {
+                case 1:
+                    preemptive_callFunction(function, ast_node->strings[0], function->module);
+                    break;
+                case 2:
+                    preemptive_callFunction(function, ast_node->strings[1], ast_node->strings[0]);
+                    break;
+                default:
+                    break;
+            }
             break;
         case AST_DECISION_MAKE_DEFAULT_RETURN:
             preemptive_returnSymbol(ast_node->strings[0], function);

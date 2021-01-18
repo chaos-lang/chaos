@@ -86,7 +86,12 @@ _Function* preemptive_getFunction(_Function* _function, char *name, char *module
         }
         preemptive_function_cursor = preemptive_function_cursor->next;
     }
-    throw_preemptive_error(E_UNDEFINED_FUNCTION, _function, name);
+    throw_preemptive_error(
+        E_UNDEFINED_FUNCTION,
+        _function,
+        name,
+        (module == NULL || strcmp(module, "") == 0) ? "<module>" : module
+    );
     return NULL;
 }
 

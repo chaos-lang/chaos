@@ -28,7 +28,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 47, in a
 [0;43m      num b = f5()
-[1;43m  Undefined function: f5
+[1;43m  Undefined function: f5 in <module>
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -38,7 +38,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 58, in f4
 [0;43m      z > 10  : f6(),
-[1;43m  Undefined function: f6
+[1;43m  Undefined function: f6 in <module>
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>
@@ -274,7 +274,7 @@ File: "~/chaos/__interactive__.kaos, module: } =>
 [1;43m  Preemptive Error:
 File: "~/chaos/__interactive__.kaos", line 264, in f4
 [0;43m      print f11(el, 1)
-[1;43m  Undefined function: f11
+[1;43m  Undefined function: f11 in <module>
 Absorbed by Interactive Shell
 [start] =>
 File: "~/chaos/__interactive__.kaos, module: } =>

@@ -97,7 +97,7 @@ void throw_error_base(
             sprintf(error_msg, "Illegal variable type: %s for function: %s", str1, str2);
             break;
         case E_UNDEFINED_FUNCTION:
-            sprintf(error_msg, "Undefined function: %s", str1);
+            sprintf(error_msg, "Undefined function: %s in %s", str1, str2);
             break;
         case E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED:
             sprintf(error_msg, "Memory allocation for the function is failed!");

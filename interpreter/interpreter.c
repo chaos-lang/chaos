@@ -1446,7 +1446,17 @@ eval_node_label:
         case AST_DECISION_MAKE_BOOLEAN:
             if (ast_node->right->value.b) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-                function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                switch (ast_node->strings_size)
+                {
+                    case 1:
+                        function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                        break;
+                    case 2:
+                        function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
+                        break;
+                    default:
+                        break;
+                }
                 function_call->lineno = kaos_lineno;
                 function_call->trigger = ast_node;
                 ast_node = function_call->function->node->child;
@@ -1476,7 +1486,17 @@ eval_node_label:
         case AST_DECISION_MAKE_DEFAULT:
             if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
                 callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-                function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                switch (ast_node->strings_size)
+                {
+                    case 1:
+                        function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                        break;
+                    case 2:
+                        function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
+                        break;
+                    default:
+                        break;
+                }
                 function_call->lineno = kaos_lineno;
                 function_call->trigger = ast_node;
                 ast_node = function_call->function->node->child;
