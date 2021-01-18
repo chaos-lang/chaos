@@ -37,6 +37,7 @@ extern void recordToken(char *token, int length);
 extern int oerrno;
 extern void yyerror(const char* s);
 extern FILE* tmp_stdin;
+extern bool global_unsafe;
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
 #include "parser.tab.h"
@@ -62,7 +63,7 @@ void injectCode(char *code, enum Phase phase_arg) {
     char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
 #ifndef CHAOS_COMPILER
-    interpret(interpreted_module, phase_arg, false, false);
+    interpret(interpreted_module, phase_arg, false, global_unsafe);
 #else
     interpret(interpreted_module, phase_arg);
 #endif
