@@ -243,144 +243,18 @@ int largest(int arr[], int n) {
 
 char *relative_path_to_absolute(char *path)
 {
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-    size_t i;
-    size_t j;
-    size_t k;
-
-    //Move to the beginning of the string
-    i = 0;
-    k = 0;
-
-    //Replace backslashes with forward slashes
-    while (path[i] != '\0') {
-        //Forward slash or backslash separator found?
-        if (path[i] == '/' || path[i] == '\\') {
-            path[k++] = '/';
-            while (path[i] == '/' || path[i] == '\\')
-                i++;
-        } else {
-            path[k++] = path[i++];
-        }
-    }
-
-    //Properly terminate the string with a NULL character
-    path[k] = '\0';
-
-    //Move back to the beginning of the string
-    i = 0;
-    j = 0;
-    k = 0;
-
-    //Parse the entire string
-    do {
-        //Forward slash separator found?
-        if (path[i] == '/' || path[i] == '\0') {
-            //"." element found?
-            if ((i - j) == 1 && !strncmp (path + j, ".", 1)) {
-                //Check whether the pathname is empty?
-                if (k == 0) {
-                    if (path[i] == '\0') {
-                        path[k++] = '.';
-                    } else if (path[i] == '/' && path[i + 1] == '\0') {
-                        path[k++] = '.';
-                        path[k++] = '/';
-                    }
-                } else if (k > 1) {
-                    //Remove the final slash if necessary
-                    if (path[i] == '\0')
-                        k--;
-                }
-            }
-            //".." element found?
-            else if ((i - j) == 2 && !strncmp (path + j, "..", 2)) {
-                //Check whether the pathname is empty?
-                if (k == 0) {
-                    path[k++] = '.';
-                    path[k++] = '.';
-
-                    //Append a slash if necessary
-                    if (path[i] == '/')
-                        path[k++] = '/';
-                } else if (k > 1) {
-                    //Search the path for the previous slash
-                    for (j = 1; j < k; j++) {
-                        if (path[k - j - 1] == '/')
-                            break;
-                    }
-
-                    //Slash separator found?
-                    if (j < k) {
-                        if (!strncmp (path + k - j, "..", 2)) {
-                            path[k++] = '.';
-                            path[k++] = '.';
-                        } else {
-                            k = k - j - 1;
-                        }
-
-                        //Append a slash if necessary
-                        if (k == 0 && path[0] == '/')
-                            path[k++] = '/';
-                        else if (path[i] == '/')
-                            path[k++] = '/';
-                    }
-                    //No slash separator found?
-                    else {
-                        if (k == 3 && !strncmp (path, "..", 2)) {
-                            path[k++] = '.';
-                            path[k++] = '.';
-
-                            //Append a slash if necessary
-                            if (path[i] == '/')
-                                path[k++] = '/';
-                        } else if (path[i] == '\0') {
-                            k = 0;
-                            path[k++] = '.';
-                        } else if (path[i] == '/' && path[i + 1] == '\0') {
-                            k = 0;
-                            path[k++] = '.';
-                            path[k++] = '/';
-                        } else {
-                            k = 0;
-                        }
-                    }
-                }
-            } else {
-                //Copy directory name
-                memmove (path + k, path + j, i - j);
-                //Advance write pointer
-                k += i - j;
-
-                //Append a slash if necessary
-                if (path[i] == '/')
-                    path[k++] = '/';
-            }
-
-            //Move to the next token
-            while (path[i] == '/')
-                i++;
-            j = i;
-        }
-        else if (k == 0) {
-            while (path[i] == '.' || path[i] == '/') {
-                j++,i++;
-            }
-        }
-    } while (path[i++] != '\0');
-
-    //Properly terminate the string with a NULL character
-    path[k] = '\0';
-    return path;
-#else
     char actual_path[PATH_MAX];
     char *absolute_path;
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
+    realpath(path, actual_path);
+#else
     char *filename;
     GetFullPathName(path, PATH_MAX, actual_path, &filename);
+#endif
     free(path);
     absolute_path = (char *) malloc(strlen(actual_path) + 1);
     strcpy(absolute_path, actual_path);
     return absolute_path;
-#endif
 }
 
 char *remove_ext(char* myStr, char extSep, char pathSep) {
