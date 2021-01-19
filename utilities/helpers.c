@@ -245,12 +245,7 @@ char *relative_path_to_absolute(char *path)
 {
     char actual_path[PATH_MAX] = {0};
     char *absolute_path;
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-    realpath(path, actual_path);
-#else
-    char *filename;
-    GetFullPathName(path, PATH_MAX, actual_path, &filename);
-#endif
+    cwk_path_normalize(path, actual_path, sizeof(actual_path));
     free(path);
     absolute_path = (char *) malloc(strlen(actual_path) + 1);
     strcpy(absolute_path, actual_path);

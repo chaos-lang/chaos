@@ -87,4 +87,6 @@ char *trim(char *s);
 #   define strdup _strdup
 #endif
 
+#include "cwalk.h"
+
 #endif
