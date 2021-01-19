@@ -36,7 +36,7 @@
     </a>
 </p>
 <p align="center">
-    Chaos is a statically-typed, test-oriented procedural programming language that achieves zero cyclomatic complexity.
+    Chaos is a strongly typed, dynamic yet compilable, test-oriented procedural programming language that achieves zero cyclomatic complexity.
 </p>
 
 ### Influenced by
@@ -48,8 +48,7 @@
  - PHP's dedication to server-side
  - Haskell's pure functions
  - C's speed and interoperability
- - NumPy's matrix arithmetics
- - Perl's regex engine
+ - Go's standalone executables
 
 ### Featured Aspects
 
@@ -65,9 +64,10 @@
    ```
  - A single unit test is enough to have 100% coverage on functions, always.
  - Warns you about untested functions in the executed program.
- - Chaos language is not object-oriented. So everything is done by functions and data types.
+ - Detects possible runtime errors in compile-time.
  - Unique function call system that combines procedures with some aspects of functional programming paradigm.
- - No `while` or `when` keywords. Loops are predetermined. Infinite loops can only be achievable through the `INFINITE` keyword.
+ - No `while` or `when` keywords. Loops are mostly predetermined. Infinite loops can only be achievable through the `INFINITE` keyword.
+ - There are `break` and `continue` statements but breaking a multiline loop inside a function is forbidden.
  - Single source of errors and unique exit codes for each one of them. So the errors are catchable by other programs.
  - Language's itself forces you to write less error-prone code.
  - Say goodbye to dependency conflicts with [Occultist](https://occultist.io/) dependency manager.
@@ -107,10 +107,16 @@ $ chaos
 kaos> print "hello world"
 hello world
 kaos> exit
-    You have chosen the order!
+    Bye bye!
 ```
 
 ### Program File as Command-line Argument
+
+**hello.kaos**:
+
+```ruby
+print "hello world"
+```
 
 ```shell
 $ chaos hello.kaos
@@ -145,7 +151,7 @@ make uninstall
 
 ## Useful Links
 
-[**Language Reference**](https://chaos-lang.org/docs/04_primitive-data-types)
+[**Language Reference**](https://chaos-lang.org/docs/03_comments)
 
 [**Developing Chaos C Extensions**](https://chaos-lang.org/docs/16_chaos_c_extensions_development)
 
