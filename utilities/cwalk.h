@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef CWK_LIBRARY_H
 #define CWK_LIBRARY_H
 
