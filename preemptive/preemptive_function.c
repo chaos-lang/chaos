@@ -72,6 +72,9 @@ void preemptive_callFunction(_Function* _function, char *name, char *module) {
 }
 
 _Function* preemptive_getFunction(_Function* _function, char *name, char *module) {
+    if (module == NULL && strcmp(_function->module, "") != 0) {
+        module = _function->module;
+    }
     preemptive_function_cursor = start_function;
     while (preemptive_function_cursor != NULL) {
         if (module == NULL && strcmp(preemptive_function_cursor->module, "") != 0) {

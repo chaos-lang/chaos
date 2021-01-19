@@ -42,12 +42,9 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         phase = PREPARSE;
 #endif
 
-    if (function_names_buffer.size > 0) {
-        if (!isInFunctionNamesBuffer(name)) {
-            freeFunctionParametersMode();
-            return;
-        }
-    }
+    bool context_is_module_context = false;
+    if (function_names_buffer.size > 0 && !isInFunctionNamesBuffer(name))
+        context_is_module_context = true;
 
     removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
@@ -68,8 +65,8 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 
 #ifdef CHAOS_COMPILER
     if (!is_dynamic) {
-        function_mode->context = malloc(1 + strlen(context));
-        strcpy(function_mode->context, context);
+        function_mode->context = malloc(1 + strlen(context_is_module_context ? module_context : context));
+        strcpy(function_mode->context, context_is_module_context ? module_context : context);
         function_mode->module_context = malloc(1 + strlen(module_context));
         strcpy(function_mode->module_context, module_context);
         function_mode->module = malloc(1 + strlen(module));
@@ -78,12 +75,15 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
     unsigned short parent_context = 1;
     if (module_path_stack.size > 1) parent_context = 2;
-    function_mode->context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - parent_context]));
-    strcpy(function_mode->context, module_path_stack.arr[module_path_stack.size - parent_context]);
-    function_mode->module_context = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-    strcpy(function_mode->module_context, module_path_stack.arr[module_path_stack.size - 1]);
-    function_mode->module = malloc(1 + strlen(module_stack.arr[module_stack.size - 1]));
-    strcpy(function_mode->module, module_stack.arr[module_stack.size - 1]);
+    char *context = module_path_stack.arr[module_path_stack.size - parent_context];
+    char *module_context = module_path_stack.arr[module_path_stack.size - 1];
+    char *module = module_stack.arr[module_stack.size - 1];
+    function_mode->context = malloc(1 + strlen(context_is_module_context ? module_context : context));
+    strcpy(function_mode->context, context_is_module_context ? module_context : context);
+    function_mode->module_context = malloc(1 + strlen(module_context));
+    strcpy(function_mode->module_context, module_context);
+    function_mode->module = malloc(1 + strlen(module));
+    strcpy(function_mode->module, module);
 #ifdef CHAOS_COMPILER
     }
 #endif
@@ -382,6 +382,15 @@ void callFunctionCleanUpCommon() {
 }
 
 _Function* getFunction(char *name, char *module) {
+    if (
+        module == NULL
+        &&
+        function_call_stack.size > 0
+        &&
+        strcmp(function_call_stack.arr[function_call_stack.size - 1]->function->module, "") != 0
+    )
+        module = function_call_stack.arr[function_call_stack.size - 1]->function->module;
+
     function_cursor = start_function;
     while (function_cursor != NULL) {
         if (module == NULL && strcmp(function_cursor->module, "") != 0) {
@@ -389,7 +398,11 @@ _Function* getFunction(char *name, char *module) {
             continue;
         }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
-        criteria = criteria && strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - 1]) == 0;
+        criteria = criteria && (
+            strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - 1]) == 0
+            ||
+            strcmp(function_cursor->module_context, module_path_stack.arr[module_path_stack.size - 1]) == 0
+        );
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {
             _Function* function = function_cursor;
@@ -410,12 +423,12 @@ _Function* getFunction(char *name, char *module) {
 _Function* getFunctionByModuleContext(char *name, char *module_context) {
     function_cursor = start_function;
     while (function_cursor != NULL) {
-        if (module_context == NULL && strcmp(function_cursor->module, "") != 0) {
-            function_cursor = function_cursor->next;
-            continue;
-        }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
-        if (criteria && module_context != NULL && strcmp(function_cursor->module_context, module_context) == 0) {
+        if (criteria && module_context != NULL && (
+            strcmp(function_cursor->context, module_context) == 0
+            ||
+            strcmp(function_cursor->module_context, module_context) == 0
+        )) {
             _Function* function = function_cursor;
             return function;
         }

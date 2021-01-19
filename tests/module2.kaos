@@ -1,0 +1,11 @@
+from samedirlib import f6, f8
+
+num def f5(num a)
+    num y = a - 1
+end {
+    y > 3  : f8(),
+    y == 3 : f6(y),
+    y == 2 : f6(y)
+}
+
+print f5(3)

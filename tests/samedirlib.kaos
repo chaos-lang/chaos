@@ -1,0 +1,21 @@
+num def f9()
+    num z = 42
+    return z
+end
+
+num def f8()
+    num z = 999
+    return z
+end
+
+num def f7()
+    num z = f9()
+    return z
+end
+
+num def f6(num b)
+    num y = b - 1
+end {
+    y > 1  : return y,
+    y == 1 : f7()
+}

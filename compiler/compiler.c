@@ -506,6 +506,7 @@ transpile_functions_label:
         function_name = snprintf_concat_string(function_name, "_%s", ast_node->strings[0]);
         if (!ast_node->dont_transpile && !is_in_array(&transpiled_functions, function_name)) {
             append_to_array(&transpiled_functions, function_name);
+            append_to_array(&transpiled_modules, ast_node->module);
             fprintf(h_fp, "void %s();\n", function_name);
             fprintf(c_fp, "void %s() {\n", function_name);
             transpile_node(ast_node->child, module, c_fp, indent);
@@ -606,6 +607,8 @@ transpile_decisions_label:
             ast_node->strings_size
         );
 
+    char *module_context = NULL;
+
     switch (ast_node->node_type)
     {
         case AST_DECISION_MAKE_BOOLEAN:
@@ -649,6 +652,10 @@ transpile_decisions_label:
                         compiler_function_counter,
                         ast_node->strings[0]
                     );
+                    module_context = compiler_getFunctionModuleContext(ast_node->strings[0], ast_node->module);
+                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[0], indent + indent_length);
+                    free(module_context);
+                    module_context = NULL;
                     break;
                 case 2:
                     fprintf(
@@ -660,11 +667,14 @@ transpile_decisions_label:
                         ast_node->strings[1],
                         ast_node->strings[0]
                     );
+                    module_context = compiler_getFunctionModuleContext(ast_node->strings[1], ast_node->strings[0]);
+                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[1], indent + indent_length);
+                    free(module_context);
+                    module_context = NULL;
                     break;
                 default:
                     break;
             }
-            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
@@ -822,6 +832,10 @@ transpile_decisions_label:
                         compiler_function_counter,
                         ast_node->strings[0]
                     );
+                    module_context = compiler_getFunctionModuleContext(ast_node->strings[0], ast_node->module);
+                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[0], indent + indent_length);
+                    free(module_context);
+                    module_context = NULL;
                     break;
                 case 2:
                     fprintf(
@@ -833,11 +847,14 @@ transpile_decisions_label:
                         ast_node->strings[1],
                         ast_node->strings[0]
                     );
+                    module_context = compiler_getFunctionModuleContext(ast_node->strings[1], ast_node->strings[0]);
+                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[1], indent + indent_length);
+                    free(module_context);
+                    module_context = NULL;
                     break;
                 default:
                     break;
             }
-            transpile_function_call_decision(c_fp, ast_node->module, module, ast_node->strings[0], indent + indent_length);
             fprintf(
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
@@ -3544,7 +3561,19 @@ void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned shor
     char *module_context = compiler_getFunctionModuleContext(name, module);
     if (!isFunctionFromDynamicLibrary(name, module))
         fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module_context, name);
-    _Function* function = getFunction(name, module);
+
+    _Function* function = NULL;
+    if (
+        module == NULL
+        &&
+        transpiled_modules.size > 0
+        &&
+        strcmp(transpiled_modules.arr[transpiled_modules.size - 1], "") != 0
+    ) {
+        function = getFunctionByModuleContext(name, transpiled_modules.arr[transpiled_modules.size - 1]);
+    } else {
+        function = getFunction(name, module);
+    }
     if (function->decision_node != NULL) {
         fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module_context, name);
     }
@@ -3739,7 +3768,22 @@ char* compiler_getCurrentModule() {
 }
 
 char* compiler_getFunctionModuleContext(char *name, char *module) {
+    if (
+        module == NULL
+        &&
+        transpiled_modules.size > 0
+        &&
+        strcmp(transpiled_modules.arr[transpiled_modules.size - 1], "") != 0
+    ) {
+        char *module_context = malloc(strlen(transpiled_modules.arr[transpiled_modules.size - 1]) + 1);
+        strcpy(module_context, transpiled_modules.arr[transpiled_modules.size - 1]);
+        compiler_escape_module(module_context);
+        return module_context;
+    }
+
     _Function* function = getFunction(name, module);
+    if (function == NULL)
+        function = getFunctionByModuleContext(name, module);
     char *module_context = malloc(strlen(function->module_context) + 1);
     strcpy(module_context, function->module_context);
     compiler_escape_module(module_context);
@@ -3747,6 +3791,18 @@ char* compiler_getFunctionModuleContext(char *name, char *module) {
 }
 
 bool isFunctionFromDynamicLibrary(char *name, char *module) {
+    if (
+        module == NULL
+        &&
+        transpiled_modules.size > 0
+        &&
+        strcmp(transpiled_modules.arr[transpiled_modules.size - 1], "") != 0
+    ) {
+        return strcmp(
+        get_filename_ext(transpiled_modules.arr[transpiled_modules.size - 1]),
+        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
+    ) == 0;
+    }
     _Function* function = getFunction(name, module);
     return strcmp(
         get_filename_ext(function->module_context),
@@ -3783,6 +3839,13 @@ void free_transpiled_functions() {
     if (transpiled_functions.size > 0) free(transpiled_functions.arr);
     transpiled_functions.capacity = 0;
     transpiled_functions.size = 0;
+
+    for (unsigned i = 0; i < transpiled_modules.size; i++) {
+        free(transpiled_modules.arr[i]);
+    }
+    if (transpiled_modules.size > 0) free(transpiled_modules.arr);
+    transpiled_modules.capacity = 0;
+    transpiled_modules.size = 0;
 }
 
 void free_transpiled_decisions() {

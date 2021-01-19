@@ -44,6 +44,7 @@
 
 string_array transpiled_functions;
 string_array transpiled_decisions;
+string_array transpiled_modules;
 
 void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep, bool unsafe);
 ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp);
