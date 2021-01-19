@@ -243,7 +243,7 @@ int largest(int arr[], int n) {
 
 char *relative_path_to_absolute(char *path)
 {
-    char actual_path[PATH_MAX];
+    char actual_path[PATH_MAX] = {0};
     char *absolute_path;
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
     realpath(path, actual_path);
