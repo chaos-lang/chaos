@@ -2,3 +2,6 @@ UNINITIALIZED READ
 system call stat64
 libsystem_c.dylib!__getcwd
 libsystem_c.dylib!__private_getcwd
+
+INVALID HEAP ARGUMENT
+dyld!*

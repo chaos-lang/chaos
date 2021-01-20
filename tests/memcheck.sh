@@ -15,7 +15,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     if [[ "$OSTYPE" == "linux"* ]]; then
         valgrind --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --track-origins=yes --error-exitcode=1 chaos $DIR/$filename || exit 1
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        /tmp/DrMemory/bin64/drmemory -exit_code_if_errors 1 -- chaos $DIR/$filename || exit 1
+        /tmp/DrMemory/bin64/drmemory -exit_code_if_errors 1 -suppress tests/shell/suppress.mac.txt -- chaos $DIR/$filename || exit 1
     fi
 done
 
