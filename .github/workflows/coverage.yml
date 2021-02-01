@@ -1,0 +1,22 @@
+name: "Code Coverage"
+
+on: [push, pull_request]
+
+jobs:
+  main:
+    name: coverage
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y llvm valgrind
+        sudo make requirements
+
+    - name: Coverage (clang)
+      run: |
+        make coverage
+        bash <(curl -s https://codecov.io/bash)

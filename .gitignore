@@ -44,3 +44,8 @@ build
 
 # Rosetta spells directory
 tests/rosetta/spells
+
+# Ignore Clang code coverage dumps
+*.profraw
+*.profdata
+coverage.txt
