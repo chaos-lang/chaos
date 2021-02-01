@@ -34,6 +34,9 @@
     <a href="https://github.com/chaos-lang/chaos/actions?query=workflow%3A%22Chaos+C+Extension+Feature+Tests%22">
         <img alt="GitHub Workflow Chaos C Extension Feature Tests Status" src="https://img.shields.io/github/workflow/status/chaos-lang/chaos/Chaos%20C%20Extension%20Feature%20Tests?logo=GitHub&label=Chaos%20C%20Extension%20Feature&style=flat-square">
     </a>
+    <a href="https://codecov.io/gh/chaos-lang/chaos">
+        <img alt="Code Coverage (Codecov)" src="https://img.shields.io/codecov/c/github/chaos-lang/chaos?logo=Codecov&style=flat-square">
+    </a>
 </p>
 <p align="center">
     Chaos is a strongly typed, dynamic yet compilable, test-oriented procedural programming language that achieves zero cyclomatic complexity.
