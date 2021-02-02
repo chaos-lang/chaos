@@ -30,8 +30,8 @@ echo "Testing all official spells"
 
 SPELL_LIST=(math string array json)
 
-mkdir -p build && \
-cd build && \
+mkdir -p .build && \
+cd .build && \
 
 for spell in ${SPELL_LIST[*]}
 do

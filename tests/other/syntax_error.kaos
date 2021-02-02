@@ -1,0 +1,5 @@
+void num def a()
+    print "inside function a"
+    num val1 = 5
+    print val1
+end

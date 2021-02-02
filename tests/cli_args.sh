@@ -1,59 +1,72 @@
 #!/bin/bash
 
 echo -e "\nINFO: Test the positional arguments (interpreter)\n"
-chaos tests/number.kaos && echo -e "\nOK\n\n" && \
-chaos -d tests/number.kaos && echo -e "\nOK\n\n" && \
+chaos tests/everything.kaos && echo -e "\nOK\n\n" && \
+chaos -d tests/everything.kaos && echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test no arguments (REPL)\n"
 echo "exit" | chaos && echo -e "\nOK\n\n" && \
 echo "exit" | chaos -d && echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test compilation variants with short options\n"
-chaos -c tests/number.kaos && \
+chaos -c tests/everything.kaos && \
     [ -f build/main ] && \
     echo -e "\nOK\n\n" && \
-chaos -c tests/number.kaos -o number && \
-    [ -f build/number ] && \
+chaos -c tests/everything.kaos -o everything && \
+    [ -f build/everything ] && \
     echo -e "\nOK\n\n" && \
-chaos -c tests/number.kaos -o number -e "-ggdb" && \
-    [ -f build/number ] && \
+chaos -c tests/everything.kaos -o everything -e "-ggdb" && \
+    [ -f build/everything ] && \
     echo -e "\nOK\n\n" && \
-chaos -c tests/number.kaos -o number -e "-ggdb" -k && \
-    [ -f build/number ] && \
-    [ -f build/number.c ] && \
-    [ -f build/number.h ] && \
+chaos -c tests/everything.kaos -o everything -e "-ggdb" -k && \
+    [ -f build/everything ] && \
+    [ -f build/everything.c ] && \
+    [ -f build/everything.h ] && \
     echo -e "\nOK\n\n" && \
-chaos -c tests/number.kaos -o number -e "-ggdb" -kd && \
-    [ -f build/number ] && \
-    [ -f build/number.c ] && \
-    [ -f build/number.h ] && \
+chaos -c tests/everything.kaos -o everything -e "-ggdb" -kd && \
+    [ -f build/everything ] && \
+    [ -f build/everything.c ] && \
+    [ -f build/everything.h ] && \
     echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test compilation variants with long options\n"
-chaos --compile tests/number.kaos && \
+chaos --compile tests/everything.kaos && \
     [ -f build/main ] && \
     echo -e "\nOK\n\n" && \
-chaos --compile tests/number.kaos --output number && \
-    [ -f build/number ] && \
+chaos --compile tests/everything.kaos --output everything && \
+    [ -f build/everything ] && \
     echo -e "\nOK\n\n" && \
-chaos --compile tests/number.kaos --output number --extra "-ggdb" && \
-    [ -f build/number ] && \
+chaos --compile tests/everything.kaos --output everything --extra "-ggdb" && \
+    [ -f build/everything ] && \
     echo -e "\nOK\n\n" && \
-chaos --compile tests/number.kaos --output number --extra "-ggdb" --keep && \
-    [ -f build/number ] && \
-    [ -f build/number.c ] && \
-    [ -f build/number.h ] && \
+chaos --compile tests/everything.kaos --output everything --extra "-ggdb" --keep && \
+    [ -f build/everything ] && \
+    [ -f build/everything.c ] && \
+    [ -f build/everything.h ] && \
     echo -e "\nOK\n\n" && \
-chaos --compile tests/number.kaos --output number --extra "-ggdb" --keep --debug && \
-    [ -f build/number ] && \
-    [ -f build/number.c ] && \
-    [ -f build/number.h ] && \
+chaos --compile tests/everything.kaos --output everything --extra "-ggdb" --keep --debug && \
+    [ -f build/everything ] && \
+    [ -f build/everything.c ] && \
+    [ -f build/everything.h ] && \
     echo -e "\nOK\n\n" && \
+
+echo -e "\nINFO: Test other arguments\n"
+chaos -h && chaos --help && \
+chaos -v && chaos --version && \
+chaos -l && chaos --license && \
+chaos -u tests/everything.kaos && chaos --unsafe tests/everything.kaos && \
+echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test invalid argument messages with short options\n"
 chaos -c || echo -e "\nOK\n\n" && \
-chaos -c tests/number.kaos -o || echo -e "\nOK\n\n" && \
-chaos -o number || echo -e "\nOK\n\n" && \
-chaos -c tests/number.kaos -o number -e || echo -e "\nOK\n\n" && \
+chaos -c tests/everything.kaos -o || echo -e "\nOK\n\n" && \
+chaos -o everything || echo -e "\nOK\n\n" && \
+chaos -c tests/everything.kaos -o everything -e || echo -e "\nOK\n\n" && \
+
+echo -e "\nINFO: Test other erroring arguments\n"
+chaos --no_such_arg || \
+chaos no_such_file.kaos || \
+chaos tests/other/syntax_error.kaos || \
+echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: CLI arguments are OK."

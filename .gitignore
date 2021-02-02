@@ -41,6 +41,7 @@ help.h
 
 # Chaos build directory
 build
+.build
 
 # Rosetta spells directory
 tests/rosetta/spells
@@ -49,3 +50,4 @@ tests/rosetta/spells
 *.profraw
 *.profdata
 coverage.txt
+.coverage
