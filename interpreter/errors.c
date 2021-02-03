@@ -352,6 +352,9 @@ void throw_error_base(
     if (is_preemptive && is_interactive)
         removeFunction(end_function);
 
+    if (is_preemptive)
+        return;
+
     if (!is_interactive) {
 #endif
         freeEverything();

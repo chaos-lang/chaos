@@ -10,6 +10,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
         continue
     fi
 
+    SKIP_TESTS="syntax_error preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+        continue
+    fi
+
     echo -e "\n\n(interpreter) Running memcheck: ${testname}\n"
 
     if [[ "$OSTYPE" == "linux"* ]]; then

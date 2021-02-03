@@ -51,7 +51,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
-    SKIP_TESTS="nonewline function decision everything"
+    SKIP_TESTS="nonewline function decision everything syntax_error preemptive"
 
     if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
         continue

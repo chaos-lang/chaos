@@ -1,0 +1,3 @@
+[1;46m  Syntax error:                                             [0m
+[0;46m    File: "tests/syntax_error.kaos", line 1, cause: num     [0m
+[0;46m      void num def a()                                      [0m

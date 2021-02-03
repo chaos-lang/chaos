@@ -32,7 +32,7 @@
 #include "../utilities/language.h"
 #include "../interpreter/errors.h"
 
-void throw_preemptive_error_base(
+void print_preemptive_error_base(
     unsigned short code,
     _Function* function,
     char *str1,
@@ -40,6 +40,7 @@ void throw_preemptive_error_base(
     long long lld1,
     unsigned long long llu1
 );
+void throw_preemptive_errors();
 
 typedef struct {
     unsigned short code;
@@ -50,8 +51,23 @@ typedef struct {
     unsigned long long llu1;
 } throw_preemptive_error_args;
 
-void throw_preemptive_error_var(throw_preemptive_error_args in);
+typedef struct throw_preemptive_error_args_array {
+    throw_preemptive_error_args* arr;
+    unsigned capacity, size;
+} throw_preemptive_error_args_array;
 
-#define throw_preemptive_error(...) throw_preemptive_error_var((throw_preemptive_error_args){__VA_ARGS__});
+typedef struct preemptive_error_lineno_array {
+    int* value;
+    unsigned capacity, size;
+} preemptive_error_lineno_array;
+
+throw_preemptive_error_args_array preemptive_errors;
+preemptive_error_lineno_array preemptive_errors_lineno;
+
+void add_preemptive_error_var(throw_preemptive_error_args in);
+void print_preemptive_error(throw_preemptive_error_args in);
+void free_preemptive_errors();
+
+#define add_preemptive_error(...) add_preemptive_error_var((throw_preemptive_error_args){__VA_ARGS__});
 
 #endif

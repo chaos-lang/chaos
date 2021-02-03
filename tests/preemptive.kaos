@@ -1,0 +1,314 @@
+void def f51()
+    print b
+end
+
+function_table
+
+num def f1()
+    num a = 101
+    return a
+end
+
+num def f2()
+    num b = 102
+    return b
+end
+
+num def f3()
+    num c = 103
+    return c
+end
+
+num def f52(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(),
+    n1 > 10 : f2(),
+    default : f3()
+}
+
+function_table
+
+
+num def f53(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(),
+    z > 10  : f2(n2),
+    default : f3()
+}
+
+function_table
+
+
+void def a()
+    num b = f5()
+end
+
+function_table
+
+
+num def f54(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(),
+    z > 10  : f6(),
+    default : f3()
+}
+
+function_table
+
+
+num def f55(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z == 8  : f1(z),
+    z > 10  : f2(),
+    default : f3()
+}
+
+function_table
+
+
+num def f56()
+    num c = 103
+    num x = f1(c)
+    return c
+end
+
+function_table
+
+
+num def f8(num a, str b)
+    print a
+    print b
+    num c = a + 5
+    return c
+end
+
+function_table
+
+void def f57()
+    num a = 3
+    num b = 5
+    f8(a, b)
+end
+
+function_table
+
+void def f58()
+    f8(3, 5)
+end
+
+function_table
+
+void def f59()
+    list a = [1, 2, 3]
+    str b = 'hello'
+    f8(a, b)
+end
+
+function_table
+
+void def f60()
+    f8([1, 2, 3], 'hello')
+end
+
+function_table
+
+void def f61()
+    num a = 3
+    str b = 'hello'
+    bool c = true
+    f8(a, b, c)
+end
+
+function_table
+
+void def f62()
+    f8(3, 'hello', true)
+end
+
+function_table
+
+
+list def f63()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    return a
+end
+
+function_table
+
+dict def f64()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    return b
+end
+
+function_table
+
+
+list def f65()
+    num x = 5
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+end {
+    x == 5  : return a,
+    default : return a
+}
+
+function_table
+
+dict def f66()
+    num x = 5
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+end {
+    x == 5  : return b,
+    default : return b
+}
+
+function_table
+
+dict def f67()
+    num x = 5
+end
+
+function_table
+
+
+void def f68()
+    3 times do
+        print b
+        2 times do
+            print c
+        end
+    end
+end
+
+function_table
+
+void def f69()
+    n times do
+        print "hello world"
+    end
+end
+
+function_table
+
+void def f70()
+    foreach a as el
+        print el
+    end
+end
+
+function_table
+
+void def f7()
+    list a = [1, 2, 3]
+    foreach a as el
+        print el
+    end
+end
+
+function_table
+
+void def f71()
+    list a = [1, 2, 3]
+    foreach a as el
+        print el
+        print b
+    end
+end
+
+function_table
+
+void def f8()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    foreach a as key : val
+        print key
+        print val
+    end
+end
+
+function_table
+
+void def f72()
+    dict a = {'a': 1, 'b': 2, 'c': 3}
+    foreach a as key : val
+        print key
+        print val
+        print b
+    end
+end
+
+function_table
+
+
+num def f9(num x, num y)
+    num z = x + y
+    bool a = true
+end {
+    z > 5   : break,
+    z == 8  : f1(),
+    z > 10  : f2(),
+    default : f3()
+}
+
+function_table
+
+void def f73(num list a)
+    foreach a as el
+        print el
+        print f11(el, 1)
+    end
+end
+
+function_table
+
+void def f74(num a)
+    foreach a as el
+        print el
+        print f9(el, 1)
+    end
+end
+
+function_table
+
+void def f75(num a)
+    foreach a as key : val
+        print key
+        print f9(val, 1)
+    end
+end
+
+function_table
+
+
+num def f76(num x, num y)
+    num r = f9(x, y)
+    return r
+end
+
+function_table
+
+void def f12(num list a)
+    foreach a as el
+        print el
+        print f9(el, 1)
+    end
+end
+
+function_table
+
+
+void def f13(num list a)
+    foreach a as el
+        print f9(el, 1)
+    end
+end
+
+list a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+f13(a)

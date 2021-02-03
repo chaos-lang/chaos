@@ -28,6 +28,7 @@
 #include "preemptive_function.h"
 
 int preemptive_loop_length;
+bool preemptive_continue;
 
 void preemptive_check();
 ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function);

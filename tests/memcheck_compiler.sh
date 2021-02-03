@@ -13,6 +13,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
         continue
     fi
 
+    SKIP_TESTS="syntax_error preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+        continue
+    fi
+
     echo -e "\n\n(compiler) Running memcheck: chaos -c ${TESTS_DIR}/${testname}\n"
 
     if [[ "$OSTYPE" == "linux"* ]]; then
@@ -27,6 +33,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
 
     if [[ "$testname" == "exit_"* ]]; then
+        continue
+    fi
+
+    SKIP_TESTS="syntax_error preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
         continue
     fi
 

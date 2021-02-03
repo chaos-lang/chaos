@@ -25,11 +25,19 @@
 extern int kaos_lineno;
 
 int preemptive_loop_length = 0;
+bool preemptive_continue = false;
 
 void preemptive_check() {
     function_cursor = start_function;
     while (function_cursor != NULL) {
         _Function* function = function_cursor;
+        if (debug_enabled)
+            printf(
+                "(CheckF)\tFunction: {name: %s, module: %s, lineno: %d}\n",
+                function->name,
+                function->module,
+                function->line_no
+            );
         function_cursor = function_cursor->next;
         check_function(function->node->child, function->module_context, function);
         check_function(function->decision_node, function->module_context, function);
@@ -37,12 +45,16 @@ void preemptive_check() {
             function->type != K_VOID &&
             function->symbol == NULL &&
             function->decision_node == NULL &&
-            !function->is_dynamic
-        )
-            throw_preemptive_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function, function->name);
+            !function->is_dynamic &&
+            !preemptive_continue
+        ) {
+            add_preemptive_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function, function->name);
+        }
         function->symbol = NULL;
         preemptive_freeAllSymbols();
+        preemptive_continue = false;
     }
+    throw_preemptive_errors();
 }
 
 ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function) {
@@ -83,11 +95,12 @@ check_function_label:
 
     if (debug_enabled)
         printf(
-            "(Check)\t\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            "(Check)\t\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu, lineno: %d}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
-            ast_node->strings_size
+            ast_node->strings_size,
+            ast_node->lineno
         );
 
     if (ast_node->node_type == AST_END) {
@@ -95,6 +108,9 @@ check_function_label:
             nested_loop_counter--;
         }
     }
+
+    if (preemptive_continue)
+        return NULL;
 
     Symbol* symbol;
     char *_module = NULL;
@@ -121,12 +137,15 @@ check_function_label:
         case AST_START_FOREACH:
             nested_loop_counter++;
             symbol = preemptive_getSymbol(ast_node->strings[0], function);
+            if (symbol == NULL)
+                return NULL;
             if (symbol->type != K_LIST) {
                 if (symbol->name != NULL) {
-                    throw_preemptive_error(E_NOT_A_LIST, function, symbol->name);
+                    add_preemptive_error(E_NOT_A_LIST, function, symbol->name);
                 } else {
-                    throw_preemptive_error(E_NOT_A_LIST, function, symbol->secondary_name);
+                    add_preemptive_error(E_NOT_A_LIST, function, symbol->secondary_name);
                 }
+                return NULL;
             }
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
             end_node = preemptive_walk_until_end(ast_node->next, ast_node->module);
@@ -135,12 +154,15 @@ check_function_label:
         case AST_START_FOREACH_DICT:
             nested_loop_counter++;
             symbol = preemptive_getSymbol(ast_node->strings[0], function);
+            if (symbol == NULL)
+                return NULL;
             if (symbol->type != K_DICT) {
                 if (symbol->name != NULL) {
-                    throw_preemptive_error(E_NOT_A_DICT, function, symbol->name);
+                    add_preemptive_error(E_NOT_A_DICT, function, symbol->name);
                 } else {
-                    throw_preemptive_error(E_NOT_A_DICT, function, symbol->secondary_name);
+                    add_preemptive_error(E_NOT_A_DICT, function, symbol->secondary_name);
                 }
+                return NULL;
             }
             preemptive_addSymbol(ast_node->strings[1], symbol->secondary_type, V_VOID);
             preemptive_addSymbol(ast_node->strings[2], symbol->secondary_type, V_VOID);
@@ -728,38 +750,58 @@ check_break_continue_label:
 
     if (debug_enabled)
         printf(
-            "(CheckBC)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
+            "(CheckBC)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu, lineno: %d}\n",
             ast_node->id,
             getAstNodeTypeName(ast_node->node_type),
             ast_node->module,
-            ast_node->strings_size
+            ast_node->strings_size,
+            ast_node->lineno
         );
+
+    if (preemptive_continue)
+        return;
 
     switch (ast_node->node_type)
     {
         case AST_DECISION_MAKE_BOOLEAN_BREAK:
-            if (nested_loop_counter == 0)
-                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function, function->name);
-            if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function, function->name);
+            if (nested_loop_counter == 0) {
+                add_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function, function->name);
+                return;
+            }
+            if (preemptive_loop_length > 2) {
+                add_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function, function->name);
+                return;
+            }
             break;
         case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
-            if (nested_loop_counter == 0)
-                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function, function->name);
-            if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function, function->name);
+            if (nested_loop_counter == 0) {
+                add_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function, function->name);
+                return;
+            }
+            if (preemptive_loop_length > 2) {
+                add_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function, function->name);
+                return;
+            }
             break;
         case AST_DECISION_MAKE_DEFAULT_BREAK:
-            if (nested_loop_counter == 0)
-                throw_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function, function->name);
-            if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function, function->name);
+            if (nested_loop_counter == 0) {
+                add_preemptive_error(E_BREAK_CALL_OUTSIDE_LOOP, function, function->name);
+                return;
+            }
+            if (preemptive_loop_length > 2) {
+                add_preemptive_error(E_BREAK_CALL_MULTILINE_LOOP, function, function->name);
+                return;
+            }
             break;
         case AST_DECISION_MAKE_DEFAULT_CONTINUE:
-            if (nested_loop_counter == 0)
-                throw_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function, function->name);
-            if (preemptive_loop_length > 2)
-                throw_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function, function->name);
+            if (nested_loop_counter == 0) {
+                add_preemptive_error(E_CONTINUE_CALL_OUTSIDE_LOOP, function, function->name);
+                return;
+            }
+            if (preemptive_loop_length > 2) {
+                add_preemptive_error(E_CONTINUE_CALL_MULTILINE_LOOP, function, function->name);
+                return;
+            }
             break;
         default:
             break;

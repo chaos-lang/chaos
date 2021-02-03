@@ -28,6 +28,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
+    SKIP_TESTS="syntax_error preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+        continue
+    fi
+
     echo "(compiler) Compiling test: ${testname}"
 
     if [ "$EXTRA_FLAGS_ENABLED" = true ] ; then
@@ -51,6 +57,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     filename=$(basename $filepath)
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
+
+    SKIP_TESTS="syntax_error preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+        continue
+    fi
 
     echo "(compiler) Running test: ${testname}"
 

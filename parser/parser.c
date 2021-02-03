@@ -260,7 +260,9 @@ void freeEverything() {
 void yyerror(const char* s) {
     if (phase == PREPARSE) return;
 
-    yyerror_msg(capitalize(s), getCurrentModule(), yytext);
+    char *error_name = capitalize(s);
+    yyerror_msg(error_name, getCurrentModule(), yytext);
+    free(error_name);
 
 #ifndef CHAOS_COMPILER
     if (is_interactive) {

@@ -66,7 +66,6 @@ chaos -c tests/everything.kaos -o everything -e || echo -e "\nOK\n\n" && \
 echo -e "\nINFO: Test other erroring arguments\n"
 chaos --no_such_arg || \
 chaos no_such_file.kaos || \
-chaos tests/other/syntax_error.kaos || \
 echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: CLI arguments are OK."
