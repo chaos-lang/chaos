@@ -47,6 +47,11 @@ clang-dev:
 	export CHAOS_EXTRA_FLAGS=-ggdb
 	${MAKE} chaos
 
+prof:
+	export CHAOS_COMPILER=gcc
+	export CHAOS_EXTRA_FLAGS=-pg
+	${MAKE} chaos
+
 clang-dev-sanitizer-memory:
 	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -g -O0 -fno-optimize-sibling-calls'
 	export CHAOS_EXTRA_FLAGS=-ggdb
@@ -189,3 +194,6 @@ rosetta-test-compiler:
 
 rosetta-update:
 	./tests/rosetta/update.sh
+
+benchmark:
+	./benchmark.sh

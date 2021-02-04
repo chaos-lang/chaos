@@ -1,0 +1,15 @@
+num def tak_sub(num x, num y, num z)
+    num tak1 = tak(x-1, y, z)
+    num tak2 = tak(y-1, z, x)
+    num tak3 = tak(z-1, x, y)
+    num result = tak(tak1, tak2, tak3)
+    return result
+end
+
+num def tak(num x, num y, num z)
+end {
+    y < x   : tak_sub(x, y, z),
+    default : return z
+}
+
+print tak(18, 12, 6)

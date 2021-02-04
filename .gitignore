@@ -51,3 +51,7 @@ tests/rosetta/spells
 *.profdata
 coverage.txt
 .coverage
+
+# Benchmarking
+gmon.out
+benchmark.*
