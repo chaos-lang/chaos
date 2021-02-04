@@ -2,10 +2,14 @@
 setlocal EnableDelayedExpansion
 
 FOR %%f in (*.kaos) do (
-    set filename=%%f
-    set testname=%%~nf
+    SET filename=%%f
+    SET testname=%%~nf
 
-    IF "!filename:~0,5!"=="exit_" (
+    SET ignore=false
+    IF "!filename:~0,5!" == "exit_" SET ignore=true
+    IF "!testname!" == "syntax_error" SET ignore=true
+    IF "!testname!" == "preemptive" SET ignore=true
+    IF !ignore! == true (
         ECHO.
         ECHO Ignoring memcheck for !filename!
     ) ELSE (
@@ -20,10 +24,14 @@ FOR %%f in (*.kaos) do (
 )
 
 FOR %%f in (*.kaos) do (
-    set filename=%%f
-    set testname=%%~nf
+    SET filename=%%f
+    SET testname=%%~nf
 
-    IF "!filename:~0,5!"=="exit_" (
+    SET ignore=false
+    IF "!filename:~0,5!" == "exit_" SET ignore=true
+    IF "!testname!" == "syntax_error" SET ignore=true
+    IF "!testname!" == "preemptive" SET ignore=true
+    IF !ignore! == true (
         ECHO.
         ECHO Ignoring memcheck for !filename!
     ) ELSE (

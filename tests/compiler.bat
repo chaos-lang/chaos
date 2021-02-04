@@ -2,33 +2,55 @@
 setlocal EnableDelayedExpansion
 
 for %%f in (tests\*.kaos) do (
-    ECHO.
-    ECHO.
-    chaos -c %%f -o %%~nf
-    IF errorlevel 1 (
-        ECHO Fail
-        EXIT /B 1
+    SET filename=%%f
+    SET testname=%%~nf
+
+    SET ignore=false
+    IF "!testname!" == "syntax_error" SET ignore=true
+    IF "!testname!" == "preemptive" SET ignore=true
+    IF !ignore! == true (
+        ECHO.
+        ECHO Ignoring !filename!
     ) ELSE (
-        ECHO OK
+        ECHO.
+        ECHO.
+        chaos -c %%f -o %%~nf
+        IF errorlevel 1 (
+            ECHO Fail
+            EXIT /B 1
+        ) ELSE (
+            ECHO OK
+        )
     )
 )
 
 for %%f in (tests\*.kaos) do (
-    ECHO.
-    ECHO.
-    build\%%~nf.exe > tmpFile
-    TYPE tmpFile
-    IF NOT "%%~nf" == "string" (
-        powershell -Command "(gc tmpFile) -replace '\\', '/' | Out-File -encoding ASCII tmpFile"
-    )
-    FC tests\%%~nf.out tmpFile
-    IF errorlevel 1 (
-        DEL tmpFile
-        ECHO Fail
-        EXIT /B 1
+    SET filename=%%f
+    SET testname=%%~nf
+
+    SET ignore=false
+    IF "!testname!" == "syntax_error" SET ignore=true
+    IF "!testname!" == "preemptive" SET ignore=true
+    IF !ignore! == true (
+        ECHO.
+        ECHO Ignoring !filename!
     ) ELSE (
-        DEL tmpFile
-        ECHO OK
+        ECHO.
+        ECHO.
+        build\!testname!.exe > tmpFile
+        TYPE tmpFile
+        IF NOT "!testname!" == "string" (
+            powershell -Command "(gc tmpFile) -replace '\\', '/' | Out-File -encoding ASCII tmpFile"
+        )
+        FC tests\!testname!.out tmpFile
+        IF errorlevel 1 (
+            DEL tmpFile
+            ECHO Fail
+            EXIT /B 1
+        ) ELSE (
+            DEL tmpFile
+            ECHO OK
+        )
     )
 )
 EXIT /B 0
