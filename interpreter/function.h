@@ -60,7 +60,6 @@ typedef struct _Function {
     struct Symbol* symbol;
     struct _Function* previous;
     struct _Function* next;
-    struct FunctionCall* parent_scope;
     string_array decision_expressions;
     string_array decision_functions;
     char *decision_default;
@@ -80,6 +79,7 @@ _Function* function_parameters_mode;
 
 typedef struct FunctionCall {
     struct _Function* function;
+    struct FunctionCall* parent_scope;
     struct ASTNode* trigger;
     int lineno;
 #ifndef CHAOS_COMPILER
@@ -177,5 +177,6 @@ void popExecutedFunctionStack();
 void freeFunctionReturn(FunctionCall* function_call);
 void decisionBreakLoop();
 void decisionContinueLoop();
+void updateDecisionSymbolChainScope();
 
 #endif

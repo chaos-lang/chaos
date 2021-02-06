@@ -266,7 +266,7 @@ FunctionCall* callFunction(char *name, char *module) {
 
     FunctionCall* parent_scope = getCurrentScope();
     pushExecutedFunctionStack(function_call);
-    function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope = parent_scope;
+    function_call_stack.arr[function_call_stack.size - 1]->parent_scope = parent_scope;
 
 #ifndef CHAOS_COMPILER
     if (
@@ -630,7 +630,7 @@ void returnSymbol(char *name) {
         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION, getTypeName(symbol->secondary_type), function_call_stack.arr[function_call_stack.size - 1]->function->name);
     }
 
-    scope_override = function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope;
+    scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
     function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
@@ -845,7 +845,7 @@ void executeDecision(FunctionCall* function_call) {
             decision_symbol_chain,
             decision_symbol_chain->secondary_type
         );
-        function_call_stack.arr[function_call_stack.size - 1]->function->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope;
+        function_call_stack.arr[function_call_stack.size - 1]->function->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
     }
     if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);
@@ -926,4 +926,10 @@ void decisionContinueLoop() {
 #else
     longjmp(LoopContinueDecision, 1);
 #endif
+}
+
+void updateDecisionSymbolChainScope() {
+    if (function_call_stack.size > 0 && decision_symbol_chain != NULL) {
+        decision_symbol_chain->scope = function_call_stack.arr[function_call_stack.size - 1];
+    }
 }

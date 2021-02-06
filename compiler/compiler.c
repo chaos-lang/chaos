@@ -683,6 +683,7 @@ transpile_decisions_label:
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
                 "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n"
                 "%*creturn;\n"
                 "%*c} else {\n"
                 "%*cresetFunctionParametersMode();\n"
@@ -693,6 +694,8 @@ transpile_decisions_label:
                 indent + indent_length,
                 ' ',
                 compiler_function_counter,
+                indent + indent_length,
+                ' ',
                 indent + indent_length,
                 ' ',
                 indent,
@@ -863,6 +866,7 @@ transpile_decisions_label:
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
                 "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n"
                 "%*c} else {\n"
                 "%*cresetFunctionParametersMode();\n"
                 "%*c}\n",
@@ -872,6 +876,8 @@ transpile_decisions_label:
                 indent + indent_length,
                 ' ',
                 compiler_function_counter,
+                indent + indent_length,
+                ' ',
                 indent,
                 ' ',
                 indent + indent_length,
@@ -2056,14 +2062,17 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cupdateSymbolByClonningFunctionReturn(\"%s\", function_call_%llu);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 ast_node->strings[0],
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_RETURN_VAR:
@@ -2193,13 +2202,16 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cupdateComplexSymbolByClonningFunctionReturn(function_call_%llu);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_PRINT_VAR:
@@ -3312,13 +3324,16 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\\n\", false, true);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_ECHO_FUNCTION_RETURN:
@@ -3335,13 +3350,16 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\", false, true);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_PRETTY_PRINT_FUNCTION_RETURN:
@@ -3358,13 +3376,16 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\\n\", true, true);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_PRETTY_ECHO_FUNCTION_RETURN:
@@ -3381,13 +3402,16 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cprintFunctionReturn(function_call_%llu, \"\", true, true);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_FUNCTION_RETURN:
@@ -3404,13 +3428,16 @@ transpile_node_label:
             fprintf(
                 c_fp,
                 "%*cfreeFunctionReturn(function_call_%llu);\n"
-                "%*cfree(function_call_%llu);\n",
+                "%*cfree(function_call_%llu);\n"
+                "%*cupdateDecisionSymbolChainScope();\n",
                 indent,
                 ' ',
                 compiler_function_counter,
                 indent,
                 ' ',
-                compiler_function_counter
+                compiler_function_counter,
+                indent,
+                ' '
             );
             break;
         case AST_NESTED_COMPLEX_TRANSITION:
@@ -3649,7 +3676,8 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
     fprintf(
         c_fp,
         "%*ccreateCloneFromFunctionReturn(\"%s\", %s, function_call_%llu, %s);\n"
-        "%*cfree(function_call_%llu);\n",
+        "%*cfree(function_call_%llu);\n"
+        "%*cupdateDecisionSymbolChainScope();\n",
         indent,
         ' ',
         ast_node->strings[0],
@@ -3658,7 +3686,9 @@ void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *mod
         type_strings[type2],
         indent,
         ' ',
-        compiler_function_counter
+        compiler_function_counter,
+        indent,
+        ' '
     );
 }
 

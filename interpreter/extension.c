@@ -123,7 +123,7 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
 }
 
 void returnVariable(Symbol* symbol) {
-    scope_override = function_call_stack.arr[function_call_stack.size - 1]->function->parent_scope;
+    scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
     function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
