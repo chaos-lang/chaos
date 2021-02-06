@@ -106,8 +106,6 @@ char *decision_buffer;
 
 string_array function_names_buffer;
 
-unsigned short recursion_depth;
-
 jmp_buf LoopBreakDecision;
 jmp_buf LoopContinueDecision;
 

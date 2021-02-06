@@ -322,7 +322,6 @@ void absorbError() {
         // callFunctionCleanUpSymbols(function_call);
         removeSymbolsByScope(function_call);
         if (function_call->dont_pop_module_stack) {
-            recursion_depth--;
             popExecutedFunctionStack();
         } else {
             callFunctionCleanUpCommon();

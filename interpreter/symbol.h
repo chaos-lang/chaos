@@ -60,7 +60,6 @@ typedef struct Symbol {
     unsigned long children_count;
     char *key;
     struct FunctionCall* scope;
-    unsigned short recursion_depth;
     enum Role role;
     struct _Function* param_of;
 } Symbol;

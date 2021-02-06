@@ -3,11 +3,11 @@ string4
 e
 y
 [start] =>
-	{id: 0, name: var7, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string2} =>
-	{id: 1, name: var8, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string4} =>
-	{id: 2, name: a, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: hey} =>
-	{id: 5, name: b, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: e} =>
-	{id: 9, name: c, 2nd_name: (null), key: (null), scope: N/A, depth: 0, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: y} =>
+	{id: 0, name: var7, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string2} =>
+	{id: 1, name: var8, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string4} =>
+	{id: 2, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: hey} =>
+	{id: 5, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: e} =>
+	{id: 9, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: y} =>
 [end]
 kaos
 hello

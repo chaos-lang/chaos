@@ -76,7 +76,6 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     symbol->value_type = value_type;
     symbol->children_count = 0;
     symbol->scope = getCurrentScope();
-    symbol->recursion_depth = recursion_depth;
     symbol->role = DEFAULT;
 
     if (start_symbol == NULL) {
@@ -157,8 +156,7 @@ Symbol* findSymbol(char *name) {
         if (
             symbol_cursor->name != NULL &&
             strcmp(symbol_cursor->name, name) == 0 &&
-            symbol_cursor->scope == getCurrentScope() &&
-            symbol_cursor->recursion_depth == recursion_depth
+            symbol_cursor->scope == getCurrentScope()
         ) {
             Symbol* symbol = symbol_cursor;
             return symbol;
@@ -528,8 +526,7 @@ bool isDefined(char *name) {
         if (
             symbol_cursor->name != NULL &&
             name != NULL && strcmp(symbol_cursor->name, name) == 0 &&
-            symbol_cursor->scope == getCurrentScope() &&
-            symbol_cursor->recursion_depth == recursion_depth
+            symbol_cursor->scope == getCurrentScope()
         ) {
             return true;
         }
@@ -563,13 +560,12 @@ void printSymbolTable() {
         encoded = encodeSymbolValueToString(symbol, false, false, true, 0, encoded, false);
         FunctionCall* scope = symbol->scope;
         printf(
-            "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, depth: %hu, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
+            "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
             symbol->id,
             symbol->name,
             symbol->secondary_name,
             symbol->key,
             scope->function->name,
-            symbol->recursion_depth,
             symbol->type,
             symbol->secondary_type,
             symbol->value_type,

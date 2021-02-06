@@ -228,7 +228,6 @@ FunctionCall* callFunction(char *name, char *module) {
                 parameter->secondary_type
             );
             parameter_call->scope = function_call;
-            parameter_call->recursion_depth = recursion_depth + 1;
             parameter_call->param_of = function;
 
             function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = parameter_call;
@@ -255,7 +254,6 @@ FunctionCall* callFunction(char *name, char *module) {
             parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
             strcpy(parameter_call->name, parameter->secondary_name);
             parameter_call->scope = function_call;
-            parameter_call->recursion_depth = recursion_depth + 1;
             parameter_call->param_of = function;
             parameter_call->secondary_type = parameter->secondary_type;
         }
@@ -287,8 +285,6 @@ FunctionCall* callFunction(char *name, char *module) {
 #ifndef CHAOS_COMPILER
     }
 #endif
-
-    recursion_depth++;
 
     if (function->is_dynamic) {
         callFunctionFromDynamicLibrary(function);
@@ -346,7 +342,6 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 
 #ifndef CHAOS_COMPILER
     if (function_call->dont_pop_module_stack) {
-        recursion_depth--;
         popExecutedFunctionStack();
     } else {
 #endif
@@ -376,7 +371,6 @@ void callFunctionCleanUpSymbols(FunctionCall* function_call) {
 }
 
 void callFunctionCleanUpCommon() {
-    recursion_depth--;
     popModuleStack();
     popExecutedFunctionStack();
 }
@@ -685,7 +679,6 @@ void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call) {
 }
 
 void initMainFunction() {
-    recursion_depth = 0;
     function_names_buffer.capacity = 0;
     function_names_buffer.size = 0;
     decision_buffer = "";
