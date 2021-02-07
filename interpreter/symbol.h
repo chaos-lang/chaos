@@ -65,8 +65,6 @@ typedef struct Symbol {
 } Symbol;
 
 Symbol* symbol_cursor;
-Symbol* start_symbol;
-Symbol* end_symbol;
 
 typedef struct symbol_array {
     Symbol** arr;
@@ -191,6 +189,7 @@ bool resolveRelGreatUnknown(char* name_l, char* name_r);
 bool resolveRelSmallUnknown(char* name_l, char* name_r);
 bool resolveRelGreatEqualUnknown(char* name_l, char* name_r);
 bool resolveRelSmallEqualUnknown(char* name_l, char* name_r);
+void changeSymbolScope(Symbol* symbol, FunctionCall* scope);
 
 #include "interpreter.h"
 

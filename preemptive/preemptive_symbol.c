@@ -66,7 +66,8 @@ Symbol* preemptive_findSymbol(char *name, _Function* function) {
         symbol_cursor = symbol_cursor->next;
     }
 
-    symbol_cursor = start_symbol;
+    FunctionCall* scope = getCurrentScope();
+    symbol_cursor = scope->start_symbol;
     while (symbol_cursor != NULL) {
         if (
             symbol_cursor->secondary_name != NULL &&

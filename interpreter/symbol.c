@@ -46,8 +46,6 @@ bool is_complex_parsing = false;
 bool disable_complex_mode = false;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
-    symbol_cursor = start_symbol;
-
     Symbol* symbol;
     symbol = (struct Symbol*)calloc(1, sizeof(Symbol));
     symbol->id = symbol_id_counter++;
@@ -75,17 +73,17 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     symbol->value = value;
     symbol->value_type = value_type;
     symbol->children_count = 0;
-    symbol->scope = getCurrentScope();
+    symbol->scope = isComplexMode() ? scopeless : getCurrentScope();
     symbol->role = DEFAULT;
 
-    if (start_symbol == NULL) {
-        start_symbol = symbol;
-        end_symbol = symbol;
+    if (symbol->scope->start_symbol == NULL) {
+        symbol->scope->start_symbol = symbol;
+        symbol->scope->end_symbol = symbol;
     } else {
-        end_symbol->next = symbol;
-        symbol->previous = end_symbol;
-        end_symbol = symbol;
-        end_symbol->next = NULL;
+        symbol->scope->end_symbol->next = symbol;
+        symbol->previous = symbol->scope->end_symbol;
+        symbol->scope->end_symbol = symbol;
+        symbol->scope->end_symbol->next = NULL;
     }
 
     addSymbolToComplex(symbol);
@@ -123,16 +121,16 @@ void removeSymbol(Symbol* symbol) {
     Symbol* next_symbol = symbol->next;
 
     if (previous_symbol == NULL && next_symbol == NULL) {
-        start_symbol = NULL;
-        end_symbol = NULL;
+        symbol->scope->start_symbol = NULL;
+        symbol->scope->end_symbol = NULL;
         freeSymbol(symbol);
         return;
     } else if (previous_symbol == NULL) {
-        start_symbol = next_symbol;
-        start_symbol->previous = NULL;
+        symbol->scope->start_symbol = next_symbol;
+        symbol->scope->start_symbol->previous = NULL;
     } else if (next_symbol == NULL) {
-        end_symbol = previous_symbol;
-        end_symbol->next = NULL;
+        symbol->scope->end_symbol = previous_symbol;
+        symbol->scope->end_symbol->next = NULL;
     } else {
         previous_symbol->next = next_symbol;
         next_symbol->previous = previous_symbol;
@@ -151,12 +149,12 @@ void freeSymbol(Symbol* symbol) {
 }
 
 Symbol* findSymbol(char *name) {
-    symbol_cursor = start_symbol;
+    FunctionCall* scope = getCurrentScope();
+    symbol_cursor = scope->start_symbol;
     while (symbol_cursor != NULL) {
         if (
             symbol_cursor->name != NULL &&
-            strcmp(symbol_cursor->name, name) == 0 &&
-            symbol_cursor->scope == getCurrentScope()
+            strcmp(symbol_cursor->name, name) == 0
         ) {
             Symbol* symbol = symbol_cursor;
             return symbol;
@@ -175,7 +173,8 @@ Symbol* getSymbol(char *name) {
 }
 
 Symbol* getSymbolById(unsigned long long id) {
-    symbol_cursor = start_symbol;
+    FunctionCall* scope = getCurrentScope();
+    symbol_cursor = scope->start_symbol;
     while (symbol_cursor != NULL) {
         if (symbol_cursor->id == id) {
             Symbol* symbol = symbol_cursor;
@@ -374,7 +373,18 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
     switch (symbol->type)
     {
         case K_BOOL:
-            encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
+            switch (symbol->value_type)
+            {
+                case V_BOOL:
+                    encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
+                    break;
+                case V_VOID:
+                    encoded = strcat_ext(encoded, "N/A");
+                    break;
+                default:
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+                    break;
+            }
             return encoded;
         case K_NUMBER:
             switch (symbol->value_type)
@@ -521,12 +531,12 @@ void printSymbolValueEndWithNewLine(Symbol* symbol, bool pretty, bool escaped) {
 }
 
 bool isDefined(char *name) {
-    symbol_cursor = start_symbol;
+    FunctionCall* scope = getCurrentScope();
+    symbol_cursor = scope->start_symbol;
     while (symbol_cursor != NULL) {
         if (
             symbol_cursor->name != NULL &&
-            name != NULL && strcmp(symbol_cursor->name, name) == 0 &&
-            symbol_cursor->scope == getCurrentScope()
+            name != NULL && strcmp(symbol_cursor->name, name) == 0
         ) {
             return true;
         }
@@ -553,28 +563,35 @@ void addSymbolToComplex(Symbol* symbol) {
 }
 
 void printSymbolTable() {
-    Symbol *symbol = start_symbol;
     printf("[start] =>\n");
-    while(symbol != NULL) {
-        char *encoded = NULL;
-        encoded = encodeSymbolValueToString(symbol, false, false, true, 0, encoded, false);
-        FunctionCall* scope = symbol->scope;
-        printf(
-            "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
-            symbol->id,
-            symbol->name,
-            symbol->secondary_name,
-            symbol->key,
-            scope->function->name,
-            symbol->type,
-            symbol->secondary_type,
-            symbol->value_type,
-            symbol->role,
-            symbol->param_of != NULL ? symbol->param_of->name : "",
-            encoded
-        );
-        symbol = symbol->next;
-        free(encoded);
+    for (unsigned i = 0; i < function_call_stack.size + 1; i++) {
+        Symbol *symbol;
+        if (i == 0)
+            symbol = scopeless->start_symbol;
+        else
+            symbol = function_call_stack.arr[i - 1]->start_symbol;
+
+        while(symbol != NULL) {
+            char *encoded = NULL;
+            encoded = encodeSymbolValueToString(symbol, false, false, true, 0, encoded, false);
+            FunctionCall* scope = symbol->scope;
+            printf(
+                "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
+                symbol->id,
+                symbol->name,
+                symbol->secondary_name,
+                symbol->key,
+                scope->function->name,
+                symbol->type,
+                symbol->secondary_type,
+                symbol->value_type,
+                symbol->role,
+                symbol->param_of != NULL ? symbol->param_of->name : "",
+                encoded
+            );
+            symbol = symbol->next;
+            free(encoded);
+        }
     }
     printf("[end]\n");
 }
@@ -1146,9 +1163,6 @@ FunctionCall* getCurrentScope() {
 
     if (function_call_stack.size > 0) {
         return function_call_stack.arr[function_call_stack.size - 1];
-    } else if (function_parameters_mode != NULL) {
-        dummy_scope->function = function_parameters_mode;
-        return dummy_scope;
     } else {
         return scopeless;
     }
@@ -1162,7 +1176,7 @@ Symbol* getSymbolFunctionParameter(char *name) {
     }
 
     Symbol* symbol = getSymbol(name);
-    scope_override = scopeless;
+    scope_override = function_call_start;
     Symbol* clone_symbol = createCloneFromSymbol(
         NULL,
         symbol->type,
@@ -1174,11 +1188,17 @@ Symbol* getSymbolFunctionParameter(char *name) {
 }
 
 void freeAllSymbols() {
-    symbol_cursor = start_symbol;
-    while (symbol_cursor != NULL) {
-        Symbol* symbol = symbol_cursor;
-        symbol_cursor = symbol_cursor->next;
-        freeSymbol(symbol);
+    for (unsigned i = 0; i < function_call_stack.size + 1; i++) {
+        if (i == 0)
+            symbol_cursor = scopeless->start_symbol;
+        else
+            symbol_cursor = function_call_stack.arr[i - 1]->start_symbol;
+
+        while (symbol_cursor != NULL) {
+            Symbol* symbol = symbol_cursor;
+            symbol_cursor = symbol_cursor->next;
+            freeSymbol(symbol);
+        }
     }
 }
 
@@ -1332,13 +1352,13 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
 }
 
 void removeSymbolsByScope(FunctionCall* scope) {
-    symbol_cursor = start_symbol;
+    symbol_cursor = scope->start_symbol;
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
-        if (symbol->scope == scope && symbol != decision_symbol_chain) {
+        if (symbol != decision_symbol_chain) {
             removeSymbol(symbol);
-            removeSymbolsByScope(scope);
+            // removeSymbolsByScope(scope);
         }
     }
 }
@@ -1682,4 +1702,35 @@ bool resolveRelSmallEqualUnknown(char* name_l, char* name_r) {
             break;
     }
     return 0;
+}
+
+void changeSymbolScope(Symbol* symbol, FunctionCall* scope) {
+    Symbol* previous_symbol = symbol->previous;
+    Symbol* next_symbol = symbol->next;
+
+    if (previous_symbol == NULL && next_symbol == NULL) {
+        symbol->scope->start_symbol = NULL;
+        symbol->scope->end_symbol = NULL;
+    } else if (previous_symbol == NULL) {
+        symbol->scope->start_symbol = next_symbol;
+        symbol->scope->start_symbol->previous = NULL;
+    } else if (next_symbol == NULL) {
+        symbol->scope->end_symbol = previous_symbol;
+        symbol->scope->end_symbol->next = NULL;
+    } else {
+        previous_symbol->next = next_symbol;
+        next_symbol->previous = previous_symbol;
+    }
+
+    symbol->scope = scope;
+
+    if (symbol->scope->start_symbol == NULL) {
+        symbol->scope->start_symbol = symbol;
+        symbol->scope->end_symbol = symbol;
+    } else {
+        symbol->scope->end_symbol->next = symbol;
+        symbol->previous = symbol->scope->end_symbol;
+        symbol->scope->end_symbol = symbol;
+        symbol->scope->end_symbol->next = NULL;
+    }
 }

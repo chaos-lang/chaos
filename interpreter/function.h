@@ -82,6 +82,8 @@ typedef struct FunctionCall {
     struct FunctionCall* parent_scope;
     struct ASTNode* trigger;
     int lineno;
+    Symbol* start_symbol;
+    Symbol* end_symbol;
 #ifndef CHAOS_COMPILER
     bool dont_pop_module_stack;
 #endif
@@ -94,6 +96,7 @@ typedef struct function_call_array {
 
 function_call_array function_call_stack;
 
+FunctionCall* function_call_start;
 FunctionCall* scopeless;
 FunctionCall* scope_override;
 FunctionCall* dummy_scope;
@@ -140,6 +143,7 @@ void addFunctionOptionalParameterFloat(char *secondary_name, long double f);
 void addFunctionOptionalParameterString(char *secondary_name, char *s);
 void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type);
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional);
+void initFunctionCall();
 void addFunctionCallParameterBool(bool b);
 void addFunctionCallParameterInt(long long i);
 void addFunctionCallParameterFloat(long double f);

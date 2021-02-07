@@ -139,7 +139,7 @@ bar
 [start] =>
 	{id: 0, name: (null), 2nd_name: param3, key: (null), scope: N/A, type: 2, 2nd_type: 3, value_type: 4, role: 1, param_of: f1, value: N/A} =>
 	{id: 1, name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 1, 2nd_type: 3, value_type: 4, role: 1, param_of: f1, value: N/A} =>
-	{id: 2, name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 0, 2nd_type: 3, value_type: 4, role: 1, param_of: f1, value: false} =>
+	{id: 2, name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 0, 2nd_type: 3, value_type: 4, role: 1, param_of: f1, value: N/A} =>
 	{id: 3, name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 1, param_of: f2, value: []} =>
 	{id: 4, name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 2, 2nd_type: 3, value_type: 4, role: 1, param_of: f2, value: N/A} =>
 	{id: 5, name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 1, param_of: f3, value: {}} =>
@@ -151,7 +151,7 @@ bar
 	{id: 11, name: (null), 2nd_name: y, key: (null), scope: N/A, type: 1, 2nd_type: 3, value_type: 4, role: 1, param_of: everything_f3, value: N/A} =>
 	{id: 12, name: (null), 2nd_name: x, key: (null), scope: N/A, type: 1, 2nd_type: 3, value_type: 4, role: 1, param_of: everything_f3, value: N/A} =>
 	{id: 13, name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 1, param_of: bool_optional_param_test, value: true} =>
-	{id: 14, name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 0, 2nd_type: 3, value_type: 4, role: 1, param_of: bool_optional_param_test, value: false} =>
+	{id: 14, name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 0, 2nd_type: 3, value_type: 4, role: 1, param_of: bool_optional_param_test, value: N/A} =>
 	{id: 15, name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 1, param_of: num_optional_param_test, value: 7} =>
 	{id: 16, name: (null), 2nd_name: param1, key: (null), scope: N/A, type: 1, 2nd_type: 3, value_type: 4, role: 1, param_of: num_optional_param_test, value: N/A} =>
 	{id: 17, name: (null), 2nd_name: param2, key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 1, param_of: str_optional_param_test, value: baz} =>

@@ -26,6 +26,7 @@ extern int kaos_lineno;
 extern int yyparse();
 
 bool decision_execution_mode = false;
+FunctionCall* function_call_start = NULL;
 
 #ifdef CHAOS_COMPILER
 extern jmp_buf LoopBreak;
@@ -182,7 +183,15 @@ void resetFunctionParametersMode() {
 
 FunctionCall* callFunction(char *name, char *module) {
     _Function* function = getFunction(name, module);
-    FunctionCall* function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+    FunctionCall* function_call;
+    if (function_call_start == NULL) {
+        function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+        function_call->start_symbol = NULL;
+        function_call->end_symbol = NULL;
+    } else {
+        function_call = function_call_start;
+    }
+    function_call_start = NULL;
     function_call->function = function;
 #ifndef CHAOS_COMPILER
     function_call->dont_pop_module_stack = false;
@@ -362,10 +371,6 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 }
 
 void callFunctionCleanUpSymbols(FunctionCall* function_call) {
-    for (unsigned short i = 0; i < function_call->function->parameter_count; i++) {
-        Symbol* parameter = function_call->function->parameters[i];
-        removeSymbolByName(parameter->secondary_name);
-    }
 
     removeSymbolsByScope(function_call);
 }
@@ -546,7 +551,6 @@ void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
     } else if (phase == PROGRAM) {
         symbol->role = CALL_PARAM;
     }
-    setScopeless(symbol);
 
     if (function_parameters_mode == NULL) {
         startFunctionParameters();
@@ -571,7 +575,17 @@ void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
     function_parameters_mode->parameters[0] = symbol;
 }
 
+void initFunctionCall() {
+    if (function_call_start == NULL) {
+        function_call_start = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+        function_call_start->start_symbol = NULL;
+        function_call_start->end_symbol = NULL;
+    }
+    scope_override = function_call_start;
+}
+
 void addFunctionCallParameterBool(bool b) {
+    initFunctionCall();
     union Value value;
     value.b = b;
     Symbol* symbol = addSymbol(NULL, K_BOOL, value, V_BOOL);
@@ -579,6 +593,7 @@ void addFunctionCallParameterBool(bool b) {
 }
 
 void addFunctionCallParameterInt(long long i) {
+    initFunctionCall();
     union Value value;
     value.i = i;
     Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_INT);
@@ -586,6 +601,7 @@ void addFunctionCallParameterInt(long long i) {
 }
 
 void addFunctionCallParameterFloat(long double f) {
+    initFunctionCall();
     union Value value;
     value.f = f;
     Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_FLOAT);
@@ -593,6 +609,7 @@ void addFunctionCallParameterFloat(long double f) {
 }
 
 void addFunctionCallParameterString(char *s) {
+    initFunctionCall();
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
@@ -601,11 +618,14 @@ void addFunctionCallParameterString(char *s) {
 }
 
 void addFunctionCallParameterSymbol(char *name) {
+    initFunctionCall();
     addSymbolToFunctionParameters(getSymbolFunctionParameter(name), false);
 }
 
 void addFunctionCallParameterList(enum Type type) {
+    initFunctionCall();
     Symbol* symbol = finishComplexMode(NULL, type);
+    changeSymbolScope(symbol, scope_override);
     addSymbolToFunctionParameters(symbol, false);
 }
 
@@ -683,6 +703,8 @@ void initMainFunction() {
     function_names_buffer.size = 0;
     decision_buffer = "";
     dummy_scope = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+    dummy_scope->start_symbol = NULL;
+    dummy_scope->end_symbol = NULL;
     initScopeless();
     initMainContext();
     initKaosApi();
@@ -697,6 +719,8 @@ void initScopeless() {
     scopeless_function->type = K_ANY;
     scopeless_function->parameter_count = 0;
     scopeless = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+    scopeless->start_symbol = NULL;
+    scopeless->end_symbol = NULL;
     scopeless->function = scopeless_function;
 }
 
@@ -832,13 +856,14 @@ void executeDecision(FunctionCall* function_call) {
         return;
 
     if (function_call_stack.arr[function_call_stack.size - 1]->function->type != K_VOID && function_call_stack.arr[function_call_stack.size - 1]->function->symbol == NULL) {
+        scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
         function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
             NULL,
             decision_symbol_chain->type,
             decision_symbol_chain,
             decision_symbol_chain->secondary_type
         );
-        function_call_stack.arr[function_call_stack.size - 1]->function->symbol->scope = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
+        scope_override = NULL;
     }
     if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
         removeSymbol(decision_symbol_chain);

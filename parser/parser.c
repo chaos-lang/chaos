@@ -300,6 +300,7 @@ void absorbError() {
     freeLeftRightBracketStackSymbols();
     resetFunctionParametersMode();
     freeFunctionNamesBuffer();
+    scope_override = NULL;
 
     fflush(stdout);
 #   if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
