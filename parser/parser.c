@@ -228,6 +228,7 @@ void freeEverything() {
     freeFreeStringStack();
     freeNestedComplexModeStack();
     free(function_call_stack.arr);
+    free(program_file_path);
 
 #ifndef CHAOS_COMPILER
     yylex_destroy();
@@ -236,7 +237,6 @@ void freeEverything() {
         free(program_code);
         if (fp_opened)
             fclose(fp);
-        free(program_file_path);
         free(program_file_dir);
     } else {
 #   if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)

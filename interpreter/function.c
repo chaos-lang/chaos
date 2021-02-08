@@ -199,17 +199,19 @@ FunctionCall* callFunction(char *name, char *module) {
 
     if (function_parameters_mode != NULL &&
         function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count)) {
+            resetFunctionParametersMode();
             free(function_call);
             throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
     }
 
     if (function->parameter_count > 0 && function_parameters_mode == NULL) {
+        resetFunctionParametersMode();
         free(function_call);
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
     }
 
     if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count) {
-        freeFunctionParametersMode();
+        resetFunctionParametersMode();
         free(function_call);
         throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
     }
@@ -225,7 +227,7 @@ FunctionCall* callFunction(char *name, char *module) {
             );
 
             if (function_parameters_mode->parameters == NULL) {
-                freeFunctionParametersMode();
+                resetFunctionParametersMode();
                 free(function_call);
                 throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
             }
@@ -244,7 +246,7 @@ FunctionCall* callFunction(char *name, char *module) {
             Symbol* parameter_call = function_parameters_mode->parameters[i];
 
             if (parameter->type != K_ANY && parameter->type != parameter_call->type) {
-                freeFunctionParametersMode();
+                resetFunctionParametersMode();
                 free(function_call);
                 throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
             }
@@ -253,7 +255,7 @@ FunctionCall* callFunction(char *name, char *module) {
                 for (unsigned long i = 0; i < parameter_call->children_count; i++) {
                     Symbol* child = parameter_call->children[i];
                     if (child->type != parameter->secondary_type) {
-                        freeFunctionParametersMode();
+                        resetFunctionParametersMode();
                         free(function_call);
                         throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
                     }
