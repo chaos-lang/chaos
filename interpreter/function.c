@@ -654,8 +654,6 @@ void returnSymbol(char *name) {
         symbol->secondary_type
     );
 
-    // if (decision_symbol_chain != NULL)
-    //     removeSymbol(decision_symbol_chain);
     decision_symbol_chain = createCloneFromSymbol(
         NULL,
         symbol->type,
@@ -952,6 +950,6 @@ void decisionContinueLoop() {
 
 void updateDecisionSymbolChainScope() {
     if (function_call_stack.size > 0 && decision_symbol_chain != NULL) {
-        decision_symbol_chain->scope = function_call_stack.arr[function_call_stack.size - 1];
+        changeSymbolScope(decision_symbol_chain, function_call_stack.arr[function_call_stack.size - 1]);
     }
 }

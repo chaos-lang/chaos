@@ -5,60 +5,62 @@
 {'a': true, 'b': false}
 {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}
 {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}
-[start] =>
-	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-	{id: 1, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 2, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 3, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
-	{id: 4, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-	{id: 5, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 6, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-	{id: 8, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 9, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
-	{id: 11, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-	{id: 12, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 13, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 14, name: dict1, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: {'a': true, 'b': false}} =>
-	{id: 15, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-	{id: 16, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-	{id: 17, name: dict2, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}} =>
-	{id: 18, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
-	{id: 19, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
-	{id: 20, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 21, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 22, name: dict3, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}} =>
-	{id: 23, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
-	{id: 24, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
-	{id: 25, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
-	{id: 26, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-[end]
-[start] =>
-	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-	{id: 1, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 2, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-	{id: 8, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 9, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
-	{id: 11, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-	{id: 12, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 13, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 14, name: dict1, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: {'a': true, 'b': false}} =>
-	{id: 15, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-	{id: 16, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-	{id: 17, name: dict2, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}} =>
-	{id: 18, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
-	{id: 19, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
-	{id: 20, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-	{id: 21, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-	{id: 22, name: dict3, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}} =>
-	{id: 23, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
-	{id: 24, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
-	{id: 25, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
-	{id: 26, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-[end]
+[scope]: N/A
+	[start] =>
+		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
+		{id: 1, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 2, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 3, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
+		{id: 4, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
+		{id: 5, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 6, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
+		{id: 8, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 9, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
+		{id: 11, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
+		{id: 12, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 13, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 14, name: dict1, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: {'a': true, 'b': false}} =>
+		{id: 15, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
+		{id: 16, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
+		{id: 17, name: dict2, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}} =>
+		{id: 18, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
+		{id: 19, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
+		{id: 20, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 21, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 22, name: dict3, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}} =>
+		{id: 23, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
+		{id: 24, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
+		{id: 25, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
+		{id: 26, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
+	[end]
+[scope]: N/A
+	[start] =>
+		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
+		{id: 1, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 2, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
+		{id: 8, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 9, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
+		{id: 11, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
+		{id: 12, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 13, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 14, name: dict1, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: {'a': true, 'b': false}} =>
+		{id: 15, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
+		{id: 16, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
+		{id: 17, name: dict2, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}} =>
+		{id: 18, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
+		{id: 19, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
+		{id: 20, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
+		{id: 21, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
+		{id: 22, name: dict3, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}} =>
+		{id: 23, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
+		{id: 24, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
+		{id: 25, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
+		{id: 26, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
+	[end]
 1
 2
 {'a': 5, 'b': 2, 'c': 3}

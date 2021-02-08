@@ -5,6 +5,7 @@ Unrecognized complex data type: Number for variable: b
 Absorbed by Interactive Shell
 4
 3
-[start] =>
-	{id: 2, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-[end]
+[scope]: N/A
+	[start] =>
+		{id: 2, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
+	[end]

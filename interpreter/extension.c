@@ -130,8 +130,7 @@ void returnVariable(Symbol* symbol) {
         symbol,
         symbol->secondary_type
     );
-    if (decision_symbol_chain != NULL)
-        removeSymbol(decision_symbol_chain);
+
     decision_symbol_chain = createCloneFromSymbol(
         NULL,
         symbol->type,

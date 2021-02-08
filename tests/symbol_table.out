@@ -1,9 +1,10 @@
-[start] =>
-	{id: 0, name: var1, 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-	{id: 2, name: var3, 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-	{id: 3, name: var4, 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-	{id: 4, name: var5, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 7} =>
-	{id: 5, name: var6, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 5.4} =>
-	{id: 6, name: var7, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string2} =>
-	{id: 7, name: var8, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string4} =>
-[end]
+[scope]: N/A
+	[start] =>
+		{id: 0, name: var1, 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
+		{id: 2, name: var3, 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
+		{id: 3, name: var4, 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
+		{id: 4, name: var5, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 7} =>
+		{id: 5, name: var6, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 5.4} =>
+		{id: 6, name: var7, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string2} =>
+		{id: 7, name: var8, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: string4} =>
+	[end]

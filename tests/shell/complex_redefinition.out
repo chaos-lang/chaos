@@ -8,19 +8,22 @@ File: "~/chaos/__interactive__.kaos", line 3, in <module>
 dict a = {'a': 1}
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
-[start] =>
-	{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 5} =>
-[end]
+[scope]: N/A
+	[start] =>
+		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 5} =>
+	[end]
 5
-[start] =>
-[end]
+[scope]: N/A
+	[start] =>
+	[end]
 Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 8, in <module>
 print a
 Undefined variable: a
 Absorbed by Interactive Shell
-[start] =>
-[end]
+[scope]: N/A
+	[start] =>
+	[end]
 Chaos Error (most recent call last):
 File: "~/chaos/__interactive__.kaos", line 10, in <module>
 del a

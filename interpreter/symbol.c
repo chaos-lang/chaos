@@ -563,20 +563,23 @@ void addSymbolToComplex(Symbol* symbol) {
 }
 
 void printSymbolTable() {
-    printf("[start] =>\n");
     for (unsigned i = 0; i < function_call_stack.size + 1; i++) {
         Symbol *symbol;
-        if (i == 0)
+        if (i == 0) {
             symbol = scopeless->start_symbol;
-        else
+            printf("[scope]: %s\n", scopeless->function->name);
+        } else {
             symbol = function_call_stack.arr[i - 1]->start_symbol;
+            printf("[scope]: %s\n", function_call_stack.arr[i - 1]->function->name);
+        }
 
+        printf("\t[start] =>\n");
         while(symbol != NULL) {
             char *encoded = NULL;
             encoded = encodeSymbolValueToString(symbol, false, false, true, 0, encoded, false);
             FunctionCall* scope = symbol->scope;
             printf(
-                "\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
+                "\t\t{id: %llu, name: %s, 2nd_name: %s, key: %s, scope: %s, type: %u, 2nd_type: %u, value_type: %u, role: %u, param_of: %s, value: %s} =>\n",
                 symbol->id,
                 symbol->name,
                 symbol->secondary_name,
@@ -592,8 +595,8 @@ void printSymbolTable() {
             symbol = symbol->next;
             free(encoded);
         }
+        printf("\t[end]\n");
     }
-    printf("[end]\n");
 }
 
 Symbol* addSymbolBool(char *name, bool b) {

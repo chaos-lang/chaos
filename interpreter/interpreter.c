@@ -1660,8 +1660,8 @@ ASTNode* eval_node_after_function_call(ASTNode* end_node) {
             break;
     }
 
-    free(function_call);
     updateDecisionSymbolChainScope();
+    free(function_call);
 
     return ast_node;
 }
