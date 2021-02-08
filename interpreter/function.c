@@ -344,7 +344,6 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
         !is_loop_breaked &&
         !is_loop_continued
     ) {
-        append_to_array_without_malloc(&free_string_stack, function_call->function->name);
         throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
         return;
     }
@@ -371,7 +370,6 @@ void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
 }
 
 void callFunctionCleanUpSymbols(FunctionCall* function_call) {
-
     removeSymbolsByScope(function_call);
 }
 
@@ -410,6 +408,8 @@ _Function* getFunction(char *name, char *module) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
+        if (scope_override != NULL)
+            free(scope_override);
         throw_error(
             E_UNDEFINED_FUNCTION,
             name,
@@ -434,6 +434,8 @@ _Function* getFunctionByModuleContext(char *name, char *module_context) {
         function_cursor = function_cursor->next;
     }
     if (phase == PROGRAM) {
+        if (scope_override != NULL)
+            free(scope_override);
         throw_error(
             E_UNDEFINED_FUNCTION,
             name,
@@ -652,6 +654,8 @@ void returnSymbol(char *name) {
         symbol->secondary_type
     );
 
+    // if (decision_symbol_chain != NULL)
+    //     removeSymbol(decision_symbol_chain);
     decision_symbol_chain = createCloneFromSymbol(
         NULL,
         symbol->type,

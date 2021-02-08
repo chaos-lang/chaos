@@ -1356,10 +1356,7 @@ void removeSymbolsByScope(FunctionCall* scope) {
     while (symbol_cursor != NULL) {
         Symbol* symbol = symbol_cursor;
         symbol_cursor = symbol_cursor->next;
-        if (symbol != decision_symbol_chain) {
-            removeSymbol(symbol);
-            // removeSymbolsByScope(scope);
-        }
+        removeSymbol(symbol);
     }
 }
 

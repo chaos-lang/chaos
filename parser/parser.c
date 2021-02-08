@@ -212,10 +212,10 @@ int initParser(int argc, char** argv) {
 #endif
 
 void freeEverything() {
+    freeAllSymbols();
     free(scopeless->function);
     free(scopeless);
     free(dummy_scope);
-    freeAllSymbols();
     freeAllFunctions();
     freeModulesBuffer();
     freeFunctionNamesBuffer();
