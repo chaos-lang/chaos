@@ -103,7 +103,7 @@ void throw_error_base(
             sprintf(error_msg, "Memory allocation for the function is failed!");
             break;
         case E_UNEXPECTED_VALUE_TYPE:
-            sprintf(error_msg, "Unexpected value type: %s for variable: %s", str1, str2);
+            sprintf(error_msg, "Unexpected value type: %llu for variable: %s", llu1, str1);
             break;
         case E_FUNCTION_DID_NOT_RETURN_ANYTHING:
             sprintf(error_msg, "The function '%s' did not return anything!", str1);

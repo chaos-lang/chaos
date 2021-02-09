@@ -52,6 +52,8 @@ tests/rosetta/spells
 coverage.txt
 .coverage
 
-# Benchmarking
+# Benchmarking & Profiling
 gmon.out
-benchmark.*
+*.bench
+.benchmark
+*.gcda

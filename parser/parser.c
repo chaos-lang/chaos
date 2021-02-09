@@ -152,7 +152,10 @@ int initParser(int argc, char** argv) {
         tmp_stdin = tmpfile();
 
         char buff[PATH_MAX];
-        GetCurrentDir(buff, PATH_MAX);
+        if (GetCurrentDir(buff, PATH_MAX) == NULL) {
+            fprintf(stderr, "getcwd() error\n");
+            exit(1);
+        }
 
         program_file_dir = malloc(strlen(buff) + 1);
         strcpy(program_file_dir, buff);

@@ -85,16 +85,16 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     FILE *c_fp = fopen(c_file_path, "w");
     if (c_fp == NULL)
     {
-        printf("Cannot open file! Error no: %d\n", errno);
-        printf("C source path: %s\n", c_file_path);
+        fprintf(stderr, "Cannot open file! Error no: %d\n", errno);
+        fprintf(stderr, "C source path: %s\n", c_file_path);
         exit(1);
     }
 
     FILE *h_fp = fopen(h_file_path, "w");
     if (h_fp == NULL)
     {
-        printf("Cannot open file! Error no: %d\n", errno);
-        printf("C header path: %s\n", h_file_path);
+        fprintf(stderr, "Cannot open file! Error no: %d\n", errno);
+        fprintf(stderr, "C header path: %s\n", h_file_path);
         exit(1);
     }
 
@@ -298,11 +298,13 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     sprintf(
         cmd,
 #   if !defined(__clang__)
-        "/c %s %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
+        "-s",
+        "-O3"
         "-fcommon",
 #   if !defined(__clang__)
         "-Wl,--stack,4294967296",
@@ -366,7 +368,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     if (extra_flags_count > 0)
         extra_flags_count--;
 
-    unsigned arg_count = 29 + extra_flags_count;
+    unsigned arg_count = 31 + extra_flags_count;
 #   if !defined(__clang__)
     arg_count++;
 #   endif
@@ -376,45 +378,50 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 #   endif
 
     char *c_compiler_args[arg_count];
-    c_compiler_args[0] = c_compiler_path;
-    c_compiler_args[1] = "-Werror";
-    c_compiler_args[2] = "-Wall";
-    c_compiler_args[3] = "-pedantic";
-    c_compiler_args[4] = "-fcommon";
-    c_compiler_args[5] = "-DCHAOS_COMPILER";
-    c_compiler_args[6] = "-o";
-    c_compiler_args[7] = bin_file_path;
-    c_compiler_args[8] = c_file_path;
-    c_compiler_args[9] = "/usr/local/include/chaos/utilities/helpers.c";
-    c_compiler_args[10] = "/usr/local/include/chaos/utilities/language.c";
-    c_compiler_args[11] = "/usr/local/include/chaos/utilities/cwalk.c";
-    c_compiler_args[12] = "/usr/local/include/chaos/ast/ast.c";
-    c_compiler_args[13] = "/usr/local/include/chaos/interpreter/interpreter.c";
-    c_compiler_args[14] = "/usr/local/include/chaos/interpreter/errors.c";
-    c_compiler_args[15] = "/usr/local/include/chaos/interpreter/extension.c";
-    c_compiler_args[16] = "/usr/local/include/chaos/interpreter/function.c";
-    c_compiler_args[17] = "/usr/local/include/chaos/interpreter/module.c";
-    c_compiler_args[18] = "/usr/local/include/chaos/interpreter/symbol.c";
-    c_compiler_args[19] = "/usr/local/include/chaos/compiler/lib/alternative.c";
-    c_compiler_args[20] = "/usr/local/include/chaos/parser/parser.c";
-    c_compiler_args[21] = "/usr/local/include/chaos/parser.tab.c";
-    c_compiler_args[22] = "/usr/local/include/chaos/lex.yy.c";
-    c_compiler_args[23] = "/usr/local/include/chaos/Chaos.c";
-    c_compiler_args[24] = "-lreadline";
-    c_compiler_args[25] = "-L/usr/local/opt/readline/lib";
-    c_compiler_args[26] = "-ldl";
-    c_compiler_args[27] = "-I/usr/local/include/chaos/";
+    int arg_i = 0;
+    c_compiler_args[arg_i++] = c_compiler_path;
+    c_compiler_args[arg_i++] = "-s";
+    c_compiler_args[arg_i++] = "-O3";
+    c_compiler_args[arg_i++] = "-Werror";
+    c_compiler_args[arg_i++] = "-Wall";
+    c_compiler_args[arg_i++] = "-pedantic";
+    c_compiler_args[arg_i++] = "-fcommon";
+    c_compiler_args[arg_i++] = "-DCHAOS_COMPILER";
+    c_compiler_args[arg_i++] = "-o";
+    c_compiler_args[arg_i++] = bin_file_path;
+    c_compiler_args[arg_i++] = c_file_path;
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/utilities/helpers.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/utilities/language.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/utilities/cwalk.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/ast/ast.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/interpreter.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/errors.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/extension.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/function.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/module.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/symbol.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/compiler/lib/alternative.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/parser/parser.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/parser.tab.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/lex.yy.c";
+    c_compiler_args[arg_i++] = "/usr/local/include/chaos/Chaos.c";
+    c_compiler_args[arg_i++] = "-lreadline";
+    c_compiler_args[arg_i++] = "-L/usr/local/opt/readline/lib";
+    c_compiler_args[arg_i++] = "-ldl";
+    c_compiler_args[arg_i++] = "-I/usr/local/include/chaos/";
 
     for (unsigned i = 0; i < (extra_flags_count); i++) {
-        c_compiler_args[28 + i] = extra_flags_arr.arr[i];
+        c_compiler_args[arg_i + i] = extra_flags_arr.arr[i];
+        arg_i++;
     }
 
 #   if !defined(__clang__)
-    c_compiler_args[28 + extra_flags_count] = "-fcompare-debug-second",
+    c_compiler_args[arg_i + extra_flags_count] = "-fcompare-debug-second",
 #   endif
 
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    c_compiler_args[29 + extra_flags_count] = "-Wl,-stack_size,0x100000000",
+    c_compiler_args[arg_i + extra_flags_count] = "-Wl,-stack_size,0x100000000",
+    arg_i++;
 #   endif
 
     c_compiler_args[arg_count - 1] = NULL;
@@ -431,7 +438,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     {
         // printf("Process %lu returned result: %d\n", (unsigned long) wait_result, status);
         if (status != 0) {
-            printf("Compilation of %s is failed!\n", c_file_path);
+            fprintf(stderr, "Compilation of %s is failed!\n", c_file_path);
             exit(1);
         }
     }
@@ -1002,9 +1009,9 @@ compiler_register_functions_label:
             ast_node->strings_size
         );
 
-    char* compiler_current_context;
-    char* compiler_current_module_context;
-    char* compiler_current_module;
+    char* compiler_current_context = NULL;
+    char* compiler_current_module_context = NULL;
+    char* compiler_current_module = NULL;
     if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
         compiler_current_context = compiler_getCurrentContext();
         compiler_current_module_context = compiler_getCurrentModuleContext();

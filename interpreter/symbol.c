@@ -238,7 +238,7 @@ char* _getSymbolValueString(Symbol* symbol) {
         strcpy(value, symbol->value.s);
         return value;
     } else {
-        throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
     }
     return "";
 }
@@ -265,7 +265,7 @@ long double _getSymbolValueFloat(Symbol* symbol) {
             return value;
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
             break;
     }
     return 0.0;
@@ -322,7 +322,7 @@ long long _getSymbolValueInt(Symbol* symbol) {
             return value;
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
             break;
     }
     return 0;
@@ -356,7 +356,7 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
             value = (long long)symbol->value.f;
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
             break;
     }
     return value * symbol->sign;
@@ -382,7 +382,7 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                     encoded = strcat_ext(encoded, "N/A");
                     break;
                 default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
                     break;
             }
             return encoded;
@@ -399,7 +399,7 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                     encoded = strcat_ext(encoded, "N/A");
                     break;
                 default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
                     break;
             }
             return encoded;
@@ -510,7 +510,7 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
                     encoded = strcat_ext(encoded, "N/A");
                     break;
                 default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
+                    throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
                     break;
             }
             return encoded;
@@ -1588,7 +1588,7 @@ bool resolveRelEqualUnknown(char* name_l, char* name_r) {
             return symbol_l->value.f == _getSymbolValueFloat(symbol_r);
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
             break;
     }
     return 0;
@@ -1610,7 +1610,7 @@ bool resolveRelNotEqualUnknown(char* name_l, char* name_r) {
             return symbol_l->value.f != _getSymbolValueFloat(symbol_r);
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
             break;
     }
     return 0;
@@ -1632,7 +1632,7 @@ bool resolveRelGreatUnknown(char* name_l, char* name_r) {
             return symbol_l->value.f > _getSymbolValueFloat(symbol_r);
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
             break;
     }
     return 0;
@@ -1654,7 +1654,7 @@ bool resolveRelSmallUnknown(char* name_l, char* name_r) {
             return symbol_l->value.f < _getSymbolValueFloat(symbol_r);
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
             break;
     }
     return 0;
@@ -1676,7 +1676,7 @@ bool resolveRelGreatEqualUnknown(char* name_l, char* name_r) {
             return symbol_l->value.f >= _getSymbolValueFloat(symbol_r);
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
             break;
     }
     return 0;
@@ -1698,7 +1698,7 @@ bool resolveRelSmallEqualUnknown(char* name_l, char* name_r) {
             return symbol_l->value.f <= _getSymbolValueFloat(symbol_r);
             break;
         default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol_l->value_type), symbol_l->name);
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
             break;
     }
     return 0;

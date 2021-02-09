@@ -47,7 +47,7 @@ ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
 ASTNode* startForeachDict(char *list_name, char *element_key, char *element_value, ASTNode* ast_node);
 bool is_node_function_related(ASTNode* ast_node);
 ASTNode* register_functions(ASTNode* ast_node, char *module);
-ASTNode* eval_node(ASTNode* ast_node, char *module);
+ASTNode* eval_node(ASTNode* ast_node, char *module) __attribute__ ((hot));
 ASTNode* walk_until_end(ASTNode* ast_node, char *module);
 void breakLoop();
 void continueLoop();

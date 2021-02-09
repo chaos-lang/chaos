@@ -94,7 +94,10 @@ char *fileGetContents(char *file_path) {
         file_buffer = malloc(length + 1);
         file_buffer[length] = '\0';
         if (file_buffer) {
-            fread(file_buffer, 1, length, f);
+            if (fread(file_buffer, 1, length, f) != length && ferror(f)) {
+                append_to_array_without_malloc(&free_string_stack, file_path);
+                throw_error(E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH, file_path);
+            }
         }
         fclose(f);
     } else {

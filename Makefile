@@ -6,6 +6,7 @@ UNAME_S := $(shell uname -s)
 
 default:
 	export CHAOS_COMPILER=gcc
+	export CHAOS_EXTRA_FLAGS='-s -O3'
 	${MAKE} chaos
 
 requirements:
@@ -35,36 +36,47 @@ endif
 
 clang:
 	export CHAOS_COMPILER=clang
+	export CHAOS_EXTRA_FLAGS='-s -O3'
 	${MAKE} chaos
 
 dev:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS=-ggdb
+	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev:
 	export CHAOS_COMPILER=clang
-	export CHAOS_EXTRA_FLAGS=-ggdb
+	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 prof:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS=-pg
+	export CHAOS_EXTRA_FLAGS='-O3 -fprofile-generate'
+	${MAKE} chaos
+
+prof-use:
+	export CHAOS_COMPILER=gcc
+	export CHAOS_EXTRA_FLAGS='-s -O3 -fprofile-use'
+	${MAKE} chaos
+
+bench:
+	export CHAOS_COMPILER=gcc
+	export CHAOS_EXTRA_FLAGS='-pg'
 	${MAKE} chaos
 
 clang-dev-sanitizer-memory:
 	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -g -O0 -fno-optimize-sibling-calls'
-	export CHAOS_EXTRA_FLAGS=-ggdb
+	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev-sanitizer-address:
 	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g -O0'
-	export CHAOS_EXTRA_FLAGS=-ggdb
+	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev-sanitizer-undefined_behavior:
 	export CHAOS_COMPILER='clang -fsanitize=undefined -g -O0'
-	export CHAOS_EXTRA_FLAGS=-ggdb
+	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-coverage:
@@ -73,7 +85,7 @@ clang-coverage:
 
 free-debug:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS=-DCHAOS_DEBUG -ggdb
+	export CHAOS_EXTRA_FLAGS='-DCHAOS_DEBUG -Og -ggdb'
 	${MAKE} chaos
 
 help.h:
@@ -178,7 +190,7 @@ memcheck-compiler:
 	./tests/memcheck_compiler.sh
 
 compile-dev:
-	gcc -DCHAOS_COMPILER -o build/main build/main.c /usr/local/include/chaos/utilities/helpers.c /usr/local/include/chaos/ast/ast.c /usr/local/include/chaos/interpreter/errors.c /usr/local/include/chaos/interpreter/extension.c /usr/local/include/chaos/interpreter/function.c /usr/local/include/chaos/interpreter/module.c /usr/local/include/chaos/interpreter/symbol.c /usr/local/include/chaos/compiler/compiler.c /usr/local/include/chaos/compiler/lib/alternative.c /usr/local/include/chaos/Chaos.c -lreadline -L/usr/local/opt/readline/lib -ldl -I/usr/local/include/chaos/ -ggdb
+	gcc -DCHAOS_COMPILER -o build/main build/main.c /usr/local/include/chaos/utilities/helpers.c /usr/local/include/chaos/ast/ast.c /usr/local/include/chaos/interpreter/errors.c /usr/local/include/chaos/interpreter/extension.c /usr/local/include/chaos/interpreter/function.c /usr/local/include/chaos/interpreter/module.c /usr/local/include/chaos/interpreter/symbol.c /usr/local/include/chaos/compiler/compiler.c /usr/local/include/chaos/compiler/lib/alternative.c /usr/local/include/chaos/Chaos.c -lreadline -L/usr/local/opt/readline/lib -ldl -I/usr/local/include/chaos/ -Og -ggdb
 
 rosetta-install:
 	./tests/rosetta/install.sh
@@ -197,3 +209,6 @@ rosetta-update:
 
 benchmark:
 	./benchmark.sh
+
+profile:
+	./profile.sh
