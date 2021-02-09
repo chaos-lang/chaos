@@ -304,7 +304,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
 #   endif
         c_compiler_path,
         "-s",
-        "-O3"
+        "-O3",
         "-fcommon",
 #   if !defined(__clang__)
         "-Wl,--stack,4294967296",

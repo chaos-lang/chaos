@@ -139,13 +139,13 @@ test-compiler-dev:
 	./tests/compiler.sh -e "-ggdb"
 
 test-compiler-dev-sanitizer-memory:
-	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -O1 -fno-optimize-sibling-calls -ggdb"
+	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -O0 -ggdb"
 
 test-compiler-dev-sanitizer-address:
-	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -g -ggdb"
+	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -g -O0 -ggdb"
 
 test-compiler-dev-sanitizer-undefined_behavior:
-	./tests/compiler.sh -e "-fsanitize=undefined -ggdb"
+	./tests/compiler.sh -e "-fsanitize=undefined -O0 -ggdb"
 
 test-extensions-linux-gcc:
 	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so && \
