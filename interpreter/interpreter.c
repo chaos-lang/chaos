@@ -303,25 +303,313 @@ register_functions_label:
 }
 
 ASTNode* eval_node(ASTNode* ast_node, char *module) {
-eval_node_label:
+void *generic_labels[275] = {
+    &&AST_STEP,
+    &&AST_VAR_CREATE_BOOL,
+    &&AST_VAR_CREATE_BOOL_VAR,
+    &&AST_VAR_CREATE_BOOL_VAR_EL,
+    &&AST_VAR_CREATE_BOOL_FUNC_RETURN,
+    &&AST_VAR_CREATE_NUMBER,
+    &&AST_VAR_CREATE_NUMBER_VAR,
+    &&AST_VAR_CREATE_NUMBER_VAR_EL,
+    &&AST_VAR_CREATE_NUMBER_FUNC_RETURN,
+    &&AST_VAR_CREATE_STRING,
+    &&AST_VAR_CREATE_STRING_VAR,
+    &&AST_VAR_CREATE_STRING_VAR_EL,
+    &&AST_VAR_CREATE_STRING_FUNC_RETURN,
+    &&AST_VAR_CREATE_ANY_BOOL,
+    &&AST_VAR_CREATE_ANY_NUMBER,
+    &&AST_VAR_CREATE_ANY_STRING,
+    &&AST_VAR_CREATE_ANY_VAR,
+    &&AST_VAR_CREATE_ANY_VAR_EL,
+    &&AST_VAR_CREATE_ANY_FUNC_RETURN,
+    &&AST_VAR_CREATE_LIST,
+    &&AST_VAR_CREATE_LIST_VAR,
+    &&AST_VAR_CREATE_LIST_FUNC_RETURN,
+    &&AST_VAR_CREATE_DICT,
+    &&AST_VAR_CREATE_DICT_VAR,
+    &&AST_VAR_CREATE_DICT_FUNC_RETURN,
+    &&AST_VAR_CREATE_BOOL_LIST,
+    &&AST_VAR_CREATE_BOOL_LIST_VAR,
+    &&AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN,
+    &&AST_VAR_CREATE_BOOL_DICT,
+    &&AST_VAR_CREATE_BOOL_DICT_VAR,
+    &&AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN,
+    &&AST_VAR_CREATE_NUMBER_LIST,
+    &&AST_VAR_CREATE_NUMBER_LIST_VAR,
+    &&AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN,
+    &&AST_VAR_CREATE_NUMBER_DICT,
+    &&AST_VAR_CREATE_NUMBER_DICT_VAR,
+    &&AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN,
+    &&AST_VAR_CREATE_STRING_LIST,
+    &&AST_VAR_CREATE_STRING_LIST_VAR,
+    &&AST_VAR_CREATE_STRING_LIST_FUNC_RETURN,
+    &&AST_VAR_CREATE_STRING_DICT,
+    &&AST_VAR_CREATE_STRING_DICT_VAR,
+    &&AST_VAR_CREATE_STRING_DICT_FUNC_RETURN,
+    &&AST_VAR_UPDATE_BOOL,
+    &&AST_VAR_UPDATE_NUMBER,
+    &&AST_VAR_UPDATE_STRING,
+    &&AST_VAR_UPDATE_LIST,
+    &&AST_VAR_UPDATE_DICT,
+    &&AST_VAR_UPDATE_VAR,
+    &&AST_VAR_UPDATE_VAR_EL,
+    &&AST_VAR_UPDATE_FUNC_RETURN,
+    &&AST_RETURN_VAR,
+    &&AST_PRINT_COMPLEX_EL,
+    &&AST_COMPLEX_EL_UPDATE_BOOL,
+    &&AST_COMPLEX_EL_UPDATE_NUMBER,
+    &&AST_COMPLEX_EL_UPDATE_STRING,
+    &&AST_COMPLEX_EL_UPDATE_LIST,
+    &&AST_COMPLEX_EL_UPDATE_DICT,
+    &&AST_COMPLEX_EL_UPDATE_VAR,
+    &&AST_COMPLEX_EL_UPDATE_VAR_EL,
+    &&AST_COMPLEX_EL_UPDATE_FUNC_RETURN,
+    &&AST_PRINT_VAR,
+    &&AST_PRINT_VAR_EL,
+    &&AST_PRINT_EXPRESSION,
+    &&AST_PRINT_MIXED_EXPRESSION,
+    &&AST_PRINT_STRING,
+    &&AST_PRINT_INTERACTIVE_VAR,
+    &&AST_PRINT_INTERACTIVE_EXPRESSION,
+    &&AST_PRINT_INTERACTIVE_MIXED_EXPRESSION,
+    &&AST_ECHO_VAR,
+    &&AST_ECHO_VAR_EL,
+    &&AST_ECHO_EXPRESSION,
+    &&AST_ECHO_MIXED_EXPRESSION,
+    &&AST_ECHO_STRING,
+    &&AST_PRETTY_PRINT_VAR,
+    &&AST_PRETTY_PRINT_VAR_EL,
+    &&AST_PRETTY_ECHO_VAR,
+    &&AST_PRETTY_ECHO_VAR_EL,
+    &&AST_PARENTHESIS,
+    &&AST_EXPRESSION_VALUE,
+    &&AST_EXPRESSION_PLUS,
+    &&AST_EXPRESSION_MINUS,
+    &&AST_EXPRESSION_MULTIPLY,
+    &&AST_EXPRESSION_BITWISE_AND,
+    &&AST_EXPRESSION_BITWISE_OR,
+    &&AST_EXPRESSION_BITWISE_XOR,
+    &&AST_EXPRESSION_BITWISE_NOT,
+    &&AST_EXPRESSION_BITWISE_LEFT_SHIFT,
+    &&AST_EXPRESSION_BITWISE_RIGHT_SHIFT,
+    &&AST_VAR_EXPRESSION_VALUE,
+    &&AST_VAR_EXPRESSION_INCREMENT,
+    &&AST_VAR_EXPRESSION_DECREMENT,
+    &&AST_VAR_EXPRESSION_INCREMENT_ASSIGN,
+    &&AST_VAR_EXPRESSION_ASSIGN_INCREMENT,
+    &&AST_MIXED_EXPRESSION_VALUE,
+    &&AST_MIXED_EXPRESSION_PLUS,
+    &&AST_MIXED_EXPRESSION_MINUS,
+    &&AST_MIXED_EXPRESSION_MULTIPLY,
+    &&AST_MIXED_EXPRESSION_DIVIDE,
+    &&AST_VAR_MIXED_EXPRESSION_VALUE,
+    &&AST_BOOLEAN_EXPRESSION_VALUE,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_NOT,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_NOT_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_VALUE,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_BOOLEAN,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_EXP,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED,
+    &&AST_BOOLEAN_EXPRESSION_REL_EQUAL_UNKNOWN,
+    &&AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_UNKNOWN,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_UNKNOWN,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_UNKNOWN,
+    &&AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_UNKNOWN,
+    &&AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_UNKNOWN,
+    &&AST_VAR_BOOLEAN_EXPRESSION_VALUE,
+    &&AST_DELETE_VAR,
+    &&AST_DELETE_VAR_EL,
+    &&AST_PRINT_SYMBOL_TABLE,
+    &&AST_LIST_START,
+    &&AST_LIST_ADD_VAR,
+    &&AST_LIST_ADD_VAR_EL,
+    &&AST_LIST_NESTED_FINISH,
+    &&AST_DICT_START,
+    &&AST_DICT_ADD_VAR,
+    &&AST_DICT_ADD_VAR_EL,
+    &&AST_DICT_NESTED_FINISH,
+    &&AST_POP_NESTED_COMPLEX_STACK,
+    &&AST_LEFT_RIGHT_BRACKET_EXPRESSION,
+    &&AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION,
+    &&AST_LEFT_RIGHT_BRACKET_STRING,
+    &&AST_LEFT_RIGHT_BRACKET_VAR,
+    &&AST_LEFT_RIGHT_BRACKET_VAR_MINUS,
+    &&AST_BUILD_COMPLEX_VARIABLE,
+    &&AST_EXIT_SUCCESS,
+    &&AST_EXIT_EXPRESSION,
+    &&AST_EXIT_VAR,
+    &&AST_START_TIMES_DO,
+    &&AST_START_TIMES_DO_INFINITE,
+    &&AST_START_TIMES_DO_VAR,
+    &&AST_START_FOREACH,
+    &&AST_START_FOREACH_DICT,
+    &&AST_END,
+    &&AST_PRINT_FUNCTION_TABLE,
+    &&AST_FUNCTION_PARAMETERS_START,
+    &&AST_FUNCTION_STEP,
+    &&AST_FUNCTION_PARAMETER_BOOL,
+    &&AST_FUNCTION_PARAMETER_NUMBER,
+    &&AST_FUNCTION_PARAMETER_STRING,
+    &&AST_FUNCTION_PARAMETER_LIST,
+    &&AST_FUNCTION_PARAMETER_BOOL_LIST,
+    &&AST_FUNCTION_PARAMETER_NUMBER_LIST,
+    &&AST_FUNCTION_PARAMETER_STRING_LIST,
+    &&AST_FUNCTION_PARAMETER_DICT,
+    &&AST_FUNCTION_PARAMETER_BOOL_DICT,
+    &&AST_FUNCTION_PARAMETER_NUMBER_DICT,
+    &&AST_FUNCTION_PARAMETER_STRING_DICT,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_BOOL,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_STRING,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_LIST,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_LIST,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_LIST,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_DICT,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_DICT,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_DICT,
+    &&AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT,
+    &&AST_FUNCTION_CALL_PARAMETERS_START,
+    &&AST_FUNCTION_CALL_PARAMETER_BOOL,
+    &&AST_FUNCTION_CALL_PARAMETER_NUMBER,
+    &&AST_FUNCTION_CALL_PARAMETER_STRING,
+    &&AST_FUNCTION_CALL_PARAMETER_VAR,
+    &&AST_FUNCTION_CALL_PARAMETER_LIST,
+    &&AST_FUNCTION_CALL_PARAMETER_DICT,
+    &&AST_DEFINE_FUNCTION_BOOL,
+    &&AST_DEFINE_FUNCTION_NUMBER,
+    &&AST_DEFINE_FUNCTION_STRING,
+    &&AST_DEFINE_FUNCTION_ANY,
+    &&AST_DEFINE_FUNCTION_LIST,
+    &&AST_DEFINE_FUNCTION_DICT,
+    &&AST_DEFINE_FUNCTION_BOOL_LIST,
+    &&AST_DEFINE_FUNCTION_BOOL_DICT,
+    &&AST_DEFINE_FUNCTION_NUMBER_LIST,
+    &&AST_DEFINE_FUNCTION_NUMBER_DICT,
+    &&AST_DEFINE_FUNCTION_STRING_LIST,
+    &&AST_DEFINE_FUNCTION_STRING_DICT,
+    &&AST_DEFINE_FUNCTION_VOID,
+    &&AST_PRINT_FUNCTION_RETURN,
+    &&AST_ECHO_FUNCTION_RETURN,
+    &&AST_PRETTY_PRINT_FUNCTION_RETURN,
+    &&AST_PRETTY_ECHO_FUNCTION_RETURN,
+    &&AST_FUNCTION_RETURN,
+    &&AST_ADD_FUNCTION_NAME,
+    &&AST_APPEND_MODULE,
+    &&AST_PREPEND_MODULE,
+    &&AST_MODULE_IMPORT,
+    &&AST_MODULE_IMPORT_AS,
+    &&AST_MODULE_IMPORT_PARTIAL,
+    &&AST_NESTED_COMPLEX_TRANSITION,
+    &&AST_DECISION_DEFINE,
+    &&AST_DECISION_MAKE_BOOLEAN,
+    &&AST_DECISION_MAKE_BOOLEAN_BREAK,
+    &&AST_DECISION_MAKE_BOOLEAN_CONTINUE,
+    &&AST_DECISION_MAKE_BOOLEAN_RETURN,
+    &&AST_DECISION_MAKE_DEFAULT,
+    &&AST_DECISION_MAKE_DEFAULT_BREAK,
+    &&AST_DECISION_MAKE_DEFAULT_CONTINUE,
+    &&AST_DECISION_MAKE_DEFAULT_RETURN,
+    &&AST_JSON_PARSER
+};
+
+Symbol* symbol;
+FunctionCall* function_call = NULL;
+long double l_value;
+long double r_value;
+long long exit_code;
+char *_module = NULL;
+char *out = NULL;
+
+eval_node_start:
     if (ast_node == NULL || stop_ast_evaluation) {
         return ast_node;
     }
 
     if (strcmp(ast_node->module, module) != 0) {
         ast_node = ast_node->next;
-        goto eval_node_label;
+        goto eval_node_start;
     }
 
     if (ast_node->node_type == AST_DECISION_DEFINE) {
         ast_node = ast_node->next;
-        goto eval_node_label;
+        goto eval_node_start;
     }
 
     if (ast_node->node_type != AST_FUNCTION_STEP)
         if (is_node_function_related(ast_node)) {
             ast_node = ast_node->next;
-            goto eval_node_label;
+            goto eval_node_start;
         }
 
     if (ast_node->depend != NULL) {
@@ -354,7 +642,7 @@ eval_node_label:
         if (ast_node_prev != NULL) {
             ast_node = ast_node_prev->next;
             module = ast_node_prev->module;
-            goto eval_node_label;
+            goto eval_node_start;
         } else {
 #endif
             return ast_node;
@@ -364,1177 +652,1201 @@ eval_node_label:
     }
 
 #ifndef CHAOS_COMPILER
-    switch (ast_node->node_type)
+
+void *loop_labels[5] = {
+    &&AST_START_TIMES_DO,
+    &&AST_START_TIMES_DO_INFINITE,
+    &&AST_START_TIMES_DO_VAR,
+    &&AST_START_FOREACH,
+    &&AST_START_FOREACH_DICT
+};
+
+int loop_labels_index = ast_node->node_type - 203;
+if (loop_labels_index >= 0 && loop_labels_index <= 5)
+    goto *loop_labels[ast_node->node_type - 203];
+else
+    goto generic_labels_start;
+
+AST_START_TIMES_DO:
+    return startTimesDo(ast_node->right->value.i, false, ast_node);
+AST_START_TIMES_DO_INFINITE:
+    return startTimesDo(0, true, ast_node);
+AST_START_TIMES_DO_VAR:
+    return startTimesDo(getSymbolValueInt(ast_node->strings[0]), false, ast_node);
+AST_START_FOREACH:
+    return startForeach(ast_node->strings[0], ast_node->strings[1], ast_node);
+AST_START_FOREACH_DICT:
+    return startForeachDict(ast_node->strings[0], ast_node->strings[1], ast_node->strings[2], ast_node);
+#endif
+
+generic_labels_start:
+
+goto *generic_labels[ast_node->node_type];
+
+AST_VAR_CREATE_BOOL:
+    addSymbolBool(ast_node->strings[0], ast_node->right->value.b);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_BOOL, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_VAR_EL:
+    createCloneFromComplexElement(ast_node->strings[0], K_BOOL, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_FUNC_RETURN:
+    switch (ast_node->strings_size)
     {
-        case AST_START_TIMES_DO:
-            return startTimesDo(ast_node->right->value.i, false, ast_node);
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_START_TIMES_DO_INFINITE:
-            return startTimesDo(0, true, ast_node);
-            break;
-        case AST_START_TIMES_DO_VAR:
-            return startTimesDo(getSymbolValueInt(ast_node->strings[0]), false, ast_node);
-            break;
-        case AST_START_FOREACH:
-            return startForeach(ast_node->strings[0], ast_node->strings[1], ast_node);
-            break;
-        case AST_START_FOREACH_DICT:
-            return startForeachDict(ast_node->strings[0], ast_node->strings[1], ast_node->strings[2], ast_node);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
         default:
             break;
     }
-#endif
-
-
-    Symbol* symbol;
-    FunctionCall* function_call = NULL;
-    long double l_value;
-    long double r_value;
-    long long exit_code;
-    char *_module = NULL;
-    char *out = NULL;
-
-    switch (ast_node->node_type)
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_NUMBER:
+    if (ast_node->right->value_type == V_INT) {
+        addSymbolInt(ast_node->strings[0], ast_node->right->value.i);
+    } else {
+        addSymbolFloat(ast_node->strings[0], ast_node->right->value.f);
+    }
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_NUMBER, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_VAR_EL:
+    createCloneFromComplexElement(ast_node->strings[0], K_NUMBER, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_FUNC_RETURN:
+    switch (ast_node->strings_size)
     {
-        case AST_VAR_CREATE_BOOL:
-            addSymbolBool(ast_node->strings[0], ast_node->right->value.b);
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_BOOL_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_BOOL, ast_node->strings[1], K_ANY);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_BOOL_VAR_EL:
-            createCloneFromComplexElement(ast_node->strings[0], K_BOOL, ast_node->strings[1], K_ANY);
+        default:
             break;
-        case AST_VAR_CREATE_BOOL_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_STRING:
+    addSymbolString(ast_node->strings[0], ast_node->value.s);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_STRING, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_VAR_EL:
+    createCloneFromComplexElement(ast_node->strings[0], K_STRING, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                addSymbolInt(ast_node->strings[0], ast_node->right->value.i);
-            } else {
-                addSymbolFloat(ast_node->strings[0], ast_node->right->value.f);
-            }
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_NUMBER_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_NUMBER, ast_node->strings[1], K_ANY);
+        default:
             break;
-        case AST_VAR_CREATE_NUMBER_VAR_EL:
-            createCloneFromComplexElement(ast_node->strings[0], K_NUMBER, ast_node->strings[1], K_ANY);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_ANY_BOOL:
+    addSymbolAnyBool(ast_node->strings[0], ast_node->right->value.b);
+    goto eval_node_end;
+AST_VAR_CREATE_ANY_NUMBER:
+    if (ast_node->right->value_type == V_INT) {
+        addSymbolAnyInt(ast_node->strings[0], ast_node->right->value.i);
+    } else {
+        addSymbolAnyFloat(ast_node->strings[0], ast_node->right->value.f);
+    }
+    goto eval_node_end;
+AST_VAR_CREATE_ANY_STRING:
+    addSymbolAnyString(ast_node->strings[0], ast_node->value.s);
+    goto eval_node_end;
+AST_VAR_CREATE_ANY_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_ANY, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_ANY_VAR_EL:
+    createCloneFromComplexElement(ast_node->strings[0], K_ANY, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_ANY_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_STRING:
-            addSymbolString(ast_node->strings[0], ast_node->value.s);
+        default:
             break;
-        case AST_VAR_CREATE_STRING_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_STRING, ast_node->strings[1], K_ANY);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_LIST:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_LIST_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_LIST_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_STRING_VAR_EL:
-            createCloneFromComplexElement(ast_node->strings[0], K_STRING, ast_node->strings[1], K_ANY);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_STRING_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_ANY_BOOL:
-            addSymbolAnyBool(ast_node->strings[0], ast_node->right->value.b);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_DICT:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_DICT_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_ANY);
+    goto eval_node_end;
+AST_VAR_CREATE_DICT_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_ANY_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                addSymbolAnyInt(ast_node->strings[0], ast_node->right->value.i);
-            } else {
-                addSymbolAnyFloat(ast_node->strings[0], ast_node->right->value.f);
-            }
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_ANY_STRING:
-            addSymbolAnyString(ast_node->strings[0], ast_node->value.s);
+        default:
             break;
-        case AST_VAR_CREATE_ANY_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_ANY, ast_node->strings[1], K_ANY);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_BOOL_LIST:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_BOOL);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_LIST_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_BOOL);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_ANY_VAR_EL:
-            createCloneFromComplexElement(ast_node->strings[0], K_ANY, ast_node->strings[1], K_ANY);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_ANY_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_LIST:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_ANY);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_BOOL_DICT:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_BOOL);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_DICT_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_BOOL);
+    goto eval_node_end;
+AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_LIST_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_ANY);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_DICT:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_ANY);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_NUMBER_LIST:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_NUMBER);
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_LIST_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_NUMBER);
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_DICT_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_ANY);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_BOOL_LIST:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_BOOL);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_NUMBER_DICT:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_NUMBER);
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_DICT_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_NUMBER);
+    goto eval_node_end;
+AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_BOOL_LIST_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_BOOL);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_BOOL_DICT:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_BOOL);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_STRING_LIST:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_STRING);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_LIST_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_STRING);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_BOOL_DICT_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_BOOL);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_NUMBER_LIST:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_NUMBER);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_CREATE_STRING_DICT:
+    reverseComplexMode();
+    finishComplexMode(ast_node->strings[0], K_STRING);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_DICT_VAR:
+    createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_STRING);
+    goto eval_node_end;
+AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_NUMBER_LIST_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_NUMBER);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_NUMBER_DICT:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_NUMBER);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_VAR_UPDATE_BOOL:
+    updateSymbolBool(ast_node->strings[0], ast_node->right->value.b);
+    goto eval_node_end;
+AST_VAR_UPDATE_NUMBER:
+    if (ast_node->right->value_type == V_INT) {
+        updateSymbolInt(ast_node->strings[0], ast_node->right->value.i);
+    } else {
+        updateSymbolFloat(ast_node->strings[0], ast_node->right->value.f);
+    }
+    goto eval_node_end;
+AST_VAR_UPDATE_STRING:
+    updateSymbolString(ast_node->strings[0], ast_node->value.s);
+    goto eval_node_end;
+AST_VAR_UPDATE_LIST:
+    reverseComplexMode();
+    finishComplexModeWithUpdate(ast_node->strings[0]);
+    goto eval_node_end;
+AST_VAR_UPDATE_DICT:
+    reverseComplexMode();
+    finishComplexModeWithUpdate(ast_node->strings[0]);
+    goto eval_node_end;
+AST_VAR_UPDATE_VAR:
+    updateSymbolByClonningName(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_VAR_UPDATE_VAR_EL:
+    updateSymbolByClonningComplexElement(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_VAR_UPDATE_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 2:
+            function_call = callFunction(ast_node->strings[1], NULL);
             break;
-        case AST_VAR_CREATE_NUMBER_DICT_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_NUMBER);
+        case 3:
+            function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
             break;
-        case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_STRING_LIST:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_STRING);
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_RETURN_VAR:
+    returnSymbol(ast_node->strings[0]);
+    goto eval_node_end;
+AST_PRINT_COMPLEX_EL:
+    printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false);
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_BOOL:
+    updateComplexElementBool(ast_node->right->value.b);
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_NUMBER:
+    if (ast_node->right->value_type == V_INT) {
+        updateComplexElementInt(ast_node->right->value.i);
+    } else {
+        updateComplexElementFloat(ast_node->right->value.f);
+    }
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_STRING:
+    updateComplexElementString(ast_node->value.s);
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_LIST:
+    reverseComplexMode();
+    updateComplexElementComplex();
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_DICT:
+    reverseComplexMode();
+    updateComplexElementComplex();
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_VAR:
+    updateComplexElementSymbol(getSymbol(ast_node->strings[0]));
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_VAR_EL:
+    updateComplexElementSymbol(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0));
+    goto eval_node_end;
+AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
+    switch (ast_node->strings_size)
+    {
+        case 1:
+            function_call = callFunction(ast_node->strings[0], NULL);
             break;
-        case AST_VAR_CREATE_STRING_LIST_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_LIST, ast_node->strings[1], K_STRING);
+        case 2:
+            function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
             break;
-        case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
+        default:
             break;
-        case AST_VAR_CREATE_STRING_DICT:
-            reverseComplexMode();
-            finishComplexMode(ast_node->strings[0], K_STRING);
-            break;
-        case AST_VAR_CREATE_STRING_DICT_VAR:
-            createCloneFromSymbolByName(ast_node->strings[0], K_DICT, ast_node->strings[1], K_STRING);
-            break;
-        case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_VAR_UPDATE_BOOL:
-            updateSymbolBool(ast_node->strings[0], ast_node->right->value.b);
-            break;
-        case AST_VAR_UPDATE_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                updateSymbolInt(ast_node->strings[0], ast_node->right->value.i);
-            } else {
-                updateSymbolFloat(ast_node->strings[0], ast_node->right->value.f);
-            }
-            break;
-        case AST_VAR_UPDATE_STRING:
-            updateSymbolString(ast_node->strings[0], ast_node->value.s);
-            break;
-        case AST_VAR_UPDATE_LIST:
-            reverseComplexMode();
-            finishComplexModeWithUpdate(ast_node->strings[0]);
-            break;
-        case AST_VAR_UPDATE_DICT:
-            reverseComplexMode();
-            finishComplexModeWithUpdate(ast_node->strings[0]);
-            break;
-        case AST_VAR_UPDATE_VAR:
-            updateSymbolByClonningName(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_UPDATE_VAR_EL:
-            updateSymbolByClonningComplexElement(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_UPDATE_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], NULL);
-                    break;
-                case 3:
-                    function_call = callFunction(ast_node->strings[2], ast_node->strings[1]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_RETURN_VAR:
-            returnSymbol(ast_node->strings[0]);
-            break;
-        case AST_PRINT_COMPLEX_EL:
-            printSymbolValueEndWithNewLine(getComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id), false, false);
-            break;
-        case AST_COMPLEX_EL_UPDATE_BOOL:
-            updateComplexElementBool(ast_node->right->value.b);
-            break;
-        case AST_COMPLEX_EL_UPDATE_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                updateComplexElementInt(ast_node->right->value.i);
-            } else {
-                updateComplexElementFloat(ast_node->right->value.f);
-            }
-            break;
-        case AST_COMPLEX_EL_UPDATE_STRING:
-            updateComplexElementString(ast_node->value.s);
-            break;
-        case AST_COMPLEX_EL_UPDATE_LIST:
-            reverseComplexMode();
-            updateComplexElementComplex();
-            break;
-        case AST_COMPLEX_EL_UPDATE_DICT:
-            reverseComplexMode();
-            updateComplexElementComplex();
-            break;
-        case AST_COMPLEX_EL_UPDATE_VAR:
-            updateComplexElementSymbol(getSymbol(ast_node->strings[0]));
-            break;
-        case AST_COMPLEX_EL_UPDATE_VAR_EL:
-            updateComplexElementSymbol(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0));
-            break;
-        case AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
-            switch (ast_node->strings_size)
-            {
-                case 1:
-                    function_call = callFunction(ast_node->strings[0], NULL);
-                    break;
-                case 2:
-                    function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
-                    break;
-                default:
-                    break;
-            }
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_PRINT_VAR:
-            printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, true);
-            break;
-        case AST_PRINT_VAR_EL:
-            printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), false, true);
-            break;
-        case AST_PRINT_EXPRESSION:
+    }
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_PRINT_VAR:
+    printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, true);
+    goto eval_node_end;
+AST_PRINT_VAR_EL:
+    printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), false, true);
+    goto eval_node_end;
+AST_PRINT_EXPRESSION:
+    printf("%lld\n", ast_node->right->value.i);
+    goto eval_node_end;
+AST_PRINT_MIXED_EXPRESSION:
+    printf("%Lg\n", ast_node->right->value.f);
+    goto eval_node_end;
+AST_PRINT_STRING:
+    out = escape_the_sequences_in_string_literal(ast_node->value.s);
+    printf("%s\n", out);
+    free(out);
+    goto eval_node_end;
+AST_PRINT_INTERACTIVE_VAR:
+#ifndef CHAOS_COMPILER
+    if (ast_node->strings[0][0] != '\0' && is_interactive)
+        printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, false);
+#endif
+    goto eval_node_end;
+AST_PRINT_INTERACTIVE_EXPRESSION:
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        if (ast_node->right->node_type < AST_VAR_EXPRESSION_INCREMENT || ast_node->right->node_type > AST_VAR_EXPRESSION_ASSIGN_INCREMENT)
             printf("%lld\n", ast_node->right->value.i);
-            break;
-        case AST_PRINT_MIXED_EXPRESSION:
-            printf("%Lg\n", ast_node->right->value.f);
-            break;
-        case AST_PRINT_STRING:
-            out = escape_the_sequences_in_string_literal(ast_node->value.s);
-            printf("%s\n", out);
-            free(out);
-            break;
-        case AST_PRINT_INTERACTIVE_VAR:
-#ifndef CHAOS_COMPILER
-            if (ast_node->strings[0][0] != '\0' && is_interactive)
-                printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), false, false);
 #endif
-            break;
-        case AST_PRINT_INTERACTIVE_EXPRESSION:
+    goto eval_node_end;
+AST_PRINT_INTERACTIVE_MIXED_EXPRESSION:
 #ifndef CHAOS_COMPILER
-            if (is_interactive)
-                if (ast_node->right->node_type < AST_VAR_EXPRESSION_INCREMENT || ast_node->right->node_type > AST_VAR_EXPRESSION_ASSIGN_INCREMENT)
-                    printf("%lld\n", ast_node->right->value.i);
+    if (is_interactive)
+        printf("%Lg\n", ast_node->right->value.f);
 #endif
-            break;
-        case AST_PRINT_INTERACTIVE_MIXED_EXPRESSION:
-#ifndef CHAOS_COMPILER
-            if (is_interactive)
-                printf("%Lg\n", ast_node->right->value.f);
-#endif
-            break;
-        case AST_ECHO_VAR:
-            printSymbolValueEndWith(getSymbol(ast_node->strings[0]), "", false, true);
-            break;
-        case AST_ECHO_VAR_EL:
-            printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), "", false, true);
-            break;
-        case AST_ECHO_EXPRESSION:
-            printf("%lld", ast_node->right->value.i);
-            break;
-        case AST_ECHO_MIXED_EXPRESSION:
-            printf("%Lg", ast_node->right->value.f);
-            break;
-        case AST_ECHO_STRING:
-            out = escape_the_sequences_in_string_literal(ast_node->value.s);
-            printf("%s", out);
-            free(out);
-            break;
-        case AST_PRETTY_PRINT_VAR:
-            printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), true, true);
-            break;
-        case AST_PRETTY_PRINT_VAR_EL:
-            printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), true, true);
-            break;
-        case AST_PRETTY_ECHO_VAR:
-            printSymbolValueEndWith(getSymbol(ast_node->strings[0]), "", true, true);
-            break;
-        case AST_PRETTY_ECHO_VAR_EL:
-            printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), "", true, true);
-            break;
-        case AST_PARENTHESIS:
-            ast_node->value = ast_node->right->value;
-            ast_node->value_type = ast_node->right->value_type;
-            break;
-        case AST_EXPRESSION_PLUS:
-            ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_MINUS:
-            ast_node->value.i = ast_node->left->value.i - ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_MULTIPLY:
-            ast_node->value.i = ast_node->left->value.i * ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_AND:
-            ast_node->value.i = ast_node->left->value.i & ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_OR:
-            ast_node->value.i = ast_node->left->value.i | ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_XOR:
-            ast_node->value.i = ast_node->left->value.i ^ ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_NOT:
-            ast_node->value.i = ~ ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_LEFT_SHIFT:
-            ast_node->value.i = ast_node->left->value.i << ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_RIGHT_SHIFT:
-            ast_node->value.i = ast_node->left->value.i >> ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_VALUE:
-            ast_node->value.i = getSymbolValueInt(ast_node->strings[0]);
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_INCREMENT:
-            ast_node->value.i = ast_node->right->value.i + 1;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_DECREMENT:
-            ast_node->value.i = ast_node->right->value.i - 1;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_INCREMENT_ASSIGN:
-            ast_node->value.i = incrementThenAssign(ast_node->strings[0], ast_node->right->value.i);
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_ASSIGN_INCREMENT:
-            ast_node->value.i = assignThenIncrement(ast_node->strings[0], ast_node->right->value.i);
-            ast_node->value_type = V_INT;
-            break;
-        case AST_MIXED_EXPRESSION_PLUS:
-            if (ast_node->left->value_type == V_INT) {
-                l_value = (long double) ast_node->left->value.i;
-            } else {
-                l_value = ast_node->left->value.f;
-            }
-            if (ast_node->right->value_type == V_INT) {
-                r_value = (long double) ast_node->right->value.i;
-            } else {
-                r_value = ast_node->right->value.f;
-            }
-            ast_node->value.f = l_value + r_value;
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_MIXED_EXPRESSION_MINUS:
-            if (ast_node->left->value_type == V_INT) {
-                l_value = (long double) ast_node->left->value.i;
-            } else {
-                l_value = ast_node->left->value.f;
-            }
-            if (ast_node->right->value_type == V_INT) {
-                r_value = (long double) ast_node->right->value.i;
-            } else {
-                r_value = ast_node->right->value.f;
-            }
-            ast_node->value.f = l_value - r_value;
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_MIXED_EXPRESSION_MULTIPLY:
-            if (ast_node->left->value_type == V_INT) {
-                l_value = (long double) ast_node->left->value.i;
-            } else {
-                l_value = ast_node->left->value.f;
-            }
-            if (ast_node->right->value_type == V_INT) {
-                r_value = (long double) ast_node->right->value.i;
-            } else {
-                r_value = ast_node->right->value.f;
-            }
-            ast_node->value.f = l_value * r_value;
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_MIXED_EXPRESSION_DIVIDE:
-            if (ast_node->left->value_type == V_INT) {
-                l_value = (long double) ast_node->left->value.i;
-            } else {
-                l_value = ast_node->left->value.f;
-            }
-            if (ast_node->right->value_type == V_INT) {
-                r_value = (long double) ast_node->right->value.i;
-            } else {
-                r_value = ast_node->right->value.f;
-            }
-            ast_node->value.f = l_value / r_value;
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_VAR_MIXED_EXPRESSION_VALUE:
-            ast_node->value.f = getSymbolValueFloat(ast_node->strings[0]);
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL:
-            ast_node->value.b = ast_node->left->value.b == ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL:
-            ast_node->value.b = ast_node->left->value.b != ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT:
-            ast_node->value.b = ast_node->left->value.b > ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL:
-            ast_node->value.b = ast_node->left->value.b < ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL:
-            ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL:
-            ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND:
-            ast_node->value.b = ast_node->left->value.b && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR:
-            ast_node->value.b = ast_node->left->value.b || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT:
-            ast_node->value.b = ! ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED:
-            ast_node->value.b = ast_node->left->value.f == ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED:
-            ast_node->value.b = ast_node->left->value.f != ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED:
-            ast_node->value.b = ast_node->left->value.f > ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED:
-            ast_node->value.b = ast_node->left->value.f < ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED:
-            ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED:
-            ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED:
-            ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED:
-            ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_MIXED:
-            ast_node->value.b = ! ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f != ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f > ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f < ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b == ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b != ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b > ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b < ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b && ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED:
-            ast_node->value.b = ast_node->left->value.b || ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP:
-            ast_node->value.b = ast_node->left->value.i == ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP:
-            ast_node->value.b = ast_node->left->value.i != ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP:
-            ast_node->value.b = ast_node->left->value.i > ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP:
-            ast_node->value.b = ast_node->left->value.i < ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP:
-            ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP:
-            ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP:
-            ast_node->value.b = ast_node->left->value.i && ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP:
-            ast_node->value.b = ast_node->left->value.i || ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP:
-            ast_node->value.b = ! ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i == ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i != ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i > ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i < ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_BOOLEAN:
-            ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b == ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b != ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b > ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b < ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b && ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_EXP:
-            ast_node->value.b = ast_node->left->value.b || ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f == ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f != ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f > ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f < ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f && ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_EXP:
-            ast_node->value.b = ast_node->left->value.f || ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i == ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i != ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i > ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i < ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i && ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED:
-            ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_UNKNOWN:
-            ast_node->value.b = resolveRelEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_UNKNOWN:
-            ast_node->value.b = resolveRelNotEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_UNKNOWN:
-            ast_node->value.b = resolveRelGreatUnknown(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_UNKNOWN:
-            ast_node->value.b = resolveRelSmallUnknown(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_UNKNOWN:
-            ast_node->value.b = resolveRelGreatEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_UNKNOWN:
-            ast_node->value.b = resolveRelSmallEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
-            ast_node->value.b = getSymbolValueBool(ast_node->strings[0]);
-            break;
-        case AST_DELETE_VAR:
-            removeSymbolByName(ast_node->strings[0]);
-            break;
-        case AST_DELETE_VAR_EL:
-            removeComplexElementByLeftRightBracketStack(ast_node->strings[0]);
-            break;
-        case AST_PRINT_SYMBOL_TABLE:
-            printSymbolTable();
-            break;
-        case AST_LIST_START:
-            addSymbolList(NULL);
-            break;
-        case AST_LIST_ADD_VAR:
-            cloneSymbolToComplex(ast_node->strings[0], NULL);
-            break;
-        case AST_LIST_ADD_VAR_EL:
-            buildVariableComplexElement(ast_node->strings[0], NULL);
-            break;
-        case AST_LIST_NESTED_FINISH:
-            if (isNestedComplexMode()) {
-                pushNestedComplexModeStack(getComplexMode());
-                reverseComplexMode();
-                finishComplexMode(NULL, K_ANY);
-            }
-            break;
-        case AST_DICT_START:
-            addSymbolDict(NULL);
-            break;
-        case AST_DICT_ADD_VAR:
-            cloneSymbolToComplex(ast_node->strings[1], ast_node->strings[0]);
-            break;
-        case AST_DICT_ADD_VAR_EL:
-            buildVariableComplexElement(ast_node->strings[1], ast_node->strings[0]);
-            break;
-        case AST_DICT_NESTED_FINISH:
-            if (isNestedComplexMode()) {
-                pushNestedComplexModeStack(getComplexMode());
-                reverseComplexMode();
-                finishComplexMode(NULL, K_ANY);
-            }
-            break;
-        case AST_POP_NESTED_COMPLEX_STACK:
-            popNestedComplexModeStack(ast_node->strings[0]);
-            break;
-        case AST_LEFT_RIGHT_BRACKET_EXPRESSION:
-            disable_complex_mode = true;
-            if (ast_node->right->value_type == V_INT) {
-                symbol = addSymbolInt(NULL, ast_node->right->value.i);
-            } else {
-                symbol = addSymbolFloat(NULL, ast_node->right->value.f);
-            }
-            symbol->sign = 1;
-            pushLeftRightBracketStack(symbol->id);
-            disable_complex_mode = false;
-            break;
-        case AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
-            disable_complex_mode = true;
-            if (ast_node->right->value_type == V_INT) {
-                symbol = addSymbolInt(NULL, - ast_node->right->value.i);
-            } else {
-                symbol = addSymbolFloat(NULL, - ast_node->right->value.f);
-            }
-            symbol->sign = 1;
-            pushLeftRightBracketStack(symbol->id);
-            disable_complex_mode = false;
-            break;
-        case AST_LEFT_RIGHT_BRACKET_STRING:
-            disable_complex_mode = true;
-            symbol = addSymbolString(NULL, ast_node->value.s);
-            symbol->sign = 1;
-            pushLeftRightBracketStack(symbol->id);
-            disable_complex_mode = false;
-            break;
-        case AST_LEFT_RIGHT_BRACKET_VAR:
-            disable_complex_mode = true;
-            symbol = createCloneFromSymbolByName(NULL, K_ANY, ast_node->strings[0], K_ANY);
-            symbol->sign = 1;
-            pushLeftRightBracketStack(symbol->id);
-            disable_complex_mode = false;
-            break;
-        case AST_LEFT_RIGHT_BRACKET_VAR_MINUS:
-            disable_complex_mode = true;
-            symbol = createCloneFromSymbolByName(NULL, K_ANY, ast_node->strings[0], K_ANY);
-            symbol->sign = -1;
-            pushLeftRightBracketStack(symbol->id);
-            disable_complex_mode = false;
-            break;
-        case AST_BUILD_COMPLEX_VARIABLE:
-            disable_complex_mode = true;
-            buildVariableComplexElement(ast_node->strings[0], NULL);
-            disable_complex_mode = false;
-            break;
-        case AST_EXIT_SUCCESS:
-#ifndef CHAOS_COMPILER
-            if (is_interactive)
-                print_bye_bye();
-#endif
-            freeEverything();
-            exit(E_SUCCESS);
-            break;
-        case AST_EXIT_EXPRESSION:
-#ifndef CHAOS_COMPILER
-            if (is_interactive)
-                print_bye_bye();
-#endif
-            exit_code = ast_node->right->value.i;
-            freeEverything();
-            exit(exit_code);
-            break;
-        case AST_EXIT_VAR:
-#ifndef CHAOS_COMPILER
-            if (is_interactive)
-                print_bye_bye();
-#endif
-            exit_code = getSymbolValueInt(ast_node->strings[0]);
-            freeEverything();
-            exit(exit_code);
-            break;
-        case AST_PRINT_FUNCTION_TABLE:
-            printFunctionTable();
-            break;
-        case AST_FUNCTION_CALL_PARAMETERS_START:
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_BOOL:
-            addFunctionCallParameterBool(ast_node->right->value.b);
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                addFunctionCallParameterInt(ast_node->right->value.i);
-            } else {
-                addFunctionCallParameterFloat(ast_node->right->value.f);
-            }
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_STRING:
-            addFunctionCallParameterString(ast_node->value.s);
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_VAR:
-            addFunctionCallParameterSymbol(ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_LIST:
-            reverseComplexMode();
-            addFunctionCallParameterList(K_ANY);
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_DICT:
-            reverseComplexMode();
-            addFunctionCallParameterList(K_ANY);
-            break;
-        case AST_PRINT_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1)
-                _module = ast_node->strings[1];
-            function_call = callFunction(ast_node->strings[0], _module);
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_ECHO_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1)
-                _module = ast_node->strings[1];
-            function_call = callFunction(ast_node->strings[0], _module);
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_PRETTY_PRINT_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1)
-                _module = ast_node->strings[1];
-            function_call = callFunction(ast_node->strings[0], _module);
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_PRETTY_ECHO_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1)
-                _module = ast_node->strings[1];
-            function_call = callFunction(ast_node->strings[0], _module);
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1)
-                _module = ast_node->strings[1];
-            function_call = callFunction(ast_node->strings[0], _module);
-            function_call->lineno = kaos_lineno;
-            function_call->trigger = ast_node;
-            ast_node = function_call->function->node->child;
-            module = function_call->function->module_context;
-            goto eval_node_label;
-            break;
-        case AST_NESTED_COMPLEX_TRANSITION:
-            reverseComplexMode();
-            break;
-        case AST_DECISION_MAKE_BOOLEAN:
-            if (ast_node->right->value.b) {
-                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-                switch (ast_node->strings_size)
-                {
-                    case 1:
-                        function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
-                        break;
-                    case 2:
-                        function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
-                        break;
-                    default:
-                        break;
-                }
-                function_call->lineno = kaos_lineno;
-                function_call->trigger = ast_node;
-                ast_node = function_call->function->node->child;
-                module = function_call->function->module_context;
-                goto eval_node_label;
-            } else {
-                resetFunctionParametersMode();
-            }
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_BREAK:
-            if (nested_loop_counter > 0 && ast_node->right->value.b) {
-                decisionBreakLoop();
-            }
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
-            if (nested_loop_counter > 0 && ast_node->right->value.b) {
-                decisionContinueLoop();
-            }
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_RETURN:
-            if (ast_node->right->value.b) {
-                returnSymbol(ast_node->strings[0]);
-                stop_ast_evaluation = true;
-                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-            }
-            break;
-        case AST_DECISION_MAKE_DEFAULT:
-            if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
-                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-                switch (ast_node->strings_size)
-                {
-                    case 1:
-                        function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
-                        break;
-                    case 2:
-                        function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
-                        break;
-                    default:
-                        break;
-                }
-                function_call->lineno = kaos_lineno;
-                function_call->trigger = ast_node;
-                ast_node = function_call->function->node->child;
-                module = function_call->function->module_context;
-                goto eval_node_label;
-            } else {
-                resetFunctionParametersMode();
-            }
-            break;
-        case AST_DECISION_MAKE_DEFAULT_BREAK:
-            if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
-                decisionBreakLoop();
-            }
-            break;
-        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
-            if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
-                decisionContinueLoop();
-            }
-            break;
-        case AST_DECISION_MAKE_DEFAULT_RETURN:
-            if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
-                returnSymbol(ast_node->strings[0]);
-                stop_ast_evaluation = true;
-                callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-            }
-            break;
-        case AST_JSON_PARSER:
-            reverseComplexMode();
-            symbol = finishComplexMode(NULL, K_ANY);
-            returnVariable(symbol);
-            break;
-        default:
-            break;
+    goto eval_node_end;
+AST_ECHO_VAR:
+    printSymbolValueEndWith(getSymbol(ast_node->strings[0]), "", false, true);
+    goto eval_node_end;
+AST_ECHO_VAR_EL:
+    printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), "", false, true);
+    goto eval_node_end;
+AST_ECHO_EXPRESSION:
+    printf("%lld", ast_node->right->value.i);
+    goto eval_node_end;
+AST_ECHO_MIXED_EXPRESSION:
+    printf("%Lg", ast_node->right->value.f);
+    goto eval_node_end;
+AST_ECHO_STRING:
+    out = escape_the_sequences_in_string_literal(ast_node->value.s);
+    printf("%s", out);
+    free(out);
+    goto eval_node_end;
+AST_PRETTY_PRINT_VAR:
+    printSymbolValueEndWithNewLine(getSymbol(ast_node->strings[0]), true, true);
+    goto eval_node_end;
+AST_PRETTY_PRINT_VAR_EL:
+    printSymbolValueEndWithNewLine(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), true, true);
+    goto eval_node_end;
+AST_PRETTY_ECHO_VAR:
+    printSymbolValueEndWith(getSymbol(ast_node->strings[0]), "", true, true);
+    goto eval_node_end;
+AST_PRETTY_ECHO_VAR_EL:
+    printSymbolValueEndWith(getComplexElementThroughLeftRightBracketStack(ast_node->strings[0], 0), "", true, true);
+    goto eval_node_end;
+AST_PARENTHESIS:
+    ast_node->value = ast_node->right->value;
+    ast_node->value_type = ast_node->right->value_type;
+    goto eval_node_end;
+AST_EXPRESSION_PLUS:
+    ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_MINUS:
+    ast_node->value.i = ast_node->left->value.i - ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_MULTIPLY:
+    ast_node->value.i = ast_node->left->value.i * ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_BITWISE_AND:
+    ast_node->value.i = ast_node->left->value.i & ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_BITWISE_OR:
+    ast_node->value.i = ast_node->left->value.i | ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_BITWISE_XOR:
+    ast_node->value.i = ast_node->left->value.i ^ ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_BITWISE_NOT:
+    ast_node->value.i = ~ ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_BITWISE_LEFT_SHIFT:
+    ast_node->value.i = ast_node->left->value.i << ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_EXPRESSION_BITWISE_RIGHT_SHIFT:
+    ast_node->value.i = ast_node->left->value.i >> ast_node->right->value.i;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_VAR_EXPRESSION_VALUE:
+    ast_node->value.i = getSymbolValueInt(ast_node->strings[0]);
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_VAR_EXPRESSION_INCREMENT:
+    ast_node->value.i = ast_node->right->value.i + 1;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_VAR_EXPRESSION_DECREMENT:
+    ast_node->value.i = ast_node->right->value.i - 1;
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_VAR_EXPRESSION_INCREMENT_ASSIGN:
+    ast_node->value.i = incrementThenAssign(ast_node->strings[0], ast_node->right->value.i);
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_VAR_EXPRESSION_ASSIGN_INCREMENT:
+    ast_node->value.i = assignThenIncrement(ast_node->strings[0], ast_node->right->value.i);
+    ast_node->value_type = V_INT;
+    goto eval_node_end;
+AST_MIXED_EXPRESSION_PLUS:
+    if (ast_node->left->value_type == V_INT) {
+        l_value = (long double) ast_node->left->value.i;
+    } else {
+        l_value = ast_node->left->value.f;
     }
+    if (ast_node->right->value_type == V_INT) {
+        r_value = (long double) ast_node->right->value.i;
+    } else {
+        r_value = ast_node->right->value.f;
+    }
+    ast_node->value.f = l_value + r_value;
+    ast_node->value_type = V_FLOAT;
+    goto eval_node_end;
+AST_MIXED_EXPRESSION_MINUS:
+    if (ast_node->left->value_type == V_INT) {
+        l_value = (long double) ast_node->left->value.i;
+    } else {
+        l_value = ast_node->left->value.f;
+    }
+    if (ast_node->right->value_type == V_INT) {
+        r_value = (long double) ast_node->right->value.i;
+    } else {
+        r_value = ast_node->right->value.f;
+    }
+    ast_node->value.f = l_value - r_value;
+    ast_node->value_type = V_FLOAT;
+    goto eval_node_end;
+AST_MIXED_EXPRESSION_MULTIPLY:
+    if (ast_node->left->value_type == V_INT) {
+        l_value = (long double) ast_node->left->value.i;
+    } else {
+        l_value = ast_node->left->value.f;
+    }
+    if (ast_node->right->value_type == V_INT) {
+        r_value = (long double) ast_node->right->value.i;
+    } else {
+        r_value = ast_node->right->value.f;
+    }
+    ast_node->value.f = l_value * r_value;
+    ast_node->value_type = V_FLOAT;
+    goto eval_node_end;
+AST_MIXED_EXPRESSION_DIVIDE:
+    if (ast_node->left->value_type == V_INT) {
+        l_value = (long double) ast_node->left->value.i;
+    } else {
+        l_value = ast_node->left->value.f;
+    }
+    if (ast_node->right->value_type == V_INT) {
+        r_value = (long double) ast_node->right->value.i;
+    } else {
+        r_value = ast_node->right->value.f;
+    }
+    ast_node->value.f = l_value / r_value;
+    ast_node->value_type = V_FLOAT;
+    goto eval_node_end;
+AST_VAR_MIXED_EXPRESSION_VALUE:
+    ast_node->value.f = getSymbolValueFloat(ast_node->strings[0]);
+    ast_node->value_type = V_FLOAT;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL:
+    ast_node->value.b = ast_node->left->value.b == ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL:
+    ast_node->value.b = ast_node->left->value.b != ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT:
+    ast_node->value.b = ast_node->left->value.b > ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL:
+    ast_node->value.b = ast_node->left->value.b < ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL:
+    ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL:
+    ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND:
+    ast_node->value.b = ast_node->left->value.b && ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR:
+    ast_node->value.b = ast_node->left->value.b || ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_NOT:
+    ast_node->value.b = ! ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED:
+    ast_node->value.b = ast_node->left->value.f == ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED:
+    ast_node->value.b = ast_node->left->value.f != ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED:
+    ast_node->value.b = ast_node->left->value.f > ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED:
+    ast_node->value.b = ast_node->left->value.f < ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED:
+    ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED:
+    ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED:
+    ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED:
+    ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_NOT_MIXED:
+    ast_node->value.b = ! ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f != ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f > ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f < ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b == ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b != ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b > ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b < ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b && ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED:
+    ast_node->value.b = ast_node->left->value.b || ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP:
+    ast_node->value.b = ast_node->left->value.i == ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP:
+    ast_node->value.b = ast_node->left->value.i != ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP:
+    ast_node->value.b = ast_node->left->value.i > ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP:
+    ast_node->value.b = ast_node->left->value.i < ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP:
+    ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP:
+    ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP:
+    ast_node->value.b = ast_node->left->value.i && ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP:
+    ast_node->value.b = ast_node->left->value.i || ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP:
+    ast_node->value.b = ! ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i == ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i != ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i > ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i < ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_BOOLEAN:
+    ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b == ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b != ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b > ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b < ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b && ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_EXP:
+    ast_node->value.b = ast_node->left->value.b || ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f == ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f != ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f > ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f < ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f && ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_EXP:
+    ast_node->value.b = ast_node->left->value.f || ast_node->right->value.i;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i == ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i != ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i > ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i < ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i && ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED:
+    ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_EQUAL_UNKNOWN:
+    ast_node->value.b = resolveRelEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_UNKNOWN:
+    ast_node->value.b = resolveRelNotEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_UNKNOWN:
+    ast_node->value.b = resolveRelGreatUnknown(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_UNKNOWN:
+    ast_node->value.b = resolveRelSmallUnknown(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_UNKNOWN:
+    ast_node->value.b = resolveRelGreatEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_UNKNOWN:
+    ast_node->value.b = resolveRelSmallEqualUnknown(ast_node->strings[0], ast_node->strings[1]);
+    goto eval_node_end;
+AST_VAR_BOOLEAN_EXPRESSION_VALUE:
+    ast_node->value.b = getSymbolValueBool(ast_node->strings[0]);
+    goto eval_node_end;
+AST_DELETE_VAR:
+    removeSymbolByName(ast_node->strings[0]);
+    goto eval_node_end;
+AST_DELETE_VAR_EL:
+    removeComplexElementByLeftRightBracketStack(ast_node->strings[0]);
+    goto eval_node_end;
+AST_PRINT_SYMBOL_TABLE:
+    printSymbolTable();
+    goto eval_node_end;
+AST_LIST_START:
+    addSymbolList(NULL);
+    goto eval_node_end;
+AST_LIST_ADD_VAR:
+    cloneSymbolToComplex(ast_node->strings[0], NULL);
+    goto eval_node_end;
+AST_LIST_ADD_VAR_EL:
+    buildVariableComplexElement(ast_node->strings[0], NULL);
+    goto eval_node_end;
+AST_LIST_NESTED_FINISH:
+    if (isNestedComplexMode()) {
+        pushNestedComplexModeStack(getComplexMode());
+        reverseComplexMode();
+        finishComplexMode(NULL, K_ANY);
+    }
+    goto eval_node_end;
+AST_DICT_START:
+    addSymbolDict(NULL);
+    goto eval_node_end;
+AST_DICT_ADD_VAR:
+    cloneSymbolToComplex(ast_node->strings[1], ast_node->strings[0]);
+    goto eval_node_end;
+AST_DICT_ADD_VAR_EL:
+    buildVariableComplexElement(ast_node->strings[1], ast_node->strings[0]);
+    goto eval_node_end;
+AST_DICT_NESTED_FINISH:
+    if (isNestedComplexMode()) {
+        pushNestedComplexModeStack(getComplexMode());
+        reverseComplexMode();
+        finishComplexMode(NULL, K_ANY);
+    }
+    goto eval_node_end;
+AST_POP_NESTED_COMPLEX_STACK:
+    popNestedComplexModeStack(ast_node->strings[0]);
+    goto eval_node_end;
+AST_LEFT_RIGHT_BRACKET_EXPRESSION:
+    disable_complex_mode = true;
+    if (ast_node->right->value_type == V_INT) {
+        symbol = addSymbolInt(NULL, ast_node->right->value.i);
+    } else {
+        symbol = addSymbolFloat(NULL, ast_node->right->value.f);
+    }
+    symbol->sign = 1;
+    pushLeftRightBracketStack(symbol->id);
+    disable_complex_mode = false;
+    goto eval_node_end;
+AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
+    disable_complex_mode = true;
+    if (ast_node->right->value_type == V_INT) {
+        symbol = addSymbolInt(NULL, - ast_node->right->value.i);
+    } else {
+        symbol = addSymbolFloat(NULL, - ast_node->right->value.f);
+    }
+    symbol->sign = 1;
+    pushLeftRightBracketStack(symbol->id);
+    disable_complex_mode = false;
+    goto eval_node_end;
+AST_LEFT_RIGHT_BRACKET_STRING:
+    disable_complex_mode = true;
+    symbol = addSymbolString(NULL, ast_node->value.s);
+    symbol->sign = 1;
+    pushLeftRightBracketStack(symbol->id);
+    disable_complex_mode = false;
+    goto eval_node_end;
+AST_LEFT_RIGHT_BRACKET_VAR:
+    disable_complex_mode = true;
+    symbol = createCloneFromSymbolByName(NULL, K_ANY, ast_node->strings[0], K_ANY);
+    symbol->sign = 1;
+    pushLeftRightBracketStack(symbol->id);
+    disable_complex_mode = false;
+    goto eval_node_end;
+AST_LEFT_RIGHT_BRACKET_VAR_MINUS:
+    disable_complex_mode = true;
+    symbol = createCloneFromSymbolByName(NULL, K_ANY, ast_node->strings[0], K_ANY);
+    symbol->sign = -1;
+    pushLeftRightBracketStack(symbol->id);
+    disable_complex_mode = false;
+    goto eval_node_end;
+AST_BUILD_COMPLEX_VARIABLE:
+    disable_complex_mode = true;
+    buildVariableComplexElement(ast_node->strings[0], NULL);
+    disable_complex_mode = false;
+    goto eval_node_end;
+AST_EXIT_SUCCESS:
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        print_bye_bye();
+#endif
+    freeEverything();
+    exit(E_SUCCESS);
+AST_EXIT_EXPRESSION:
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        print_bye_bye();
+#endif
+    exit_code = ast_node->right->value.i;
+    freeEverything();
+    exit(exit_code);
+AST_EXIT_VAR:
+#ifndef CHAOS_COMPILER
+    if (is_interactive)
+        print_bye_bye();
+#endif
+    exit_code = getSymbolValueInt(ast_node->strings[0]);
+    freeEverything();
+    exit(exit_code);
+AST_PRINT_FUNCTION_TABLE:
+    printFunctionTable();
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETERS_START:
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETER_BOOL:
+    addFunctionCallParameterBool(ast_node->right->value.b);
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETER_NUMBER:
+    if (ast_node->right->value_type == V_INT) {
+        addFunctionCallParameterInt(ast_node->right->value.i);
+    } else {
+        addFunctionCallParameterFloat(ast_node->right->value.f);
+    }
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETER_STRING:
+    addFunctionCallParameterString(ast_node->value.s);
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETER_VAR:
+    addFunctionCallParameterSymbol(ast_node->strings[0]);
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETER_LIST:
+    reverseComplexMode();
+    addFunctionCallParameterList(K_ANY);
+    goto eval_node_end;
+AST_FUNCTION_CALL_PARAMETER_DICT:
+    reverseComplexMode();
+    addFunctionCallParameterList(K_ANY);
+    goto eval_node_end;
+AST_PRINT_FUNCTION_RETURN:
+    if (ast_node->strings_size > 1)
+        _module = ast_node->strings[1];
+    function_call = callFunction(ast_node->strings[0], _module);
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_ECHO_FUNCTION_RETURN:
+    if (ast_node->strings_size > 1)
+        _module = ast_node->strings[1];
+    function_call = callFunction(ast_node->strings[0], _module);
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_PRETTY_PRINT_FUNCTION_RETURN:
+    if (ast_node->strings_size > 1)
+        _module = ast_node->strings[1];
+    function_call = callFunction(ast_node->strings[0], _module);
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_PRETTY_ECHO_FUNCTION_RETURN:
+    if (ast_node->strings_size > 1)
+        _module = ast_node->strings[1];
+    function_call = callFunction(ast_node->strings[0], _module);
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_FUNCTION_RETURN:
+    if (ast_node->strings_size > 1)
+        _module = ast_node->strings[1];
+    function_call = callFunction(ast_node->strings[0], _module);
+    function_call->lineno = kaos_lineno;
+    function_call->trigger = ast_node;
+    ast_node = function_call->function->node->child;
+    module = function_call->function->module_context;
+    goto eval_node_start;
+AST_NESTED_COMPLEX_TRANSITION:
+    reverseComplexMode();
+    goto eval_node_end;
+AST_DECISION_MAKE_BOOLEAN:
+    if (ast_node->right->value.b) {
+        callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+        switch (ast_node->strings_size)
+        {
+            case 1:
+                function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                break;
+            case 2:
+                function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
+                break;
+            default:
+                break;
+        }
+        function_call->lineno = kaos_lineno;
+        function_call->trigger = ast_node;
+        ast_node = function_call->function->node->child;
+        module = function_call->function->module_context;
+        goto eval_node_start;
+    } else {
+        resetFunctionParametersMode();
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_BOOLEAN_BREAK:
+    if (nested_loop_counter > 0 && ast_node->right->value.b) {
+        decisionBreakLoop();
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_BOOLEAN_CONTINUE:
+    if (nested_loop_counter > 0 && ast_node->right->value.b) {
+        decisionContinueLoop();
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_BOOLEAN_RETURN:
+    if (ast_node->right->value.b) {
+        returnSymbol(ast_node->strings[0]);
+        stop_ast_evaluation = true;
+        callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_DEFAULT:
+    if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+        callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+        switch (ast_node->strings_size)
+        {
+            case 1:
+                function_call = callFunction(ast_node->strings[0], function_call_stack.arr[function_call_stack.size - 1]->function->module);
+                break;
+            case 2:
+                function_call = callFunction(ast_node->strings[1], ast_node->strings[0]);
+                break;
+            default:
+                break;
+        }
+        function_call->lineno = kaos_lineno;
+        function_call->trigger = ast_node;
+        ast_node = function_call->function->node->child;
+        module = function_call->function->module_context;
+        goto eval_node_start;
+    } else {
+        resetFunctionParametersMode();
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_DEFAULT_BREAK:
+    if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+        decisionBreakLoop();
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_DEFAULT_CONTINUE:
+    if (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+        decisionContinueLoop();
+    }
+    goto eval_node_end;
+AST_DECISION_MAKE_DEFAULT_RETURN:
+    if (function_call_stack.arr[function_call_stack.size - 1] != NULL) {
+        returnSymbol(ast_node->strings[0]);
+        stop_ast_evaluation = true;
+        callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
+    }
+    goto eval_node_end;
+AST_JSON_PARSER:
+    reverseComplexMode();
+    symbol = finishComplexMode(NULL, K_ANY);
+    returnVariable(symbol);
+    goto eval_node_end;
 
+AST_STEP:
+AST_EXPRESSION_VALUE:
+AST_MIXED_EXPRESSION_VALUE:
+AST_BOOLEAN_EXPRESSION_VALUE:
+AST_END:
+AST_FUNCTION_PARAMETERS_START:
+AST_FUNCTION_STEP:
+AST_FUNCTION_PARAMETER_BOOL:
+AST_FUNCTION_PARAMETER_NUMBER:
+AST_FUNCTION_PARAMETER_STRING:
+AST_FUNCTION_PARAMETER_LIST:
+AST_FUNCTION_PARAMETER_BOOL_LIST:
+AST_FUNCTION_PARAMETER_NUMBER_LIST:
+AST_FUNCTION_PARAMETER_STRING_LIST:
+AST_FUNCTION_PARAMETER_DICT:
+AST_FUNCTION_PARAMETER_BOOL_DICT:
+AST_FUNCTION_PARAMETER_NUMBER_DICT:
+AST_FUNCTION_PARAMETER_STRING_DICT:
+AST_OPTIONAL_FUNCTION_PARAMETER_BOOL:
+AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER:
+AST_OPTIONAL_FUNCTION_PARAMETER_STRING:
+AST_OPTIONAL_FUNCTION_PARAMETER_LIST:
+AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_LIST:
+AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_LIST:
+AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST:
+AST_OPTIONAL_FUNCTION_PARAMETER_DICT:
+AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_DICT:
+AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_DICT:
+AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT:
+AST_DEFINE_FUNCTION_BOOL:
+AST_DEFINE_FUNCTION_NUMBER:
+AST_DEFINE_FUNCTION_STRING:
+AST_DEFINE_FUNCTION_ANY:
+AST_DEFINE_FUNCTION_LIST:
+AST_DEFINE_FUNCTION_DICT:
+AST_DEFINE_FUNCTION_BOOL_LIST:
+AST_DEFINE_FUNCTION_BOOL_DICT:
+AST_DEFINE_FUNCTION_NUMBER_LIST:
+AST_DEFINE_FUNCTION_NUMBER_DICT:
+AST_DEFINE_FUNCTION_STRING_LIST:
+AST_DEFINE_FUNCTION_STRING_DICT:
+AST_DEFINE_FUNCTION_VOID:
+AST_ADD_FUNCTION_NAME:
+AST_APPEND_MODULE:
+AST_PREPEND_MODULE:
+AST_MODULE_IMPORT:
+AST_MODULE_IMPORT_AS:
+AST_MODULE_IMPORT_PARTIAL:
+AST_DECISION_DEFINE:
+
+eval_node_end:
     if (phase != PREPARSE) {
         ast_node = ast_node->next;
-        goto eval_node_label;
+        goto eval_node_start;
     }
     return ast_node;
 }
