@@ -298,13 +298,11 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     sprintf(
         cmd,
 #   if !defined(__clang__)
-        "/c %s %s %s %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   else
-        "/c %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
 #   endif
         c_compiler_path,
-        "-s",
-        "-O3",
         "-fcommon",
 #   if !defined(__clang__)
         "-Wl,--stack,4294967296",
@@ -368,7 +366,7 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     if (extra_flags_count > 0)
         extra_flags_count--;
 
-    unsigned arg_count = 31 + extra_flags_count;
+    unsigned arg_count = 29 + extra_flags_count;
 #   if !defined(__clang__)
     arg_count++;
 #   endif
@@ -380,8 +378,6 @@ void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_fla
     char *c_compiler_args[arg_count];
     int arg_i = 0;
     c_compiler_args[arg_i++] = c_compiler_path;
-    c_compiler_args[arg_i++] = "-s";
-    c_compiler_args[arg_i++] = "-O3";
     c_compiler_args[arg_i++] = "-Werror";
     c_compiler_args[arg_i++] = "-Wall";
     c_compiler_args[arg_i++] = "-pedantic";

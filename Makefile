@@ -65,17 +65,17 @@ bench:
 	${MAKE} chaos
 
 clang-dev-sanitizer-memory:
-	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -g -O0 -fno-optimize-sibling-calls'
+	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -g'
 	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev-sanitizer-address:
-	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g -O0'
+	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g '
 	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev-sanitizer-undefined_behavior:
-	export CHAOS_COMPILER='clang -fsanitize=undefined -g -O0'
+	export CHAOS_COMPILER='clang -fsanitize=undefined -g'
 	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
@@ -139,13 +139,13 @@ test-compiler-dev:
 	./tests/compiler.sh -e "-ggdb"
 
 test-compiler-dev-sanitizer-memory:
-	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -O0 -ggdb"
+	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -g -O0 -ggdb"
 
 test-compiler-dev-sanitizer-address:
 	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -g -O0 -ggdb"
 
 test-compiler-dev-sanitizer-undefined_behavior:
-	./tests/compiler.sh -e "-fsanitize=undefined -O0 -ggdb"
+	./tests/compiler.sh -e "-fsanitize=undefined -g -O0 -ggdb"
 
 test-extensions-linux-gcc:
 	gcc -shared -fPIC tests/extensions/spells/example/example.c -o tests/extensions/spells/example/example.so && \
