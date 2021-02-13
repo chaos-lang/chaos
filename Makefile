@@ -139,7 +139,7 @@ test-compiler-dev:
 	./tests/compiler.sh -e "-ggdb"
 
 test-compiler-dev-sanitizer-memory:
-	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -g -O0 -ggdb"
+	./tests/compiler.sh -e "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -g -ggdb"
 
 test-compiler-dev-sanitizer-address:
 	./tests/compiler.sh -e "-fsanitize=address -fno-omit-frame-pointer -g -O0 -ggdb"
