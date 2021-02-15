@@ -473,3 +473,137 @@ char *ast_node_type_names[] = {
 char* getAstNodeTypeName(unsigned i) {
     return ast_node_type_names[i];
 }
+
+AST* ast(int lineno)
+{
+    AST* ast = (struct AST*)calloc(1, sizeof(AST));
+    ast->lineno = lineno;
+    return ast;
+}
+
+Expr* buildExpr(enum ExprKind kind, int lineno)
+{
+    Expr* expr = (struct Expr*)calloc(1, sizeof(Expr));
+    expr->ast = ast(lineno);
+    expr->kind = kind;
+    return expr;
+}
+
+Stmt* buildStmt(enum StmtKind kind, int lineno)
+{
+    Stmt* stmt = (struct Stmt*)calloc(1, sizeof(Stmt));
+    stmt->ast = ast(lineno);
+    stmt->kind = kind;
+    return stmt;
+}
+
+Expr* basicLitBool(bool b, int lineno)
+{
+    union Value value;
+    value.b = b;
+    BasicLit* basic_lit = (struct BasicLit*)calloc(1, sizeof(BasicLit));
+    basic_lit->value_type = V_BOOL;
+    basic_lit->value = value;
+    Expr* expr = buildExpr(BasicLit_kind, lineno);
+    expr->v.basic_lit = basic_lit;
+    return expr;
+}
+
+Expr* basicLitInt(long long i, int lineno)
+{
+    union Value value;
+    value.i = i;
+    BasicLit* basic_lit = (struct BasicLit*)calloc(1, sizeof(BasicLit));
+    basic_lit->value_type = V_INT;
+    basic_lit->value = value;
+    Expr* expr = buildExpr(BasicLit_kind, lineno);
+    expr->v.basic_lit = basic_lit;
+    return expr;
+}
+
+Expr* basicLitFloat(long double f, int lineno)
+{
+    union Value value;
+    value.f = f;
+    BasicLit* basic_lit = (struct BasicLit*)calloc(1, sizeof(BasicLit));
+    basic_lit->value_type = V_FLOAT;
+    basic_lit->value = value;
+    Expr* expr = buildExpr(BasicLit_kind, lineno);
+    expr->v.basic_lit = basic_lit;
+    return expr;
+}
+
+Expr* basicLitString(char *s, int lineno)
+{
+    union Value value;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
+    free(s);
+    BasicLit* basic_lit = (struct BasicLit*)calloc(1, sizeof(BasicLit));
+    basic_lit->value_type = V_INT;
+    basic_lit->value = value;
+    Expr* expr = buildExpr(BasicLit_kind, lineno);
+    expr->v.basic_lit = basic_lit;
+    return expr;
+}
+
+Expr* ident(char *s, int lineno)
+{
+    Ident* ident = (struct Ident*)calloc(1, sizeof(Ident));
+    ident->name = malloc(1 + strlen(s));
+    strcpy(ident->name, s);
+    free(s);
+    Expr* expr = buildExpr(Ident_kind, lineno);
+    expr->v.ident = ident;
+    return expr;
+}
+
+Expr* binaryExpr(Expr* x, enum Token op, Expr* y, int lineno)
+{
+    BinaryExpr* binary_expr = (struct BinaryExpr*)calloc(1, sizeof(BinaryExpr));
+    binary_expr->x = x;
+    binary_expr->op = op;
+    binary_expr->y = y;
+    Expr* expr = buildExpr(BinaryExpr_kind, lineno);
+    expr->v.binary_expr = binary_expr;
+    return expr;
+}
+
+Expr* unaryExpr(enum Token op, Expr* x, int lineno)
+{
+    UnaryExpr* unary_expr = (struct UnaryExpr*)calloc(1, sizeof(UnaryExpr));
+    unary_expr->op = op;
+    unary_expr->x = x;
+    Expr* expr = buildExpr(UnaryExpr_kind, lineno);
+    expr->v.unary_expr = unary_expr;
+    return expr;
+}
+
+Expr* parenExpr(Expr* x, int lineno)
+{
+    ParenExpr* paren_expr = (struct ParenExpr*)calloc(1, sizeof(ParenExpr));
+    paren_expr->x = x;
+    Expr* expr = buildExpr(ParenExpr_kind, lineno);
+    expr->v.paren_expr = paren_expr;
+    return expr;
+}
+
+Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno)
+{
+    AssignStmt* assign_stmt = (struct AssignStmt*)calloc(1, sizeof(AssignStmt));
+    assign_stmt->x = x;
+    assign_stmt->tok = tok;
+    assign_stmt->y = y;
+    Stmt* stmt = buildStmt(AssignStmt_kind, lineno);
+    stmt->v.assign_stmt = assign_stmt;
+    return stmt;
+}
+
+Stmt* returnStmt(Expr* x, int lineno)
+{
+    ReturnStmt* return_stmt = (struct ReturnStmt*)calloc(1, sizeof(ReturnStmt));
+    return_stmt->x = x;
+    Stmt* stmt = buildStmt(ReturnStmt_kind, lineno);
+    stmt->v.return_stmt = return_stmt;
+    return stmt;
+}

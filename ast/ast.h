@@ -354,4 +354,96 @@ ASTNode* free_node(ASTNode* ast_node);
 void setASTNodeTranspiled(ASTNode* ast_node, char* transpiled);
 char* getAstNodeTypeName(unsigned i);
 
+
+typedef struct AST {
+    int lineno;
+} AST;
+
+enum Token {
+    ADD=1,
+    SUB=2,
+    MUL=3,
+    QUO=4,
+    REM=5
+};
+
+enum ExprKind {
+    BasicLit_kind=1,
+    Ident_kind=2,
+    BinaryExpr_kind=3,
+    UnaryExpr_kind=4,
+    ParenExpr_kind=5
+};
+
+typedef struct Expr {
+    struct AST* ast;
+    enum ExprKind kind;
+    union {
+        struct BasicLit* basic_lit;
+        struct Ident* ident;
+        struct BinaryExpr* binary_expr;
+        struct UnaryExpr* unary_expr;
+        struct ParenExpr* paren_expr;
+    } v;
+} Expr;
+
+typedef struct BasicLit {
+    enum ValueType value_type;
+    union Value value;
+} BasicLit;
+
+typedef struct Ident {
+    char *name;
+} Ident;
+
+typedef struct BinaryExpr {
+    struct Expr* x;
+    enum Token op;
+    struct Expr* y;
+} BinaryExpr;
+
+typedef struct UnaryExpr {
+    enum Token op;
+    struct Expr* x;
+} UnaryExpr;
+
+typedef struct ParenExpr {
+    struct Expr* x;
+} ParenExpr;
+
+enum StmtKind {
+    AssignStmt_kind=1,
+    ReturnStmt_kind=2
+};
+
+typedef struct Stmt {
+    struct AST* ast;
+    enum StmtKind kind;
+    union {
+        struct AssignStmt* assign_stmt;
+        struct ReturnStmt* return_stmt;
+    } v;
+} Stmt;
+
+typedef struct AssignStmt {
+    struct Expr* x;
+    enum Token tok;
+    struct Expr* y;
+} AssignStmt;
+
+typedef struct ReturnStmt {
+    struct Expr* x;
+} ReturnStmt;
+
+AST* ast(int lineno);
+Expr* buildExpr(enum ExprKind kind, int lineno);
+Expr* basicLitBool(bool b, int lineno);
+Expr* basicLitInt(long long i, int lineno);
+Expr* basicLitFloat(long double f, int lineno);
+Expr* basicLitString(char *s, int lineno);
+Expr* ident(char *s, int lineno);
+Expr* binaryExpr(Expr* x, enum Token op, Expr* y, int lineno);
+Expr* unaryExpr(enum Token op, Expr* x, int lineno);
+Expr* parenExpr(Expr* x, int lineno);
+
 #endif
