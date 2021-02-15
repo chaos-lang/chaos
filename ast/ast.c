@@ -607,3 +607,12 @@ Stmt* returnStmt(Expr* x, int lineno)
     stmt->v.return_stmt = return_stmt;
     return stmt;
 }
+
+Stmt* printStmt(Expr* x, int lineno)
+{
+    PrintStmt* print_stmt = (struct PrintStmt*)calloc(1, sizeof(PrintStmt));
+    print_stmt->x = x;
+    Stmt* stmt = buildStmt(PrintStmt_kind, lineno);
+    stmt->v.print_stmt = print_stmt;
+    return stmt;
+}

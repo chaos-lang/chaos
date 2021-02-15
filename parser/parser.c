@@ -49,9 +49,9 @@ int initParser(int argc, char** argv) {
     bool compiler_fopen_fail = false;
     char *program_file = NULL;
     char *bin_file = NULL;
-    bool keep = false;
-    bool unsafe = false;
-    char *extra_flags = NULL;
+    // bool keep = false;
+    // bool unsafe = false;
+    // char *extra_flags = NULL;
 
     char opt;
     while ((opt = getopt_long(argc, argv, "hvldc:o:e:ku", long_options, NULL)) != -1)
@@ -81,13 +81,13 @@ int initParser(int argc, char** argv) {
                 bin_file = optarg;
                 break;
             case 'e':
-                extra_flags = optarg;
+                // extra_flags = optarg;
                 break;
             case 'k':
-                keep = true;
+                // keep = true;
                 break;
             case 'u':
-                unsafe = true;
+                // unsafe = true;
                 global_unsafe = true;
                 break;
             case '?':
@@ -198,13 +198,13 @@ int initParser(int argc, char** argv) {
         main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
-        if (!is_interactive) {
-            if (compiler_mode) {
-                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep, unsafe);
-            } else {
-                interpret(main_interpreted_module, INIT_PREPARSE, false, unsafe);
-            }
-        }
+        // if (!is_interactive) {
+        //     if (compiler_mode) {
+        //         compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep, unsafe);
+        //     } else {
+        //         interpret(main_interpreted_module, INIT_PREPARSE, false, unsafe);
+        //     }
+        // }
         if (!is_interactive) break;
     } while(!feof(yyin));
 

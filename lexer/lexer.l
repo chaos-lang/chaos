@@ -62,11 +62,11 @@ void injectCode(char *code, enum Phase phase_arg) {
 
     char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
     strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
-#ifndef CHAOS_COMPILER
-    interpret(interpreted_module, phase_arg, false, global_unsafe);
-#else
-    interpret(interpreted_module, phase_arg);
-#endif
+// #ifndef CHAOS_COMPILER
+//     interpret(interpreted_module, phase_arg, false, global_unsafe);
+// #else
+//     interpret(interpreted_module, phase_arg);
+// #endif
     free(interpreted_module);
 
     yy_delete_buffer(new_buffer);

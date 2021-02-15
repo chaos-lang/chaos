@@ -413,7 +413,8 @@ typedef struct ParenExpr {
 
 enum StmtKind {
     AssignStmt_kind=1,
-    ReturnStmt_kind=2
+    PrintStmt_kind=2,
+    ReturnStmt_kind=3
 };
 
 typedef struct Stmt {
@@ -421,6 +422,7 @@ typedef struct Stmt {
     enum StmtKind kind;
     union {
         struct AssignStmt* assign_stmt;
+        struct PrintStmt* print_stmt;
         struct ReturnStmt* return_stmt;
     } v;
 } Stmt;
@@ -435,6 +437,26 @@ typedef struct ReturnStmt {
     struct Expr* x;
 } ReturnStmt;
 
+typedef struct PrintStmt {
+    struct Expr* x;
+} PrintStmt;
+
+typedef struct StmtList {
+    struct Stmt** stmts;
+    unsigned long stmt_count;
+} StmtList;
+
+typedef struct File {
+    struct StmtList* stmt_list;
+} File;
+
+typedef struct Program {
+    struct File** files;
+    unsigned long file_count;
+} Program;
+
+Program* program;
+
 AST* ast(int lineno);
 Expr* buildExpr(enum ExprKind kind, int lineno);
 Expr* basicLitBool(bool b, int lineno);
@@ -445,5 +467,7 @@ Expr* ident(char *s, int lineno);
 Expr* binaryExpr(Expr* x, enum Token op, Expr* y, int lineno);
 Expr* unaryExpr(enum Token op, Expr* x, int lineno);
 Expr* parenExpr(Expr* x, int lineno);
+Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
+Stmt* returnStmt(Expr* x, int lineno);
 
 #endif
