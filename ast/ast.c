@@ -484,20 +484,15 @@ AST* ast(int lineno)
     return ast;
 }
 
+
+// Expr
+
 Expr* buildExpr(enum ExprKind kind, int lineno)
 {
     Expr* expr = (struct Expr*)calloc(1, sizeof(Expr));
     expr->ast = ast(lineno);
     expr->kind = kind;
     return expr;
-}
-
-Stmt* buildStmt(enum StmtKind kind, int lineno)
-{
-    Stmt* stmt = (struct Stmt*)calloc(1, sizeof(Stmt));
-    stmt->ast = ast(lineno);
-    stmt->kind = kind;
-    return stmt;
 }
 
 Expr* basicLitBool(bool b, int lineno)
@@ -543,7 +538,7 @@ Expr* basicLitString(char *s, int lineno)
     strcpy(value.s, s);
     free(s);
     BasicLit* basic_lit = (struct BasicLit*)calloc(1, sizeof(BasicLit));
-    basic_lit->value_type = V_INT;
+    basic_lit->value_type = V_STRING;
     basic_lit->value = value;
     Expr* expr = buildExpr(BasicLit_kind, lineno);
     expr->v.basic_lit = basic_lit;
@@ -602,6 +597,17 @@ Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno)
     return expr;
 }
 
+
+// Stmt
+
+Stmt* buildStmt(enum StmtKind kind, int lineno)
+{
+    Stmt* stmt = (struct Stmt*)calloc(1, sizeof(Stmt));
+    stmt->ast = ast(lineno);
+    stmt->kind = kind;
+    return stmt;
+}
+
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno)
 {
     AssignStmt* assign_stmt = (struct AssignStmt*)calloc(1, sizeof(AssignStmt));
@@ -639,6 +645,61 @@ Stmt* exprStmt(Expr* x, int lineno)
     stmt->v.expr_stmt = expr_stmt;
     return stmt;
 }
+
+Stmt* declStmt(Decl* decl, int lineno)
+{
+    DeclStmt* decl_stmt = (struct DeclStmt*)calloc(1, sizeof(DeclStmt));
+    decl_stmt->decl = decl;
+    Stmt* stmt = buildStmt(DeclStmt_kind, lineno);
+    stmt->v.decl_stmt = decl_stmt;
+    return stmt;
+}
+
+
+// Spec
+
+Spec* buildSpec(enum SpecKind kind, int lineno)
+{
+    Spec* spec = (struct Spec*)calloc(1, sizeof(Spec));
+    spec->ast = ast(lineno);
+    spec->kind = kind;
+    return spec;
+}
+
+Spec* typeSpec(enum Type type, enum Type second_type, int lineno)
+{
+    TypeSpec* type_spec = (struct TypeSpec*)calloc(1, sizeof(TypeSpec));
+    type_spec->type = type;
+    type_spec->second_type = second_type;
+    Spec* spec = buildSpec(TypeSpec_kind, lineno);
+    spec->v.type_spec = type_spec;
+    return spec;
+}
+
+
+// Decl
+
+Decl* buildDecl(enum DeclKind kind, int lineno)
+{
+    Decl* decl = (struct Decl*)calloc(1, sizeof(Decl));
+    decl->ast = ast(lineno);
+    decl->kind = kind;
+    return decl;
+}
+
+Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno)
+{
+    VarDecl* var_decl = (struct VarDecl*)calloc(1, sizeof(VarDecl));
+    var_decl->type_spec = type_spec;
+    var_decl->ident = ident;
+    var_decl->expr = expr;
+    Decl* decl = buildDecl(VarDecl_kind, lineno);
+    decl->v.var_decl = var_decl;
+    return decl;
+}
+
+
+// Generic
 
 void initProgram()
 {

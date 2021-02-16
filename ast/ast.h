@@ -362,6 +362,9 @@ typedef struct AST {
     int lineno;
 } AST;
 
+
+// Expr
+
 enum ExprKind {
     BasicLit_kind=1,
     Ident_kind=2,
@@ -414,11 +417,15 @@ typedef struct IncDecExpr {
     bool first;
 } IncDecExpr;
 
+
+// Stmt
+
 enum StmtKind {
     AssignStmt_kind=1,
     PrintStmt_kind=2,
     ReturnStmt_kind=3,
     ExprStmt_kind=4,
+    DeclStmt_kind=5,
 };
 
 typedef struct Stmt {
@@ -429,6 +436,7 @@ typedef struct Stmt {
         struct PrintStmt* print_stmt;
         struct ReturnStmt* return_stmt;
         struct ExprStmt* expr_stmt;
+        struct DeclStmt* decl_stmt;
     } v;
 } Stmt;
 
@@ -449,6 +457,54 @@ typedef struct PrintStmt {
 typedef struct ExprStmt {
     struct Expr* x;
 } ExprStmt;
+
+typedef struct DeclStmt {
+    struct Decl* decl;
+} DeclStmt;
+
+
+// Spec
+
+enum SpecKind {
+    TypeSpec_kind=1,
+};
+
+typedef struct Spec {
+    struct AST* ast;
+    enum SpecKind kind;
+    union {
+        struct TypeSpec* type_spec;
+    } v;
+} Spec;
+
+typedef struct TypeSpec {
+    enum Type type;
+    enum Type second_type;
+} TypeSpec;
+
+
+// Decl
+
+enum DeclKind {
+    VarDecl_kind=1,
+};
+
+typedef struct Decl {
+    struct AST* ast;
+    enum DeclKind kind;
+    union {
+        struct VarDecl* var_decl;
+    } v;
+} Decl;
+
+typedef struct VarDecl {
+    struct Spec* type_spec;
+    struct Expr* ident;
+    struct Expr* expr;
+} VarDecl;
+
+
+// Generic
 
 typedef struct StmtList {
     struct Stmt** stmts;
@@ -477,10 +533,16 @@ Expr* binaryExpr(Expr* x, enum Token op, Expr* y, int lineno);
 Expr* unaryExpr(enum Token op, Expr* x, int lineno);
 Expr* parenExpr(Expr* x, int lineno);
 Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno);
+Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
 Stmt* printStmt(Expr* x, int lineno);
 Stmt* exprStmt(Expr* x, int lineno);
+Stmt* declStmt(Decl* decl, int lineno);
+Spec* buildSpec(enum SpecKind kind, int lineno);
+Spec* typeSpec(enum Type type, enum Type second_type, int lineno);
+Decl* buildDecl(enum DeclKind kind, int lineno);
+Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 void initProgram();
 void addStmt(StmtList* stmt_list, Stmt* stmt);
 

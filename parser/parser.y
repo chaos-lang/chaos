@@ -56,6 +56,8 @@ extern bool is_complex_parsing;
     unsigned long long lluval;
     Expr* expr;
     Stmt* stmt;
+    Spec* spec;
+    Decl* decl;
 }
 
 %token START_PROGRAM START_PREPARSE START_JSON_PARSE
@@ -81,7 +83,9 @@ extern bool is_complex_parsing;
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
-%type<stmt> stmt assign_stmt return_stmt print_stmt expr_stmt
+%type<stmt> stmt assign_stmt return_stmt print_stmt expr_stmt decl_stmt
+%type<spec> type_spec
+%type<decl> var_decl
 
 %destructor {
     free($$);
@@ -257,6 +261,9 @@ stmt:
     | expr_stmt T_NEWLINE {
         $$ = $1;
     }
+    | decl_stmt T_NEWLINE {
+        $$ = $1;
+    }
 ;
 
 assign_stmt:
@@ -280,6 +287,57 @@ print_stmt:
 expr_stmt:
     expr {
         $$ = exprStmt($1, yylineno);
+    }
+;
+
+decl_stmt:
+    var_decl {
+        $$ = declStmt($1, yylineno);
+    }
+;
+
+type_spec:
+    T_VAR_BOOL {
+        $$ = typeSpec(K_BOOL, K_ANY, yylineno);
+    }
+    | T_VAR_NUMBER {
+        $$ = typeSpec(K_NUMBER, K_ANY, yylineno);
+    }
+    | T_VAR_STRING {
+        $$ = typeSpec(K_STRING, K_ANY, yylineno);
+    }
+    | T_VAR_ANY {
+        $$ = typeSpec(K_ANY, K_ANY, yylineno);
+    }
+    | T_VAR_LIST {
+        $$ = typeSpec(K_LIST, K_ANY, yylineno);
+    }
+    | T_VAR_DICT {
+        $$ = typeSpec(K_DICT, K_ANY, yylineno);
+    }
+    | T_VAR_BOOL T_VAR_LIST {
+        $$ = typeSpec(K_LIST, K_BOOL, yylineno);
+    }
+    | T_VAR_NUMBER T_VAR_LIST {
+        $$ = typeSpec(K_LIST, K_NUMBER, yylineno);
+    }
+    | T_VAR_STRING T_VAR_LIST {
+        $$ = typeSpec(K_LIST, K_STRING, yylineno);
+    }
+    | T_VAR_BOOL T_VAR_DICT {
+        $$ = typeSpec(K_DICT, K_BOOL, yylineno);
+    }
+    | T_VAR_NUMBER T_VAR_DICT {
+        $$ = typeSpec(K_DICT, K_NUMBER, yylineno);
+    }
+    | T_VAR_STRING T_VAR_DICT {
+        $$ = typeSpec(K_DICT, K_STRING, yylineno);
+    }
+;
+
+var_decl:
+    type_spec ident T_ASSIGN expr {
+        $$ = varDecl($1, $2, $4, yylineno);
     }
 ;
 

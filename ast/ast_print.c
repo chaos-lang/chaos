@@ -146,6 +146,16 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             );
             printASTExpr(stmt->v.expr_stmt->x, false, "\n");
             break;
+        case DeclStmt_kind:
+            printf(
+                "%*c\"_type\": \"DeclStmt\",\n%*c\"decl\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTDecl(stmt->v.decl_stmt->decl, false, "\n");
+            break;
         default:
             break;
     }
@@ -304,6 +314,87 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__,
                 expr->v.incdec_expr->first ? "true" : "false"
             );
+            break;
+        default:
+            break;
+    }
+
+    indent = indent - __KAOS_INDENT_LENGTH__;
+    printf("%*c}%s", indent, __KAOS_INDENT_CHAR__, end);
+}
+
+void printASTSpec(Spec* spec, bool is_list, char *end)
+{
+    if (is_list)
+        printf(
+            "%*c{\n",
+            indent,
+            __KAOS_INDENT_CHAR__
+        );
+    else
+        printf("{\n");
+    indent = indent + __KAOS_INDENT_LENGTH__;
+
+    switch (spec->kind)
+    {
+        case TypeSpec_kind:
+            printf(
+                "%*c\"_type\": \"TypeSpec\",\n"
+                "%*c\"type\": \"%s\",\n"
+                "%*c\"second_type\": \"%s\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__,
+                getTypeName(spec->v.type_spec->type),
+                indent,
+                __KAOS_INDENT_CHAR__,
+                getTypeName(spec->v.type_spec->second_type)
+            );
+            break;
+        default:
+            break;
+    }
+
+    indent = indent - __KAOS_INDENT_LENGTH__;
+    printf("%*c}%s", indent, __KAOS_INDENT_CHAR__, end);
+}
+
+void printASTDecl(Decl* decl, bool is_list, char *end)
+{
+    if (is_list)
+        printf(
+            "%*c{\n",
+            indent,
+            __KAOS_INDENT_CHAR__
+        );
+    else
+        printf("{\n");
+    indent = indent + __KAOS_INDENT_LENGTH__;
+
+    switch (decl->kind)
+    {
+        case VarDecl_kind:
+            printf(
+                "%*c\"_type\": \"VarDecl\",\n%*c\"type_spec\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(decl->v.var_decl->type_spec, false, ",\n");
+            printf(
+                "%*c\"ident\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.var_decl->ident, false, ",\n");
+            printf(
+                "%*c\"expr\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.var_decl->expr, false, "\n");
             break;
         default:
             break;
