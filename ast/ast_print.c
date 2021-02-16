@@ -282,26 +282,167 @@ char *getToken(enum Token tok)
 {
     switch (tok)
     {
-        case ADD_token:
-            return ADD;
+        case NEWLINE_tok:
+            return TT_NEWLINE;
             break;
-        case SUB_token:
-            return SUB;
+        case COMMENT1_tok:
+            return TT_COMMENT1;
             break;
-        case MUL_token:
-            return MUL;
+        case COMMENT2_tok:
+            return TT_COMMENT2;
             break;
-        case QUO_token:
-            return QUO;
+        case ASSIGN_tok:
+            return TT_ASSIGN;
             break;
-        case REM_token:
-            return REM;
+        case ADD_tok:
+            return TT_ADD;
             break;
-        case EQL_token:
-            return EQL;
+        case SUB_tok:
+            return TT_SUB;
+            break;
+        case MUL_tok:
+            return TT_MUL;
+            break;
+        case QUO_tok:
+            return TT_QUO;
+            break;
+        case REM_tok:
+            return TT_REM;
+            break;
+        case BACKSLASH_tok:
+            return TT_BACKSLASH;
+            break;
+        case LPAREN_tok:
+            return TT_LPAREN;
+            break;
+        case RPAREN_tok:
+            return TT_RPAREN;
+            break;
+        case LBRACK_tok:
+            return TT_LBRACK;
+            break;
+        case RBRACK_tok:
+            return TT_RBRACK;
+            break;
+        case LBRACE_tok:
+            return TT_LBRACE;
+            break;
+        case RBRACE_tok:
+            return TT_RBRACE;
+            break;
+        case COMMA_tok:
+            return TT_COMMA;
+            break;
+        case PERIOD_tok:
+            return TT_PERIOD;
+            break;
+        case EQL_tok:
+            return TT_EQL;
+            break;
+        case NEQ_tok:
+            return TT_NEQ;
+            break;
+        case GTR_tok:
+            return TT_GTR;
+            break;
+        case LSS_tok:
+            return TT_LSS;
+            break;
+        case GEQ_tok:
+            return TT_GEQ;
+            break;
+        case LEQ_tok:
+            return TT_LEQ;
+            break;
+        case LAND_tok:
+            return TT_LAND;
+            break;
+        case LOR_tok:
+            return TT_LOR;
+            break;
+        case NOT_tok:
+            return TT_NOT;
+            break;
+        case AND_tok:
+            return TT_AND;
+            break;
+        case OR_tok:
+            return TT_OR;
+            break;
+        case XOR_tok:
+            return TT_XOR;
+            break;
+        case TILDE_tok:
+            return TT_TILDE;
+            break;
+        case SHL_tok:
+            return TT_SHL;
+            break;
+        case SHR_tok:
+            return TT_SHR;
+            break;
+        case INC_tok:
+            return TT_INC;
+            break;
+        case DEC_tok:
+            return TT_DEC;
+            break;
+        case COLON_tok:
+            return TT_COLON;
+            break;
+        case EXIT_tok:
+            return TT_EXIT;
+            break;
+        case PRINT_tok:
+            return TT_PRINT;
+            break;
+        case ECHO_tok:
+            return TT_ECHO;
+            break;
+        case PRETTY_tok:
+            return TT_PRETTY;
+            break;
+        case TRUE_tok:
+            return TT_TRUE;
+            break;
+        case FALSE_tok:
+            return TT_FALSE;
+            break;
+        case SYMBOL_TABLE_tok:
+            return TT_SYMBOL_TABLE;
+            break;
+        case FUNCTION_TABLE_tok:
+            return TT_FUNCTION_TABLE;
+            break;
+        case DEL_tok:
+            return TT_DEL;
+            break;
+        case RETURN_tok:
+            return TT_RETURN;
+            break;
+        case DEFAULT_tok:
+            return TT_DEFAULT;
+            break;
+        case TIMES_DO_tok:
+            return TT_TIMES_DO;
+            break;
+        case END_tok:
+            return TT_END;
+            break;
+        case FOREACH_tok:
+            return TT_FOREACH;
+            break;
+        case AS_tok:
+            return TT_AS;
+            break;
+        case FROM_tok:
+            return TT_FROM;
+            break;
+        case INFINITE_tok:
+            return TT_INFINITE;
             break;
         default:
             break;
     }
-    return ILLEGAL;
+    return TT_ILLEGAL;
 }

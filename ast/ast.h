@@ -363,13 +363,60 @@ typedef struct AST {
 } AST;
 
 enum Token {
-    ILLEGAL_token=1,
-    ADD_token=2,
-    SUB_token=3,
-    MUL_token=4,
-    QUO_token=5,
-    REM_token=6,
-    EQL_token=7
+    ILLEGAL_tok,
+    NEWLINE_tok,
+    COMMENT1_tok,
+    COMMENT2_tok,
+    ASSIGN_tok,
+    ADD_tok,
+    SUB_tok,
+    MUL_tok,
+    QUO_tok,
+    REM_tok,
+    BACKSLASH_tok,
+    LPAREN_tok,
+    RPAREN_tok,
+    LBRACK_tok,
+    RBRACK_tok,
+    LBRACE_tok,
+    RBRACE_tok,
+    COMMA_tok,
+    PERIOD_tok,
+    EQL_tok,
+    NEQ_tok,
+    GTR_tok,
+    LSS_tok,
+    GEQ_tok,
+    LEQ_tok,
+    LAND_tok,
+    LOR_tok,
+    NOT_tok,
+    AND_tok,
+    OR_tok,
+    XOR_tok,
+    TILDE_tok,
+    SHL_tok,
+    SHR_tok,
+    INC_tok,
+    DEC_tok,
+    COLON_tok,
+    EXIT_tok,
+    PRINT_tok,
+    ECHO_tok,
+    PRETTY_tok,
+    TRUE_tok,
+    FALSE_tok,
+    SYMBOL_TABLE_tok,
+    FUNCTION_TABLE_tok,
+    DEL_tok,
+    RETURN_tok,
+    DEFAULT_tok,
+    TIMES_DO_tok,
+    END_tok,
+    FOREACH_tok,
+    AS_tok,
+    FROM_tok,
+    INFINITE_tok,
 };
 
 enum ExprKind {
@@ -377,7 +424,7 @@ enum ExprKind {
     Ident_kind=2,
     BinaryExpr_kind=3,
     UnaryExpr_kind=4,
-    ParenExpr_kind=5
+    ParenExpr_kind=5,
 };
 
 typedef struct Expr {
@@ -419,7 +466,7 @@ typedef struct ParenExpr {
 enum StmtKind {
     AssignStmt_kind=1,
     PrintStmt_kind=2,
-    ReturnStmt_kind=3
+    ReturnStmt_kind=3,
 };
 
 typedef struct Stmt {

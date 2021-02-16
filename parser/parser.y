@@ -64,21 +64,21 @@ extern bool is_complex_parsing;
 %token<fval> T_FLOAT
 %token<sval> T_STRING T_VAR
 %token<lluval> T_UNSIGNED_LONG_LONG_INT
-%token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT T_EQUAL
-%token T_LEFT_BRACKET T_RIGHT_BRACKET T_LEFT_CURLY_BRACKET T_RIGHT_CURLY_BRACKET T_COMMA T_DOT T_COLON
-%token T_NEWLINE T_QUIT
+%token T_ADD T_SUB T_MUL T_QUO T_REM T_LPAREN T_RPAREN T_ASSIGN
+%token T_LBRACK T_RBRACK T_LBRACE T_RBRACE T_COMMA T_PERIOD T_COLON
+%token T_NEWLINE T_EXIT
 %token T_PRINT T_ECHO T_PRETTY
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_LIST T_VAR_DICT T_VAR_ANY T_NULL
 %token T_DEL T_RETURN T_VOID T_DEFAULT T_BREAK T_CONTINUE
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
-%token T_TIMES_DO T_FOREACH T_AS T_END T_FUNCTION T_IMPORT T_FROM T_BACKSLASH T_INFINITE
-%token T_REL_EQUAL T_REL_NOT_EQUAL T_REL_GREAT T_REL_SMALL T_REL_GREAT_EQUAL T_REL_SMALL_EQUAL
-%token T_LOGIC_AND T_LOGIC_OR T_LOGIC_NOT
-%token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_NOT T_BITWISE_LEFT_SHIFT T_BITWISE_RIGHT_SHIFT
-%token T_INCREMENT T_DECREMENT
-%left T_PLUS T_MINUS T_VAR
-%left T_MULTIPLY T_DIVIDE
-%right T_U_PLUS
+%token T_TIMES_DO T_FOREACH T_AS T_END T_DEF T_IMPORT T_FROM T_BACKSLASH T_INFINITE
+%token T_EQL T_NEQ T_GTR T_LSS T_GEQ T_LEQ
+%token T_LAND T_LOR T_NOT
+%token T_AND T_OR T_XOR T_TILDE T_SHL T_SHR
+%token T_INC T_DEC
+%left T_ADD T_SUB T_VAR
+%left T_MUL T_QUO
+%right T_U_ADD
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr
 %type<stmt> stmt assign_stmt return_stmt print_stmt
@@ -149,19 +149,19 @@ basic_lit:
 ;
 
 binary_expr:
-    expr T_PLUS expr {
-        $$ = binaryExpr($1, ADD_token, $3, yylineno);
+    expr T_ADD expr {
+        $$ = binaryExpr($1, ADD_tok, $3, yylineno);
     }
 ;
 
 unary_expr:
-    T_PLUS expr %prec T_U_PLUS {
-        $$ = unaryExpr(ADD_token, $2, yylineno);
+    T_ADD expr %prec T_U_ADD {
+        $$ = unaryExpr(ADD_tok, $2, yylineno);
     }
 ;
 
 paren_expr:
-    T_LEFT expr T_RIGHT {
+    T_LPAREN expr T_RPAREN {
         $$ = parenExpr($2, yylineno);
     }
 ;
@@ -179,8 +179,8 @@ stmt:
 ;
 
 assign_stmt:
-    expr T_EQUAL expr {
-        $$ = assignStmt($1, EQL_token, $3, yylineno);
+    expr T_ASSIGN expr {
+        $$ = assignStmt($1, EQL_tok, $3, yylineno);
     }
 ;
 
