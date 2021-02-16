@@ -76,11 +76,11 @@ extern bool is_complex_parsing;
 %token T_LAND T_LOR T_NOT
 %token T_AND T_OR T_XOR T_TILDE T_SHL T_SHR
 %token T_INC T_DEC
-%left T_ADD T_SUB T_VAR
+%left T_ADD T_SUB T_NOT T_TILDE T_VAR
 %left T_MUL T_QUO
-%right T_U_ADD
+%right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
-%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr
+%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
 %type<stmt> stmt assign_stmt return_stmt print_stmt
 
 %destructor {
@@ -122,6 +122,9 @@ expr:
     | paren_expr {
         $$ = $1;
     }
+    | incdec_expr {
+        $$ = $1;
+    }
 ;
 
 ident:
@@ -152,17 +155,92 @@ binary_expr:
     expr T_ADD expr {
         $$ = binaryExpr($1, ADD_tok, $3, yylineno);
     }
+    | expr T_SUB expr {
+        $$ = binaryExpr($1, SUB_tok, $3, yylineno);
+    }
+    | expr T_MUL expr {
+        $$ = binaryExpr($1, MUL_tok, $3, yylineno);
+    }
+    | expr T_QUO expr {
+        $$ = binaryExpr($1, QUO_tok, $3, yylineno);
+    }
+    | expr T_REM expr {
+        $$ = binaryExpr($1, REM_tok, $3, yylineno);
+    }
+    | expr T_EQL expr {
+        $$ = binaryExpr($1, EQL_tok, $3, yylineno);
+    }
+    | expr T_NEQ expr {
+        $$ = binaryExpr($1, NEQ_tok, $3, yylineno);
+    }
+    | expr T_GTR expr {
+        $$ = binaryExpr($1, GTR_tok, $3, yylineno);
+    }
+    | expr T_LSS expr {
+        $$ = binaryExpr($1, LSS_tok, $3, yylineno);
+    }
+    | expr T_GEQ expr {
+        $$ = binaryExpr($1, GEQ_tok, $3, yylineno);
+    }
+    | expr T_LEQ expr {
+        $$ = binaryExpr($1, LEQ_tok, $3, yylineno);
+    }
+    | expr T_LAND expr {
+        $$ = binaryExpr($1, LAND_tok, $3, yylineno);
+    }
+    | expr T_LOR expr {
+        $$ = binaryExpr($1, LOR_tok, $3, yylineno);
+    }
+    | expr T_AND expr {
+        $$ = binaryExpr($1, AND_tok, $3, yylineno);
+    }
+    | expr T_OR expr {
+        $$ = binaryExpr($1, OR_tok, $3, yylineno);
+    }
+    | expr T_XOR expr {
+        $$ = binaryExpr($1, XOR_tok, $3, yylineno);
+    }
+    | expr T_SHL expr {
+        $$ = binaryExpr($1, SHL_tok, $3, yylineno);
+    }
+    | expr T_SHR expr {
+        $$ = binaryExpr($1, SHR_tok, $3, yylineno);
+    }
 ;
 
 unary_expr:
     T_ADD expr %prec T_U_ADD {
         $$ = unaryExpr(ADD_tok, $2, yylineno);
     }
+    | T_SUB expr %prec T_U_SUB {
+        $$ = unaryExpr(SUB_tok, $2, yylineno);
+    }
+    | T_NOT expr %prec T_U_NOT {
+        $$ = unaryExpr(NOT_tok, $2, yylineno);
+    }
+    | T_TILDE expr %prec T_U_TILDE {
+        $$ = unaryExpr(TILDE_tok, $2, yylineno);
+    }
 ;
 
 paren_expr:
     T_LPAREN expr T_RPAREN {
         $$ = parenExpr($2, yylineno);
+    }
+;
+
+incdec_expr:
+    T_INC ident {
+        $$ = incDecExpr(INC_tok, $2, true, yylineno);
+    }
+    | ident T_INC {
+        $$ = incDecExpr(INC_tok, $1, false, yylineno);
+    }
+    | T_DEC ident {
+        $$ = incDecExpr(DEC_tok, $2, true, yylineno);
+    }
+    | ident T_DEC {
+        $$ = incDecExpr(DEC_tok, $1, false, yylineno);
     }
 ;
 

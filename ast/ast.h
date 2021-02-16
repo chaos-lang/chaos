@@ -425,6 +425,7 @@ enum ExprKind {
     BinaryExpr_kind=3,
     UnaryExpr_kind=4,
     ParenExpr_kind=5,
+    IncDecExpr_kind=6,
 };
 
 typedef struct Expr {
@@ -436,6 +437,7 @@ typedef struct Expr {
         struct BinaryExpr* binary_expr;
         struct UnaryExpr* unary_expr;
         struct ParenExpr* paren_expr;
+        struct IncDecExpr* incdec_expr;
     } v;
 } Expr;
 
@@ -462,6 +464,12 @@ typedef struct UnaryExpr {
 typedef struct ParenExpr {
     struct Expr* x;
 } ParenExpr;
+
+typedef struct IncDecExpr {
+    enum Token op;
+    struct Expr* ident;
+    bool first;
+} IncDecExpr;
 
 enum StmtKind {
     AssignStmt_kind=1,
@@ -519,6 +527,7 @@ Expr* ident(char *s, int lineno);
 Expr* binaryExpr(Expr* x, enum Token op, Expr* y, int lineno);
 Expr* unaryExpr(enum Token op, Expr* x, int lineno);
 Expr* parenExpr(Expr* x, int lineno);
+Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
 Stmt* printStmt(Expr* x, int lineno);

@@ -28,7 +28,7 @@ void printAST()
 {
     indent = __KAOS_INDENT_LENGTH__;
     printf(
-        "{\n%*c\"type\": \"Program\"\n%*c\"files\": [\n",
+        "{\n%*c\"_type\": \"Program\",\n%*c\"files\": [\n",
         indent,
         __KAOS_INDENT_CHAR__,
         indent,
@@ -45,7 +45,7 @@ void printAST()
         indent = indent + __KAOS_INDENT_LENGTH__;
 
         printf(
-            "%*c\"type\": \"File\"\n%*c\"stmt_list\": [\n",
+            "%*c\"_type\": \"File\",\n%*c\"stmt_list\": [\n",
             indent,
             __KAOS_INDENT_CHAR__,
             indent,
@@ -56,6 +56,10 @@ void printAST()
         StmtList* stmt_list = program->files[i]->stmt_list;
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
             printASTStmt(stmt_list->stmts[j - 1], true);
+            if (j - 1 == 0)
+                printf("\n");
+            else
+                printf(",\n");
         }
 
         indent = indent - __KAOS_INDENT_LENGTH__;
@@ -93,7 +97,7 @@ void printASTStmt(Stmt* stmt, bool is_list)
     {
         case AssignStmt_kind:
             printf(
-                "%*c\"type\": \"AssignStmt\"\n%*c\"x\": ",
+                "%*c\"_type\": \"AssignStmt\",\n%*c\"x\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -101,21 +105,22 @@ void printASTStmt(Stmt* stmt, bool is_list)
             );
             printASTExpr(stmt->v.assign_stmt->x, false);
             printf(
-                "%*c\"op\": \"%s\",\n",
+                ",\n%*c\"op\": \"%s\"",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 getToken(stmt->v.assign_stmt->tok)
             );
             printf(
-                "%*c\"y\": ",
+                ",\n%*c\"y\": ",
                 indent,
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(stmt->v.assign_stmt->y, false);
+            printf("\n");
             break;
         case ReturnStmt_kind:
             printf(
-                "%*c\"type\": \"ReturnStmt\"\n%*c\"x\": ",
+                "%*c\"_type\": \"ReturnStmt\",\n%*c\"x\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -125,7 +130,7 @@ void printASTStmt(Stmt* stmt, bool is_list)
             break;
         case PrintStmt_kind:
             printf(
-                "%*c\"type\": \"PrintStmt\"\n%*c\"x\": ",
+                "%*c\"_type\": \"PrintStmt\",\n%*c\"x\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -138,7 +143,7 @@ void printASTStmt(Stmt* stmt, bool is_list)
     }
 
     indent = indent - __KAOS_INDENT_LENGTH__;
-    printf("%*c}\n", indent, __KAOS_INDENT_CHAR__);
+    printf("%*c}", indent, __KAOS_INDENT_CHAR__);
 }
 
 void printASTExpr(Expr* expr, bool is_list)
@@ -157,7 +162,7 @@ void printASTExpr(Expr* expr, bool is_list)
     {
         case BasicLit_kind:
             printf(
-                "%*c\"type\": \"BasicLit\",\n",
+                "%*c\"_type\": \"BasicLit\",\n",
                 indent,
                 __KAOS_INDENT_CHAR__
             );
@@ -166,7 +171,7 @@ void printASTExpr(Expr* expr, bool is_list)
                 case V_BOOL:
                     printf(
                         "%*c\"value_type\": \"bool\",\n"
-                        "%*c\"value\": \"%s\",\n",
+                        "%*c\"value\": \"%s\"\n",
                         indent,
                         __KAOS_INDENT_CHAR__,
                         indent,
@@ -177,7 +182,7 @@ void printASTExpr(Expr* expr, bool is_list)
                 case V_INT:
                     printf(
                         "%*c\"value_type\": \"int\",\n"
-                        "%*c\"value\": \"%lld\",\n",
+                        "%*c\"value\": \"%lld\"\n",
                         indent,
                         __KAOS_INDENT_CHAR__,
                         indent,
@@ -188,7 +193,7 @@ void printASTExpr(Expr* expr, bool is_list)
                 case V_FLOAT:
                     printf(
                         "%*c\"value_type\": \"float\",\n"
-                        "%*c\"value\": \"%Lg\",\n",
+                        "%*c\"value\": \"%Lg\"\n",
                         indent,
                         __KAOS_INDENT_CHAR__,
                         indent,
@@ -199,7 +204,7 @@ void printASTExpr(Expr* expr, bool is_list)
                 case V_STRING:
                     printf(
                         "%*c\"value_type\": \"int\",\n"
-                        "%*c\"value\": \"%s\",\n",
+                        "%*c\"value\": \"%s\"\n",
                         indent,
                         __KAOS_INDENT_CHAR__,
                         indent,
@@ -213,8 +218,8 @@ void printASTExpr(Expr* expr, bool is_list)
             break;
         case Ident_kind:
             printf(
-                "%*c\"type\": \"Ident\",\n"
-                "%*c\"name\": \"%s\",\n",
+                "%*c\"_type\": \"Ident\",\n"
+                "%*c\"name\": \"%s\"\n",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -224,7 +229,7 @@ void printASTExpr(Expr* expr, bool is_list)
             break;
         case BinaryExpr_kind:
             printf(
-                "%*c\"type\": \"BinaryExpr\"\n%*c\"x\": ",
+                "%*c\"_type\": \"BinaryExpr\",\n%*c\"x\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -232,7 +237,7 @@ void printASTExpr(Expr* expr, bool is_list)
             );
             printASTExpr(expr->v.binary_expr->x, false);
             printf(
-                "%*c\"op\": \"%s\",\n",
+                ",\n%*c\"op\": \"%s\",\n",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 getToken(expr->v.binary_expr->op)
@@ -243,10 +248,11 @@ void printASTExpr(Expr* expr, bool is_list)
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(expr->v.binary_expr->y, false);
+            printf("\n");
             break;
         case UnaryExpr_kind:
             printf(
-                "%*c\"type\": \"UnaryExpr\"\n%*c\"op\": \"%s\",\n",
+                "%*c\"_type\": \"UnaryExpr\",\n%*c\"op\": \"%s\",\n",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -259,23 +265,47 @@ void printASTExpr(Expr* expr, bool is_list)
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(expr->v.unary_expr->x, false);
+            printf("\n");
             break;
         case ParenExpr_kind:
             printf(
-                "%*c\"type\": \"ParenExpr\"\n%*c\"x\": ",
+                "%*c\"_type\": \"ParenExpr\",\n%*c\"x\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(expr->v.paren_expr->x, false);
+            printf("\n");
+            break;
+        case IncDecExpr_kind:
+            printf(
+                "%*c\"_type\": \"IncDecExpr\",\n%*c\"op\": \"%s\",\n",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__,
+                getToken(expr->v.incdec_expr->op)
+            );
+            printf(
+                "%*c\"ident\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.incdec_expr->ident, false);
+            printf(
+                ",\n%*c\"first\": %s\n",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                expr->v.incdec_expr->first ? "true" : "false"
+            );
             break;
         default:
             break;
     }
 
     indent = indent - __KAOS_INDENT_LENGTH__;
-    printf("%*c}\n", indent, __KAOS_INDENT_CHAR__);
+    printf("%*c}", indent, __KAOS_INDENT_CHAR__);
 }
 
 char *getToken(enum Token tok)
