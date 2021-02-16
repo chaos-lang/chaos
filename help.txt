@@ -9,4 +9,5 @@ Usage: chaos [options] <file> [--] [args...]
     -e, --extra         Extra flags to inject into C compiler command.
     -k, --keep          Don't remove the C source and header files (temporary files) after compilation.
     -u, --unsafe        Unsafe mode (fast warm up). Disables the preemptive error checks.
+    -a, --ast           Print Abstract Syntax Tree (AST) in JSON format and exit immediately.
 

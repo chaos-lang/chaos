@@ -40,6 +40,7 @@ static struct option long_options[] =
     {"extra", required_argument, NULL, 'e'},
     {"keep", no_argument, NULL, 'k'},
     {"unsafe", no_argument, NULL, 'u'},
+    {"ast", no_argument, NULL, 'a'},
     {NULL, 0, NULL, 0}
 };
 
@@ -47,6 +48,7 @@ int initParser(int argc, char** argv) {
     debug_enabled = false;
     bool compiler_mode = false;
     bool compiler_fopen_fail = false;
+    bool print_ast = false;
     char *program_file = NULL;
     char *bin_file = NULL;
     // bool keep = false;
@@ -54,7 +56,7 @@ int initParser(int argc, char** argv) {
     // char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvldc:o:e:ku", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvldc:o:e:k:u:a:", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -89,6 +91,9 @@ int initParser(int argc, char** argv) {
             case 'u':
                 // unsafe = true;
                 global_unsafe = true;
+                break;
+            case 'a':
+                print_ast = true;
                 break;
             case '?':
                 switch (optopt)
@@ -183,6 +188,7 @@ int initParser(int argc, char** argv) {
     }
 
     initMainFunction();
+    initProgram();
 
     main_interpreted_module = NULL;
 
@@ -198,6 +204,9 @@ int initParser(int argc, char** argv) {
         main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
+        if (print_ast) {
+            printAST();
+        }
         // if (!is_interactive) {
         //     if (compiler_mode) {
         //         compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep, unsafe);

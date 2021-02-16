@@ -36,6 +36,7 @@
 #define __KAOS_SPELLS__ "spells"
 #define __KAOS_SYNTAX_ERROR__ "Syntax error"
 #define __KAOS_INDENT_LENGTH__ 4
+#define __KAOS_INDENT_CHAR__ ' '
 
 #if defined(__APPLE__) || defined(__MACH__)
 #   define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dylib"

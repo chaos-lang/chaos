@@ -54,7 +54,8 @@ extern bool is_complex_parsing;
     long double fval;
     char *sval;
     unsigned long long lluval;
-    ASTNode* ast_node_type;
+    Expr* expr;
+    Stmt* stmt;
 }
 
 %token START_PROGRAM START_PREPARSE START_JSON_PARSE
@@ -77,6 +78,10 @@ extern bool is_complex_parsing;
 %token T_INCREMENT T_DECREMENT
 %left T_PLUS T_MINUS T_VAR
 %left T_MULTIPLY T_DIVIDE
+%right T_U_PLUS
+
+%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr
+%type<stmt> stmt assign_stmt return_stmt print_stmt
 
 %destructor {
     free($$);
@@ -87,14 +92,109 @@ extern bool is_complex_parsing;
 %%
 
 meta_start:
-    | START_PROGRAM parser              { }
+    | START_PROGRAM parser {}
 ;
 
 parser:
-    | parser line   { }
+    | line {}
 ;
 
-line: {}
+line:
+    | T_NEWLINE line {}
+    | stmt line {
+        addStmt(program->files[0]->stmt_list, $1);
+    }
+;
+
+expr:
+    ident {
+        $$ = $1;
+    }
+    | basic_lit {
+        $$ = $1;
+    }
+    | binary_expr {
+        $$ = $1;
+    }
+    | unary_expr {
+        $$ = $1;
+    }
+    | paren_expr {
+        $$ = $1;
+    }
+;
+
+ident:
+    T_VAR {
+        $$ = ident($1, yylineno);
+    }
+;
+
+basic_lit:
+    T_TRUE {
+        $$ = basicLitBool($1, yylineno);
+    }
+    | T_FALSE {
+        $$ = basicLitBool($1, yylineno);
+    }
+    | T_INT {
+        $$ = basicLitInt($1, yylineno);
+    }
+    | T_FLOAT {
+        $$ = basicLitFloat($1, yylineno);
+    }
+    | T_STRING {
+        $$ = basicLitString($1, yylineno);
+    }
+;
+
+binary_expr:
+    expr T_PLUS expr {
+        $$ = binaryExpr($1, ADD_token, $3, yylineno);
+    }
+;
+
+unary_expr:
+    T_PLUS expr %prec T_U_PLUS {
+        $$ = unaryExpr(ADD_token, $2, yylineno);
+    }
+;
+
+paren_expr:
+    T_LEFT expr T_RIGHT {
+        $$ = parenExpr($2, yylineno);
+    }
+;
+
+stmt:
+    assign_stmt T_NEWLINE {
+        $$ = $1;
+    }
+    | return_stmt T_NEWLINE {
+        $$ = $1;
+    }
+    | print_stmt T_NEWLINE {
+        $$ = $1;
+    }
+;
+
+assign_stmt:
+    expr T_EQUAL expr {
+        $$ = assignStmt($1, EQL_token, $3, yylineno);
+    }
+;
+
+return_stmt:
+    T_RETURN expr {
+        $$ = returnStmt($2, yylineno);
+    }
+;
+
+print_stmt:
+    T_PRINT expr {
+        $$ = printStmt($2, yylineno);
+    }
+;
 
 %%
 

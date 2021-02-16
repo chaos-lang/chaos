@@ -474,6 +474,9 @@ char* getAstNodeTypeName(unsigned i) {
     return ast_node_type_names[i];
 }
 
+
+// NEW AST START
+
 AST* ast(int lineno)
 {
     AST* ast = (struct AST*)calloc(1, sizeof(AST));
@@ -615,4 +618,26 @@ Stmt* printStmt(Expr* x, int lineno)
     Stmt* stmt = buildStmt(PrintStmt_kind, lineno);
     stmt->v.print_stmt = print_stmt;
     return stmt;
+}
+
+void initProgram()
+{
+    program = (struct Program*)calloc(1, sizeof(Program));
+    File* file = (struct File*)calloc(1, sizeof(File));
+    program->files = realloc(
+        program->files,
+        sizeof(File) * ++program->file_count
+    );
+    program->files[0] = file;
+    StmtList* stmt_list = (struct StmtList*)calloc(1, sizeof(StmtList));
+    file->stmt_list = stmt_list;
+}
+
+void addStmt(StmtList* stmt_list, Stmt* stmt)
+{
+    stmt_list->stmts = realloc(
+        stmt_list->stmts,
+        sizeof(Stmt) * ++stmt_list->stmt_count
+    );
+    stmt_list->stmts[stmt_list->stmt_count - 1] = stmt;
 }

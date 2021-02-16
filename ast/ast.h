@@ -32,6 +32,7 @@ bool debug_enabled;
 
 #include "../enums.h"
 #include "../utilities/helpers.h"
+#include "token.h"
 
 enum ASTNodeType {
     AST_STEP,
@@ -355,16 +356,20 @@ void setASTNodeTranspiled(ASTNode* ast_node, char* transpiled);
 char* getAstNodeTypeName(unsigned i);
 
 
+// NEW AST START
+
 typedef struct AST {
     int lineno;
 } AST;
 
 enum Token {
-    ADD=1,
-    SUB=2,
-    MUL=3,
-    QUO=4,
-    REM=5
+    ILLEGAL_token=1,
+    ADD_token=2,
+    SUB_token=3,
+    MUL_token=4,
+    QUO_token=5,
+    REM_token=6,
+    EQL_token=7
 };
 
 enum ExprKind {
@@ -469,5 +474,8 @@ Expr* unaryExpr(enum Token op, Expr* x, int lineno);
 Expr* parenExpr(Expr* x, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
+Stmt* printStmt(Expr* x, int lineno);
+void initProgram();
+void addStmt(StmtList* stmt_list, Stmt* stmt);
 
 #endif
