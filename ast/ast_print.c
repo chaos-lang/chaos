@@ -127,6 +127,7 @@ void printASTStmt(Stmt* stmt, bool is_list)
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(stmt->v.return_stmt->x, false);
+            printf("\n");
             break;
         case PrintStmt_kind:
             printf(
@@ -137,6 +138,18 @@ void printASTStmt(Stmt* stmt, bool is_list)
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(stmt->v.return_stmt->x, false);
+            printf("\n");
+            break;
+        case ExprStmt_kind:
+            printf(
+                "%*c\"_type\": \"ExprStmt\",\n%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(stmt->v.expr_stmt->x, false);
+            printf("\n");
             break;
         default:
             break;

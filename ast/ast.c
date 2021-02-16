@@ -631,6 +631,15 @@ Stmt* printStmt(Expr* x, int lineno)
     return stmt;
 }
 
+Stmt* exprStmt(Expr* x, int lineno)
+{
+    ExprStmt* expr_stmt = (struct ExprStmt*)calloc(1, sizeof(ExprStmt));
+    expr_stmt->x = x;
+    Stmt* stmt = buildStmt(ExprStmt_kind, lineno);
+    stmt->v.expr_stmt = expr_stmt;
+    return stmt;
+}
+
 void initProgram()
 {
     program = (struct Program*)calloc(1, sizeof(Program));

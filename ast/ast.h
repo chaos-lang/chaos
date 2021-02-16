@@ -475,6 +475,7 @@ enum StmtKind {
     AssignStmt_kind=1,
     PrintStmt_kind=2,
     ReturnStmt_kind=3,
+    ExprStmt_kind=4,
 };
 
 typedef struct Stmt {
@@ -484,6 +485,7 @@ typedef struct Stmt {
         struct AssignStmt* assign_stmt;
         struct PrintStmt* print_stmt;
         struct ReturnStmt* return_stmt;
+        struct ExprStmt* expr_stmt;
     } v;
 } Stmt;
 
@@ -500,6 +502,10 @@ typedef struct ReturnStmt {
 typedef struct PrintStmt {
     struct Expr* x;
 } PrintStmt;
+
+typedef struct ExprStmt {
+    struct Expr* x;
+} ExprStmt;
 
 typedef struct StmtList {
     struct Stmt** stmts;
@@ -531,6 +537,7 @@ Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
 Stmt* printStmt(Expr* x, int lineno);
+Stmt* exprStmt(Expr* x, int lineno);
 void initProgram();
 void addStmt(StmtList* stmt_list, Stmt* stmt);
 

@@ -81,7 +81,7 @@ extern bool is_complex_parsing;
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
-%type<stmt> stmt assign_stmt return_stmt print_stmt
+%type<stmt> stmt assign_stmt return_stmt print_stmt expr_stmt
 
 %destructor {
     free($$);
@@ -254,6 +254,9 @@ stmt:
     | print_stmt T_NEWLINE {
         $$ = $1;
     }
+    | expr_stmt T_NEWLINE {
+        $$ = $1;
+    }
 ;
 
 assign_stmt:
@@ -271,6 +274,12 @@ return_stmt:
 print_stmt:
     T_PRINT expr {
         $$ = printStmt($2, yylineno);
+    }
+;
+
+expr_stmt:
+    expr {
+        $$ = exprStmt($1, yylineno);
     }
 ;
 
