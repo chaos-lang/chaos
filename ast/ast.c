@@ -675,6 +675,24 @@ Stmt* delStmt(Expr* ident, int lineno)
     return stmt;
 }
 
+Stmt* symbolTableStmt(int lineno)
+{
+    SymbolTableStmt* symbol_table_stmt = (struct SymbolTableStmt*)calloc(1, sizeof(SymbolTableStmt));
+    symbol_table_stmt->kind = SymbolTableStmt_kind;
+    Stmt* stmt = buildStmt(SymbolTableStmt_kind, lineno);
+    stmt->v.symbol_table_stmt = symbol_table_stmt;
+    return stmt;
+}
+
+Stmt* functionTableStmt(int lineno)
+{
+    FunctionTableStmt* function_table_stmt = (struct FunctionTableStmt*)calloc(1, sizeof(FunctionTableStmt));
+    function_table_stmt->kind = FunctionTableStmt_kind;
+    Stmt* stmt = buildStmt(FunctionTableStmt_kind, lineno);
+    stmt->v.function_table_stmt = function_table_stmt;
+    return stmt;
+}
+
 
 // Spec
 

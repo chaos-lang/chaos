@@ -84,6 +84,7 @@ extern bool is_complex_parsing;
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt
+%type<stmt> symbol_table_stmt function_table_stmt
 %type<spec> type_spec sub_type_spec pretty_spec
 %type<decl> var_decl
 
@@ -270,6 +271,12 @@ stmt:
     | del_stmt T_NEWLINE {
         $$ = $1;
     }
+    | symbol_table_stmt T_NEWLINE {
+        $$ = $1;
+    }
+    | function_table_stmt T_NEWLINE {
+        $$ = $1;
+    }
 ;
 
 assign_stmt:
@@ -317,6 +324,18 @@ decl_stmt:
 del_stmt:
     T_DEL ident {
         $$ = delStmt($2, yylineno);
+    }
+;
+
+symbol_table_stmt:
+    T_SYMBOL_TABLE {
+        $$ = symbolTableStmt(yylineno);
+    }
+;
+
+function_table_stmt:
+    T_FUNCTION_TABLE {
+        $$ = functionTableStmt(yylineno);
     }
 ;
 

@@ -194,6 +194,20 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             );
             printASTExpr(stmt->v.del_stmt->ident, false, "\n");
             break;
+        case SymbolTableStmt_kind:
+            printf(
+                "%*c\"_type\": \"SymbolTableStmt\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case FunctionTableStmt_kind:
+            printf(
+                "%*c\"_type\": \"FunctionTableStmt\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
         default:
             break;
     }
