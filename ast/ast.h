@@ -423,9 +423,11 @@ typedef struct IncDecExpr {
 enum StmtKind {
     AssignStmt_kind=1,
     PrintStmt_kind=2,
-    ReturnStmt_kind=3,
-    ExprStmt_kind=4,
-    DeclStmt_kind=5,
+    EchoStmt_kind=3,
+    ReturnStmt_kind=4,
+    ExprStmt_kind=5,
+    DeclStmt_kind=6,
+    DelStmt_kind=7,
 };
 
 typedef struct Stmt {
@@ -434,9 +436,11 @@ typedef struct Stmt {
     union {
         struct AssignStmt* assign_stmt;
         struct PrintStmt* print_stmt;
+        struct EchoStmt* echo_stmt;
         struct ReturnStmt* return_stmt;
         struct ExprStmt* expr_stmt;
         struct DeclStmt* decl_stmt;
+        struct DelStmt* del_stmt;
     } v;
 } Stmt;
 
@@ -451,8 +455,14 @@ typedef struct ReturnStmt {
 } ReturnStmt;
 
 typedef struct PrintStmt {
+    struct Spec* mod;
     struct Expr* x;
 } PrintStmt;
+
+typedef struct EchoStmt {
+    struct Spec* mod;
+    struct Expr* x;
+} EchoStmt;
 
 typedef struct ExprStmt {
     struct Expr* x;
@@ -462,11 +472,16 @@ typedef struct DeclStmt {
     struct Decl* decl;
 } DeclStmt;
 
+typedef struct DelStmt {
+    struct Expr* ident;
+} DelStmt;
+
 
 // Spec
 
 enum SpecKind {
     TypeSpec_kind=1,
+    PrettySpec_kind=2,
 };
 
 typedef struct Spec {
@@ -474,13 +489,18 @@ typedef struct Spec {
     enum SpecKind kind;
     union {
         struct TypeSpec* type_spec;
+        struct PrettySpec* pretty_spec;
     } v;
 } Spec;
 
 typedef struct TypeSpec {
     enum Type type;
-    enum Type second_type;
+    struct Spec* sub_type_spec;
 } TypeSpec;
+
+typedef struct PrettySpec {
+    enum SpecKind kind;
+} PrettySpec;
 
 
 // Decl
@@ -536,11 +556,14 @@ Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno);
 Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
-Stmt* printStmt(Expr* x, int lineno);
+Stmt* printStmt(Spec* mod, Expr* x, int lineno);
+Stmt* echoStmt(Spec* mod, Expr* x, int lineno);
 Stmt* exprStmt(Expr* x, int lineno);
 Stmt* declStmt(Decl* decl, int lineno);
+Stmt* delStmt(Expr* ident, int lineno);
 Spec* buildSpec(enum SpecKind kind, int lineno);
-Spec* typeSpec(enum Type type, enum Type second_type, int lineno);
+Spec* typeSpec(enum Type type, struct Spec* sub_type_spec, int lineno);
+Spec* prettySpec(int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 void initProgram();

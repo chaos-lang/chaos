@@ -128,13 +128,41 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             break;
         case PrintStmt_kind:
             printf(
-                "%*c\"_type\": \"PrintStmt\",\n%*c\"x\": ",
+                "%*c\"_type\": \"PrintStmt\",\n%*c\"mod\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
                 __KAOS_INDENT_CHAR__
             );
-            printASTExpr(stmt->v.return_stmt->x, false, "\n");
+            if (stmt->v.print_stmt->mod == NULL)
+                printf("null,\n");
+            else
+                printASTSpec(stmt->v.print_stmt->mod, false, ",\n");
+            printf(
+                "%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(stmt->v.print_stmt->x, false, "\n");
+            break;
+        case EchoStmt_kind:
+            printf(
+                "%*c\"_type\": \"EchoStmt\",\n%*c\"mod\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (stmt->v.echo_stmt->mod == NULL)
+                printf("null,\n");
+            else
+                printASTSpec(stmt->v.echo_stmt->mod, false, ",\n");
+            printf(
+                "%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(stmt->v.echo_stmt->x, false, "\n");
             break;
         case ExprStmt_kind:
             printf(
@@ -155,6 +183,16 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             printASTDecl(stmt->v.decl_stmt->decl, false, "\n");
+            break;
+        case DelStmt_kind:
+            printf(
+                "%*c\"_type\": \"DelStmt\",\n%*c\"ident\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(stmt->v.del_stmt->ident, false, "\n");
             break;
         default:
             break;
@@ -341,15 +379,25 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
             printf(
                 "%*c\"_type\": \"TypeSpec\",\n"
                 "%*c\"type\": \"%s\",\n"
-                "%*c\"second_type\": \"%s\"\n",
+                "%*c\"sub_type_spec\": ",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
                 __KAOS_INDENT_CHAR__,
                 getTypeName(spec->v.type_spec->type),
                 indent,
-                __KAOS_INDENT_CHAR__,
-                getTypeName(spec->v.type_spec->second_type)
+                __KAOS_INDENT_CHAR__
+            );
+            if (spec->v.type_spec->sub_type_spec == NULL)
+                printf("null\n");
+            else
+                printASTSpec(spec->v.type_spec->sub_type_spec, false, ",\n");
+            break;
+        case PrettySpec_kind:
+            printf(
+                "%*c\"_type\": \"PrettySpec\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
             );
             break;
         default:

@@ -83,8 +83,8 @@ extern bool is_complex_parsing;
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
-%type<stmt> stmt assign_stmt return_stmt print_stmt expr_stmt decl_stmt
-%type<spec> type_spec
+%type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt
+%type<spec> type_spec sub_type_spec pretty_spec
 %type<decl> var_decl
 
 %destructor {
@@ -258,10 +258,16 @@ stmt:
     | print_stmt T_NEWLINE {
         $$ = $1;
     }
+    | echo_stmt T_NEWLINE {
+        $$ = $1;
+    }
     | expr_stmt T_NEWLINE {
         $$ = $1;
     }
     | decl_stmt T_NEWLINE {
+        $$ = $1;
+    }
+    | del_stmt T_NEWLINE {
         $$ = $1;
     }
 ;
@@ -280,7 +286,19 @@ return_stmt:
 
 print_stmt:
     T_PRINT expr {
-        $$ = printStmt($2, yylineno);
+        $$ = printStmt(NULL, $2, yylineno);
+    }
+    | pretty_spec T_PRINT expr {
+        $$ = printStmt($1, $3, yylineno);
+    }
+;
+
+echo_stmt:
+    T_ECHO expr {
+        $$ = echoStmt(NULL, $2, yylineno);
+    }
+    | pretty_spec T_ECHO expr {
+        $$ = echoStmt($1, $3, yylineno);
     }
 ;
 
@@ -296,42 +314,63 @@ decl_stmt:
     }
 ;
 
+del_stmt:
+    T_DEL ident {
+        $$ = delStmt($2, yylineno);
+    }
+;
+
 type_spec:
     T_VAR_BOOL {
-        $$ = typeSpec(K_BOOL, K_ANY, yylineno);
+        $$ = typeSpec(K_BOOL, NULL, yylineno);
     }
     | T_VAR_NUMBER {
-        $$ = typeSpec(K_NUMBER, K_ANY, yylineno);
+        $$ = typeSpec(K_NUMBER, NULL, yylineno);
     }
     | T_VAR_STRING {
-        $$ = typeSpec(K_STRING, K_ANY, yylineno);
+        $$ = typeSpec(K_STRING, NULL, yylineno);
     }
     | T_VAR_ANY {
-        $$ = typeSpec(K_ANY, K_ANY, yylineno);
+        $$ = typeSpec(K_ANY, NULL, yylineno);
     }
     | T_VAR_LIST {
-        $$ = typeSpec(K_LIST, K_ANY, yylineno);
+        $$ = typeSpec(K_LIST, NULL, yylineno);
     }
     | T_VAR_DICT {
-        $$ = typeSpec(K_DICT, K_ANY, yylineno);
+        $$ = typeSpec(K_DICT, NULL, yylineno);
     }
-    | T_VAR_BOOL T_VAR_LIST {
-        $$ = typeSpec(K_LIST, K_BOOL, yylineno);
+    | T_VAR_BOOL sub_type_spec {
+        $$ = typeSpec(K_BOOL, $2, yylineno);
     }
-    | T_VAR_NUMBER T_VAR_LIST {
-        $$ = typeSpec(K_LIST, K_NUMBER, yylineno);
+    | T_VAR_NUMBER sub_type_spec {
+        $$ = typeSpec(K_NUMBER, $2, yylineno);
     }
-    | T_VAR_STRING T_VAR_LIST {
-        $$ = typeSpec(K_LIST, K_STRING, yylineno);
+    | T_VAR_STRING sub_type_spec {
+        $$ = typeSpec(K_STRING, $2, yylineno);
     }
-    | T_VAR_BOOL T_VAR_DICT {
-        $$ = typeSpec(K_DICT, K_BOOL, yylineno);
+    | T_VAR_ANY sub_type_spec {
+        $$ = typeSpec(K_ANY, $2, yylineno);
     }
-    | T_VAR_NUMBER T_VAR_DICT {
-        $$ = typeSpec(K_DICT, K_NUMBER, yylineno);
+;
+
+sub_type_spec:
+    T_VAR_LIST {
+        $$ = typeSpec(K_LIST, NULL, yylineno);
     }
-    | T_VAR_STRING T_VAR_DICT {
-        $$ = typeSpec(K_DICT, K_STRING, yylineno);
+    | T_VAR_DICT {
+        $$ = typeSpec(K_DICT, NULL, yylineno);
+    }
+    | T_VAR_LIST sub_type_spec {
+        $$ = typeSpec(K_LIST, $2, yylineno);
+    }
+    | T_VAR_DICT sub_type_spec {
+        $$ = typeSpec(K_DICT, $2, yylineno);
+    }
+;
+
+pretty_spec:
+    T_PRETTY {
+        $$ = prettySpec(yylineno);
     }
 ;
 

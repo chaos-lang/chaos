@@ -628,12 +628,23 @@ Stmt* returnStmt(Expr* x, int lineno)
     return stmt;
 }
 
-Stmt* printStmt(Expr* x, int lineno)
+Stmt* printStmt(Spec* mod, Expr* x, int lineno)
 {
     PrintStmt* print_stmt = (struct PrintStmt*)calloc(1, sizeof(PrintStmt));
+    print_stmt->mod = mod;
     print_stmt->x = x;
     Stmt* stmt = buildStmt(PrintStmt_kind, lineno);
     stmt->v.print_stmt = print_stmt;
+    return stmt;
+}
+
+Stmt* echoStmt(Spec* mod, Expr* x, int lineno)
+{
+    EchoStmt* echo_stmt = (struct EchoStmt*)calloc(1, sizeof(EchoStmt));
+    echo_stmt->mod = mod;
+    echo_stmt->x = x;
+    Stmt* stmt = buildStmt(EchoStmt_kind, lineno);
+    stmt->v.echo_stmt = echo_stmt;
     return stmt;
 }
 
@@ -655,6 +666,15 @@ Stmt* declStmt(Decl* decl, int lineno)
     return stmt;
 }
 
+Stmt* delStmt(Expr* ident, int lineno)
+{
+    DelStmt* del_stmt = (struct DelStmt*)calloc(1, sizeof(DelStmt));
+    del_stmt->ident = ident;
+    Stmt* stmt = buildStmt(DelStmt_kind, lineno);
+    stmt->v.del_stmt = del_stmt;
+    return stmt;
+}
+
 
 // Spec
 
@@ -666,13 +686,22 @@ Spec* buildSpec(enum SpecKind kind, int lineno)
     return spec;
 }
 
-Spec* typeSpec(enum Type type, enum Type second_type, int lineno)
+Spec* typeSpec(enum Type type, struct Spec* sub_type_spec, int lineno)
 {
     TypeSpec* type_spec = (struct TypeSpec*)calloc(1, sizeof(TypeSpec));
     type_spec->type = type;
-    type_spec->second_type = second_type;
+    type_spec->sub_type_spec = sub_type_spec;
     Spec* spec = buildSpec(TypeSpec_kind, lineno);
     spec->v.type_spec = type_spec;
+    return spec;
+}
+
+Spec* prettySpec(int lineno)
+{
+    PrettySpec* pretty_spec = (struct PrettySpec*)calloc(1, sizeof(PrettySpec));
+    pretty_spec->kind = PrettySpec_kind;
+    Spec* spec = buildSpec(PrettySpec_kind, lineno);
+    spec->v.pretty_spec = pretty_spec;
     return spec;
 }
 
