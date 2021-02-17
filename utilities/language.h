@@ -1,7 +1,8 @@
 /*
  * Description: Language module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +31,8 @@
 #define __KAOS_LANGUAGE_FILE_EXTENSION__ "kaos"
 #define __KAOS_LANGUAGE_MOTTO__ "Turn chaos into magic!"
 #define __KAOS_LANGUAGE_KEYWORD_COUNT__ 33
-#define __KAOS_INTERACTIVE_MODULE_NAME__ "__interactive__."__KAOS_LANGUAGE_FILE_EXTENSION__
+#define __KAOS_INTERACTIVE_MODULE_NAME__ \
+  "__interactive__."__KAOS_LANGUAGE_FILE_EXTENSION__
 #define __KAOS_MSG_LINE_LENGTH__ 1000
 #define __KAOS_BYE_BYE__ "Bye bye!"
 #define __KAOS_SPELLS__ "spells"
@@ -38,22 +40,22 @@
 #define __KAOS_INDENT_LENGTH__ 4
 
 #if defined(__APPLE__) || defined(__MACH__)
-#   define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dylib"
+#define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dylib"
 #elif defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dll"
+#define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dll"
 #else
-#   define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "so"
+#define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "so"
 #endif
 
 #define __KAOS_EXTENSION_REGISTER_FUNCTION__ "KaosRegister"
 #define __KAOS_EXTENSION_FUNCTION_PREFIX__ "Kaos_"
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-#   define __KAOS_SHELL_INDICATOR__ "\001\033[0;90m\002kaos>\001\033[0m\002 "
-#   define __KAOS_SHELL_INDICATOR_BLOCK__ "\001\033[0;90m\002....\001\033[0m\002  "
+#define __KAOS_SHELL_INDICATOR__ "\001\033[0;90m\002kaos>\001\033[0m\002 "
+#define __KAOS_SHELL_INDICATOR_BLOCK__ "\001\033[0;90m\002....\001\033[0m\002  "
 #else
-#   define __KAOS_SHELL_INDICATOR__ "kaos>"
-#   define __KAOS_SHELL_INDICATOR_BLOCK__ ".... "
+#define __KAOS_SHELL_INDICATOR__ "kaos>"
+#define __KAOS_SHELL_INDICATOR_BLOCK__ ".... "
 #endif
 
 #define __KAOS_TAB__ "    "
@@ -64,9 +66,14 @@
 #include <stdio.h>
 
 #ifdef CHAOS_DEBUG
-#   include <stdlib.h>
+#include <stdlib.h>
 
-#   define free(p) do{ printf( "%s(%d):freeing %p &%p\n", __FILE__, __LINE__, (void*)p, (void*)&p ); free(p);  }while(0)
+#define free(p)                                                     \
+  do {                                                              \
+    printf("%s(%d):freeing %p &%p\n", __FILE__, __LINE__, (void*)p, \
+           (void*)&p);                                              \
+    free(p);                                                        \
+  } while (0)
 #endif
 
 #include "platform.h"

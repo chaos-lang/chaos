@@ -1,7 +1,8 @@
 /*
  * Description: Enums module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +24,14 @@
 #ifndef KAOS_ENUMS_H
 #define KAOS_ENUMS_H
 
-enum Phase { INIT_PREPARSE, PREPARSE, INIT_PROGRAM, PROGRAM, INIT_JSON_PARSE, JSON_PARSE };
+enum Phase {
+  INIT_PREPARSE,
+  PREPARSE,
+  INIT_PROGRAM,
+  PROGRAM,
+  INIT_JSON_PARSE,
+  JSON_PARSE
+};
 
 enum Type { K_BOOL, K_NUMBER, K_STRING, K_ANY, K_LIST, K_DICT, K_VOID };
 enum ValueType { V_BOOL, V_INT, V_FLOAT, V_STRING, V_VOID };

@@ -1,7 +1,8 @@
 /*
  * Description: Helpers module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -28,13 +29,13 @@
 
 #define __KAOS_ITOA_BUFFER_LENGTH__ 64
 
+#include <assert.h>
 #include <ctype.h>
 #include <string.h>
-#include <assert.h>
 
 typedef struct string_array {
-    char **arr;
-    unsigned capacity, size;
+  char **arr;
+  unsigned capacity, size;
 } string_array;
 
 string_array free_string_stack;
@@ -55,36 +56,36 @@ bool is_in_array(string_array *array, char *str);
 char *capitalize(const char *str);
 int largest(int arr[], int n);
 char *relative_path_to_absolute(char *path);
-char *remove_ext(char* myStr, char extSep, char pathSep);
-char* str_replace(char *target, const char *needle, const char *replacement);
-bool is_file_exists(char* file_path);
+char *remove_ext(char *myStr, char extSep, char pathSep);
+char *str_replace(char *target, const char *needle, const char *replacement);
+bool is_file_exists(char *file_path);
 const char *get_filename_ext(const char *filename);
 void freeFreeStringStack();
-char* escape_the_sequences_in_string_literal(char* string);
-char* escape_string_literal_for_transpiler(char* string);
-char* insert_nth_char(char* string, char c, long long n);
-void remove_nth_char(char* string, long long n);
+char *escape_the_sequences_in_string_literal(char *string);
+char *escape_string_literal_for_transpiler(char *string);
+char *insert_nth_char(char *string, char c, long long n);
+void remove_nth_char(char *string, long long n);
 int string_ends_with(const char *str, const char *suffix);
 void string_uppercase(char *s);
-char* replace_char(char* str, char find, char replace);
-void copy_binary_file(char* source_path, char* target_path);
+char *replace_char(char *str, char find, char replace);
+void copy_binary_file(char *source_path, char *target_path);
 bool in(char *s, char **x, int len);
-string_array str_split(char* a_str, const char a_delim);
-char *get_nth_line( FILE *f, int line_no );
+string_array str_split(char *a_str, const char a_delim);
+char *get_nth_line(FILE *f, int line_no);
 char *ltrim(char *s);
 char *rtrim(char *s);
 char *trim(char *s);
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   include <direct.h>
-#   define GetCurrentDir _getcwd
+#include <direct.h>
+#define GetCurrentDir _getcwd
 #else
-#   include <unistd.h>
-#   define GetCurrentDir getcwd
+#include <unistd.h>
+#define GetCurrentDir getcwd
 #endif
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   define strdup _strdup
+#define strdup _strdup
 #endif
 
 #include "cwalk.h"

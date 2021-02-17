@@ -1,7 +1,8 @@
 /*
  * Description: Messages module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -21,199 +22,174 @@
  */
 
 #include "messages.h"
+
 #include "helpers.h"
 
 void greet() {
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-    if (!isatty(fileno(stdin)))
-        return;
+  if (!isatty(fileno(stdin)))
+    return;
 #else
-    if (!_isatty(_fileno(stdin)))
-        return;
+  if (!_isatty(_fileno(stdin)))
+    return;
 #endif
 
-    char lang[__KAOS_MSG_LINE_LENGTH__ / 2 - __KAOS_INDENT_LENGTH__ * 2];
-    char compiler[__KAOS_MSG_LINE_LENGTH__ / 2 - __KAOS_INDENT_LENGTH__ * 2];
-    char lang_compiler[__KAOS_MSG_LINE_LENGTH__];
-    char motto[__KAOS_MSG_LINE_LENGTH__];
-    char copyright[__KAOS_MSG_LINE_LENGTH__];
-    char notice1[__KAOS_MSG_LINE_LENGTH__];
-    char notice2[__KAOS_MSG_LINE_LENGTH__];
-    char license[__KAOS_MSG_LINE_LENGTH__];
+  char lang[__KAOS_MSG_LINE_LENGTH__ / 2 - __KAOS_INDENT_LENGTH__ * 2];
+  char compiler[__KAOS_MSG_LINE_LENGTH__ / 2 - __KAOS_INDENT_LENGTH__ * 2];
+  char lang_compiler[__KAOS_MSG_LINE_LENGTH__];
+  char motto[__KAOS_MSG_LINE_LENGTH__];
+  char copyright[__KAOS_MSG_LINE_LENGTH__];
+  char notice1[__KAOS_MSG_LINE_LENGTH__];
+  char notice2[__KAOS_MSG_LINE_LENGTH__];
+  char license[__KAOS_MSG_LINE_LENGTH__];
 
-    sprintf(
-        lang,
-        "%s Language %d.%d.%d (%s %s)",
-        __KAOS_LANGUAGE_NAME__,
-        __KAOS_VERSION_MAJOR__,
-        __KAOS_VERSION_MINOR__,
-        __KAOS_VERSION_PATCHLEVEL__,
-        __DATE__,
-        __TIME__
-    );
+  sprintf(lang, "%s Language %d.%d.%d (%s %s)", __KAOS_LANGUAGE_NAME__,
+          __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__,
+          __KAOS_VERSION_PATCHLEVEL__, __DATE__, __TIME__);
 #if defined(__clang__)
-    sprintf(
-        compiler,
-        "Clang version: %d.%d.%d on %s",
-        __clang_major__,
-        __clang_minor__,
-        __clang_patchlevel__,
-        __KAOS_PLATFORM_NAME__
-    );
+  sprintf(compiler, "Clang version: %d.%d.%d on %s", __clang_major__,
+          __clang_minor__, __clang_patchlevel__, __KAOS_PLATFORM_NAME__);
 #elif defined(__GNUC__) || defined(__GNUG__)
-    sprintf(
-        compiler,
-        "GCC version: %d.%d.%d on %s",
-        __GNUC__,
-        __GNUC_MINOR__,
-        __GNUC_PATCHLEVEL__,
-        __KAOS_PLATFORM_NAME__
-    );
+  sprintf(compiler, "GCC version: %d.%d.%d on %s", __GNUC__, __GNUC_MINOR__,
+          __GNUC_PATCHLEVEL__, __KAOS_PLATFORM_NAME__);
 #endif
-    sprintf(lang_compiler, "%*c%s, %s", __KAOS_INDENT_LENGTH__ * 2, ' ', lang, compiler);
-    sprintf(
-        copyright,
-        "%*c%s",
-        __KAOS_INDENT_LENGTH__,
-        ' ',
-        "Copyright (C) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>"
-    );
-    sprintf(notice1, "%*c%s", __KAOS_INDENT_LENGTH__, ' ', "This program comes with");
-    sprintf(
-        notice2,
-        "%*c%s",
-        __KAOS_INDENT_LENGTH__,
-        ' ',
-        "and you are welcome to redistribute it under certain conditions."
-    );
-    sprintf(license, "%*c%s", __KAOS_INDENT_LENGTH__, ' ', "License:");
+  sprintf(lang_compiler, "%*c%s, %s", __KAOS_INDENT_LENGTH__ * 2, ' ', lang,
+          compiler);
+  sprintf(copyright, "%*c%s", __KAOS_INDENT_LENGTH__, ' ',
+          "Copyright (C) 2019-2021 Chaos Language Development Authority "
+          "<info@chaos-lang.org>");
+  sprintf(notice1, "%*c%s", __KAOS_INDENT_LENGTH__, ' ',
+          "This program comes with");
+  sprintf(notice2, "%*c%s", __KAOS_INDENT_LENGTH__, ' ',
+          "and you are welcome to redistribute it under certain conditions.");
+  sprintf(license, "%*c%s", __KAOS_INDENT_LENGTH__, ' ', "License:");
 
-    int cols[4];
-    cols[0] = (int) strlen(lang_compiler) + 1;
-    cols[1] = (int) strlen(copyright) + 1;
-    cols[2] = (int) strlen(notice1) + 1;
-    cols[3] = (int) strlen(notice2) + 1;
-    int ws_col = largest(cols, 2) + 4;
+  int cols[4];
+  cols[0] = (int)strlen(lang_compiler) + 1;
+  cols[1] = (int)strlen(copyright) + 1;
+  cols[2] = (int)strlen(notice1) + 1;
+  cols[3] = (int)strlen(notice2) + 1;
+  int ws_col = largest(cols, 2) + 4;
 
-    sprintf(motto, "%*c%s", ws_col / 2 - 12, ' ', __KAOS_LANGUAGE_MOTTO__);
+  sprintf(motto, "%*c%s", ws_col / 2 - 12, ' ', __KAOS_LANGUAGE_MOTTO__);
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col, "");
+  printf("%-*s", ws_col, "");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
+  printf("\033[1;45m");
 #endif
-    printf("%-*s", ws_col, lang_compiler);
+  printf("%-*s", ws_col, lang_compiler);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
-    printf("\033[5;45m");
+  printf("\033[1;45m");
+  printf("\033[5;45m");
 #endif
-    printf("%-*s", ws_col, motto);
+  printf("%-*s", ws_col, motto);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col, "");
+  printf("%-*s", ws_col, "");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col, copyright);
+  printf("%-*s", ws_col, copyright);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", 28, notice1);
+  printf("%-*s", 28, notice1);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[1;45m");
+  printf("\033[1;45m");
 #endif
-    printf("%-*s", 21, "ABSOLUTELY NO WARRANTY");
+  printf("%-*s", 21, "ABSOLUTELY NO WARRANTY");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col - 50, ". This is free software,");
+  printf("%-*s", ws_col - 50, ". This is free software,");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col, notice2);
+  printf("%-*s", ws_col, notice2);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", 13, license);
+  printf("%-*s", 13, license);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[4;45m");
+  printf("\033[4;45m");
 #endif
-    printf("%-*s", 31, "GNU General Public License v3.0");
+  printf("%-*s", 31, "GNU General Public License v3.0");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col - 44, " (run `chaos -l` to print the license)");
+  printf("%-*s", ws_col - 44, " (run `chaos -l` to print the license)");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0;45m");
+  printf("\033[0;45m");
 #endif
-    printf("%-*s", ws_col, "");
+  printf("%-*s", ws_col, "");
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
 
-    printf("\n\n");
+  printf("\n\n");
 }
 
 void print_bye_bye() {
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-    if (!isatty(fileno(stdin)))
-        return;
+  if (!isatty(fileno(stdin)))
+    return;
 #else
-    if (!_isatty(_fileno(stdin)))
-        return;
+  if (!_isatty(_fileno(stdin)))
+    return;
 #endif
-    int ws_col = (int) strlen(__KAOS_BYE_BYE__) + 8 + 1;
-    char bye_bye_msg[ws_col];
-    sprintf(bye_bye_msg, "    %s    ", __KAOS_BYE_BYE__);
+  int ws_col = (int)strlen(__KAOS_BYE_BYE__) + 8 + 1;
+  char bye_bye_msg[ws_col];
+  sprintf(bye_bye_msg, "    %s    ", __KAOS_BYE_BYE__);
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[5;42m");
+  printf("\033[5;42m");
 #endif
-    printf("%-*s", ws_col, bye_bye_msg);
+  printf("%-*s", ws_col, bye_bye_msg);
 #if defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-    printf("\033[0m");
+  printf("\033[0m");
 #endif
-    printf("\n");
+  printf("\n");
 }
 
 unsigned char help_txt[] = {
@@ -273,44 +249,40 @@ unsigned char help_txt[] = {
     0x44, 0x69, 0x73, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x20, 0x74, 0x68, 0x65,
     0x20, 0x70, 0x72, 0x65, 0x65, 0x6d, 0x70, 0x74, 0x69, 0x76, 0x65, 0x20,
     0x65, 0x72, 0x72, 0x6f, 0x72, 0x20, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x73,
-    0x2e, 0x0a, 0x0a
-};
+    0x2e, 0x0a, 0x0a};
 unsigned int help_txt_len = 675;
 
 void print_help() {
-    char lang[__KAOS_MSG_LINE_LENGTH__];
-    sprintf(
-        lang,
-        "%s Language %d.%d.%d (%s %s) ",
-        __KAOS_LANGUAGE_NAME__,
-        __KAOS_VERSION_MAJOR__,
-        __KAOS_VERSION_MINOR__,
-        __KAOS_VERSION_PATCHLEVEL__,
-        __DATE__,
-        __TIME__
-    );
-    printf("%s\n\n", lang);
-    printf("%s", help_txt);
+  char lang[__KAOS_MSG_LINE_LENGTH__];
+  sprintf(lang, "%s Language %d.%d.%d (%s %s) ", __KAOS_LANGUAGE_NAME__,
+          __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__,
+          __KAOS_VERSION_PATCHLEVEL__, __DATE__, __TIME__);
+  printf("%s\n\n", lang);
+  printf("%s", help_txt);
 }
 
 void print_license() {
-    char license_path[PATH_MAX];
+  char license_path[PATH_MAX];
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    PWSTR szPath = NULL;
-#   if defined(__clang__)
-    SHGetKnownFolderPath(&FOLDERID_ProgramFiles, 0, NULL, &szPath);
-    sprintf(license_path, "%ls/LLVM/lib/clang/%d.%d.%d/include/chaos/LICENSE", szPath, __clang_major__, __clang_minor__, __clang_patchlevel__);
-#   elif defined(__GNUC__) || defined(__GNUG__)
-    SHGetKnownFolderPath(&FOLDERID_ProgramData, 0, NULL, &szPath);
-    sprintf(license_path, "%ls/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos/LICENSE", szPath, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-#   endif
-    CoTaskMemFree(szPath);
+  PWSTR szPath = NULL;
+#if defined(__clang__)
+  SHGetKnownFolderPath(&FOLDERID_ProgramFiles, 0, NULL, &szPath);
+  sprintf(license_path, "%ls/LLVM/lib/clang/%d.%d.%d/include/chaos/LICENSE",
+          szPath, __clang_major__, __clang_minor__, __clang_patchlevel__);
+#elif defined(__GNUC__) || defined(__GNUG__)
+  SHGetKnownFolderPath(&FOLDERID_ProgramData, 0, NULL, &szPath);
+  sprintf(license_path,
+          "%ls/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/"
+          "x86_64-w64-mingw32/%d.%d.%d/include/chaos/LICENSE",
+          szPath, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+#endif
+  CoTaskMemFree(szPath);
 #else
-    sprintf(license_path, "/usr/local/include/chaos/LICENSE");
+  sprintf(license_path, "/usr/local/include/chaos/LICENSE");
 #endif
 
-    printf("license_path: %s\n", license_path);
-    char *license_text = fileGetContents(license_path);
-    printf("%s", license_text);
-    free(license_text);
+  printf("license_path: %s\n", license_path);
+  char *license_text = fileGetContents(license_path);
+  printf("%s", license_text);
+  free(license_text);
 }

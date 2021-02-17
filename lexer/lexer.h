@@ -1,7 +1,8 @@
 /*
  * Description: Lexer of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,10 +24,10 @@
 #ifndef KAOS_LEXER_H
 #define KAOS_LEXER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "../enums.h"
 

@@ -1,7 +1,8 @@
 /*
  * Description: Modularity feature of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -25,11 +26,11 @@
 
 #include <stdio.h>
 
-#include "symbol.h"
-#include "errors.h"
 #include "../lexer/lexer.h"
 #include "../utilities/helpers.h"
+#include "errors.h"
 #include "extension.h"
+#include "symbol.h"
 
 string_array modules_buffer;
 
@@ -46,17 +47,17 @@ void appendModuleToModuleBuffer(char *name);
 void prependModuleToModuleBuffer(char *name);
 void handleModuleImport(char *module_name, bool directly_import);
 void moduleImportParse(char *module_path);
-char* resolveModulePath(char *module_name, bool directly_import);
+char *resolveModulePath(char *module_name, bool directly_import);
 void moduleImportCleanUp(char *module_path);
 void freeModulesBuffer();
 void pushModuleStack(char *module_path, char *module);
 void popModuleStack();
 void freeModulePathStack();
 void freeModuleStack();
-char* getCurrentModule();
-char* getMainModuleDir();
-char* getParentDir(char* path);
-void stripLastPathSegment(char* path);
-char* searchSpellsIfNotExits(char* module_path, char* relative_path);
+char *getCurrentModule();
+char *getMainModuleDir();
+char *getParentDir(char *path);
+void stripLastPathSegment(char *path);
+char *searchSpellsIfNotExits(char *module_path, char *relative_path);
 
 #endif

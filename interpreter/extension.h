@@ -1,7 +1,8 @@
 /*
  * Description: Extension module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -25,33 +26,34 @@
 
 #include <stdio.h>
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   include <windows.h>
-#   define LIBTYPE HINSTANCE
-#   define OPENLIB(libname) LoadLibrary(libname)
-#   define CLOSELIB(handle) FreeLibrary(handle)
-#   define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
+#include <windows.h>
+#define LIBTYPE HINSTANCE
+#define OPENLIB(libname) LoadLibrary(libname)
+#define CLOSELIB(handle) FreeLibrary(handle)
+#define LIBFUNC(lib, fn) GetProcAddress((lib), (fn))
 typedef FARPROC lib_func;
 #else
-#   include <dlfcn.h>
-#   define LIBTYPE void*
-#   define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_NODELETE)
-#   define CLOSELIB(handle) dlclose(handle)
-#   define LIBFUNC(lib, fn) dlsym((lib), (fn))
+#include <dlfcn.h>
+#define LIBTYPE void*
+#define OPENLIB(libname) dlopen((libname), RTLD_NOW | RTLD_NODELETE)
+#define CLOSELIB(handle) dlclose(handle)
+#define LIBFUNC(lib, fn) dlsym((lib), (fn))
 typedef void (*lib_func)();
 #endif
 
-#include "function.h"
 #include "../Chaos.h"
+#include "function.h"
 
 typedef struct dynamic_library {
-    void     *handle;
-    lib_func  func;
+  void* handle;
+  lib_func func;
 } dynamic_library;
 
 void initKaosApi();
 void callRegisterInDynamicLibrary(char* dynamic_library_path);
 void callFunctionFromDynamicLibrary(_Function* function);
-dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name);
+dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path,
+                                              char* function_name);
 void returnVariable(Symbol* symbol);
 
 #endif

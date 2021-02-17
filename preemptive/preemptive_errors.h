@@ -1,7 +1,9 @@
 /*
- * Description: Preemptive Errors module of the Chaos Programming Language's source
+ * Description: Preemptive Errors module of the Chaos Programming Language's
+ * source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,42 +25,37 @@
 #ifndef KAOS_PREEMPTIVE_ERRORS_H
 #define KAOS_PREEMPTIVE_ERRORS_H
 
+#include <setjmp.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <setjmp.h>
 #include <string.h>
 
-#include "../utilities/language.h"
 #include "../interpreter/errors.h"
+#include "../utilities/language.h"
 
-void print_preemptive_error_base(
-    unsigned short code,
-    _Function* function,
-    char *str1,
-    char *str2,
-    long long lld1,
-    unsigned long long llu1
-);
+void print_preemptive_error_base(unsigned short code, _Function* function,
+                                 char* str1, char* str2, long long lld1,
+                                 unsigned long long llu1);
 void throw_preemptive_errors();
 
 typedef struct {
-    unsigned short code;
-    _Function* function;
-    char *str1;
-    char *str2;
-    long long lld1;
-    unsigned long long llu1;
+  unsigned short code;
+  _Function* function;
+  char* str1;
+  char* str2;
+  long long lld1;
+  unsigned long long llu1;
 } throw_preemptive_error_args;
 
 typedef struct throw_preemptive_error_args_array {
-    throw_preemptive_error_args* arr;
-    unsigned capacity, size;
+  throw_preemptive_error_args* arr;
+  unsigned capacity, size;
 } throw_preemptive_error_args_array;
 
 typedef struct preemptive_error_lineno_array {
-    int* value;
-    unsigned capacity, size;
+  int* value;
+  unsigned capacity, size;
 } preemptive_error_lineno_array;
 
 throw_preemptive_error_args_array preemptive_errors;
@@ -68,6 +65,7 @@ void add_preemptive_error_var(throw_preemptive_error_args in);
 void print_preemptive_error(throw_preemptive_error_args in);
 void free_preemptive_errors();
 
-#define add_preemptive_error(...) add_preemptive_error_var((throw_preemptive_error_args){__VA_ARGS__});
+#define add_preemptive_error(...) \
+  add_preemptive_error_var((throw_preemptive_error_args){__VA_ARGS__});
 
 #endif

@@ -1,7 +1,8 @@
 /*
  * Description: Parser of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,10 +24,10 @@
 #ifndef KAOS_PARSER_H
 #define KAOS_PARSER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef CHAOS_COMPILER
 #include "../utilities/messages.h"
@@ -40,14 +41,14 @@
 
 extern int yyparse();
 extern int yylex_destroy();
-extern FILE* yyin;
+extern FILE *yyin;
 extern char *yytext;
 FILE *fp;
 bool fp_opened;
 
 #ifndef CHAOS_COMPILER
 bool is_interactive;
-FILE* tmp_stdin;
+FILE *tmp_stdin;
 #endif
 
 char *program_file_path;
@@ -58,9 +59,9 @@ jmp_buf InteractiveShellErrorAbsorber;
 
 bool global_unsafe;
 
-int initParser(int argc, char** argv);
+int initParser(int argc, char **argv);
 void freeEverything();
-void yyerror(const char* s);
+void yyerror(const char *s);
 
 #ifndef CHAOS_COMPILER
 void absorbError();

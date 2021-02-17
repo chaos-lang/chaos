@@ -1,7 +1,8 @@
 /*
  * Description: Loop module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,30 +24,30 @@
 #ifndef KAOS_LOOP_H
 #define KAOS_LOOP_H
 
+#include <setjmp.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
-#include <setjmp.h>
 
-#include "symbol.h"
 #include "../ast/ast.h"
+#include "symbol.h"
 
 enum LoopType { TIMESDO, FOREACH, FOREACH_DICT };
 
 typedef struct {
-    char *name;
-    char *key;
-    char *value;
+  char* name;
+  char* key;
+  char* value;
 } LoopElement;
 
 typedef struct {
-    enum LoopType type;
-    unsigned long long iter;
-    bool is_infinite;
-    unsigned nested_counter;
-    char *list;
-    LoopElement element;
-    struct ASTNode* ast_node;
+  enum LoopType type;
+  unsigned long long iter;
+  bool is_infinite;
+  unsigned nested_counter;
+  char* list;
+  LoopElement element;
+  struct ASTNode* ast_node;
 } Loop;
 
 Loop* loop_mode;
@@ -60,8 +61,9 @@ jmp_buf LoopContinue;
 ASTNode* loop_end_ast_node;
 
 ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node);
-ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node);
-ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_value, ASTNode* ast_node);
+ASTNode* startForeach(char* list_name, char* element_name, ASTNode* ast_node);
+ASTNode* startForeachDict(char* dict_name, char* element_key,
+                          char* element_value, ASTNode* ast_node);
 void breakLoop();
 void continueLoop();
 

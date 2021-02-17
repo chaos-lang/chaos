@@ -1,7 +1,8 @@
 /*
  * Description: Messages module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -24,26 +25,27 @@
 #define KAOS_MESSAGES_H
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   if !defined(__clang__)
-#      undef NTDDI_VERSION
-#      define NTDDI_VERSION 0x06000000
-#   endif
-#   include <windows.h>
-#   include <initguid.h>
-#   include <KnownFolders.h>
-#   include <Shlobj.h>
+#if !defined(__clang__)
+#undef NTDDI_VERSION
+#define NTDDI_VERSION 0x06000000
+#endif
+#include <KnownFolders.h>
+#include <Shlobj.h>
+#include <initguid.h>
+#include <windows.h>
 #endif
 
-#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
-#   include "windows/getopt.h"
+#if defined(__clang__) && \
+    (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
+#include "windows/getopt.h"
 #else
-#   include <getopt.h>
+#include <getopt.h>
 #endif
 
 #if defined(__APPLE__) && defined(__MACH__)
-#   include <sys/syslimits.h>
+#include <sys/syslimits.h>
 #elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#   include <linux/limits.h>
+#include <linux/limits.h>
 #endif
 
 void greet();

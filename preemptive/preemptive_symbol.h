@@ -1,7 +1,9 @@
 /*
- * Description: Preemptive Symbol module of the Chaos Programming Language's source
+ * Description: Preemptive Symbol module of the Chaos Programming Language's
+ * source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -31,9 +33,10 @@ Symbol* preemptive_end_symbol;
 
 unsigned long long preemptive_nested_complex_counter;
 
-Symbol* preemptive_addSymbol(char *name, enum Type type, enum ValueType value_type);
-Symbol* preemptive_findSymbol(char *name, _Function* function);
-Symbol* preemptive_getSymbol(char *name, _Function* function);
+Symbol* preemptive_addSymbol(char* name, enum Type type,
+                             enum ValueType value_type);
+Symbol* preemptive_findSymbol(char* name, _Function* function);
+Symbol* preemptive_getSymbol(char* name, _Function* function);
 void preemptive_freeAllSymbols();
 void preemptive_removeSymbol(Symbol* symbol);
 

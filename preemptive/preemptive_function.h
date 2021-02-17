@@ -1,7 +1,9 @@
 /*
- * Description: Preemptive Function module of the Chaos Programming Language's source
+ * Description: Preemptive Function module of the Chaos Programming Language's
+ * source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -28,16 +30,17 @@
 
 _Function* preemptive_function_cursor;
 
-void preemptive_callFunction(_Function* _function, char *name, char *module);
-_Function* preemptive_getFunction(_Function* _function, char *name, char *module);
+void preemptive_callFunction(_Function* _function, char* name, char* module);
+_Function* preemptive_getFunction(_Function* _function, char* name,
+                                  char* module);
 void preemptive_addSymbolToFunctionParameters(Symbol* symbol, bool is_optional);
 void preemptive_addFunctionCallParameterBool();
 void preemptive_addFunctionCallParameterInt();
 void preemptive_addFunctionCallParameterFloat();
 void preemptive_addFunctionCallParameterString();
-void preemptive_addFunctionCallParameterSymbol(char *name, _Function* function);
+void preemptive_addFunctionCallParameterSymbol(char* name, _Function* function);
 void preemptive_addFunctionCallParameterList(Symbol* symbol);
-void preemptive_returnSymbol(char *name, _Function* function);
+void preemptive_returnSymbol(char* name, _Function* function);
 void preemptive_resetFunctionParametersMode();
 
 #endif

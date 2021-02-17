@@ -1,7 +1,8 @@
 /*
  * Description: Loop module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2020 Chaos Language Development Authority
+ * <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -20,12 +21,13 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
+#include "loop.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "loop.h"
-#include "../interpreter/symbol.h"
 #include "../interpreter/interpreter.h"
+#include "../interpreter/symbol.h"
 
 unsigned long long nested_loop_counter = 0;
 bool interactive_shell_loop_error_absorbed = false;
@@ -34,124 +36,123 @@ ASTNode* loop_end_ast_node = NULL;
 extern int yyparse();
 
 ASTNode* startTimesDo(long long iter, bool is_infinite, ASTNode* ast_node) {
-    if (iter < 0) {
-        throw_error(E_NEGATIVE_ITERATION_COUNT, NULL, NULL, iter);
-    }
-    ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
-    loop_end_ast_node = next_node;
+  if (iter < 0) {
+    throw_error(E_NEGATIVE_ITERATION_COUNT, NULL, NULL, iter);
+  }
+  ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
+  loop_end_ast_node = next_node;
 
 #ifndef CHAOS_COMPILER
-    if (is_interactive)
-        if (setjmp(InteractiveShellLoopErrorAbsorber))
-            interactive_shell_loop_error_absorbed = true;
+  if (is_interactive)
+    if (setjmp(InteractiveShellLoopErrorAbsorber))
+      interactive_shell_loop_error_absorbed = true;
 #endif
 
-    nested_loop_counter++;
-    if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
-        if (is_infinite) {
-            while (true) {
-                if (setjmp(LoopBreak))
-                    break;
-                if (setjmp(LoopContinue))
-                    continue;
-                next_node = eval_node(ast_node->next, ast_node->module);
-            }
-        } else {
-            for (unsigned long long i = 0; i < (unsigned) iter; i++) {
-                if (setjmp(LoopBreak))
-                    break;
-                if (setjmp(LoopContinue))
-                    continue;
-                next_node = eval_node(ast_node->next, ast_node->module);
-            }
-        }
+  nested_loop_counter++;
+  if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
+    if (is_infinite) {
+      while (true) {
+        if (setjmp(LoopBreak))
+          break;
+        if (setjmp(LoopContinue))
+          continue;
+        next_node = eval_node(ast_node->next, ast_node->module);
+      }
+    } else {
+      for (unsigned long long i = 0; i < (unsigned)iter; i++) {
+        if (setjmp(LoopBreak))
+          break;
+        if (setjmp(LoopContinue))
+          continue;
+        next_node = eval_node(ast_node->next, ast_node->module);
+      }
     }
-    nested_loop_counter--;
+  }
+  nested_loop_counter--;
 
-    return eval_node(next_node->next, ast_node->module);
+  return eval_node(next_node->next, ast_node->module);
 }
 
-ASTNode* startForeach(char *list_name, char *element_name, ASTNode* ast_node) {
-    ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
-    loop_end_ast_node = next_node;
+ASTNode* startForeach(char* list_name, char* element_name, ASTNode* ast_node) {
+  ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
+  loop_end_ast_node = next_node;
 
-    Symbol* list = getSymbol(list_name);
-    if (list->type != K_LIST)
-        throw_error(E_NOT_A_LIST, list_name);
+  Symbol* list = getSymbol(list_name);
+  if (list->type != K_LIST)
+    throw_error(E_NOT_A_LIST, list_name);
 
 #ifndef CHAOS_COMPILER
-    if (is_interactive)
-        if (setjmp(InteractiveShellLoopErrorAbsorber))
-            interactive_shell_loop_error_absorbed = true;
+  if (is_interactive)
+    if (setjmp(InteractiveShellLoopErrorAbsorber))
+      interactive_shell_loop_error_absorbed = true;
 #endif
 
-    nested_loop_counter++;
-    if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
-        for (unsigned long i = 0; i < list->children_count; i++) {
-            Symbol* child = list->children[i];
-            Symbol* clone_symbol = createCloneFromSymbol(element_name, child->type, child, child->secondary_type);
-            if (setjmp(LoopBreak)) {
-                removeSymbol(clone_symbol);
-                break;
-            }
-            if (setjmp(LoopContinue)) {
-                removeSymbol(clone_symbol);
-                continue;
-            }
-            next_node = eval_node(ast_node->next, ast_node->module);
-            removeSymbol(clone_symbol);
-        }
+  nested_loop_counter++;
+  if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
+    for (unsigned long i = 0; i < list->children_count; i++) {
+      Symbol* child = list->children[i];
+      Symbol* clone_symbol = createCloneFromSymbol(
+          element_name, child->type, child, child->secondary_type);
+      if (setjmp(LoopBreak)) {
+        removeSymbol(clone_symbol);
+        break;
+      }
+      if (setjmp(LoopContinue)) {
+        removeSymbol(clone_symbol);
+        continue;
+      }
+      next_node = eval_node(ast_node->next, ast_node->module);
+      removeSymbol(clone_symbol);
     }
-    nested_loop_counter--;
+  }
+  nested_loop_counter--;
 
-    return eval_node(next_node->next, ast_node->module);
+  return eval_node(next_node->next, ast_node->module);
 }
 
-ASTNode* startForeachDict(char *dict_name, char *element_key, char *element_value, ASTNode* ast_node) {
-    ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
-    loop_end_ast_node = next_node;
+ASTNode* startForeachDict(char* dict_name, char* element_key,
+                          char* element_value, ASTNode* ast_node) {
+  ASTNode* next_node = walk_until_end(ast_node->next, ast_node->module);
+  loop_end_ast_node = next_node;
 
-    Symbol* dict = getSymbol(dict_name);
-    if (dict->type != K_DICT)
-        throw_error(E_NOT_A_DICT, dict_name);
+  Symbol* dict = getSymbol(dict_name);
+  if (dict->type != K_DICT)
+    throw_error(E_NOT_A_DICT, dict_name);
 
 #ifndef CHAOS_COMPILER
-    if (is_interactive)
-        if (setjmp(InteractiveShellLoopErrorAbsorber))
-            interactive_shell_loop_error_absorbed = true;
+  if (is_interactive)
+    if (setjmp(InteractiveShellLoopErrorAbsorber))
+      interactive_shell_loop_error_absorbed = true;
 #endif
 
-    nested_loop_counter++;
-    if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
-        for (unsigned long i = 0; i < dict->children_count; i++) {
-            Symbol* child = dict->children[i];
+  nested_loop_counter++;
+  if (!interactive_shell_loop_error_absorbed && !is_loop_breaked) {
+    for (unsigned long i = 0; i < dict->children_count; i++) {
+      Symbol* child = dict->children[i];
 
-            addSymbolString(element_key, child->key);
-            Symbol* clone_symbol = createCloneFromSymbol(element_value, child->type, child, child->secondary_type);
-            if (setjmp(LoopBreak)) {
-                removeSymbol(clone_symbol);
-                removeSymbolByName(element_key);
-                break;
-            }
-            if (setjmp(LoopContinue)) {
-                removeSymbol(clone_symbol);
-                removeSymbolByName(element_key);
-                continue;
-            }
-            next_node = eval_node(ast_node->next, ast_node->module);
-            removeSymbol(clone_symbol);
-            removeSymbolByName(element_key);
-        }
+      addSymbolString(element_key, child->key);
+      Symbol* clone_symbol = createCloneFromSymbol(
+          element_value, child->type, child, child->secondary_type);
+      if (setjmp(LoopBreak)) {
+        removeSymbol(clone_symbol);
+        removeSymbolByName(element_key);
+        break;
+      }
+      if (setjmp(LoopContinue)) {
+        removeSymbol(clone_symbol);
+        removeSymbolByName(element_key);
+        continue;
+      }
+      next_node = eval_node(ast_node->next, ast_node->module);
+      removeSymbol(clone_symbol);
+      removeSymbolByName(element_key);
     }
-    nested_loop_counter--;
+  }
+  nested_loop_counter--;
 
-    return eval_node(next_node->next, ast_node->module);
+  return eval_node(next_node->next, ast_node->module);
 }
 
-void breakLoop() {
-    longjmp(LoopBreak, 1);
-}
+void breakLoop() { longjmp(LoopBreak, 1); }
 
-void continueLoop() {
-    longjmp(LoopContinue, 1);
-}
+void continueLoop() { longjmp(LoopContinue, 1); }
