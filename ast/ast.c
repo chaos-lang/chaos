@@ -597,6 +597,27 @@ Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno)
     return expr;
 }
 
+Expr* moduleSelector(Spec* parent_dir_spec, Expr* x, Expr* sel, int lineno)
+{
+    ModuleSelector* module_selector = (struct ModuleSelector*)calloc(1, sizeof(ModuleSelector));
+    module_selector->parent_dir_spec = parent_dir_spec;
+    module_selector->x = x;
+    module_selector->sel = sel;
+    Expr* expr = buildExpr(ModuleSelector_kind, lineno);
+    expr->v.module_selector = module_selector;
+    return expr;
+}
+
+Expr* aliasExpr(Expr* name, Expr* asname, int lineno)
+{
+    AliasExpr* alias_expr = (struct AliasExpr*)calloc(1, sizeof(AliasExpr));
+    alias_expr->name = name;
+    alias_expr->asname = asname;
+    Expr* expr = buildExpr(AliasExpr_kind, lineno);
+    expr->v.alias_expr = alias_expr;
+    return expr;
+}
+
 
 // Stmt
 
@@ -704,7 +725,7 @@ Spec* buildSpec(enum SpecKind kind, int lineno)
     return spec;
 }
 
-Spec* typeSpec(enum Type type, struct Spec* sub_type_spec, int lineno)
+Spec* typeSpec(enum Type type, Spec* sub_type_spec, int lineno)
 {
     TypeSpec* type_spec = (struct TypeSpec*)calloc(1, sizeof(TypeSpec));
     type_spec->type = type;
@@ -720,6 +741,40 @@ Spec* prettySpec(int lineno)
     pretty_spec->kind = PrettySpec_kind;
     Spec* spec = buildSpec(PrettySpec_kind, lineno);
     spec->v.pretty_spec = pretty_spec;
+    return spec;
+}
+
+Spec* parentDirSpec(int lineno)
+{
+    ParentDirSpec* parent_dir_spec = (struct ParentDirSpec*)calloc(1, sizeof(ParentDirSpec));
+    parent_dir_spec->kind = ParentDirSpec_kind;
+    Spec* spec = buildSpec(ParentDirSpec_kind, lineno);
+    spec->v.parent_dir_spec = parent_dir_spec;
+    return spec;
+}
+
+Spec* asteriskSpec(int lineno)
+{
+    AsteriskSpec* asterisk_spec = (struct AsteriskSpec*)calloc(1, sizeof(AsteriskSpec));
+    asterisk_spec->kind = AsteriskSpec_kind;
+    Spec* spec = buildSpec(AsteriskSpec_kind, lineno);
+    spec->v.asterisk_spec = asterisk_spec;
+    return spec;
+}
+
+Spec* importSpec(Expr* module_selector, Expr* ident, ExprList* names, Spec* asterisk, int lineno)
+{
+    ImportSpec* import_spec = (struct ImportSpec*)calloc(1, sizeof(ImportSpec));
+    import_spec->module_selector = module_selector;
+    import_spec->ident = ident;
+    if (names == NULL) {
+        names = (struct ExprList*)calloc(1, sizeof(ExprList));
+        names->expr_count = 0;
+    }
+    import_spec->names = names;
+    import_spec->asterisk = asterisk;
+    Spec* spec = buildSpec(ImportSpec_kind, lineno);
+    spec->v.import_spec = import_spec;
     return spec;
 }
 
@@ -758,7 +813,20 @@ void initProgram()
     );
     program->files[0] = file;
     StmtList* stmt_list = (struct StmtList*)calloc(1, sizeof(StmtList));
+    stmt_list->stmt_count = 0;
     file->stmt_list = stmt_list;
+    SpecList* imports = (struct SpecList*)calloc(1, sizeof(SpecList));
+    imports->spec_count = 0;
+    file->imports = imports;
+}
+
+void addExpr(ExprList* expr_list, Expr* expr)
+{
+    expr_list->exprs = realloc(
+        expr_list->exprs,
+        sizeof(Expr) * ++expr_list->expr_count
+    );
+    expr_list->exprs[expr_list->expr_count - 1] = expr;
 }
 
 void addStmt(StmtList* stmt_list, Stmt* stmt)
@@ -768,4 +836,13 @@ void addStmt(StmtList* stmt_list, Stmt* stmt)
         sizeof(Stmt) * ++stmt_list->stmt_count
     );
     stmt_list->stmts[stmt_list->stmt_count - 1] = stmt;
+}
+
+void addSpec(SpecList* spec_list, Spec* spec)
+{
+    spec_list->specs = realloc(
+        spec_list->specs,
+        sizeof(Spec) * ++spec_list->spec_count
+    );
+    spec_list->specs[spec_list->spec_count - 1] = spec;
 }

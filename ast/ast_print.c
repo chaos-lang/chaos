@@ -45,9 +45,37 @@ void printAST()
         indent = indent + __KAOS_INDENT_LENGTH__;
 
         printf(
-            "%*c\"_type\": \"File\",\n%*c\"stmt_list\": [\n",
+            "%*c\"_type\": \"File\",\n",
             indent,
-            __KAOS_INDENT_CHAR__,
+            __KAOS_INDENT_CHAR__
+        );
+
+        // Imports
+        printf(
+            "%*c\"imports\": [\n",
+            indent,
+            __KAOS_INDENT_CHAR__
+        );
+        indent = indent + __KAOS_INDENT_LENGTH__;
+
+        SpecList* imports = program->files[i]->imports;
+        for (unsigned long j = imports->spec_count; 0 < j; j--) {
+            if (j - 1 == 0)
+                printASTSpec(imports->specs[j - 1], true, "\n");
+            else
+                printASTSpec(imports->specs[j - 1], true, ",\n");
+        }
+
+        indent = indent - __KAOS_INDENT_LENGTH__;
+        printf(
+            "%*c],\n",
+            indent,
+            __KAOS_INDENT_CHAR__
+        );
+
+        // Stmts
+        printf(
+            "%*c\"stmt_list\": [\n",
             indent,
             __KAOS_INDENT_CHAR__
         );
@@ -367,6 +395,56 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
                 expr->v.incdec_expr->first ? "true" : "false"
             );
             break;
+        case ModuleSelector_kind:
+            printf(
+                "%*c\"_type\": \"ModuleSelector\",\n%*c\"parent_dir_spec\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (expr->v.module_selector->parent_dir_spec == NULL)
+                printf("null,\n");
+            else
+                printASTSpec(expr->v.module_selector->parent_dir_spec, false, ",\n");
+            printf(
+                "%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (expr->v.module_selector->x == NULL)
+                printf("null,\n");
+            else
+                printASTExpr(expr->v.module_selector->x, false, ",\n");
+            printf(
+                "%*c\"sel\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (expr->v.module_selector->sel == NULL)
+                printf("null\n");
+            else
+                printASTExpr(expr->v.module_selector->sel, false, "\n");
+            break;
+        case AliasExpr_kind:
+            printf(
+                "%*c\"_type\": \"AliasExpr\",\n%*c\"name\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.alias_expr->name, false, ",\n");
+            printf(
+                "%*c\"asname\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (expr->v.alias_expr->asname == NULL)
+                printf("null\n");
+            else
+                printASTExpr(expr->v.alias_expr->asname, false, "\n");
+            break;
         default:
             break;
     }
@@ -405,7 +483,7 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
             if (spec->v.type_spec->sub_type_spec == NULL)
                 printf("null\n");
             else
-                printASTSpec(spec->v.type_spec->sub_type_spec, false, ",\n");
+                printASTSpec(spec->v.type_spec->sub_type_spec, false, "\n");
             break;
         case PrettySpec_kind:
             printf(
@@ -414,6 +492,69 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             break;
+        case ParentDirSpec_kind:
+            printf(
+                "%*c\"_type\": \"ParentDirSpec\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case AsteriskSpec_kind:
+            printf(
+                "%*c\"_type\": \"AsteriskSpec\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case ImportSpec_kind:
+            printf(
+                "%*c\"_type\": \"ImportSpec\",\n%*c\"module_selector\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(spec->v.import_spec->module_selector, false, ",\n");
+            printf(
+                "%*c\"ident\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (spec->v.import_spec->ident == NULL)
+                printf("null,\n");
+            else
+                printASTExpr(spec->v.import_spec->ident, false, ",\n");
+            printf(
+                "%*c\"names\": [\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+
+            indent = indent + __KAOS_INDENT_LENGTH__;
+            ExprList* names = spec->v.import_spec->names;
+            for (unsigned long j = names->expr_count; 0 < j; j--) {
+                if (j - 1 == 0)
+                    printASTExpr(names->exprs[j - 1], true, "\n");
+                else
+                    printASTExpr(names->exprs[j - 1], true, ",\n");
+            }
+            indent = indent - __KAOS_INDENT_LENGTH__;
+
+            printf(
+                "%*c],\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+
+            printf(
+                "%*c\"asterisk\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (spec->v.import_spec->asterisk == NULL)
+                printf("null\n");
+            else
+                printASTSpec(spec->v.import_spec->asterisk, false, "\n");
         default:
             break;
     }

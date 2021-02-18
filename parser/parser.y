@@ -58,6 +58,7 @@ extern bool is_complex_parsing;
     Stmt* stmt;
     Spec* spec;
     Decl* decl;
+    ExprList* expr_list;
 }
 
 %token START_PROGRAM START_PREPARSE START_JSON_PARSE
@@ -83,10 +84,12 @@ extern bool is_complex_parsing;
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
+%type<expr> module_selector alias_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
-%type<spec> type_spec sub_type_spec pretty_spec
+%type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<decl> var_decl
+%type<expr_list> alias_expr_list
 
 %destructor {
     free($$);
@@ -106,6 +109,9 @@ parser:
 
 line:
     | T_NEWLINE line {}
+    | import line {
+        addSpec(program->files[0]->imports, $1);
+    }
     | stmt line {
         addStmt(program->files[0]->stmt_list, $1);
     }
@@ -246,6 +252,27 @@ incdec_expr:
     }
     | ident T_DEC {
         $$ = incDecExpr(DEC_tok, $1, false, yylineno);
+    }
+;
+
+alias_expr:
+    ident {
+        $$ = aliasExpr($1, NULL, yylineno);
+    }
+    | ident T_AS ident {
+        $$ = aliasExpr($1, $3, yylineno);
+    }
+;
+
+alias_expr_list:
+    alias_expr {
+        $$ = (struct ExprList*)calloc(1, sizeof(ExprList));
+        $$->expr_count = 0;
+        addExpr($$, $1);
+    }
+    | alias_expr T_COMMA alias_expr_list {
+        $$ = $3;
+        addExpr($$, $1);
     }
 ;
 
@@ -398,6 +425,62 @@ var_decl:
         $$ = varDecl($1, $2, $4, yylineno);
     }
 ;
+
+import:
+    T_IMPORT module_selector {
+        $$ = importSpec($2, NULL, NULL, NULL, yylineno);
+    }
+    | T_IMPORT module_selector T_AS ident {
+        $$ = importSpec($2, $4, NULL, NULL, yylineno);
+    }
+    | T_FROM module_selector T_IMPORT asterisk_spec {
+        $$ = importSpec($2, NULL, NULL, $4, yylineno);
+    }
+    | T_FROM module_selector T_IMPORT alias_expr_list {
+        $$ = importSpec($2, NULL, $4, NULL, yylineno);
+    }
+;
+
+module_selector:
+    ident {
+        $$ = moduleSelector(NULL, $1, NULL, yylineno);
+    }
+    | ident T_PERIOD module_selector {
+        $$ = moduleSelector(NULL, $1, $3, yylineno);
+    }
+    | ident T_QUO module_selector {
+        $$ = moduleSelector(NULL, $1, $3, yylineno);
+    }
+    | ident T_BACKSLASH module_selector {
+        $$ = moduleSelector(NULL, $1, $3, yylineno);
+    }
+    | parent_dir_spec {
+        $$ = moduleSelector($1, NULL, NULL, yylineno);
+    }
+    | parent_dir_spec T_PERIOD module_selector {
+        $$ = moduleSelector($1, NULL, $3, yylineno);
+    }
+    | parent_dir_spec T_QUO module_selector {
+        $$ = moduleSelector($1, NULL, $3, yylineno);
+    }
+    | parent_dir_spec T_BACKSLASH module_selector {
+        $$ = moduleSelector($1, NULL, $3, yylineno);
+    }
+    | parent_dir_spec module_selector {
+        $$ = moduleSelector($1, NULL, $2, yylineno);
+    }
+;
+
+parent_dir_spec:
+    T_PERIOD T_PERIOD {
+        $$ = parentDirSpec(yylineno);
+    }
+;
+
+asterisk_spec:
+    T_MUL {
+        $$ = asteriskSpec(yylineno);
+    }
 
 %%
 
