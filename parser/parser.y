@@ -83,7 +83,7 @@ extern bool is_complex_parsing;
 %left T_MUL T_QUO
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
-%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
+%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr index_expr
 %type<expr> module_selector alias_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
@@ -134,6 +134,9 @@ expr:
         $$ = $1;
     }
     | incdec_expr {
+        $$ = $1;
+    }
+    | index_expr {
         $$ = $1;
     }
 ;
@@ -273,6 +276,12 @@ alias_expr_list:
     | alias_expr T_COMMA alias_expr_list {
         $$ = $3;
         addExpr($$, $1);
+    }
+;
+
+index_expr:
+    expr T_LBRACK expr T_RBRACK {
+        $$ = indexExpr($1, $3, yylineno);
     }
 ;
 

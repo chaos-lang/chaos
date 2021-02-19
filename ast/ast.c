@@ -618,6 +618,16 @@ Expr* aliasExpr(Expr* name, Expr* asname, int lineno)
     return expr;
 }
 
+Expr* indexExpr(Expr* x, Expr* index, int lineno)
+{
+    IndexExpr* index_expr = (struct IndexExpr*)calloc(1, sizeof(IndexExpr));
+    index_expr->x = x;
+    index_expr->index = index;
+    Expr* expr = buildExpr(IndexExpr_kind, lineno);
+    expr->v.index_expr = index_expr;
+    return expr;
+}
+
 
 // Stmt
 

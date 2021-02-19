@@ -445,6 +445,22 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
             else
                 printASTExpr(expr->v.alias_expr->asname, false, "\n");
             break;
+        case IndexExpr_kind:
+            printf(
+                "%*c\"_type\": \"IndexExpr\",\n%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.index_expr->x, false, ",\n");
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.index_expr->index, false, "\n");
+            break;
         default:
             break;
     }

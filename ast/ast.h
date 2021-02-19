@@ -374,6 +374,7 @@ enum ExprKind {
     IncDecExpr_kind=6,
     ModuleSelector_kind=7,
     AliasExpr_kind=8,
+    IndexExpr_kind=9,
 };
 
 typedef struct Expr {
@@ -388,6 +389,7 @@ typedef struct Expr {
         struct IncDecExpr* incdec_expr;
         struct ModuleSelector* module_selector;
         struct AliasExpr* alias_expr;
+        struct IndexExpr* index_expr;
     } v;
 } Expr;
 
@@ -431,6 +433,11 @@ typedef struct AliasExpr {
     struct Expr* name;
     struct Expr* asname;
 } AliasExpr;
+
+typedef struct IndexExpr {
+    struct Expr* x;
+    struct Expr* index;
+} IndexExpr;
 
 
 // Stmt
@@ -614,6 +621,7 @@ Expr* parenExpr(Expr* x, int lineno);
 Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno);
 Expr* moduleSelector(Spec* parent_dir_spec, Expr* x, Expr* sel, int lineno);
 Expr* aliasExpr(Expr* name, Expr* asname, int lineno);
+Expr* indexExpr(Expr* x, Expr* index, int lineno);
 Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
