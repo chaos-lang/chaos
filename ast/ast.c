@@ -628,6 +628,26 @@ Expr* indexExpr(Expr* x, Expr* index, int lineno)
     return expr;
 }
 
+Expr* compositeLit(Spec* type, ExprList* elts, int lineno)
+{
+    CompositeLit* composite_lit = (struct CompositeLit*)calloc(1, sizeof(CompositeLit));
+    composite_lit->type = type;
+    composite_lit->elts = elts;
+    Expr* expr = buildExpr(CompositeLit_kind, lineno);
+    expr->v.composite_lit = composite_lit;
+    return expr;
+}
+
+Expr* keyValueExpr(Expr* key, Expr* value, int lineno)
+{
+    KeyValueExpr* key_value_expr = (struct KeyValueExpr*)calloc(1, sizeof(KeyValueExpr));
+    key_value_expr->key = key;
+    key_value_expr->value = value;
+    Expr* expr = buildExpr(KeyValueExpr_kind, lineno);
+    expr->v.key_value_expr = key_value_expr;
+    return expr;
+}
+
 
 // Stmt
 
@@ -778,6 +798,24 @@ Spec* asteriskSpec(int lineno)
     asterisk_spec->kind = AsteriskSpec_kind;
     Spec* spec = buildSpec(AsteriskSpec_kind, lineno);
     spec->v.asterisk_spec = asterisk_spec;
+    return spec;
+}
+
+Spec* listType(int lineno)
+{
+    ListType* list_type = (struct ListType*)calloc(1, sizeof(ListType));
+    list_type->kind = ListType_kind;
+    Spec* spec = buildSpec(ListType_kind, lineno);
+    spec->v.list_type = list_type;
+    return spec;
+}
+
+Spec* dictType(int lineno)
+{
+    DictType* dict_type = (struct DictType*)calloc(1, sizeof(DictType));
+    dict_type->kind = DictType_kind;
+    Spec* spec = buildSpec(DictType_kind, lineno);
+    spec->v.dict_type = dict_type;
     return spec;
 }
 

@@ -375,6 +375,8 @@ enum ExprKind {
     ModuleSelector_kind=7,
     AliasExpr_kind=8,
     IndexExpr_kind=9,
+    CompositeLit_kind=10,
+    KeyValueExpr_kind=11,
 };
 
 typedef struct Expr {
@@ -390,6 +392,8 @@ typedef struct Expr {
         struct ModuleSelector* module_selector;
         struct AliasExpr* alias_expr;
         struct IndexExpr* index_expr;
+        struct CompositeLit* composite_lit;
+        struct KeyValueExpr* key_value_expr;
     } v;
 } Expr;
 
@@ -438,6 +442,16 @@ typedef struct IndexExpr {
     struct Expr* x;
     struct Expr* index;
 } IndexExpr;
+
+typedef struct CompositeLit {
+    struct Spec* type;
+    struct ExprList* elts;
+} CompositeLit;
+
+typedef struct KeyValueExpr {
+    struct Expr* key;
+    struct Expr* value;
+} KeyValueExpr;
 
 
 // Stmt
@@ -525,6 +539,8 @@ enum SpecKind {
     ParentDirSpec_kind=3,
     AsteriskSpec_kind=4,
     ImportSpec_kind=5,
+    ListType_kind=6,
+    DictType_kind=7,
 };
 
 typedef struct Spec {
@@ -536,6 +552,8 @@ typedef struct Spec {
         struct ParentDirSpec* parent_dir_spec;
         struct AsteriskSpec* asterisk_spec;
         struct ImportSpec* import_spec;
+        struct ListType* list_type;
+        struct DictType* dict_type;
     } v;
 } Spec;
 
@@ -555,6 +573,14 @@ typedef struct ParentDirSpec {
 typedef struct AsteriskSpec {
     enum SpecKind kind;
 } AsteriskSpec;
+
+typedef struct ListType {
+    enum SpecKind kind;
+} ListType;
+
+typedef struct DictType {
+    enum SpecKind kind;
+} DictType;
 
 typedef struct ImportSpec {
     struct Expr* module_selector;
@@ -628,6 +654,8 @@ Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno);
 Expr* moduleSelector(Spec* parent_dir_spec, Expr* x, Expr* sel, int lineno);
 Expr* aliasExpr(Expr* name, Expr* asname, int lineno);
 Expr* indexExpr(Expr* x, Expr* index, int lineno);
+Expr* compositeLit(Spec* type, ExprList* elts, int lineno);
+Expr* keyValueExpr(Expr* key, Expr* value, int lineno);
 Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
@@ -644,6 +672,8 @@ Spec* typeSpec(enum Type type, Spec* sub_type_spec, int lineno);
 Spec* prettySpec(int lineno);
 Spec* parentDirSpec(int lineno);
 Spec* asteriskSpec(int lineno);
+Spec* listType(int lineno);
+Spec* dictType(int lineno);
 Spec* importSpec(Expr* module_selector, Expr* ident, ExprList* names, Spec* asterisk, int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);

@@ -83,13 +83,14 @@ extern bool is_complex_parsing;
 %left T_MUL T_QUO
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
-%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr index_expr
+%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
+%type<expr> index_expr composite_lit key_value_expr
 %type<expr> module_selector alias_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<decl> var_decl
-%type<expr_list> alias_expr_list
+%type<expr_list> alias_expr_list expr_list key_value_list
 
 %destructor {
     free($$);
@@ -137,6 +138,9 @@ expr:
         $$ = $1;
     }
     | index_expr {
+        $$ = $1;
+    }
+    | composite_lit {
         $$ = $1;
     }
 ;
@@ -282,6 +286,81 @@ alias_expr_list:
 index_expr:
     expr T_LBRACK expr T_RBRACK {
         $$ = indexExpr($1, $3, yylineno);
+    }
+;
+
+expr_list:
+    expr {
+        $$ = (struct ExprList*)calloc(1, sizeof(ExprList));
+        $$->expr_count = 0;
+        addExpr($$, $1);
+    }
+    | expr T_COMMA expr_list {
+        $$ = $3;
+        addExpr($$, $1);
+    }
+    | expr T_COMMA T_NEWLINE expr_list {
+        $$ = $4;
+        addExpr($$, $1);
+    }
+;
+
+key_value_expr:
+    basic_lit T_COLON expr {
+        $$ = keyValueExpr($1, $3, yylineno);
+    }
+;
+
+key_value_list:
+    key_value_expr {
+        $$ = (struct ExprList*)calloc(1, sizeof(ExprList));
+        $$->expr_count = 0;
+        addExpr($$, $1);
+    }
+    | key_value_expr T_COMMA key_value_list {
+        $$ = $3;
+        addExpr($$, $1);
+    }
+    | key_value_expr T_COMMA T_NEWLINE key_value_list {
+        $$ = $4;
+        addExpr($$, $1);
+    }
+;
+
+composite_lit:
+    T_LBRACK T_RBRACK {
+        ExprList* expr_list = (struct ExprList*)calloc(1, sizeof(ExprList));
+        expr_list->expr_count = 0;
+        $$ = compositeLit(listType(yylineno), expr_list, yylineno);
+    }
+    | T_LBRACK expr_list T_RBRACK {
+        $$ = compositeLit(listType(yylineno), $2, yylineno);
+    }
+    | T_LBRACK T_NEWLINE expr_list T_RBRACK {
+        $$ = compositeLit(listType(yylineno), $3, yylineno);
+    }
+    | T_LBRACK expr_list T_NEWLINE T_RBRACK {
+        $$ = compositeLit(listType(yylineno), $2, yylineno);
+    }
+    | T_LBRACK T_NEWLINE expr_list T_NEWLINE T_RBRACK {
+        $$ = compositeLit(listType(yylineno), $3, yylineno);
+    }
+    | T_LBRACE T_RBRACE {
+        ExprList* key_value_list = (struct ExprList*)calloc(1, sizeof(ExprList));
+        key_value_list->expr_count = 0;
+        $$ = compositeLit(dictType(yylineno), key_value_list, yylineno);
+    }
+    | T_LBRACE key_value_list T_RBRACE {
+        $$ = compositeLit(dictType(yylineno), $2, yylineno);
+    }
+    | T_LBRACE T_NEWLINE key_value_list T_RBRACE {
+        $$ = compositeLit(dictType(yylineno), $3, yylineno);
+    }
+    | T_LBRACE key_value_list T_NEWLINE T_RBRACE {
+        $$ = compositeLit(dictType(yylineno), $2, yylineno);
+    }
+    | T_LBRACE T_NEWLINE key_value_list T_NEWLINE T_RBRACE {
+        $$ = compositeLit(dictType(yylineno), $3, yylineno);
     }
 ;
 
@@ -505,6 +584,7 @@ asterisk_spec:
     T_MUL {
         $$ = asteriskSpec(yylineno);
     }
+;
 
 %%
 

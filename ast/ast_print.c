@@ -444,6 +444,38 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
             );
             printASTExpr(expr->v.index_expr->index, false, "\n");
             break;
+        case CompositeLit_kind:
+            printf(
+                "%*c\"_type\": \"CompositeLit\",\n%*c\"type\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(expr->v.composite_lit->type, false, ",\n");
+            printf(
+                "%*c\"elts\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExprList(expr->v.composite_lit->elts, "\n");
+            break;
+        case KeyValueExpr_kind:
+            printf(
+                "%*c\"_type\": \"KeyValueExpr\",\n%*c\"key\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.key_value_expr->key, false, ",\n");
+            printf(
+                "%*c\"value\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.key_value_expr->value, false, "\n");
+            break;
         default:
             break;
     }
@@ -501,6 +533,20 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
         case AsteriskSpec_kind:
             printf(
                 "%*c\"_type\": \"AsteriskSpec\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case ListType_kind:
+            printf(
+                "%*c\"_type\": \"ListType\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case DictType_kind:
+            printf(
+                "%*c\"_type\": \"DictType\"\n",
                 indent,
                 __KAOS_INDENT_CHAR__
             );
