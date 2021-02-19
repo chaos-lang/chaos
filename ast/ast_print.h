@@ -30,6 +30,9 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end);
 void printASTExpr(Expr* expr, bool is_list, char *end);
 void printASTSpec(Spec* spec, bool is_list, char *end);
 void printASTDecl(Decl* decl, bool is_list, char *end);
+void printASTExprList(ExprList* expr_list, char *end);
+void printASTStmtList(StmtList* stmt_list, char *end);
+void printASTSpecList(SpecList* spec_list, char *end);
 char *getToken(enum Token tok);
 
 #endif

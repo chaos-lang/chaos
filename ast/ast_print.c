@@ -52,49 +52,19 @@ void printAST()
 
         // Imports
         printf(
-            "%*c\"imports\": [\n",
+            "%*c\"imports\": ",
             indent,
             __KAOS_INDENT_CHAR__
         );
-        indent = indent + __KAOS_INDENT_LENGTH__;
-
-        SpecList* imports = program->files[i]->imports;
-        for (unsigned long j = imports->spec_count; 0 < j; j--) {
-            if (j - 1 == 0)
-                printASTSpec(imports->specs[j - 1], true, "\n");
-            else
-                printASTSpec(imports->specs[j - 1], true, ",\n");
-        }
-
-        indent = indent - __KAOS_INDENT_LENGTH__;
-        printf(
-            "%*c],\n",
-            indent,
-            __KAOS_INDENT_CHAR__
-        );
+        printASTSpecList(program->files[i]->imports, ",\n");
 
         // Stmts
         printf(
-            "%*c\"stmt_list\": [\n",
+            "%*c\"stmt_list\": ",
             indent,
             __KAOS_INDENT_CHAR__
         );
-        indent = indent + __KAOS_INDENT_LENGTH__;
-
-        StmtList* stmt_list = program->files[i]->stmt_list;
-        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
-            if (j - 1 == 0)
-                printASTStmt(stmt_list->stmts[j - 1], true, "\n");
-            else
-                printASTStmt(stmt_list->stmts[j - 1], true, ",\n");
-        }
-
-        indent = indent - __KAOS_INDENT_LENGTH__;
-        printf(
-            "%*c]\n",
-            indent,
-            __KAOS_INDENT_CHAR__
-        );
+        printASTStmtList(program->files[i]->stmt_list, "\n");
 
         indent = indent - __KAOS_INDENT_LENGTH__;
         printf(
@@ -541,27 +511,11 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
             else
                 printASTExpr(spec->v.import_spec->ident, false, ",\n");
             printf(
-                "%*c\"names\": [\n",
+                "%*c\"names\": ",
                 indent,
                 __KAOS_INDENT_CHAR__
             );
-
-            indent = indent + __KAOS_INDENT_LENGTH__;
-            ExprList* names = spec->v.import_spec->names;
-            for (unsigned long j = names->expr_count; 0 < j; j--) {
-                if (j - 1 == 0)
-                    printASTExpr(names->exprs[j - 1], true, "\n");
-                else
-                    printASTExpr(names->exprs[j - 1], true, ",\n");
-            }
-            indent = indent - __KAOS_INDENT_LENGTH__;
-
-            printf(
-                "%*c],\n",
-                indent,
-                __KAOS_INDENT_CHAR__
-            );
-
+            printASTExprList(spec->v.import_spec->names, ",\n");
             printf(
                 "%*c\"asterisk\": ",
                 indent,
@@ -621,6 +575,87 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
 
     indent = indent - __KAOS_INDENT_LENGTH__;
     printf("%*c}%s", indent, __KAOS_INDENT_CHAR__, end);
+}
+
+void printASTExprList(ExprList* expr_list, char *end)
+{
+    printf("[");
+    if (expr_list->expr_count > 0) {
+        printf("\n");
+    } else {
+        printf("]%s",end);
+        return;
+    }
+
+    indent = indent + __KAOS_INDENT_LENGTH__;
+    for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+        if (i - 1 == 0)
+            printASTExpr(expr_list->exprs[i - 1], true, "\n");
+        else
+            printASTExpr(expr_list->exprs[i - 1], true, ",\n");
+    }
+    indent = indent - __KAOS_INDENT_LENGTH__;
+
+    printf(
+        "%*c]%s",
+        indent,
+        __KAOS_INDENT_CHAR__,
+        end
+    );
+}
+
+void printASTStmtList(StmtList* stmt_list, char *end)
+{
+    printf("[");
+    if (stmt_list->stmt_count > 0) {
+        printf("\n");
+    } else {
+        printf("]%s",end);
+        return;
+    }
+
+    indent = indent + __KAOS_INDENT_LENGTH__;
+    for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
+        if (i - 1 == 0)
+            printASTStmt(stmt_list->stmts[i - 1], true, "\n");
+        else
+            printASTStmt(stmt_list->stmts[i - 1], true, ",\n");
+    }
+    indent = indent - __KAOS_INDENT_LENGTH__;
+
+    printf(
+        "%*c]%s",
+        indent,
+        __KAOS_INDENT_CHAR__,
+        end
+    );
+}
+
+void printASTSpecList(SpecList* spec_list, char *end)
+{
+    printf("[");
+    if (spec_list->spec_count > 0) {
+        printf("\n");
+    } else {
+        printf("]%s",end);
+        return;
+    }
+
+    indent = indent + __KAOS_INDENT_LENGTH__;
+    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
+        if (i - 1 == 0)
+            printASTSpec(spec_list->specs[i - 1], true, "\n");
+        else
+            printASTSpec(spec_list->specs[i - 1], true, ",\n");
+    }
+    indent = indent - __KAOS_INDENT_LENGTH__;
+
+    printf(
+        "%*c]%s",
+        indent,
+        __KAOS_INDENT_CHAR__,
+        end
+    );
 }
 
 char *getToken(enum Token tok)
