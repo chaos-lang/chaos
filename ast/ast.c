@@ -706,6 +706,15 @@ Stmt* delStmt(Expr* ident, int lineno)
     return stmt;
 }
 
+Stmt* exitStmt(Expr* x, int lineno)
+{
+    ExitStmt* exit_stmt = (struct ExitStmt*)calloc(1, sizeof(ExitStmt));
+    exit_stmt->x = x;
+    Stmt* stmt = buildStmt(ExitStmt_kind, lineno);
+    stmt->v.exit_stmt = exit_stmt;
+    return stmt;
+}
+
 Stmt* symbolTableStmt(int lineno)
 {
     SymbolTableStmt* symbol_table_stmt = (struct SymbolTableStmt*)calloc(1, sizeof(SymbolTableStmt));

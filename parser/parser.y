@@ -85,7 +85,7 @@ extern bool is_complex_parsing;
 
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr index_expr
 %type<expr> module_selector alias_expr
-%type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt
+%type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<decl> var_decl
@@ -307,6 +307,9 @@ stmt:
     | del_stmt T_NEWLINE {
         $$ = $1;
     }
+    | exit_stmt T_NEWLINE {
+        $$ = $1;
+    }
     | symbol_table_stmt T_NEWLINE {
         $$ = $1;
     }
@@ -360,6 +363,18 @@ decl_stmt:
 del_stmt:
     T_DEL ident {
         $$ = delStmt($2, yylineno);
+    }
+    | T_DEL index_expr {
+        $$ = delStmt($2, yylineno);
+    }
+;
+
+exit_stmt:
+    T_EXIT {
+        $$ = exitStmt(NULL, yylineno);
+    }
+    | T_EXIT expr {
+        $$ = exitStmt($2, yylineno);
     }
 ;
 

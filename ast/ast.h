@@ -450,8 +450,9 @@ enum StmtKind {
     ExprStmt_kind=5,
     DeclStmt_kind=6,
     DelStmt_kind=7,
-    SymbolTableStmt_kind=8,
-    FunctionTableStmt_kind=9,
+    ExitStmt_kind=8,
+    SymbolTableStmt_kind=9,
+    FunctionTableStmt_kind=10,
 };
 
 typedef struct Stmt {
@@ -465,6 +466,7 @@ typedef struct Stmt {
         struct ExprStmt* expr_stmt;
         struct DeclStmt* decl_stmt;
         struct DelStmt* del_stmt;
+        struct ExitStmt* exit_stmt;
         struct SymbolTableStmt* symbol_table_stmt;
         struct FunctionTableStmt* function_table_stmt;
     } v;
@@ -501,6 +503,10 @@ typedef struct DeclStmt {
 typedef struct DelStmt {
     struct Expr* ident;
 } DelStmt;
+
+typedef struct ExitStmt {
+    struct Expr* x;
+} ExitStmt;
 
 typedef struct SymbolTableStmt {
     enum StmtKind kind;
@@ -630,6 +636,7 @@ Stmt* echoStmt(Spec* mod, Expr* x, int lineno);
 Stmt* exprStmt(Expr* x, int lineno);
 Stmt* declStmt(Decl* decl, int lineno);
 Stmt* delStmt(Expr* ident, int lineno);
+Stmt* exitStmt(Expr* x, int lineno);
 Stmt* symbolTableStmt(int lineno);
 Stmt* functionTableStmt(int lineno);
 Spec* buildSpec(enum SpecKind kind, int lineno);
