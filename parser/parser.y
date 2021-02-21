@@ -59,6 +59,7 @@ extern bool is_complex_parsing;
     Spec* spec;
     Decl* decl;
     ExprList* expr_list;
+    StmtList* stmt_list;
 }
 
 %token START_PROGRAM START_PREPARSE START_JSON_PARSE
@@ -88,9 +89,11 @@ extern bool is_complex_parsing;
 %type<expr> module_selector alias_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
+%type<stmt> block_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
-%type<decl> var_decl
+%type<decl> var_decl times_do_decl foreach_as_list_decl foreach_as_dict_decl
 %type<expr_list> alias_expr_list expr_list key_value_list
+%type<stmt_list> stmt_list
 
 %destructor {
     free($$);
@@ -397,6 +400,25 @@ stmt:
     }
 ;
 
+stmt_list:
+    stmt {
+        $$ = (struct StmtList*)calloc(1, sizeof(StmtList));
+        $$->stmt_count = 0;
+        addStmt($$, $1);
+    }
+    | T_NEWLINE {
+        $$ = (struct StmtList*)calloc(1, sizeof(StmtList));
+        $$->stmt_count = 0;
+    }
+    | stmt stmt_list {
+        $$ = $2;
+        addStmt($$, $1);
+    }
+    | T_NEWLINE stmt_list {
+        $$ = $2;
+    }
+;
+
 assign_stmt:
     expr T_ASSIGN expr {
         $$ = assignStmt($1, EQL_tok, $3, yylineno);
@@ -437,6 +459,15 @@ decl_stmt:
     var_decl {
         $$ = declStmt($1, yylineno);
     }
+    | times_do_decl {
+        $$ = declStmt($1, yylineno);
+    }
+    | foreach_as_list_decl {
+        $$ = declStmt($1, yylineno);
+    }
+    | foreach_as_dict_decl {
+        $$ = declStmt($1, yylineno);
+    }
 ;
 
 del_stmt:
@@ -466,6 +497,12 @@ symbol_table_stmt:
 function_table_stmt:
     T_FUNCTION_TABLE {
         $$ = functionTableStmt(yylineno);
+    }
+;
+
+block_stmt:
+    stmt_list T_END {
+        $$ = blockStmt($1, yylineno);
     }
 ;
 
@@ -526,6 +563,24 @@ pretty_spec:
 var_decl:
     type_spec ident T_ASSIGN expr {
         $$ = varDecl($1, $2, $4, yylineno);
+    }
+;
+
+times_do_decl:
+    expr T_TIMES_DO block_stmt {
+        $$ = timesDo($1, $3, yylineno);
+    }
+;
+
+foreach_as_list_decl:
+    T_FOREACH expr T_AS ident block_stmt {
+        $$ = foreachAsList($2, $4, $5, yylineno);
+    }
+;
+
+foreach_as_dict_decl:
+    T_FOREACH expr T_AS ident T_COLON ident block_stmt {
+        $$ = foreachAsDict($2, $4, $6, $7, yylineno);
     }
 ;
 

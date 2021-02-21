@@ -467,6 +467,7 @@ enum StmtKind {
     ExitStmt_kind=8,
     SymbolTableStmt_kind=9,
     FunctionTableStmt_kind=10,
+    BlockStmt_kind=11,
 };
 
 typedef struct Stmt {
@@ -483,6 +484,7 @@ typedef struct Stmt {
         struct ExitStmt* exit_stmt;
         struct SymbolTableStmt* symbol_table_stmt;
         struct FunctionTableStmt* function_table_stmt;
+        struct BlockStmt* block_stmt;
     } v;
 } Stmt;
 
@@ -529,6 +531,10 @@ typedef struct SymbolTableStmt {
 typedef struct FunctionTableStmt {
     enum StmtKind kind;
 } FunctionTableStmt;
+
+typedef struct BlockStmt {
+    struct StmtList* stmt_list;
+} BlockStmt;
 
 
 // Spec
@@ -594,6 +600,9 @@ typedef struct ImportSpec {
 
 enum DeclKind {
     VarDecl_kind=1,
+    TimesDo_kind=2,
+    ForeachAsList_kind=3,
+    ForeachAsDict_kind=4,
 };
 
 typedef struct Decl {
@@ -601,6 +610,9 @@ typedef struct Decl {
     enum DeclKind kind;
     union {
         struct VarDecl* var_decl;
+        struct TimesDo* times_do;
+        struct ForeachAsList* foreach_as_list;
+        struct ForeachAsDict* foreach_as_dict;
     } v;
 } Decl;
 
@@ -609,6 +621,24 @@ typedef struct VarDecl {
     struct Expr* ident;
     struct Expr* expr;
 } VarDecl;
+
+typedef struct TimesDo {
+    struct Expr* x;
+    struct Stmt* body;
+} TimesDo;
+
+typedef struct ForeachAsList {
+    struct Expr* x;
+    struct Expr* el;
+    struct Stmt* body;
+} ForeachAsList;
+
+typedef struct ForeachAsDict {
+    struct Expr* x;
+    struct Expr* key;
+    struct Expr* value;
+    struct Stmt* body;
+} ForeachAsDict;
 
 
 // Generic
@@ -667,6 +697,7 @@ Stmt* delStmt(Expr* ident, int lineno);
 Stmt* exitStmt(Expr* x, int lineno);
 Stmt* symbolTableStmt(int lineno);
 Stmt* functionTableStmt(int lineno);
+Stmt* blockStmt(StmtList* stmt_list, int lineno);
 Spec* buildSpec(enum SpecKind kind, int lineno);
 Spec* typeSpec(enum Type type, Spec* sub_type_spec, int lineno);
 Spec* prettySpec(int lineno);
@@ -677,6 +708,9 @@ Spec* dictType(int lineno);
 Spec* importSpec(Expr* module_selector, Expr* ident, ExprList* names, Spec* asterisk, int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
+Decl* timesDo(Expr* x, Stmt* body, int lineno);
+Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno);
+Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno);
 void initProgram();
 void addExpr(ExprList* expr_list, Expr* expr);
 void addSpec(SpecList* spec_list, Spec* spec);

@@ -753,6 +753,15 @@ Stmt* functionTableStmt(int lineno)
     return stmt;
 }
 
+Stmt* blockStmt(StmtList* stmt_list, int lineno)
+{
+    BlockStmt* block_stmt = (struct BlockStmt*)calloc(1, sizeof(BlockStmt));
+    block_stmt->stmt_list = stmt_list;
+    Stmt* stmt = buildStmt(BlockStmt_kind, lineno);
+    stmt->v.block_stmt = block_stmt;
+    return stmt;
+}
+
 
 // Spec
 
@@ -854,6 +863,39 @@ Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno)
     var_decl->expr = expr;
     Decl* decl = buildDecl(VarDecl_kind, lineno);
     decl->v.var_decl = var_decl;
+    return decl;
+}
+
+Decl* timesDo(Expr* x, Stmt* body, int lineno)
+{
+    TimesDo* times_do = (struct TimesDo*)calloc(1, sizeof(TimesDo));
+    times_do->x = x;
+    times_do->body = body;
+    Decl* decl = buildDecl(TimesDo_kind, lineno);
+    decl->v.times_do = times_do;
+    return decl;
+}
+
+Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno)
+{
+    ForeachAsList* foreach_as_list = (struct ForeachAsList*)calloc(1, sizeof(ForeachAsList));
+    foreach_as_list->x = x;
+    foreach_as_list->el = el;
+    foreach_as_list->body = body;
+    Decl* decl = buildDecl(ForeachAsList_kind, lineno);
+    decl->v.foreach_as_list = foreach_as_list;
+    return decl;
+}
+
+Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno)
+{
+    ForeachAsDict* foreach_as_dict = (struct ForeachAsDict*)calloc(1, sizeof(ForeachAsDict));
+    foreach_as_dict->x = x;
+    foreach_as_dict->key = key;
+    foreach_as_dict->value = value;
+    foreach_as_dict->body = body;
+    Decl* decl = buildDecl(ForeachAsDict_kind, lineno);
+    decl->v.foreach_as_dict = foreach_as_dict;
     return decl;
 }
 

@@ -219,6 +219,16 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             break;
+        case BlockStmt_kind:
+            printf(
+                "%*c\"_type\": \"BlockStmt\",\n%*c\"stmt_list\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTStmtList(stmt->v.block_stmt->stmt_list, "\n");
+            break;
         default:
             break;
     }
@@ -627,6 +637,72 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(decl->v.var_decl->expr, false, "\n");
+            break;
+        case TimesDo_kind:
+            printf(
+                "%*c\"_type\": \"TimesDo\",\n%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.times_do->x, false, ",\n");
+            printf(
+                "%*c\"body\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTStmt(decl->v.times_do->body, false, "\n");
+            break;
+        case ForeachAsList_kind:
+            printf(
+                "%*c\"_type\": \"ForeachAsList\",\n%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_list->x, false, ",\n");
+            printf(
+                "%*c\"el\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_list->el, false, ",\n");
+            printf(
+                "%*c\"body\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTStmt(decl->v.foreach_as_list->body, false, "\n");
+            break;
+        case ForeachAsDict_kind:
+            printf(
+                "%*c\"_type\": \"ForeachAsDict\",\n%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_dict->x, false, ",\n");
+            printf(
+                "%*c\"key\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_dict->key, false, ",\n");
+            printf(
+                "%*c\"value\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_dict->value, false, ",\n");
+            printf(
+                "%*c\"body\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTStmt(decl->v.foreach_as_dict->body, false, "\n");
             break;
         default:
             break;
