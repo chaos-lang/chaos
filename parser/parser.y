@@ -60,6 +60,7 @@ extern bool is_complex_parsing;
     Decl* decl;
     ExprList* expr_list;
     StmtList* stmt_list;
+    FuncDeclCom* func_decl_com;
 }
 
 %token START_PROGRAM START_PREPARSE START_JSON_PARSE
@@ -91,9 +92,11 @@ extern bool is_complex_parsing;
 %type<stmt> symbol_table_stmt function_table_stmt
 %type<stmt> block_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
-%type<decl> var_decl times_do_decl foreach_as_list_decl foreach_as_dict_decl
+%type<spec> field_spec optional_field_spec field_list_spec optional_field_list_spec
+%type<decl> var_decl times_do_decl foreach_as_list_decl foreach_as_dict_decl func_decl
 %type<expr_list> alias_expr_list expr_list key_value_list
 %type<stmt_list> stmt_list
+%type<func_decl_com> func_type
 
 %destructor {
     free($$);
@@ -468,6 +471,9 @@ decl_stmt:
     | foreach_as_dict_decl {
         $$ = declStmt($1, yylineno);
     }
+    | func_decl {
+        $$ = declStmt($1, yylineno);
+    }
 ;
 
 del_stmt:
@@ -507,7 +513,10 @@ block_stmt:
 ;
 
 type_spec:
-    T_VAR_BOOL {
+    T_VOID {
+        $$ = typeSpec(K_BOOL, NULL, yylineno);
+    }
+    | T_VAR_BOOL {
         $$ = typeSpec(K_BOOL, NULL, yylineno);
     }
     | T_VAR_NUMBER {
@@ -524,6 +533,9 @@ type_spec:
     }
     | T_VAR_DICT {
         $$ = typeSpec(K_DICT, NULL, yylineno);
+    }
+    | T_VOID sub_type_spec {
+        $$ = typeSpec(K_BOOL, $2, yylineno);
     }
     | T_VAR_BOOL sub_type_spec {
         $$ = typeSpec(K_BOOL, $2, yylineno);
@@ -563,6 +575,13 @@ pretty_spec:
 var_decl:
     type_spec ident T_ASSIGN expr {
         $$ = varDecl($1, $2, $4, yylineno);
+    }
+;
+
+func_decl:
+    func_type block_stmt {
+        $$ = funcDecl($1->func_type, $1->ident, $2, NULL, yylineno);
+        free($1);
     }
 ;
 
@@ -638,6 +657,74 @@ parent_dir_spec:
 asterisk_spec:
     T_MUL {
         $$ = asteriskSpec(yylineno);
+    }
+;
+
+field_spec:
+    type_spec ident {
+        $$ = fieldSpec($1, $2, yylineno);
+    }
+;
+
+optional_field_spec:
+    type_spec ident T_ASSIGN expr {
+        $$ = optionalFieldSpec($1, $2, $4, yylineno);
+    }
+;
+
+field_list_spec:
+    field_spec {
+        SpecList* spec_list = (struct SpecList*)calloc(1, sizeof(SpecList));
+        spec_list->spec_count = 0;
+        $$ = fieldListSpec(spec_list, yylineno);
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+    | field_spec T_COMMA field_list_spec {
+        $$ = $3;
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+    | field_spec T_COMMA T_NEWLINE field_list_spec {
+        $$ = $4;
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+    | field_spec T_COMMA optional_field_list_spec {
+        $$ = $3;
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+    | field_spec T_COMMA T_NEWLINE optional_field_list_spec {
+        $$ = $4;
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+;
+
+optional_field_list_spec:
+    optional_field_spec {
+        SpecList* spec_list = (struct SpecList*)calloc(1, sizeof(SpecList));
+        spec_list->spec_count = 0;
+        $$ = fieldListSpec(spec_list, yylineno);
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+    | optional_field_spec T_COMMA optional_field_list_spec {
+        $$ = $3;
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+    | optional_field_spec T_COMMA T_NEWLINE optional_field_list_spec {
+        $$ = $4;
+        addSpec($$->v.field_list_spec->list, $1);
+    }
+;
+
+func_type:
+    type_spec T_DEF ident T_LPAREN T_RPAREN T_NEWLINE {
+        SpecList* spec_list = (struct SpecList*)calloc(1, sizeof(SpecList));
+        spec_list->spec_count = 0;
+        Spec* params = fieldListSpec(spec_list, yylineno);
+        Spec* func_type = funcType(params, $1, yylineno);
+        $$ = funcDeclCom(func_type, $3);
+    }
+    | type_spec T_DEF ident T_LPAREN field_list_spec T_RPAREN T_NEWLINE {
+        Spec* func_type = funcType($5, $1, yylineno);
+        $$ = funcDeclCom(func_type, $3);
     }
 ;
 

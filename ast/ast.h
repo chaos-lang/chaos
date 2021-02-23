@@ -547,6 +547,10 @@ enum SpecKind {
     ImportSpec_kind=5,
     ListType_kind=6,
     DictType_kind=7,
+    FuncType_kind=8,
+    FieldListSpec_kind=9,
+    FieldSpec_kind=10,
+    OptionalFieldSpec_kind=11,
 };
 
 typedef struct Spec {
@@ -560,6 +564,10 @@ typedef struct Spec {
         struct ImportSpec* import_spec;
         struct ListType* list_type;
         struct DictType* dict_type;
+        struct FuncType* func_type;
+        struct FieldListSpec* field_list_spec;
+        struct FieldSpec* field_spec;
+        struct OptionalFieldSpec* optional_field_spec;
     } v;
 } Spec;
 
@@ -580,6 +588,13 @@ typedef struct AsteriskSpec {
     enum SpecKind kind;
 } AsteriskSpec;
 
+typedef struct ImportSpec {
+    struct Expr* module_selector;
+    struct Expr* ident;
+    struct ExprList* names;
+    struct Spec* asterisk;
+} ImportSpec;
+
 typedef struct ListType {
     enum SpecKind kind;
 } ListType;
@@ -588,12 +603,25 @@ typedef struct DictType {
     enum SpecKind kind;
 } DictType;
 
-typedef struct ImportSpec {
-    struct Expr* module_selector;
+typedef struct FuncType {
+    struct Spec* params;
+    struct Spec* result;
+} FuncType;
+
+typedef struct FieldListSpec {
+    struct SpecList* list;
+} FieldListSpec;
+
+typedef struct FieldSpec {
+    struct Spec* type_spec;
     struct Expr* ident;
-    struct ExprList* names;
-    struct Spec* asterisk;
-} ImportSpec;
+} FieldSpec;
+
+typedef struct OptionalFieldSpec {
+    struct Spec* type_spec;
+    struct Expr* ident;
+    struct Expr* expr;
+} OptionalFieldSpec;
 
 
 // Decl
@@ -603,6 +631,7 @@ enum DeclKind {
     TimesDo_kind=2,
     ForeachAsList_kind=3,
     ForeachAsDict_kind=4,
+    FuncDecl_kind=5,
 };
 
 typedef struct Decl {
@@ -613,6 +642,7 @@ typedef struct Decl {
         struct TimesDo* times_do;
         struct ForeachAsList* foreach_as_list;
         struct ForeachAsDict* foreach_as_dict;
+        struct FuncDecl* func_decl;
     } v;
 } Decl;
 
@@ -639,6 +669,13 @@ typedef struct ForeachAsDict {
     struct Expr* value;
     struct Stmt* body;
 } ForeachAsDict;
+
+typedef struct FuncDecl {
+    struct Spec* type;
+    struct Expr* name;
+    struct Stmt* body;
+    struct Spec* decision;
+} FuncDecl;
 
 
 // Generic
@@ -669,6 +706,13 @@ typedef struct Program {
 } Program;
 
 Program* program;
+
+// Communication
+
+typedef struct FuncDeclCom {
+    struct Spec* func_type;
+    struct Expr* ident;
+} FuncDeclCom;
 
 AST* ast(int lineno);
 Expr* buildExpr(enum ExprKind kind, int lineno);
@@ -706,14 +750,20 @@ Spec* asteriskSpec(int lineno);
 Spec* listType(int lineno);
 Spec* dictType(int lineno);
 Spec* importSpec(Expr* module_selector, Expr* ident, ExprList* names, Spec* asterisk, int lineno);
+Spec* funcType(Spec* params, Spec* result, int lineno);
+Spec* fieldListSpec(SpecList* list, int lineno);
+Spec* fieldSpec(Spec* type_spec, Expr* ident, int lineno);
+Spec* optionalFieldSpec(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 Decl* timesDo(Expr* x, Stmt* body, int lineno);
 Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno);
 Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno);
+Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno);
 void initProgram();
 void addExpr(ExprList* expr_list, Expr* expr);
 void addSpec(SpecList* spec_list, Spec* spec);
 void addStmt(StmtList* stmt_list, Stmt* stmt);
+FuncDeclCom* funcDeclCom(Spec* func_type, Expr* ident);
 
 #endif

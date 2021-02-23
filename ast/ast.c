@@ -844,6 +844,46 @@ Spec* importSpec(Expr* module_selector, Expr* ident, ExprList* names, Spec* aste
     return spec;
 }
 
+Spec* funcType(Spec* params, Spec* result, int lineno)
+{
+    FuncType* func_type = (struct FuncType*)calloc(1, sizeof(FuncType));
+    func_type->params = params;
+    func_type->result = result;
+    Spec* spec = buildSpec(FuncType_kind, lineno);
+    spec->v.func_type = func_type;
+    return spec;
+}
+
+Spec* fieldListSpec(SpecList* list, int lineno)
+{
+    FieldListSpec* field_list_spec = (struct FieldListSpec*)calloc(1, sizeof(FieldListSpec));
+    field_list_spec->list = list;
+    Spec* spec = buildSpec(FieldListSpec_kind, lineno);
+    spec->v.field_list_spec = field_list_spec;
+    return spec;
+}
+
+Spec* fieldSpec(Spec* type_spec, Expr* ident, int lineno)
+{
+    FieldSpec* field_spec = (struct FieldSpec*)calloc(1, sizeof(FieldSpec));
+    field_spec->type_spec = type_spec;
+    field_spec->ident = ident;
+    Spec* spec = buildSpec(FieldSpec_kind, lineno);
+    spec->v.field_spec = field_spec;
+    return spec;
+}
+
+Spec* optionalFieldSpec(Spec* type_spec, Expr* ident, Expr* expr, int lineno)
+{
+    OptionalFieldSpec* optional_field_spec = (struct OptionalFieldSpec*)calloc(1, sizeof(OptionalFieldSpec));
+    optional_field_spec->type_spec = type_spec;
+    optional_field_spec->ident = ident;
+    optional_field_spec->expr = expr;
+    Spec* spec = buildSpec(OptionalFieldSpec_kind, lineno);
+    spec->v.optional_field_spec = optional_field_spec;
+    return spec;
+}
+
 
 // Decl
 
@@ -899,6 +939,18 @@ Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno)
     return decl;
 }
 
+Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno)
+{
+    FuncDecl* func_decl = (struct FuncDecl*)calloc(1, sizeof(FuncDecl));
+    func_decl->type = type;
+    func_decl->name = name;
+    func_decl->body = body;
+    func_decl->decision = decision;
+    Decl* decl = buildDecl(FuncDecl_kind, lineno);
+    decl->v.func_decl = func_decl;
+    return decl;
+}
+
 
 // Generic
 
@@ -944,4 +996,12 @@ void addSpec(SpecList* spec_list, Spec* spec)
         sizeof(Spec) * ++spec_list->spec_count
     );
     spec_list->specs[spec_list->spec_count - 1] = spec;
+}
+
+FuncDeclCom* funcDeclCom(Spec* func_type, Expr* ident)
+{
+    FuncDeclCom* func_decl_com = (struct FuncDeclCom*)calloc(1, sizeof(FuncDeclCom));
+    func_decl_com->func_type = func_type;
+    func_decl_com->ident = ident;
+    return func_decl_com;
 }

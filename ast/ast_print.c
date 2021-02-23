@@ -547,20 +547,6 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             break;
-        case ListType_kind:
-            printf(
-                "%*c\"_type\": \"ListType\"\n",
-                indent,
-                __KAOS_INDENT_CHAR__
-            );
-            break;
-        case DictType_kind:
-            printf(
-                "%*c\"_type\": \"DictType\"\n",
-                indent,
-                __KAOS_INDENT_CHAR__
-            );
-            break;
         case ImportSpec_kind:
             printf(
                 "%*c\"_type\": \"ImportSpec\",\n%*c\"module_selector\": ",
@@ -594,6 +580,85 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
                 printf("null\n");
             else
                 printASTSpec(spec->v.import_spec->asterisk, false, "\n");
+            break;
+        case ListType_kind:
+            printf(
+                "%*c\"_type\": \"ListType\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case DictType_kind:
+            printf(
+                "%*c\"_type\": \"DictType\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case FuncType_kind:
+            printf(
+                "%*c\"_type\": \"FuncType\",\n%*c\"params\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(spec->v.func_type->params, false, ",\n");
+            printf(
+                "%*c\"result\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(spec->v.func_type->result, false, "\n");
+            break;
+        case FieldListSpec_kind:
+            printf(
+                "%*c\"_type\": \"FieldListSpec\",\n%*c\"list\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpecList(spec->v.field_list_spec->list, "\n");
+            break;
+        case FieldSpec_kind:
+            printf(
+                "%*c\"_type\": \"FieldSpec\",\n%*c\"type_spec\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(spec->v.field_spec->type_spec, false, ",\n");
+            printf(
+                "%*c\"ident\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(spec->v.field_spec->ident, false, "\n");
+            break;
+        case OptionalFieldSpec_kind:
+            printf(
+                "%*c\"_type\": \"OptionalFieldSpec\",\n%*c\"type_spec\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(spec->v.optional_field_spec->type_spec, false, ",\n");
+            printf(
+                "%*c\"ident\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(spec->v.optional_field_spec->ident, false, ",\n");
+            printf(
+                "%*c\"expr\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(spec->v.optional_field_spec->expr, false, "\n");
+            break;
         default:
             break;
     }
@@ -703,6 +768,37 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             printASTStmt(decl->v.foreach_as_dict->body, false, "\n");
+            break;
+        case FuncDecl_kind:
+            printf(
+                "%*c\"_type\": \"FuncDecl\",\n%*c\"type\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTSpec(decl->v.func_decl->type, false, ",\n");
+            printf(
+                "%*c\"name\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.func_decl->name, false, ",\n");
+            printf(
+                "%*c\"body\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTStmt(decl->v.func_decl->body, false, ",\n");
+            printf(
+                "%*c\"decision\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            if (decl->v.func_decl->decision == NULL)
+                printf("null\n");
+            else
+                printASTSpec(decl->v.func_decl->decision, false, "\n");
             break;
         default:
             break;
