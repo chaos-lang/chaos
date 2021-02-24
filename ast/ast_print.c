@@ -486,6 +486,38 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
             );
             printASTExpr(expr->v.key_value_expr->value, false, "\n");
             break;
+        case SelectorExpr_kind:
+            printf(
+                "%*c\"_type\": \"SelectorExpr\",\n%*c\"x\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.selector_expr->x, false, ",\n");
+            printf(
+                "%*c\"sel\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.selector_expr->sel, false, "\n");
+            break;
+        case CallExpr_kind:
+            printf(
+                "%*c\"_type\": \"CallExpr\",\n%*c\"fun\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.call_expr->fun, false, ",\n");
+            printf(
+                "%*c\"args\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExprList(expr->v.call_expr->args, "\n");
+            break;
         default:
             break;
     }

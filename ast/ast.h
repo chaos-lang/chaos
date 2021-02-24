@@ -377,6 +377,8 @@ enum ExprKind {
     IndexExpr_kind=9,
     CompositeLit_kind=10,
     KeyValueExpr_kind=11,
+    SelectorExpr_kind=12,
+    CallExpr_kind=13,
 };
 
 typedef struct Expr {
@@ -394,6 +396,8 @@ typedef struct Expr {
         struct IndexExpr* index_expr;
         struct CompositeLit* composite_lit;
         struct KeyValueExpr* key_value_expr;
+        struct SelectorExpr* selector_expr;
+        struct CallExpr* call_expr;
     } v;
 } Expr;
 
@@ -452,6 +456,16 @@ typedef struct KeyValueExpr {
     struct Expr* key;
     struct Expr* value;
 } KeyValueExpr;
+
+typedef struct SelectorExpr {
+    struct Expr* x;
+    struct Expr* sel;
+} SelectorExpr;
+
+typedef struct CallExpr {
+    struct Expr* fun;
+    struct ExprList* args;
+} CallExpr;
 
 
 // Stmt
@@ -730,6 +744,8 @@ Expr* aliasExpr(Expr* name, Expr* asname, int lineno);
 Expr* indexExpr(Expr* x, Expr* index, int lineno);
 Expr* compositeLit(Spec* type, ExprList* elts, int lineno);
 Expr* keyValueExpr(Expr* key, Expr* value, int lineno);
+Expr* selectorExpr(Expr* x, Expr* sel, int lineno);
+Expr* callExpr(Expr* fun, ExprList* args, int lineno);
 Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);

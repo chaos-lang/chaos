@@ -88,6 +88,7 @@ extern bool is_complex_parsing;
 %type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
 %type<expr> index_expr composite_lit key_value_expr
 %type<expr> module_selector alias_expr
+%type<expr> selector_expr call_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
 %type<stmt> block_stmt
@@ -147,6 +148,9 @@ expr:
         $$ = $1;
     }
     | composite_lit {
+        $$ = $1;
+    }
+    | call_expr {
         $$ = $1;
     }
 ;
@@ -367,6 +371,34 @@ composite_lit:
     }
     | T_LBRACE T_NEWLINE key_value_list T_NEWLINE T_RBRACE {
         $$ = compositeLit(dictType(yylineno), $3, yylineno);
+    }
+;
+
+selector_expr:
+    ident T_PERIOD ident {
+        $$ = selectorExpr($1, $3, yylineno);
+    }
+    | selector_expr T_PERIOD ident {
+        $$ = selectorExpr($1, $3, yylineno);
+    }
+;
+
+call_expr:
+    ident T_LPAREN T_RPAREN {
+        ExprList* expr_list = (struct ExprList*)calloc(1, sizeof(ExprList));
+        expr_list->expr_count = 0;
+        $$ = callExpr($1, expr_list, yylineno);
+    }
+    | ident T_LPAREN expr_list T_RPAREN {
+        $$ = callExpr($1, $3, yylineno);
+    }
+    | selector_expr T_LPAREN T_RPAREN {
+        ExprList* expr_list = (struct ExprList*)calloc(1, sizeof(ExprList));
+        expr_list->expr_count = 0;
+        $$ = callExpr($1, expr_list, yylineno);
+    }
+    | selector_expr T_LPAREN expr_list T_RPAREN {
+        $$ = callExpr($1, $3, yylineno);
     }
 ;
 

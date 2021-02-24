@@ -648,6 +648,26 @@ Expr* keyValueExpr(Expr* key, Expr* value, int lineno)
     return expr;
 }
 
+Expr* selectorExpr(Expr* x, Expr* sel, int lineno)
+{
+    SelectorExpr* selector_expr = (struct SelectorExpr*)calloc(1, sizeof(SelectorExpr));
+    selector_expr->x = x;
+    selector_expr->sel = sel;
+    Expr* expr = buildExpr(SelectorExpr_kind, lineno);
+    expr->v.selector_expr = selector_expr;
+    return expr;
+}
+
+Expr* callExpr(Expr* fun, ExprList* args, int lineno)
+{
+    CallExpr* call_expr = (struct CallExpr*)calloc(1, sizeof(CallExpr));
+    call_expr->fun = fun;
+    call_expr->args = args;
+    Expr* expr = buildExpr(CallExpr_kind, lineno);
+    expr->v.call_expr = call_expr;
+    return expr;
+}
+
 
 // Stmt
 
