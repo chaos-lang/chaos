@@ -1,0 +1,92 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "nonewline"
+                            },
+                            "sel": null
+                        }
+                    },
+                    "ident": null,
+                    "names": [],
+                    "asterisk": null
+                }
+            ],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Number",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "inside function a"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "hey"
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "args": []
+                    }
+                }
+            ]
+        }
+    ]
+}

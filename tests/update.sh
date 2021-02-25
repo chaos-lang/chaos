@@ -8,6 +8,10 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     rm "$DIR/$testname.out"
     chaos "tests/$filename" > "$DIR/$testname.out" 2>&1
 
+    if ! echo "syntax_error" | grep -w $testname > /dev/null; then
+        chaos -a "tests/$filename" > "$DIR/$testname.json"
+    fi
+
     echo "Updated: ${testname}"
 done
 

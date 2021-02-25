@@ -1,0 +1,47 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "hello world"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    }
+                },
+                {
+                    "_type": "ExitStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,93 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var1"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "bool",
+                            "value": "true"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var2"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "bool",
+                            "value": "false"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var1"
+                    },
+                    "op": "==",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "bool",
+                        "value": "false"
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var2"
+                    },
+                    "op": "==",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "bool",
+                        "value": "true"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var1"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var2"
+                    }
+                }
+            ]
+        }
+    ]
+}

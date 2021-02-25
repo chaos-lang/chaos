@@ -1,0 +1,226 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "samedirlib"
+                        },
+                        "sel": null
+                    },
+                    "ident": null,
+                    "names": [
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "f6"
+                            },
+                            "asname": null
+                        },
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "f8"
+                            },
+                            "asname": null
+                        }
+                    ],
+                    "asterisk": null
+                }
+            ],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "String",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f5"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "expr": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "Ident",
+                                                "name": "a"
+                                            },
+                                            "op": "-",
+                                            "y": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": {
+                            "_type": "DecisionBlock",
+                            "decisions": [
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "op": ">",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "3"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f8"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "op": "==",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "3"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f6"
+                                            },
+                                            "args": [
+                                                {
+                                                    "_type": "Ident",
+                                                    "name": "y"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "op": "==",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "2"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f6"
+                                            },
+                                            "args": [
+                                                {
+                                                    "_type": "Ident",
+                                                    "name": "y"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "f5"
+                        },
+                        "args": [
+                            {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "3"
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

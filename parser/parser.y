@@ -211,6 +211,9 @@ binary_expr:
     | expr T_SHR expr {
         $$ = binaryExpr($1, SHR_tok, $3, yylineno);
     }
+    | bool_expr {
+        $$ = $1;
+    }
 ;
 
 bool_expr:
@@ -262,16 +265,16 @@ paren_expr:
 ;
 
 incdec_expr:
-    T_INC ident {
+    T_INC expr {
         $$ = incDecExpr(INC_tok, $2, true, yylineno);
     }
-    | ident T_INC {
+    | expr T_INC {
         $$ = incDecExpr(INC_tok, $1, false, yylineno);
     }
-    | T_DEC ident {
+    | T_DEC expr {
         $$ = incDecExpr(DEC_tok, $2, true, yylineno);
     }
-    | ident T_DEC {
+    | expr T_DEC {
         $$ = incDecExpr(DEC_tok, $1, false, yylineno);
     }
 ;

@@ -1,0 +1,772 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "String",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f1"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "101"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "ReturnStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "a"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "String",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f2"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "b"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "102"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "ReturnStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "b"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "String",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f3"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "c"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "103"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "ReturnStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "c"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "x"
+                                        }
+                                    },
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "String",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f4"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "expr": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "Ident",
+                                                "name": "x"
+                                            },
+                                            "op": "+",
+                                            "y": {
+                                                "_type": "Ident",
+                                                "name": "y"
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "bool",
+                                            "value": "true"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": {
+                            "_type": "DecisionBlock",
+                            "decisions": [
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "op": ">",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "5"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "BreakStmt"
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "op": "==",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "8"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f1"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "op": ">",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "10"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f2"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DefaultExpr",
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f3"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "x"
+                                        }
+                                    },
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "String",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f5"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "expr": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "Ident",
+                                                "name": "x"
+                                            },
+                                            "op": "+",
+                                            "y": {
+                                                "_type": "Ident",
+                                                "name": "y"
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "bool",
+                                            "value": "true"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": {
+                            "_type": "DecisionBlock",
+                            "decisions": [
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "op": ">",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "5"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f3"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "op": "==",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "8"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f1"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "op": ">",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "10"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f2"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DefaultExpr",
+                                    "outcome": {
+                                        "_type": "BreakStmt"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "1"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "2"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "3"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "4"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "5"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "6"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "7"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "8"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "9"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "10"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "11"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "12"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "13"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "14"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "15"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "el"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "el"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "CallExpr",
+                                        "fun": {
+                                            "_type": "Ident",
+                                            "name": "f4"
+                                        },
+                                        "args": [
+                                            {
+                                                "_type": "Ident",
+                                                "name": "el"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "hey"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "el"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "el"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "CallExpr",
+                                        "fun": {
+                                            "_type": "Ident",
+                                            "name": "f5"
+                                        },
+                                        "args": [
+                                            {
+                                                "_type": "Ident",
+                                                "name": "el"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "hoy"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -183,6 +183,9 @@ test-cli-args:
 test-official-spells:
 	./tests/official_spells.sh
 
+test-ast:
+	./tests/ast.sh
+
 memcheck:
 	./tests/memcheck.sh
 

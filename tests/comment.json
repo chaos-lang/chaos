@@ -1,0 +1,193 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "hey"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "x"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "y"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "b"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Number",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "b"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "5"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DelStmt",
+                                    "ident": {
+                                        "_type": "Ident",
+                                        "name": "z"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "x"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "1"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "1"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "args": [
+                            {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "5"
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

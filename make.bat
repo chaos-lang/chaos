@@ -76,6 +76,13 @@ IF [%1]==[] (
         CD ..
         EXIT /B 0
     )
+) ELSE IF [%1]==[test-ast] (
+    CALL tests\ast.bat
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
 ) ELSE IF [%1]==[clean] (
     DEL chaos.exe parser.tab.c parser.tab.h lex.yy.c
     EXIT /B 0
