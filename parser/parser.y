@@ -91,7 +91,7 @@ extern bool is_complex_parsing;
 %type<expr> selector_expr call_expr decision_expr default_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
-%type<stmt> block_stmt
+%type<stmt> block_stmt break_stmt continue_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<spec> field_spec optional_field_spec field_list_spec optional_field_list_spec
 %type<spec> decision_block
@@ -408,12 +408,30 @@ call_expr:
 
 decision_expr:
     bool_expr T_COLON call_expr {
+        $$ = decisionExpr($1, exprStmt($3, yylineno), yylineno);
+    }
+    | bool_expr T_COLON return_stmt {
+        $$ = decisionExpr($1, $3, yylineno);
+    }
+    | bool_expr T_COLON break_stmt {
+        $$ = decisionExpr($1, $3, yylineno);
+    }
+    | bool_expr T_COLON continue_stmt {
         $$ = decisionExpr($1, $3, yylineno);
     }
 ;
 
 default_expr:
     T_DEFAULT T_COLON call_expr {
+        $$ = defaultExpr(exprStmt($3, yylineno), yylineno);
+    }
+    | T_DEFAULT T_COLON return_stmt {
+        $$ = defaultExpr($3, yylineno);
+    }
+    | T_DEFAULT T_COLON break_stmt {
+        $$ = defaultExpr($3, yylineno);
+    }
+    | T_DEFAULT T_COLON continue_stmt {
         $$ = defaultExpr($3, yylineno);
     }
 ;
@@ -578,6 +596,18 @@ function_table_stmt:
 block_stmt:
     stmt_list T_END {
         $$ = blockStmt($1, yylineno);
+    }
+;
+
+break_stmt:
+    T_BREAK {
+        $$ = breakStmt(yylineno);
+    }
+;
+
+continue_stmt:
+    T_CONTINUE {
+        $$ = continueStmt(yylineno);
     }
 ;
 

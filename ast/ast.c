@@ -668,7 +668,7 @@ Expr* callExpr(Expr* fun, ExprList* args, int lineno)
     return expr;
 }
 
-Expr* decisionExpr(Expr* bool_expr, Expr* outcome, int lineno)
+Expr* decisionExpr(Expr* bool_expr, Stmt* outcome, int lineno)
 {
     DecisionExpr* decision_expr = (struct DecisionExpr*)calloc(1, sizeof(DecisionExpr));
     decision_expr->bool_expr = bool_expr;
@@ -678,7 +678,7 @@ Expr* decisionExpr(Expr* bool_expr, Expr* outcome, int lineno)
     return expr;
 }
 
-Expr* defaultExpr(Expr* outcome, int lineno)
+Expr* defaultExpr(Stmt* outcome, int lineno)
 {
     DefaultExpr* default_expr = (struct DefaultExpr*)calloc(1, sizeof(DefaultExpr));
     default_expr->outcome = outcome;
@@ -798,6 +798,24 @@ Stmt* blockStmt(StmtList* stmt_list, int lineno)
     block_stmt->stmt_list = stmt_list;
     Stmt* stmt = buildStmt(BlockStmt_kind, lineno);
     stmt->v.block_stmt = block_stmt;
+    return stmt;
+}
+
+Stmt* breakStmt(int lineno)
+{
+    BreakStmt* break_stmt = (struct BreakStmt*)calloc(1, sizeof(BreakStmt));
+    break_stmt->kind = BreakStmt_kind;
+    Stmt* stmt = buildStmt(BreakStmt_kind, lineno);
+    stmt->v.break_stmt = break_stmt;
+    return stmt;
+}
+
+Stmt* continueStmt(int lineno)
+{
+    ContinueStmt* continue_stmt = (struct ContinueStmt*)calloc(1, sizeof(ContinueStmt));
+    continue_stmt->kind = ContinueStmt_kind;
+    Stmt* stmt = buildStmt(ContinueStmt_kind, lineno);
+    stmt->v.continue_stmt = continue_stmt;
     return stmt;
 }
 

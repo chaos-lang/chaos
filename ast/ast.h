@@ -473,11 +473,11 @@ typedef struct CallExpr {
 
 typedef struct DecisionExpr {
     struct Expr* bool_expr;
-    struct Expr* outcome;
+    struct Stmt* outcome;
 } DecisionExpr;
 
 typedef struct DefaultExpr {
-    struct Expr* outcome;
+    struct Stmt* outcome;
 } DefaultExpr;
 
 
@@ -495,6 +495,8 @@ enum StmtKind {
     SymbolTableStmt_kind=9,
     FunctionTableStmt_kind=10,
     BlockStmt_kind=11,
+    BreakStmt_kind=12,
+    ContinueStmt_kind=13,
 };
 
 typedef struct Stmt {
@@ -512,6 +514,8 @@ typedef struct Stmt {
         struct SymbolTableStmt* symbol_table_stmt;
         struct FunctionTableStmt* function_table_stmt;
         struct BlockStmt* block_stmt;
+        struct BreakStmt* break_stmt;
+        struct ContinueStmt* continue_stmt;
     } v;
 } Stmt;
 
@@ -562,6 +566,14 @@ typedef struct FunctionTableStmt {
 typedef struct BlockStmt {
     struct StmtList* stmt_list;
 } BlockStmt;
+
+typedef struct BreakStmt {
+    enum StmtKind kind;
+} BreakStmt;
+
+typedef struct ContinueStmt {
+    enum StmtKind kind;
+} ContinueStmt;
 
 
 // Spec
@@ -765,8 +777,8 @@ Expr* compositeLit(Spec* type, ExprList* elts, int lineno);
 Expr* keyValueExpr(Expr* key, Expr* value, int lineno);
 Expr* selectorExpr(Expr* x, Expr* sel, int lineno);
 Expr* callExpr(Expr* fun, ExprList* args, int lineno);
-Expr* decisionExpr(Expr* bool_expr, Expr* outcome, int lineno);
-Expr* defaultExpr(Expr* outcome, int lineno);
+Expr* decisionExpr(Expr* bool_expr, Stmt* outcome, int lineno);
+Expr* defaultExpr(Stmt* outcome, int lineno);
 Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
@@ -778,6 +790,8 @@ Stmt* delStmt(Expr* ident, int lineno);
 Stmt* exitStmt(Expr* x, int lineno);
 Stmt* symbolTableStmt(int lineno);
 Stmt* functionTableStmt(int lineno);
+Stmt* breakStmt(int lineno);
+Stmt* continueStmt(int lineno);
 Stmt* blockStmt(StmtList* stmt_list, int lineno);
 Spec* buildSpec(enum SpecKind kind, int lineno);
 Spec* typeSpec(enum Type type, Spec* sub_type_spec, int lineno);

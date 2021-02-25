@@ -229,6 +229,20 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             );
             printASTStmtList(stmt->v.block_stmt->stmt_list, "\n");
             break;
+        case BreakStmt_kind:
+            printf(
+                "%*c\"_type\": \"BreakStmt\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
+        case ContinueStmt_kind:
+            printf(
+                "%*c\"_type\": \"ContinueStmt\"\n",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            break;
         default:
             break;
     }
@@ -532,7 +546,7 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
                 indent,
                 __KAOS_INDENT_CHAR__
             );
-            printASTExpr(expr->v.decision_expr->outcome, false, "\n");
+            printASTStmt(expr->v.decision_expr->outcome, false, "\n");
             break;
         case DefaultExpr_kind:
             printf(
@@ -542,7 +556,7 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
                 indent,
                 __KAOS_INDENT_CHAR__
             );
-            printASTExpr(expr->v.default_expr->outcome, false, "\n");
+            printASTStmt(expr->v.default_expr->outcome, false, "\n");
             break;
         default:
             break;
