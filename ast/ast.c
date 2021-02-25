@@ -668,6 +668,25 @@ Expr* callExpr(Expr* fun, ExprList* args, int lineno)
     return expr;
 }
 
+Expr* decisionExpr(Expr* bool_expr, Expr* outcome, int lineno)
+{
+    DecisionExpr* decision_expr = (struct DecisionExpr*)calloc(1, sizeof(DecisionExpr));
+    decision_expr->bool_expr = bool_expr;
+    decision_expr->outcome = outcome;
+    Expr* expr = buildExpr(DecisionExpr_kind, lineno);
+    expr->v.decision_expr = decision_expr;
+    return expr;
+}
+
+Expr* defaultExpr(Expr* outcome, int lineno)
+{
+    DefaultExpr* default_expr = (struct DefaultExpr*)calloc(1, sizeof(DefaultExpr));
+    default_expr->outcome = outcome;
+    Expr* expr = buildExpr(DefaultExpr_kind, lineno);
+    expr->v.default_expr = default_expr;
+    return expr;
+}
+
 
 // Stmt
 
@@ -901,6 +920,15 @@ Spec* optionalFieldSpec(Spec* type_spec, Expr* ident, Expr* expr, int lineno)
     optional_field_spec->expr = expr;
     Spec* spec = buildSpec(OptionalFieldSpec_kind, lineno);
     spec->v.optional_field_spec = optional_field_spec;
+    return spec;
+}
+
+Spec* decisionBlock(ExprList* decisions, int lineno)
+{
+    DecisionBlock* decision_block = (struct DecisionBlock*)calloc(1, sizeof(DecisionBlock));
+    decision_block->decisions = decisions;
+    Spec* spec = buildSpec(DecisionBlock_kind, lineno);
+    spec->v.decision_block = decision_block;
     return spec;
 }
 

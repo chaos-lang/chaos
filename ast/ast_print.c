@@ -518,6 +518,32 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
             );
             printASTExprList(expr->v.call_expr->args, "\n");
             break;
+        case DecisionExpr_kind:
+            printf(
+                "%*c\"_type\": \"DecisionExpr\",\n%*c\"bool_expr\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.decision_expr->bool_expr, false, ",\n");
+            printf(
+                "%*c\"outcome\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.decision_expr->outcome, false, "\n");
+            break;
+        case DefaultExpr_kind:
+            printf(
+                "%*c\"_type\": \"DefaultExpr\",\n%*c\"outcome\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(expr->v.default_expr->outcome, false, "\n");
+            break;
         default:
             break;
     }
@@ -690,6 +716,16 @@ void printASTSpec(Spec* spec, bool is_list, char *end)
                 __KAOS_INDENT_CHAR__
             );
             printASTExpr(spec->v.optional_field_spec->expr, false, "\n");
+            break;
+        case DecisionBlock_kind:
+            printf(
+                "%*c\"_type\": \"DecisionBlock\",\n%*c\"decisions\": ",
+                indent,
+                __KAOS_INDENT_CHAR__,
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExprList(spec->v.decision_block->decisions, "\n");
             break;
         default:
             break;

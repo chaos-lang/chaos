@@ -379,6 +379,8 @@ enum ExprKind {
     KeyValueExpr_kind=11,
     SelectorExpr_kind=12,
     CallExpr_kind=13,
+    DecisionExpr_kind=14,
+    DefaultExpr_kind=15,
 };
 
 typedef struct Expr {
@@ -398,6 +400,8 @@ typedef struct Expr {
         struct KeyValueExpr* key_value_expr;
         struct SelectorExpr* selector_expr;
         struct CallExpr* call_expr;
+        struct DecisionExpr* decision_expr;
+        struct DefaultExpr* default_expr;
     } v;
 } Expr;
 
@@ -466,6 +470,15 @@ typedef struct CallExpr {
     struct Expr* fun;
     struct ExprList* args;
 } CallExpr;
+
+typedef struct DecisionExpr {
+    struct Expr* bool_expr;
+    struct Expr* outcome;
+} DecisionExpr;
+
+typedef struct DefaultExpr {
+    struct Expr* outcome;
+} DefaultExpr;
 
 
 // Stmt
@@ -565,6 +578,7 @@ enum SpecKind {
     FieldListSpec_kind=9,
     FieldSpec_kind=10,
     OptionalFieldSpec_kind=11,
+    DecisionBlock_kind=12,
 };
 
 typedef struct Spec {
@@ -582,6 +596,7 @@ typedef struct Spec {
         struct FieldListSpec* field_list_spec;
         struct FieldSpec* field_spec;
         struct OptionalFieldSpec* optional_field_spec;
+        struct DecisionBlock* decision_block;
     } v;
 } Spec;
 
@@ -636,6 +651,10 @@ typedef struct OptionalFieldSpec {
     struct Expr* ident;
     struct Expr* expr;
 } OptionalFieldSpec;
+
+typedef struct DecisionBlock {
+    struct ExprList* decisions;
+} DecisionBlock;
 
 
 // Decl
@@ -746,6 +765,8 @@ Expr* compositeLit(Spec* type, ExprList* elts, int lineno);
 Expr* keyValueExpr(Expr* key, Expr* value, int lineno);
 Expr* selectorExpr(Expr* x, Expr* sel, int lineno);
 Expr* callExpr(Expr* fun, ExprList* args, int lineno);
+Expr* decisionExpr(Expr* bool_expr, Expr* outcome, int lineno);
+Expr* defaultExpr(Expr* outcome, int lineno);
 Stmt* buildStmt(enum StmtKind kind, int lineno);
 Stmt* assignStmt(Expr* x, enum Token tok, Expr* y, int lineno);
 Stmt* returnStmt(Expr* x, int lineno);
@@ -770,6 +791,7 @@ Spec* funcType(Spec* params, Spec* result, int lineno);
 Spec* fieldListSpec(SpecList* list, int lineno);
 Spec* fieldSpec(Spec* type_spec, Expr* ident, int lineno);
 Spec* optionalFieldSpec(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
+Spec* decisionBlock(ExprList* decisions, int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 Decl* timesDo(Expr* x, Stmt* body, int lineno);

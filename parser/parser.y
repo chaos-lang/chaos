@@ -85,17 +85,18 @@ extern bool is_complex_parsing;
 %left T_MUL T_QUO
 %right T_U_ADD T_U_SUB T_U_NOT T_U_TILDE
 
-%type<expr> expr basic_lit ident binary_expr unary_expr paren_expr incdec_expr
+%type<expr> expr basic_lit ident binary_expr bool_expr unary_expr paren_expr incdec_expr
 %type<expr> index_expr composite_lit key_value_expr
 %type<expr> module_selector alias_expr
-%type<expr> selector_expr call_expr
+%type<expr> selector_expr call_expr decision_expr default_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> symbol_table_stmt function_table_stmt
 %type<stmt> block_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<spec> field_spec optional_field_spec field_list_spec optional_field_list_spec
+%type<spec> decision_block
 %type<decl> var_decl times_do_decl foreach_as_list_decl foreach_as_dict_decl func_decl
-%type<expr_list> alias_expr_list expr_list key_value_list
+%type<expr_list> alias_expr_list expr_list key_value_list decision_expr_list
 %type<stmt_list> stmt_list
 %type<func_decl_com> func_type
 
@@ -195,7 +196,25 @@ binary_expr:
     | expr T_REM expr {
         $$ = binaryExpr($1, REM_tok, $3, yylineno);
     }
-    | expr T_EQL expr {
+    | expr T_AND expr {
+        $$ = binaryExpr($1, AND_tok, $3, yylineno);
+    }
+    | expr T_OR expr {
+        $$ = binaryExpr($1, OR_tok, $3, yylineno);
+    }
+    | expr T_XOR expr {
+        $$ = binaryExpr($1, XOR_tok, $3, yylineno);
+    }
+    | expr T_SHL expr {
+        $$ = binaryExpr($1, SHL_tok, $3, yylineno);
+    }
+    | expr T_SHR expr {
+        $$ = binaryExpr($1, SHR_tok, $3, yylineno);
+    }
+;
+
+bool_expr:
+    expr T_EQL expr {
         $$ = binaryExpr($1, EQL_tok, $3, yylineno);
     }
     | expr T_NEQ expr {
@@ -218,21 +237,6 @@ binary_expr:
     }
     | expr T_LOR expr {
         $$ = binaryExpr($1, LOR_tok, $3, yylineno);
-    }
-    | expr T_AND expr {
-        $$ = binaryExpr($1, AND_tok, $3, yylineno);
-    }
-    | expr T_OR expr {
-        $$ = binaryExpr($1, OR_tok, $3, yylineno);
-    }
-    | expr T_XOR expr {
-        $$ = binaryExpr($1, XOR_tok, $3, yylineno);
-    }
-    | expr T_SHL expr {
-        $$ = binaryExpr($1, SHL_tok, $3, yylineno);
-    }
-    | expr T_SHR expr {
-        $$ = binaryExpr($1, SHR_tok, $3, yylineno);
     }
 ;
 
@@ -399,6 +403,39 @@ call_expr:
     }
     | selector_expr T_LPAREN expr_list T_RPAREN {
         $$ = callExpr($1, $3, yylineno);
+    }
+;
+
+decision_expr:
+    bool_expr T_COLON call_expr {
+        $$ = decisionExpr($1, $3, yylineno);
+    }
+;
+
+default_expr:
+    T_DEFAULT T_COLON call_expr {
+        $$ = defaultExpr($3, yylineno);
+    }
+;
+
+decision_expr_list:
+    decision_expr {
+        $$ = (struct ExprList*)calloc(1, sizeof(ExprList));
+        $$->expr_count = 0;
+        addExpr($$, $1);
+    }
+    | default_expr {
+        $$ = (struct ExprList*)calloc(1, sizeof(ExprList));
+        $$->expr_count = 0;
+        addExpr($$, $1);
+    }
+    | decision_expr T_COMMA decision_expr_list {
+        $$ = $3;
+        addExpr($$, $1);
+    }
+    | decision_expr T_COMMA T_NEWLINE decision_expr_list {
+        $$ = $4;
+        addExpr($$, $1);
     }
 ;
 
@@ -615,6 +652,10 @@ func_decl:
         $$ = funcDecl($1->func_type, $1->ident, $2, NULL, yylineno);
         free($1);
     }
+    | func_type block_stmt decision_block {
+        $$ = funcDecl($1->func_type, $1->ident, $2, $3, yylineno);
+        free($1);
+    }
 ;
 
 times_do_decl:
@@ -757,6 +798,21 @@ func_type:
     | type_spec T_DEF ident T_LPAREN field_list_spec T_RPAREN T_NEWLINE {
         Spec* func_type = funcType($5, $1, yylineno);
         $$ = funcDeclCom(func_type, $3);
+    }
+;
+
+decision_block:
+    T_LBRACE decision_expr_list T_RBRACE {
+        $$ = decisionBlock($2, yylineno);
+    }
+    | T_LBRACE T_NEWLINE decision_expr_list T_RBRACE {
+        $$ = decisionBlock($3, yylineno);
+    }
+    | T_LBRACE decision_expr_list T_NEWLINE T_RBRACE {
+        $$ = decisionBlock($2, yylineno);
+    }
+    | T_LBRACE T_NEWLINE decision_expr_list T_NEWLINE T_RBRACE {
+        $$ = decisionBlock($3, yylineno);
     }
 ;
 
