@@ -23,8 +23,7 @@
 #include "compiler_emit.h"
 
 char *reg_names[] = {
-    "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
-	"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7"
+    "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"
 };
 
 void emit(i64_array* program)
@@ -57,59 +56,27 @@ void emitBytecode(cpu *c)
             printf("%s %s %lld\n", "CMPI", getRegName(c->dest), c->src);
 			c->pc += 2;
 			break;
-		case CMPF:
-			printf("%s %s %s\n", "CMPF", getRegName(c->dest), getRegName(c->src));
-			c->pc += 2;
-			break;
-		case CMPFI:
-            printf("%s %s %lld\n", "CMPFI", getRegName(c->dest), c->src);
-			c->pc += 2;
-			break;
 		case MOV:
             printf("%s %s %s\n", "MOV", getRegName(c->dest), getRegName(c->src));
-			c->pc += 2;
-			break;
-		case MOVF:
-            printf("%s %s %s\n", "MOVF", getRegName(c->dest), getRegName(c->src));
 			c->pc += 2;
 			break;
 		case STI:
             printf("%s %s %s\n", "STI", getRegName(c->dest), getRegName(c->src));
 			c->pc += 2;
 			break;
-		case STF:
-            printf("%s %s %s\n", "STF", getRegName(c->dest), getRegName(c->src));
-			c->pc += 2;
-			break;
 		case LDI:
             printf("%s %s %s\n", "LDI", getRegName(c->dest), getRegName(c->src));
-			c->pc += 2;
-			break;
-		case LDF:
-            printf("%s %s %s\n", "LDF", getRegName(c->dest), getRegName(c->src));
 			c->pc += 2;
 			break;
 		case LII:
 			printf("%s %s %lld\n", "LII", getRegName(c->dest), c->src);
 			c->pc += 2;
 			break;
-		case LIF:
-            printf("%s %s %g\n", "LIF", getRegName(c->dest), (f64)c->src);
-			c->pc += 2;
-			break;
 		case PSH:
             printf("%s %s\n", "PSH", getRegName(c->mem[++c->pc]));
 			break;
-		case PSHF:
-            printf("%s %s\n", "PSHF", getRegName(c->mem[++c->pc]));
-            c->pc++;
-			break;
 		case POP:
             printf("%s %s\n", "POP", getRegName(c->mem[++c->pc]));
-            c->pc++;
-			break;
-		case POPF:
-            printf("%s %s\n", "POPF", getRegName(c->mem[++c->pc]));
             c->pc++;
 			break;
 		case INC:
@@ -135,22 +102,6 @@ void emitBytecode(cpu *c)
 		case DIV:
 			printf("%s %s %s\n", "DIV", getRegName(c->dest), getRegName(c->src));
 			c->pc += 2;
-			break;
-		case ADDF:
-			printf("%s %s %s\n", "ADDF", getRegName(c->dest), getRegName(c->src));
-			c->pc +=2;
-			break;
-		case SUBF:
-			printf("%s %s %s\n", "SUBF", getRegName(c->dest), getRegName(c->src));
-			c->pc +=2;
-			break;
-		case MULF:
-			printf("%s %s %s\n", "MULF", getRegName(c->dest), getRegName(c->src));
-			c->pc +=2;
-			break;
-		case DIVF:
-			printf("%s %s %s\n", "DIVF", getRegName(c->dest), getRegName(c->src));
-			c->pc +=2;
 			break;
 		case JLZ:
             printf("%s\n", "JLZ");

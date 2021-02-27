@@ -70,57 +70,27 @@ void execute(cpu *c)
 			set_flags(c, c->r[c->dest], c->src);
 			c->pc += 2;
 			break;
-		case CMPF:
-			fset_flags(c, c->fr[c->dest - 8], (f64)c->fr[c->src - 8]);
-			c->pc += 2;
-			break;
-		case CMPFI:
-			fset_flags(c, c->fr[c->dest - 8], (f64)c->src);
-			c->pc += 2;
-			break;
 		case MOV:
 			c->r[c->dest] = c->r[c->src];
-			c->pc += 2;
-			break;
-		case MOVF:
-			c->fr[c->dest - 8] = c->fr[c->src - 8];
 			c->pc += 2;
 			break;
 		case STI:
 			c->mem[c->dest] = c->r[c->src];
 			c->pc += 2;
 			break;
-		case STF:
-			c->mem[c->dest] = (i64)c->fr[c->src - 8];
-			c->pc += 2;
-			break;
 		case LDI:
 			c->r[c->dest] = c->mem[c->src];
-			c->pc += 2;
-			break;
-		case LDF:
-			c->fr[c->dest - 8] = (f64)c->mem[c->src];
 			c->pc += 2;
 			break;
 		case LII:
 			c->r[c->dest] = c->src;
 			c->pc += 2;
 			break;
-		case LIF:
-			c->fr[c->dest - 8] = (f64)c->src;
-			c->pc += 2;
-			break;
 		case PSH:
 			c->mem[--c->sp] = c->r[c->mem[++c->pc]];
 			break;
-		case PSHF:
-			c->mem[--c->sp] = (i64)c->fr[c->mem[++c->pc]-8];
-			break;
 		case POP:
 			c->r[c->mem[++c->pc]] = c->mem[c->sp++];
-			break;
-		case POPF:
-			c->fr[c->mem[++c->pc]-8] = (f64)c->mem[c->sp++];
 			break;
 		case INC:
 			c->r[c->dest]++;
@@ -145,22 +115,6 @@ void execute(cpu *c)
 		case DIV:
 			c->r[c->dest] /= c->r[c->src];
 			c->pc += 2;
-			break;
-		case ADDF:
-			c->fr[c->dest - 8] += c->fr[c->src - 8];
-			c->pc +=2;
-			break;
-		case SUBF:
-			c->fr[c->dest - 8] -= c->fr[c->src - 8];
-			c->pc +=2;
-			break;
-		case MULF:
-			c->fr[c->dest - 8] *= c->fr[c->src - 8];
-			c->pc +=2;
-			break;
-		case DIVF:
-			c->fr[c->dest - 8] /= c->fr[c->src - 8];
-			c->pc +=2;
 			break;
 		case JLZ:
 			if (c->ltz) {
