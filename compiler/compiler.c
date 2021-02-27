@@ -102,7 +102,7 @@ void compileExpr(i64_array* program, Expr* expr)
                         pushProgram(program, LII);
                         pushProgram(program, R0);
                         pushProgram(program, expr->v.basic_lit->value.s[i - 1] - '0');
-                        pushProgram(program, PSH);
+                        pushProgram(program, PUSH);
                         pushProgram(program, R0);
                     }
                     pushProgram(program, LII);

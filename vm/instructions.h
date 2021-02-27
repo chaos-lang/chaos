@@ -29,7 +29,7 @@ enum instr {
 	MOV,
 	STI, LDI,
 	LII,
-	PSH, POP,
+	PUSH, POP,
 	INC, DEC,
 	ADD, SUB, MUL, DIV,
 	JLZ, JGZ, JEZ, JNZ, JMP,

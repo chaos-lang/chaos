@@ -72,8 +72,8 @@ void emitBytecode(cpu *c)
 			printf("%s %s %lld\n", "LII", getRegName(c->dest), c->src);
 			c->pc += 2;
 			break;
-		case PSH:
-            printf("%s %s\n", "PSH", getRegName(c->mem[++c->pc]));
+		case PUSH:
+            printf("%s %s\n", "PUSH", getRegName(c->mem[++c->pc]));
 			break;
 		case POP:
             printf("%s %s\n", "POP", getRegName(c->mem[++c->pc]));

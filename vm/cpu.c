@@ -86,7 +86,7 @@ void execute(cpu *c)
 			c->r[c->dest] = c->src;
 			c->pc += 2;
 			break;
-		case PSH:
+		case PUSH:
 			c->mem[--c->sp] = c->r[c->mem[++c->pc]];
 			break;
 		case POP:
