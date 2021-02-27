@@ -218,7 +218,7 @@ int initParser(int argc, char** argv) {
             emit(program);
             printf("\nProgram Output:\n");
         }
-        expandStack(program, 1000);
+        expandStack(program, INT_MAX);
         cpu *c = new_cpu(program->arr, program->capacity);
         run_cpu(c);
         free_cpu(c);
