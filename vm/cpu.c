@@ -56,6 +56,8 @@ void fetch(cpu *c)
 
 void execute(cpu *c)
 {
+    size_t len;
+
 	switch (c->inst) {
 		case CLF:
 			clear_flags(c);
@@ -239,7 +241,13 @@ void execute(cpu *c)
                 case V_FLOAT:
                     printf("%lld.%lld\n", c->r[R1], c->r[R2]);
                     break;
-                default:
+                case V_STRING:
+                    len = c->r[R1];
+                    for (size_t i = 0; i < len; i++) {
+                        c->r[R1] = c->mem[c->sp++];
+                        printf("%c", (int)c->r[R1] + '0');
+                    }
+                    printf("\n");
                     break;
             }
 			break;

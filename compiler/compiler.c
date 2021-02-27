@@ -57,6 +57,8 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
 void compileExpr(i64_array* program, Expr* expr)
 {
+    size_t len;
+
     switch (expr->kind)
     {
         case BasicLit_kind:
@@ -95,12 +97,20 @@ void compileExpr(i64_array* program, Expr* expr)
                     pushProgram(program, frac);
                     break;
                 case V_STRING:
+                    len = strlen(expr->v.basic_lit->value.s);
+                    for (size_t i = len; i > 0; i--) {
+                        pushProgram(program, LII);
+                        pushProgram(program, R0);
+                        pushProgram(program, expr->v.basic_lit->value.s[i - 1] - '0');
+                        pushProgram(program, PSH);
+                        pushProgram(program, R0);
+                    }
                     pushProgram(program, LII);
                     pushProgram(program, R0);
                     pushProgram(program, V_STRING);
                     pushProgram(program, LII);
                     pushProgram(program, R1);
-                    pushProgram(program, 99);
+                    pushProgram(program, len);
                     break;
                 default:
                     break;
@@ -125,6 +135,14 @@ void pushProgram(i64_array* program, i64 el)
 i64 popProgram(i64_array* program)
 {
     return program->arr[program->size--];
+}
+
+void expandStack(i64_array* program, i64 stack)
+{
+    if (program->capacity == 0)
+        program->arr = (i64*)malloc((program->capacity += stack) * sizeof(i64*));
+    else
+        program->arr = (i64*)realloc(program->arr, (program->capacity += stack) * sizeof(i64*));
 }
 
 void freeProgram(i64_array* program)
