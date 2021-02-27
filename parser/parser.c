@@ -71,6 +71,7 @@ int initParser(int argc, char** argv) {
                 exit(0);
             case 'd':
                 debug_enabled = true;
+                print_ast = true;
                 break;
             case 'c':
                 compiler_mode = true;
@@ -205,10 +206,18 @@ int initParser(int argc, char** argv) {
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
         if (print_ast) {
+            if (debug_enabled)
+                printf("Abstract Syntax Tree (AST):\n");
             printAST(_ast_root);
-            break;
+            if (!debug_enabled)
+                break;
         }
         i64_array* program = compile(_ast_root);
+        if (debug_enabled) {
+            printf("\nBytecode:\n");
+            emit(program);
+            printf("\nProgram Output:\n");
+        }
         cpu *c = new_cpu(program->arr, program->size);
         run_cpu(c);
         free_cpu(c);

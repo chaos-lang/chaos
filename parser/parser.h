@@ -36,6 +36,7 @@
 
 #ifndef CHAOS_COMPILER
 #include "../compiler/compiler.h"
+#include "../compiler/compiler_emit.h"
 #endif
 
 #include "../ast/ast_print.h"
