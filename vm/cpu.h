@@ -1,5 +1,5 @@
 /*
- * Description: Abstract Syntax Tree printing module of the Chaos Programming Language's source
+ * Description: CPU module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,19 +20,20 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_AST_PRINT_H
-#define KAOS_AST_PRINT_H
+#ifndef CPU_H
+#define CPU_H
 
-#include "ast.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-void printAST(ASTRoot* ast_root);
-void printASTStmt(Stmt* stmt, bool is_list, char *end);
-void printASTExpr(Expr* expr, bool is_list, char *end);
-void printASTSpec(Spec* spec, bool is_list, char *end);
-void printASTDecl(Decl* decl, bool is_list, char *end);
-void printASTExprList(ExprList* expr_list, char *end);
-void printASTStmtList(StmtList* stmt_list, char *end);
-void printASTSpecList(SpecList* spec_list, char *end);
-char *getToken(enum Token tok);
+#include "types.h"
+#include "instructions.h"
+#include "flags.h"
+
+cpu *new_cpu(i64 *memory, i64 mem_size);
+void free_cpu(cpu *c);
+void run_cpu(cpu *c);
+void fetch(cpu *c);
+void execute(cpu *c);
 
 #endif

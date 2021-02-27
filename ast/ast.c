@@ -1020,15 +1020,15 @@ Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno)
 
 // Generic
 
-void initProgram()
+void initASTRoot()
 {
-    program = (struct Program*)calloc(1, sizeof(Program));
+    _ast_root = (struct ASTRoot*)calloc(1, sizeof(ASTRoot));
     File* file = (struct File*)calloc(1, sizeof(File));
-    program->files = realloc(
-        program->files,
-        sizeof(File) * ++program->file_count
+    _ast_root->files = realloc(
+        _ast_root->files,
+        sizeof(File) * ++_ast_root->file_count
     );
-    program->files[0] = file;
+    _ast_root->files[0] = file;
     StmtList* stmt_list = (struct StmtList*)calloc(1, sizeof(StmtList));
     stmt_list->stmt_count = 0;
     file->stmt_list = stmt_list;

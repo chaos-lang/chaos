@@ -188,7 +188,7 @@ int initParser(int argc, char** argv) {
     }
 
     initMainFunction();
-    initProgram();
+    initASTRoot();
 
     main_interpreted_module = NULL;
 
@@ -205,8 +205,13 @@ int initParser(int argc, char** argv) {
         strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
         yyparse();
         if (print_ast) {
-            printAST();
+            printAST(_ast_root);
+            break;
         }
+        i64_array* program = compile(_ast_root);
+        cpu *c = new_cpu(program->arr, program->size);
+        run_cpu(c);
+        free_cpu(c);
         // if (!is_interactive) {
         //     if (compiler_mode) {
         //         compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep, unsafe);

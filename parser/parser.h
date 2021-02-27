@@ -39,6 +39,7 @@
 #endif
 
 #include "../ast/ast_print.h"
+#include "../vm/cpu.h"
 
 extern int yyparse();
 extern int yylex_destroy();

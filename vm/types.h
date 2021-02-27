@@ -1,5 +1,5 @@
 /*
- * Description: Abstract Syntax Tree printing module of the Chaos Programming Language's source
+ * Description: CPU types module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,19 +20,39 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_AST_PRINT_H
-#define KAOS_AST_PRINT_H
+#ifndef TYPES_H
+#define TYPES_H
 
-#include "ast.h"
+#define byte unsigned char
+#define u64 unsigned long long
+#define i64 long long
+#define f64 double
 
-void printAST(ASTRoot* ast_root);
-void printASTStmt(Stmt* stmt, bool is_list, char *end);
-void printASTExpr(Expr* expr, bool is_list, char *end);
-void printASTSpec(Spec* spec, bool is_list, char *end);
-void printASTDecl(Decl* decl, bool is_list, char *end);
-void printASTExprList(ExprList* expr_list, char *end);
-void printASTStmtList(StmtList* stmt_list, char *end);
-void printASTSpecList(SpecList* spec_list, char *end);
-char *getToken(enum Token tok);
+enum registers {
+	R0, R1, R2, R3, R4, R5, R6, R7,
+	F0, F1, F2, F3, F4, F5, F6, F7,
+	NUM_REGISTERS
+};
+
+typedef struct {
+	i64 *mem;
+	i64 max_mem;
+
+	// registers
+	i64 pc;
+	i64 sp;
+	i64 r[8];
+	f64 fr[8];
+
+	// instruction parts
+	i64 inst;
+	i64 dest;
+	i64 src;
+
+	// flags
+	i64 zero;
+	i64 ltz;
+	i64 gtz;
+} cpu;
 
 #endif

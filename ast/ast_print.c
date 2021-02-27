@@ -24,7 +24,7 @@
 
 unsigned short indent;
 
-void printAST()
+void printAST(ASTRoot* ast_root)
 {
     indent = __KAOS_INDENT_LENGTH__;
     printf(
@@ -36,7 +36,7 @@ void printAST()
     );
     indent = indent + __KAOS_INDENT_LENGTH__;
 
-    for (unsigned long i = 0; i < program->file_count; i++) {
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
         printf(
             "%*c{\n",
             indent,
@@ -56,7 +56,7 @@ void printAST()
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTSpecList(program->files[i]->imports, ",\n");
+        printASTSpecList(ast_root->files[i]->imports, ",\n");
 
         // Stmts
         printf(
@@ -64,7 +64,7 @@ void printAST()
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmtList(program->files[i]->stmt_list, "\n");
+        printASTStmtList(ast_root->files[i]->stmt_list, "\n");
 
         indent = indent - __KAOS_INDENT_LENGTH__;
         printf(

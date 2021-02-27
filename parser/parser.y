@@ -119,10 +119,10 @@ parser:
 line:
     | T_NEWLINE line {}
     | import line {
-        addSpec(program->files[0]->imports, $1);
+        addSpec(_ast_root->files[0]->imports, $1);
     }
     | stmt line {
-        addStmt(program->files[0]->stmt_list, $1);
+        addStmt(_ast_root->files[0]->stmt_list, $1);
     }
 ;
 

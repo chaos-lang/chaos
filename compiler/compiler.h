@@ -23,50 +23,23 @@
 #ifndef KAOS_COMPILER_H
 #define KAOS_COMPILER_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   include <windows.h>
-#else
-#   include <sys/wait.h>
-#endif
-
-#if defined(__APPLE__) && defined(__MACH__)
-#   include <sys/syslimits.h>
-#elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#   include <linux/limits.h>
-#endif
-
-#include <errno.h>
-
 #include "../ast/ast.h"
-#include "../preemptive/preemptive.h"
+#include "../vm/types.h"
+#include "../vm/instructions.h"
 
-string_array transpiled_functions;
-string_array transpiled_decisions;
-string_array transpiled_modules;
+typedef struct i64_array {
+    i64* arr;
+    size_t capacity;
+    size_t size;
+} i64_array;
 
-void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep, bool unsafe);
-ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp);
-ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
-ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
-ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
-bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type);
-bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator);
-void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned short indent);
-void transpile_function_call_decision(FILE *c_fp, char *module_context, char* module_context_compiler, char *name, unsigned short indent);
-void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2, unsigned short indent);
-void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp);
-void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent);
-char* compiler_getCurrentContext();
-char* compiler_getCurrentModuleContext();
-char* compiler_getCurrentModule();
-char* compiler_getFunctionModuleContext(char *name, char *module);
-bool isFunctionFromDynamicLibrary(char *name, char *module);
-bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module);
-char* fix_bs(char* str);
-void compiler_escape_module(char* module);
-void free_transpiled_functions();
-void free_transpiled_decisions();
+i64_array* compile(ASTRoot* ast_root);
+void compileStmtList(i64_array* program, StmtList* stmt_list);
+void compileStmt(i64_array* program, Stmt* stmt);
+void compileExpr(i64_array* program, Expr* expr);
+void pushProgram(i64_array* program, i64 el);
+i64 popProgram(i64_array* program);
+void freeProgram(i64_array* program);
+i64_array* initProgram();
 
 #endif

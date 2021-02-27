@@ -1,5 +1,5 @@
 /*
- * Description: Abstract Syntax Tree printing module of the Chaos Programming Language's source
+ * Description: CPU flags module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,19 +20,27 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_AST_PRINT_H
-#define KAOS_AST_PRINT_H
+#include "flags.h"
 
-#include "ast.h"
+void clear_flags(cpu *c)
+{
+	c->zero = 0;
+	c->ltz = 0;
+	c->gtz = 0;
+}
 
-void printAST(ASTRoot* ast_root);
-void printASTStmt(Stmt* stmt, bool is_list, char *end);
-void printASTExpr(Expr* expr, bool is_list, char *end);
-void printASTSpec(Spec* spec, bool is_list, char *end);
-void printASTDecl(Decl* decl, bool is_list, char *end);
-void printASTExprList(ExprList* expr_list, char *end);
-void printASTStmtList(StmtList* stmt_list, char *end);
-void printASTSpecList(SpecList* spec_list, char *end);
-char *getToken(enum Token tok);
+void set_flags(cpu *c, i64 a, i64 b)
+{
+	i64 res = a - b;
+	c->zero = (res == 0);
+	c->ltz = (res < 0);
+	c->gtz = (res > 0);
+}
 
-#endif
+void fset_flags(cpu *c, f64 a, f64 b)
+{
+	f64 res = a - b;
+	c->zero = (res == 0);
+	c->ltz = (res < 0);
+	c->gtz = (res > 0);
+}

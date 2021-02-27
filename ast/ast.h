@@ -745,12 +745,12 @@ typedef struct File {
     struct StmtList* stmt_list;
 } File;
 
-typedef struct Program {
+typedef struct ASTRoot {
     struct File** files;
     unsigned long file_count;
-} Program;
+} ASTRoot;
 
-Program* program;
+ASTRoot* _ast_root;
 
 // Communication
 
@@ -812,7 +812,7 @@ Decl* timesDo(Expr* x, Stmt* body, int lineno);
 Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno);
 Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno);
 Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno);
-void initProgram();
+void initASTRoot();
 void addExpr(ExprList* expr_list, Expr* expr);
 void addSpec(SpecList* spec_list, Spec* spec);
 void addStmt(StmtList* stmt_list, Stmt* stmt);
