@@ -23,6 +23,8 @@
 #ifndef KAOS_COMPILER_H
 #define KAOS_COMPILER_H
 
+#include <math.h>
+
 #include "../ast/ast.h"
 #include "../vm/types.h"
 #include "../vm/instructions.h"

@@ -228,8 +228,20 @@ void execute(cpu *c)
 			c->r[c->dest] = !c->r[c->dest];
 			c->pc++;
         case PRNT:
-            printf("%lld\n", c->r[c->dest]);
-            c->pc += 1;
+            switch (c->r[R0])
+            {
+                case V_BOOL:
+                    printf("%s\n", c->r[R1] ? "true" : "false");
+                    break;
+                case V_INT:
+                    printf("%lld\n", c->r[R1]);
+                    break;
+                case V_FLOAT:
+                    printf("%lld.%lld\n", c->r[R1], c->r[R2]);
+                    break;
+                default:
+                    break;
+            }
 			break;
 	}
 }

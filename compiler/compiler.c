@@ -49,7 +49,6 @@ void compileStmt(i64_array* program, Stmt* stmt)
         case PrintStmt_kind:
             compileExpr(program, stmt->v.print_stmt->x);
             pushProgram(program, PRNT);
-            pushProgram(program, R0);
             break;
         default:
             break;
@@ -66,21 +65,41 @@ void compileExpr(i64_array* program, Expr* expr)
                 case V_BOOL:
                     pushProgram(program, LII);
                     pushProgram(program, R0);
+                    pushProgram(program, V_BOOL);
+                    pushProgram(program, LII);
+                    pushProgram(program, R1);
                     pushProgram(program, expr->v.basic_lit->value.b ? 1 : 0);
                     break;
                 case V_INT:
                     pushProgram(program, LII);
                     pushProgram(program, R0);
+                    pushProgram(program, V_INT);
+                    pushProgram(program, LII);
+                    pushProgram(program, R1);
                     pushProgram(program, expr->v.basic_lit->value.i);
                     break;
                 case V_FLOAT:
                     pushProgram(program, LII);
                     pushProgram(program, R0);
-                    pushProgram(program, 42);
+                    pushProgram(program, V_FLOAT);
+                    i64 ipart;
+                    i64 frac;
+                    char *buf = NULL;
+                    buf = snprintf_concat_float(buf, "%Lf", expr->v.basic_lit->value.f);
+                    sscanf(buf, "%lld.%lld", &ipart, &frac);
+                    pushProgram(program, LII);
+                    pushProgram(program, R1);
+                    pushProgram(program, ipart);
+                    pushProgram(program, LII);
+                    pushProgram(program, R2);
+                    pushProgram(program, frac);
                     break;
                 case V_STRING:
                     pushProgram(program, LII);
                     pushProgram(program, R0);
+                    pushProgram(program, V_STRING);
+                    pushProgram(program, LII);
+                    pushProgram(program, R1);
                     pushProgram(program, 99);
                     break;
                 default:

@@ -205,8 +205,7 @@ void emitBytecode(cpu *c)
 			printf("%s %s %s\n", "LNOT", getRegName(c->dest), getRegName(c->src));
 			c->pc++;
         case PRNT:
-            printf("%s %s\n", "PRNT", getRegName(c->dest));
-            c->pc += 1;
+            printf("%s\n", "PRNT");
 			break;
 	}
 }

@@ -30,6 +30,8 @@
 #include "instructions.h"
 #include "flags.h"
 
+#include "../enums.h"
+
 cpu *new_cpu(i64 *memory, i64 mem_size);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
