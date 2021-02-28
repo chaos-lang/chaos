@@ -33,12 +33,14 @@ typedef struct i64_array {
     i64* arr;
     size_t capacity;
     size_t size;
+    i64 heap;
 } i64_array;
 
 i64_array* compile(ASTRoot* ast_root);
 void compileStmtList(i64_array* program, StmtList* stmt_list);
 void compileStmt(i64_array* program, Stmt* stmt);
 void compileExpr(i64_array* program, Expr* expr);
+void compileDecl(i64_array* program, Decl* decl);
 void pushProgram(i64_array* program, i64 el);
 i64 popProgram(i64_array* program);
 void expandStack(i64_array* program, i64 stack);

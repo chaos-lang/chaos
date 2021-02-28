@@ -62,6 +62,7 @@ typedef struct Symbol {
     struct FunctionCall* scope;
     enum Role role;
     struct _Function* param_of;
+    long long addr;
 } Symbol;
 
 Symbol* symbol_cursor;

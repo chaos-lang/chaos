@@ -61,11 +61,11 @@ void emitBytecode(cpu *c)
 			c->pc += 2;
 			break;
 		case STI:
-            printf("%s %s %s\n", "STI", getRegName(c->dest), getRegName(c->src));
+            printf("%s %lld %s\n", "STI", c->dest, getRegName(c->src));
 			c->pc += 2;
 			break;
 		case LDI:
-            printf("%s %s %s\n", "LDI", getRegName(c->dest), getRegName(c->src));
+            printf("%s %s %lld\n", "LDI", getRegName(c->dest), c->src);
 			c->pc += 2;
 			break;
 		case LII:
@@ -77,7 +77,6 @@ void emitBytecode(cpu *c)
 			break;
 		case POP:
             printf("%s %s\n", "POP", getRegName(c->mem[++c->pc]));
-            c->pc++;
 			break;
 		case INC:
 			printf("%s %s\n", "INC", getRegName(c->dest));
