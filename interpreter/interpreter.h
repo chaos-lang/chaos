@@ -29,15 +29,11 @@
 
 #include "../ast/ast.h"
 
-#ifndef CHAOS_COMPILER
-#include "../preemptive/preemptive.h"
-#endif
-
 extern unsigned long long nested_loop_counter;
 extern ASTNode* loop_end_ast_node;
 
 #ifndef CHAOS_COMPILER
-void interpret(char *module, enum Phase phase_arg, bool is_interactive, bool unsafe);
+void interpret(char *module, enum Phase phase_arg, bool is_interactive);
 #else
 void interpret(char *module, enum Phase phase_arg);
 #endif

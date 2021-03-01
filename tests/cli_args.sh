@@ -54,7 +54,7 @@ echo -e "\nINFO: Test other arguments\n"
 chaos -h && chaos --help && \
 chaos -v && chaos --version && \
 chaos -l && chaos --license && \
-chaos -u tests/everything.kaos && chaos --unsafe tests/everything.kaos && \
+chaos -a tests/everything.kaos && chaos --ast tests/everything.kaos && \
 echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test invalid argument messages with short options\n"
