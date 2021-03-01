@@ -30,8 +30,7 @@ i64_array* compile(ASTRoot* ast_root)
         compileStmtList(program, ast_root->files[i]->stmt_list);
     }
 
-    pushProgram(program, HLT);
-
+    push_instr(program, HLT);
     return program;
 }
 
@@ -47,7 +46,7 @@ void compileStmt(i64_array* program, Stmt* stmt)
     switch (stmt->kind) {
     case PrintStmt_kind:
         compileExpr(program, stmt->v.print_stmt->x);
-        pushProgram(program, PRNT);
+        push_instr(program, PRNT);
         break;
     case DeclStmt_kind:
         compileDecl(program, stmt->v.decl_stmt->decl);
@@ -66,52 +65,60 @@ void compileExpr(i64_array* program, Expr* expr)
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
-            pushProgram(program, LII);
-            pushProgram(program, R0);
-            pushProgram(program, V_BOOL);
-            pushProgram(program, LII);
-            pushProgram(program, R1);
-            pushProgram(program, expr->v.basic_lit->value.b ? 1 : 0);
+            push_instr(program, LII);
+            push_instr(program, R0);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1);
+            push_instr(program, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
-            pushProgram(program, LII);
-            pushProgram(program, R0);
-            pushProgram(program, V_INT);
-            pushProgram(program, LII);
-            pushProgram(program, R1);
-            pushProgram(program, expr->v.basic_lit->value.i);
+            push_instr(program, LII);
+            push_instr(program, R0);
+            push_instr(program, V_INT);
+
+            push_instr(program, LII);
+            push_instr(program, R1);
+            push_instr(program, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
-            pushProgram(program, LII);
-            pushProgram(program, R0);
-            pushProgram(program, V_FLOAT);
+            push_instr(program, LII);
+            push_instr(program, R0);
+            push_instr(program, V_FLOAT);
+
             i64 ipart;
             i64 frac;
             char *buf = NULL;
             buf = snprintf_concat_float(buf, "%Lf", expr->v.basic_lit->value.f);
             sscanf(buf, "%lld.%lld", &ipart, &frac);
-            pushProgram(program, LII);
-            pushProgram(program, R1);
-            pushProgram(program, ipart);
-            pushProgram(program, LII);
-            pushProgram(program, R2);
-            pushProgram(program, frac);
+
+            push_instr(program, LII);
+            push_instr(program, R1);
+            push_instr(program, ipart);
+
+            push_instr(program, LII);
+            push_instr(program, R2);
+            push_instr(program, frac);
             break;
         case V_STRING:
             len = strlen(expr->v.basic_lit->value.s);
             for (size_t i = len; i > 0; i--) {
-                pushProgram(program, LII);
-                pushProgram(program, R0);
-                pushProgram(program, expr->v.basic_lit->value.s[i - 1] - '0');
-                pushProgram(program, PUSH);
-                pushProgram(program, R0);
+                push_instr(program, LII);
+                push_instr(program, R0);
+                push_instr(program, expr->v.basic_lit->value.s[i - 1] - '0');
+
+                push_instr(program, PUSH);
+                push_instr(program, R0);
             }
-            pushProgram(program, LII);
-            pushProgram(program, R0);
-            pushProgram(program, V_STRING);
-            pushProgram(program, LII);
-            pushProgram(program, R1);
-            pushProgram(program, len);
+
+            push_instr(program, LII);
+            push_instr(program, R0);
+            push_instr(program, V_STRING);
+
+            push_instr(program, LII);
+            push_instr(program, R1);
+            push_instr(program, len);
             break;
         default:
             break;
@@ -122,47 +129,54 @@ void compileExpr(i64_array* program, Expr* expr)
         addr = symbol->addr;
         switch (symbol->value_type) {
         case V_BOOL:
-            pushProgram(program, LDI);
-            pushProgram(program, R0);
-            pushProgram(program, addr++);
-            pushProgram(program, LDI);
-            pushProgram(program, R1);
-            pushProgram(program, addr++);
+            push_instr(program, LDI);
+            push_instr(program, R0);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R1);
+            push_instr(program, addr++);
             break;
         case V_INT:
-            pushProgram(program, LDI);
-            pushProgram(program, R0);
-            pushProgram(program, addr++);
-            pushProgram(program, LDI);
-            pushProgram(program, R1);
-            pushProgram(program, addr++);
+            push_instr(program, LDI);
+            push_instr(program, R0);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R1);
+            push_instr(program, addr++);
             break;
         case V_FLOAT:
-            pushProgram(program, LDI);
-            pushProgram(program, R0);
-            pushProgram(program, addr++);
-            pushProgram(program, LDI);
-            pushProgram(program, R1);
-            pushProgram(program, addr++);
-            pushProgram(program, LDI);
-            pushProgram(program, R2);
-            pushProgram(program, addr++);
+            push_instr(program, LDI);
+            push_instr(program, R0);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R1);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R2);
+            push_instr(program, addr++);
             break;
         case V_STRING:
-            pushProgram(program, LDI);
-            pushProgram(program, R0);
-            pushProgram(program, addr++);
-            pushProgram(program, LDI);
-            pushProgram(program, R1);
-            pushProgram(program, addr++);
+            push_instr(program, LDI);
+            push_instr(program, R0);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R1);
+            push_instr(program, addr++);
+
             len = strlen(symbol->value.s);
             addr += len - 1;
             for (size_t i = len; i > 0; i--) {
-                pushProgram(program, LDI);
-                pushProgram(program, R2);
-                pushProgram(program, addr--);
-                pushProgram(program, PUSH);
-                pushProgram(program, R2);
+                push_instr(program, LDI);
+                push_instr(program, R2);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2);
             }
             addr += len - 1;
             break;
@@ -190,12 +204,14 @@ void compileDecl(i64_array* program, Decl* decl)
                 decl->v.var_decl->expr->v.basic_lit->value.b
             );
             symbol->addr = program->heap;
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R0);
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R1);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1);
             break;
         case V_INT:
             symbol = addSymbolInt(
@@ -203,12 +219,14 @@ void compileDecl(i64_array* program, Decl* decl)
                 decl->v.var_decl->expr->v.basic_lit->value.i
             );
             symbol->addr = program->heap;
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R0);
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R1);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1);
             break;
         case V_FLOAT:
             symbol = addSymbolFloat(
@@ -216,15 +234,18 @@ void compileDecl(i64_array* program, Decl* decl)
                 decl->v.var_decl->expr->v.basic_lit->value.f
             );
             symbol->addr = program->heap;
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R0);
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R1);
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R2);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R2);
             break;
         case V_STRING:
             symbol = addSymbolString(
@@ -232,19 +253,23 @@ void compileDecl(i64_array* program, Decl* decl)
                 decl->v.var_decl->expr->v.basic_lit->value.s
             );
             symbol->addr = program->heap;
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R0);
-            pushProgram(program, STI);
-            pushProgram(program, program->heap++);
-            pushProgram(program, R1);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1);
+
             len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
             for (size_t i = len; i > 0; i--) {
-                pushProgram(program, POP);
-                pushProgram(program, R0);
-                pushProgram(program, STI);
-                pushProgram(program, program->heap++);
-                pushProgram(program, R0);
+                push_instr(program, POP);
+                push_instr(program, R0);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0);
             }
             break;
         default:
@@ -256,7 +281,7 @@ void compileDecl(i64_array* program, Decl* decl)
     }
 }
 
-void pushProgram(i64_array* program, i64 el)
+void push_instr(i64_array* program, i64 el)
 {
     if (program->capacity == 0)
         program->arr = (i64*)malloc(++(program->capacity) * sizeof(i64*));
