@@ -55,20 +55,19 @@ int defineFunction(
 
             struct KaosValue optional_param_value = optional_params[j];
 
-            switch (optional_param_type)
-            {
-                case K_BOOL:
-                    addFunctionOptionalParameterBool(params_name[i], optional_param_value.b);
-                    break;
-                case K_NUMBER:
-                    addFunctionOptionalParameterFloat(params_name[i], optional_param_value.f);
-                    break;
-                case K_STRING:
-                    addFunctionOptionalParameterString(params_name[i], optional_param_value.s);
-                    break;
-                default:
-                    throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
-                    break;
+            switch (optional_param_type) {
+            case K_BOOL:
+                addFunctionOptionalParameterBool(params_name[i], optional_param_value.b);
+                break;
+            case K_NUMBER:
+                addFunctionOptionalParameterFloat(params_name[i], optional_param_value.f);
+                break;
+            case K_STRING:
+                addFunctionOptionalParameterString(params_name[i], optional_param_value.s);
+                break;
+            default:
+                throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
+                break;
             }
             j--;
         }

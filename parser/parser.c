@@ -58,62 +58,60 @@ int initParser(int argc, char** argv) {
     char opt;
     while ((opt = getopt_long(argc, argv, "hvldc:o:e:k:u:a:", long_options, NULL)) != -1)
     {
-        switch (opt)
-        {
-            case 'h':
-                print_help();
-                exit(0);
-            case 'v':
-                printf("%d.%d.%d\n", __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__, __KAOS_VERSION_PATCHLEVEL__);
-                exit(0);
-            case 'l':
-                print_license();
-                exit(0);
-            case 'd':
-                debug_enabled = true;
-                print_ast = true;
-                break;
+        switch (opt) {
+        case 'h':
+            print_help();
+            exit(0);
+        case 'v':
+            printf("%d.%d.%d\n", __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__, __KAOS_VERSION_PATCHLEVEL__);
+            exit(0);
+        case 'l':
+            print_license();
+            exit(0);
+        case 'd':
+            debug_enabled = true;
+            print_ast = true;
+            break;
+        case 'c':
+            compiler_mode = true;
+            program_file = optarg;
+            fp = fopen(program_file, "r");
+            if (fp == NULL)
+                compiler_fopen_fail = true;
+            break;
+        case 'o':
+            bin_file = optarg;
+            break;
+        case 'e':
+            // extra_flags = optarg;
+            break;
+        case 'k':
+            // keep = true;
+            break;
+        case 'u':
+            // unsafe = true;
+            global_unsafe = true;
+            break;
+        case 'a':
+            print_ast = true;
+            break;
+        case '?':
+            switch (optopt) {
             case 'c':
-                compiler_mode = true;
-                program_file = optarg;
-                fp = fopen(program_file, "r");
-                if (fp == NULL)
-                    compiler_fopen_fail = true;
+                throwCompilerInteractiveError();
                 break;
             case 'o':
-                bin_file = optarg;
+                throwMissingOutputName();
                 break;
             case 'e':
-                // extra_flags = optarg;
+                throwMissingExtraFlags();
                 break;
-            case 'k':
-                // keep = true;
+            default:
+                print_help();
+                exit(E_INVALID_OPTION);
                 break;
-            case 'u':
-                // unsafe = true;
-                global_unsafe = true;
-                break;
-            case 'a':
-                print_ast = true;
-                break;
-            case '?':
-                switch (optopt)
-                {
-                    case 'c':
-                        throwCompilerInteractiveError();
-                        break;
-                    case 'o':
-                        throwMissingOutputName();
-                        break;
-                    case 'e':
-                        throwMissingExtraFlags();
-                        break;
-                    default:
-                        print_help();
-                        exit(E_INVALID_OPTION);
-                        break;
-                }
-                break;
+            }
+            break;
         }
     }
 

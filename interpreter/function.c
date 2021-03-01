@@ -798,25 +798,24 @@ void freeAllFunctions() {
 }
 
 bool block(enum BlockType type) {
-    switch (type)
-    {
-        case B_EXPRESSION:
-            if (decision_mode != NULL) {
-                decision_expression_mode = decision_mode;
-                decision_function_mode = NULL;
-                return true;
-            }
-            break;
-        case B_FUNCTION:
-            if (decision_mode != NULL) {
-                decision_function_mode = decision_mode;
-                decision_expression_mode = NULL;
-                return true;
-            }
-            break;
-        default:
-            return false;
-            break;
+    switch (type) {
+    case B_EXPRESSION:
+        if (decision_mode != NULL) {
+            decision_expression_mode = decision_mode;
+            decision_function_mode = NULL;
+            return true;
+        }
+        break;
+    case B_FUNCTION:
+        if (decision_mode != NULL) {
+            decision_function_mode = decision_mode;
+            decision_expression_mode = NULL;
+            return true;
+        }
+        break;
+    default:
+        return false;
+        break;
     }
     return false;
 }

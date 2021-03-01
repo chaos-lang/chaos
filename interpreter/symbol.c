@@ -250,23 +250,22 @@ long double getSymbolValueFloat(char *name) {
 
 long double _getSymbolValueFloat(Symbol* symbol) {
     long double value;
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            value = symbol->value.b ? 1.0 : 0.0;
-            return value;
-            break;
-        case V_INT:
-            value = (long double)symbol->value.i;
-            return value;
-            break;
-        case V_FLOAT:
-            value = symbol->value.f;
-            return value;
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
-            break;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        value = symbol->value.b ? 1.0 : 0.0;
+        return value;
+        break;
+    case V_INT:
+        value = (long double)symbol->value.i;
+        return value;
+        break;
+    case V_FLOAT:
+        value = symbol->value.f;
+        return value;
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
+        break;
     }
     return 0.0;
 }
@@ -278,24 +277,23 @@ bool getSymbolValueBool(char *name) {
 
 bool _getSymbolValueBool(Symbol* symbol) {
     bool value;
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            value = symbol->value.b;
-            return value;
-            break;
-        case V_INT:
-            value = symbol->value.i > 0 ? true : false;
-            return value;
-            break;
-        case V_FLOAT:
-            value = symbol->value.f > 0.0 ? true : false;
-            return value;
-            break;
-        default:
-            value = symbol->value.s[0] != '\0' ? true : false;
-            return value;
-            break;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        value = symbol->value.b;
+        return value;
+        break;
+    case V_INT:
+        value = symbol->value.i > 0 ? true : false;
+        return value;
+        break;
+    case V_FLOAT:
+        value = symbol->value.f > 0.0 ? true : false;
+        return value;
+        break;
+    default:
+        value = symbol->value.s[0] != '\0' ? true : false;
+        return value;
+        break;
     }
     return false;
 }
@@ -307,23 +305,22 @@ long long getSymbolValueInt(char *name) {
 
 long long _getSymbolValueInt(Symbol* symbol) {
     long long value;
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            value = symbol->value.b ? 1 : 0;
-            return value;
-            break;
-        case V_INT:
-            value = symbol->value.i;
-            return value;
-            break;
-        case V_FLOAT:
-            value = (long long)symbol->value.f;
-            return value;
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
-            break;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        value = symbol->value.b ? 1 : 0;
+        return value;
+        break;
+    case V_INT:
+        value = symbol->value.i;
+        return value;
+        break;
+    case V_FLOAT:
+        value = (long long)symbol->value.f;
+        return value;
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
+        break;
     }
     return 0;
 }
@@ -344,20 +341,19 @@ long long getSymbolValueInt_ZeroIfNotInt(Symbol* symbol) {
         return 0;
     }
     long long value = 0;
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            value = symbol->value.b ? 1 : 0;
-            break;
-        case V_INT:
-            value = symbol->value.i;
-            break;
-        case V_FLOAT:
-            value = (long long)symbol->value.f;
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
-            break;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        value = symbol->value.b ? 1 : 0;
+        break;
+    case V_INT:
+        value = symbol->value.i;
+        break;
+    case V_FLOAT:
+        value = (long long)symbol->value.f;
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
+        break;
     }
     return value * symbol->sign;
 }
@@ -370,153 +366,149 @@ void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped
 }
 
 char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded, bool double_quotes) {
-    switch (symbol->type)
-    {
-        case K_BOOL:
-            switch (symbol->value_type)
-            {
-                case V_BOOL:
-                    encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
-                    break;
-                case V_VOID:
-                    encoded = strcat_ext(encoded, "N/A");
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
-                    break;
-            }
-            return encoded;
-        case K_NUMBER:
-            switch (symbol->value_type)
-            {
-                case V_INT:
-                    encoded = snprintf_concat_int(encoded, "%lld", symbol->value.i);
-                    break;
-                case V_FLOAT:
-                    encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
-                    break;
-                case V_VOID:
-                    encoded = strcat_ext(encoded, "N/A");
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
-                    break;
-            }
-            return encoded;
-        case K_STRING:
-            if (symbol->value_type == V_VOID) {
-                return strcat_ext(encoded, "N/A");
-            }
-            if (is_complex) {
-                if (double_quotes) {
-                    encoded = snprintf_concat_string(encoded, "\"%s\"", symbol->value.s);
-                } else {
-                    encoded = snprintf_concat_string(encoded, "'%s'", symbol->value.s);
-                }
-            } else {
-                if (escaped) {
-                    char* out = escape_the_sequences_in_string_literal(symbol->value.s);
-                    encoded = strcat_ext(encoded, out);
-                    free(out);
-                } else {
-                    encoded = strcat_ext(encoded, symbol->value.s);
-                }
-            }
-            return encoded;
-        case K_LIST:
-            iter++;
-            encoded = strcat_ext(encoded, "[");
-            if (pretty) {
-                encoded = strcat_ext(encoded, "\n");
-            }
-            for (unsigned long i = 0; i < symbol->children_count; i++) {
-                if (pretty) {
-                    for (unsigned long j = 0; j < iter; j++) {
-                        encoded = strcat_ext(encoded, __KAOS_TAB__);
-                    }
-                }
-                encoded = encodeSymbolValueToString(symbol->children[i], true, pretty, escaped, iter, encoded, double_quotes);
-                if (i + 1 != symbol->children_count) {
-                    if (pretty) {
-                        encoded = strcat_ext(encoded, ",\n");
-                    } else {
-                        encoded = strcat_ext(encoded, ", ");
-                    }
-                }
-            }
-            if (pretty) {
-                encoded = strcat_ext(encoded, "\n");
-            }
-            if (pretty) {
-                for (unsigned long j = 0; j < (iter - 1); j++) {
-                    encoded = strcat_ext(encoded, __KAOS_TAB__);
-                }
-            }
-            encoded = strcat_ext(encoded, "]");
-            return encoded;
-        case K_DICT:
-            iter++;
-            encoded = strcat_ext(encoded, "{");
-            if (pretty) {
-                encoded = strcat_ext(encoded, "\n");
-            }
-            for (unsigned long i = 0; i < symbol->children_count; i++) {
-                if (pretty) {
-                    for (unsigned long j = 0; j < iter; j++) {
-                        encoded = strcat_ext(encoded, __KAOS_TAB__);
-                    }
-                }
-                Symbol* child = symbol->children[i];
-                if (double_quotes) {
-                    encoded = snprintf_concat_string(encoded, "\"%s\": ", child->key);
-                } else {
-                    encoded = snprintf_concat_string(encoded, "'%s': ", child->key);
-                }
-                encoded = encodeSymbolValueToString(child, true, pretty, escaped, iter, encoded, double_quotes);
-                if (i + 1 != symbol->children_count) {
-                    if (pretty) {
-                        encoded = strcat_ext(encoded, ",\n");
-                    } else {
-                        encoded = strcat_ext(encoded, ", ");
-                    }
-                }
-            }
-            if (pretty) {
-                encoded = strcat_ext(encoded, "\n");
-            }
-            if (pretty) {
-                for (unsigned long j = 0; j < (iter - 1); j++) {
-                    encoded = strcat_ext(encoded, __KAOS_TAB__);
-                }
-            }
-            encoded = strcat_ext(encoded, "}");
-            return encoded;
-        case K_ANY:
-            switch (symbol->value_type)
-            {
-                case V_STRING:
-                    encoded = strcat_ext(encoded, symbol->value.s);
-                    break;
-                case V_INT:
-                    encoded = snprintf_concat_int(encoded, "%lld", symbol->value.i);
-                    break;
-                case V_FLOAT:
-                    encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
-                    break;
-                case V_BOOL:
-                    encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
-                    break;
-                case V_VOID:
-                    encoded = strcat_ext(encoded, "N/A");
-                    break;
-                default:
-                    throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
-                    break;
-            }
-            return encoded;
-        default:
-            throw_error(E_UNKNOWN_VARIABLE_TYPE, getTypeName(symbol->type), symbol->name);
+    switch (symbol->type) {
+    case K_BOOL:
+        switch (symbol->value_type) {
+        case V_BOOL:
+            encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
             break;
+        case V_VOID:
+            encoded = strcat_ext(encoded, "N/A");
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
+            break;
+        }
+        return encoded;
+    case K_NUMBER:
+        switch (symbol->value_type) {
+        case V_INT:
+            encoded = snprintf_concat_int(encoded, "%lld", symbol->value.i);
+            break;
+        case V_FLOAT:
+            encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
+            break;
+        case V_VOID:
+            encoded = strcat_ext(encoded, "N/A");
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
+            break;
+        }
+        return encoded;
+    case K_STRING:
+        if (symbol->value_type == V_VOID) {
+            return strcat_ext(encoded, "N/A");
+        }
+        if (is_complex) {
+            if (double_quotes) {
+                encoded = snprintf_concat_string(encoded, "\"%s\"", symbol->value.s);
+            } else {
+                encoded = snprintf_concat_string(encoded, "'%s'", symbol->value.s);
+            }
+        } else {
+            if (escaped) {
+                char* out = escape_the_sequences_in_string_literal(symbol->value.s);
+                encoded = strcat_ext(encoded, out);
+                free(out);
+            } else {
+                encoded = strcat_ext(encoded, symbol->value.s);
+            }
+        }
+        return encoded;
+    case K_LIST:
+        iter++;
+        encoded = strcat_ext(encoded, "[");
+        if (pretty) {
+            encoded = strcat_ext(encoded, "\n");
+        }
+        for (unsigned long i = 0; i < symbol->children_count; i++) {
+            if (pretty) {
+                for (unsigned long j = 0; j < iter; j++) {
+                    encoded = strcat_ext(encoded, __KAOS_TAB__);
+                }
+            }
+            encoded = encodeSymbolValueToString(symbol->children[i], true, pretty, escaped, iter, encoded, double_quotes);
+            if (i + 1 != symbol->children_count) {
+                if (pretty) {
+                    encoded = strcat_ext(encoded, ",\n");
+                } else {
+                    encoded = strcat_ext(encoded, ", ");
+                }
+            }
+        }
+        if (pretty) {
+            encoded = strcat_ext(encoded, "\n");
+        }
+        if (pretty) {
+            for (unsigned long j = 0; j < (iter - 1); j++) {
+                encoded = strcat_ext(encoded, __KAOS_TAB__);
+            }
+        }
+        encoded = strcat_ext(encoded, "]");
+        return encoded;
+    case K_DICT:
+        iter++;
+        encoded = strcat_ext(encoded, "{");
+        if (pretty) {
+            encoded = strcat_ext(encoded, "\n");
+        }
+        for (unsigned long i = 0; i < symbol->children_count; i++) {
+            if (pretty) {
+                for (unsigned long j = 0; j < iter; j++) {
+                    encoded = strcat_ext(encoded, __KAOS_TAB__);
+                }
+            }
+            Symbol* child = symbol->children[i];
+            if (double_quotes) {
+                encoded = snprintf_concat_string(encoded, "\"%s\": ", child->key);
+            } else {
+                encoded = snprintf_concat_string(encoded, "'%s': ", child->key);
+            }
+            encoded = encodeSymbolValueToString(child, true, pretty, escaped, iter, encoded, double_quotes);
+            if (i + 1 != symbol->children_count) {
+                if (pretty) {
+                    encoded = strcat_ext(encoded, ",\n");
+                } else {
+                    encoded = strcat_ext(encoded, ", ");
+                }
+            }
+        }
+        if (pretty) {
+            encoded = strcat_ext(encoded, "\n");
+        }
+        if (pretty) {
+            for (unsigned long j = 0; j < (iter - 1); j++) {
+                encoded = strcat_ext(encoded, __KAOS_TAB__);
+            }
+        }
+        encoded = strcat_ext(encoded, "}");
+        return encoded;
+    case K_ANY:
+        switch (symbol->value_type) {
+        case V_STRING:
+            encoded = strcat_ext(encoded, symbol->value.s);
+            break;
+        case V_INT:
+            encoded = snprintf_concat_int(encoded, "%lld", symbol->value.i);
+            break;
+        case V_FLOAT:
+            encoded = snprintf_concat_float(encoded, "%Lg", symbol->value.f);
+            break;
+        case V_BOOL:
+            encoded = strcat_ext(encoded, symbol->value.b ? "true" : "false");
+            break;
+        case V_VOID:
+            encoded = strcat_ext(encoded, "N/A");
+            break;
+        default:
+            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol->name, NULL, 0, symbol->value_type);
+            break;
+        }
+        return encoded;
+    default:
+        throw_error(E_UNKNOWN_VARIABLE_TYPE, getTypeName(symbol->type), symbol->name);
+        break;
     }
     return encoded;
 }
@@ -1206,85 +1198,81 @@ void freeAllSymbols() {
 }
 
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol) {
-    switch (clone_symbol->value_type)
-    {
-        case V_BOOL:
-            clone_symbol->value.b = symbolValueByTypeCastingToBool(symbol);
-            break;
-        case V_INT:
-            clone_symbol->value.i = symbolValueByTypeCastingToInt(symbol);
-            break;
-        case V_FLOAT:
-            clone_symbol->value.f = symbolValueByTypeCastingToFloat(symbol);
-            break;
-        case V_STRING:
-            free(clone_symbol->value.s);
-            clone_symbol->value.s = symbolValueByTypeCastingToString(symbol);
-            break;
-        default:
-            throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_symbol->name);
-            break;
+    switch (clone_symbol->value_type) {
+    case V_BOOL:
+        clone_symbol->value.b = symbolValueByTypeCastingToBool(symbol);
+        break;
+    case V_INT:
+        clone_symbol->value.i = symbolValueByTypeCastingToInt(symbol);
+        break;
+    case V_FLOAT:
+        clone_symbol->value.f = symbolValueByTypeCastingToFloat(symbol);
+        break;
+    case V_STRING:
+        free(clone_symbol->value.s);
+        clone_symbol->value.s = symbolValueByTypeCastingToString(symbol);
+        break;
+    default:
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, getTypeName(symbol->type), clone_symbol->name);
+        break;
     }
     return deepCopySymbol(clone_symbol, clone_symbol->type, NULL);
 }
 
 bool symbolValueByTypeCastingToBool(Symbol* symbol) {
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            return symbol->value.b;
-        case V_INT:
-            if (symbol->value.i != 0) {
-                return true;
-            } else {
-                return false;
-            }
-        case V_FLOAT:
-            if (symbol->value.f != 0.0) {
-                return true;
-            } else {
-                return false;
-            }
-        case V_STRING:
-            if (symbol->value.s[0] != '\0') {
-                return true;
-            } else {
-                return false;
-            }
-        default:
+    switch (symbol->value_type) {
+    case V_BOOL:
+        return symbol->value.b;
+    case V_INT:
+        if (symbol->value.i != 0) {
+            return true;
+        } else {
             return false;
+        }
+    case V_FLOAT:
+        if (symbol->value.f != 0.0) {
+            return true;
+        } else {
+            return false;
+        }
+    case V_STRING:
+        if (symbol->value.s[0] != '\0') {
+            return true;
+        } else {
+            return false;
+        }
+    default:
+        return false;
     }
 }
 
 long long symbolValueByTypeCastingToInt(Symbol* symbol) {
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            return symbol->value.b ? 1 : 0;
-        case V_INT:
-            return symbol->value.i;
-        case V_FLOAT:
-            return (long long)symbol->value.f;
-        case V_STRING:
-            return atoi(symbol->value.s);
-        default:
-            return 0;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        return symbol->value.b ? 1 : 0;
+    case V_INT:
+        return symbol->value.i;
+    case V_FLOAT:
+        return (long long)symbol->value.f;
+    case V_STRING:
+        return atoi(symbol->value.s);
+    default:
+        return 0;
     }
 }
 
 long double symbolValueByTypeCastingToFloat(Symbol* symbol) {
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            return symbol->value.b ? 1.0 : 0.0;
-        case V_INT:
-            return (long double) symbol->value.i;
-        case V_FLOAT:
-            return symbol->value.f;
-        case V_STRING:
-            return atof(symbol->value.s);
-        default:
-            return 0.0;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        return symbol->value.b ? 1.0 : 0.0;
+    case V_INT:
+        return (long double) symbol->value.i;
+    case V_FLOAT:
+        return symbol->value.f;
+    case V_STRING:
+        return atof(symbol->value.s);
+    default:
+        return 0.0;
     }
 }
 
@@ -1292,35 +1280,34 @@ char* symbolValueByTypeCastingToString(Symbol* symbol) {
     char buffer[__KAOS_ITOA_BUFFER_LENGTH__];
     char *val;
     char *result;
-    switch (symbol->value_type)
-    {
-        case V_BOOL:
-            val = symbol->value.b ? "true" : "false";
-            result = malloc(1 + strlen(val));
-            strcpy(result, val);
-            return result;
-        case V_INT:
-            val = longlong_to_string(symbol->value.i, buffer, 10);
-            result = malloc(1 + strlen(val));
-            strcpy(result, val);
-            return result;
-        case V_FLOAT:
-            sprintf(buffer, "%Lg", symbol->value.f);
-            val = buffer;
-            result = malloc(1 + strlen(val));
-            strcpy(result, val);
-            return result;
-        case V_STRING:
-            val = symbol->value.s;
-            result = malloc(1 + strlen(val));
-            strcpy(result, val);
-            return result;
-        default:
-            val = "";
-            result = malloc(1 + strlen(val));
-            strcpy(result, val);
-            return result;
-            break;
+    switch (symbol->value_type) {
+    case V_BOOL:
+        val = symbol->value.b ? "true" : "false";
+        result = malloc(1 + strlen(val));
+        strcpy(result, val);
+        return result;
+    case V_INT:
+        val = longlong_to_string(symbol->value.i, buffer, 10);
+        result = malloc(1 + strlen(val));
+        strcpy(result, val);
+        return result;
+    case V_FLOAT:
+        sprintf(buffer, "%Lg", symbol->value.f);
+        val = buffer;
+        result = malloc(1 + strlen(val));
+        strcpy(result, val);
+        return result;
+    case V_STRING:
+        val = symbol->value.s;
+        result = malloc(1 + strlen(val));
+        strcpy(result, val);
+        return result;
+    default:
+        val = "";
+        result = malloc(1 + strlen(val));
+        strcpy(result, val);
+        return result;
+        break;
     }
 }
 
@@ -1328,27 +1315,26 @@ Symbol* createSymbolWithoutValueType(char *name, enum Type type) {
     union Value value;
     enum ValueType value_type;
 
-    switch (type)
-    {
-        case K_BOOL:
-            value.b = false;
-            value_type = V_BOOL;
-            break;
-        case K_NUMBER:
-            value.f = 0.0;
-            value_type = V_FLOAT;
-            break;
-        case K_STRING:
-            value.s = malloc(1 + strlen(""));
-            strcpy(value.s, "");
-            value_type = V_STRING;
-            break;
-        default:
-            value.i = 0;
-            value_type = V_INT;
-            append_to_array_without_malloc(&free_string_stack, name);
-            throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
-            break;
+    switch (type) {
+    case K_BOOL:
+        value.b = false;
+        value_type = V_BOOL;
+        break;
+    case K_NUMBER:
+        value.f = 0.0;
+        value_type = V_FLOAT;
+        break;
+    case K_STRING:
+        value.s = malloc(1 + strlen(""));
+        strcpy(value.s, "");
+        value_type = V_STRING;
+        break;
+    default:
+        value.i = 0;
+        value_type = V_INT;
+        append_to_array_without_malloc(&free_string_stack, name);
+        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE, name);
+        break;
     }
 
     return addSymbol(name, type, value, value_type);
@@ -1576,20 +1562,19 @@ bool resolveRelEqualUnknown(char* name_l, char* name_r) {
     Symbol* symbol_l = getSymbol(name_l);
     Symbol* symbol_r = getSymbol(name_r);
 
-    switch (symbol_l->value_type)
-    {
-        case V_BOOL:
-            return symbol_l->value.b == _getSymbolValueBool(symbol_r);
-            break;
-        case V_INT:
-            return symbol_l->value.i == _getSymbolValueInt(symbol_r);
-            break;
-        case V_FLOAT:
-            return symbol_l->value.f == _getSymbolValueFloat(symbol_r);
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
-            break;
+    switch (symbol_l->value_type) {
+    case V_BOOL:
+        return symbol_l->value.b == _getSymbolValueBool(symbol_r);
+        break;
+    case V_INT:
+        return symbol_l->value.i == _getSymbolValueInt(symbol_r);
+        break;
+    case V_FLOAT:
+        return symbol_l->value.f == _getSymbolValueFloat(symbol_r);
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
+        break;
     }
     return 0;
 }
@@ -1598,20 +1583,19 @@ bool resolveRelNotEqualUnknown(char* name_l, char* name_r) {
     Symbol* symbol_l = getSymbol(name_l);
     Symbol* symbol_r = getSymbol(name_r);
 
-    switch (symbol_l->value_type)
-    {
-        case V_BOOL:
-            return symbol_l->value.b != _getSymbolValueBool(symbol_r);
-            break;
-        case V_INT:
-            return symbol_l->value.i != _getSymbolValueInt(symbol_r);
-            break;
-        case V_FLOAT:
-            return symbol_l->value.f != _getSymbolValueFloat(symbol_r);
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
-            break;
+    switch (symbol_l->value_type) {
+    case V_BOOL:
+        return symbol_l->value.b != _getSymbolValueBool(symbol_r);
+        break;
+    case V_INT:
+        return symbol_l->value.i != _getSymbolValueInt(symbol_r);
+        break;
+    case V_FLOAT:
+        return symbol_l->value.f != _getSymbolValueFloat(symbol_r);
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
+        break;
     }
     return 0;
 }
@@ -1620,20 +1604,19 @@ bool resolveRelGreatUnknown(char* name_l, char* name_r) {
     Symbol* symbol_l = getSymbol(name_l);
     Symbol* symbol_r = getSymbol(name_r);
 
-    switch (symbol_l->value_type)
-    {
-        case V_BOOL:
-            return symbol_l->value.b > _getSymbolValueBool(symbol_r);
-            break;
-        case V_INT:
-            return symbol_l->value.i > _getSymbolValueInt(symbol_r);
-            break;
-        case V_FLOAT:
-            return symbol_l->value.f > _getSymbolValueFloat(symbol_r);
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
-            break;
+    switch (symbol_l->value_type) {
+    case V_BOOL:
+        return symbol_l->value.b > _getSymbolValueBool(symbol_r);
+        break;
+    case V_INT:
+        return symbol_l->value.i > _getSymbolValueInt(symbol_r);
+        break;
+    case V_FLOAT:
+        return symbol_l->value.f > _getSymbolValueFloat(symbol_r);
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
+        break;
     }
     return 0;
 }
@@ -1642,20 +1625,19 @@ bool resolveRelSmallUnknown(char* name_l, char* name_r) {
     Symbol* symbol_l = getSymbol(name_l);
     Symbol* symbol_r = getSymbol(name_r);
 
-    switch (symbol_l->value_type)
-    {
-        case V_BOOL:
-            return symbol_l->value.b < _getSymbolValueBool(symbol_r);
-            break;
-        case V_INT:
-            return symbol_l->value.i < _getSymbolValueInt(symbol_r);
-            break;
-        case V_FLOAT:
-            return symbol_l->value.f < _getSymbolValueFloat(symbol_r);
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
-            break;
+    switch (symbol_l->value_type) {
+    case V_BOOL:
+        return symbol_l->value.b < _getSymbolValueBool(symbol_r);
+        break;
+    case V_INT:
+        return symbol_l->value.i < _getSymbolValueInt(symbol_r);
+        break;
+    case V_FLOAT:
+        return symbol_l->value.f < _getSymbolValueFloat(symbol_r);
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
+        break;
     }
     return 0;
 }
@@ -1664,20 +1646,19 @@ bool resolveRelGreatEqualUnknown(char* name_l, char* name_r) {
     Symbol* symbol_l = getSymbol(name_l);
     Symbol* symbol_r = getSymbol(name_r);
 
-    switch (symbol_l->value_type)
-    {
-        case V_BOOL:
-            return symbol_l->value.b >= _getSymbolValueBool(symbol_r);
-            break;
-        case V_INT:
-            return symbol_l->value.i >= _getSymbolValueInt(symbol_r);
-            break;
-        case V_FLOAT:
-            return symbol_l->value.f >= _getSymbolValueFloat(symbol_r);
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
-            break;
+    switch (symbol_l->value_type) {
+    case V_BOOL:
+        return symbol_l->value.b >= _getSymbolValueBool(symbol_r);
+        break;
+    case V_INT:
+        return symbol_l->value.i >= _getSymbolValueInt(symbol_r);
+        break;
+    case V_FLOAT:
+        return symbol_l->value.f >= _getSymbolValueFloat(symbol_r);
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
+        break;
     }
     return 0;
 }
@@ -1686,20 +1667,19 @@ bool resolveRelSmallEqualUnknown(char* name_l, char* name_r) {
     Symbol* symbol_l = getSymbol(name_l);
     Symbol* symbol_r = getSymbol(name_r);
 
-    switch (symbol_l->value_type)
-    {
-        case V_BOOL:
-            return symbol_l->value.b <= _getSymbolValueBool(symbol_r);
-            break;
-        case V_INT:
-            return symbol_l->value.i <= _getSymbolValueInt(symbol_r);
-            break;
-        case V_FLOAT:
-            return symbol_l->value.f <= _getSymbolValueFloat(symbol_r);
-            break;
-        default:
-            throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
-            break;
+    switch (symbol_l->value_type) {
+    case V_BOOL:
+        return symbol_l->value.b <= _getSymbolValueBool(symbol_r);
+        break;
+    case V_INT:
+        return symbol_l->value.i <= _getSymbolValueInt(symbol_r);
+        break;
+    case V_FLOAT:
+        return symbol_l->value.f <= _getSymbolValueFloat(symbol_r);
+        break;
+    default:
+        throw_error(E_UNEXPECTED_VALUE_TYPE, symbol_l->name, NULL, 0, symbol_l->value_type);
+        break;
     }
     return 0;
 }

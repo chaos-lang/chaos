@@ -58,110 +58,109 @@ void throw_error_base(
         sprintf(title_msg, "%*c%s Error (most recent call last):", indent, ' ', __KAOS_LANGUAGE_NAME__);
     }
 
-    switch (code)
-    {
-        case E_UNKNOWN_VARIABLE_TYPE:
-            sprintf(error_msg, "Unknown variable type: %s for variable: %s", str1, str2);
-            break;
-        case E_VARIABLE_ALREADY_DEFINED:
-            sprintf(error_msg, "The variable name '%s' is already defined!", str1);
-            break;
-        case E_UNDEFINED_VARIABLE:
-            sprintf(error_msg, "Undefined variable: %s", str1);
-            break;
-        case E_MEMORY_ALLOCATION_FOR_LIST_FAILED:
-            sprintf(error_msg, "Memory allocation for list '%s' is failed!", str1);
-            break;
-        case E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST:
-            sprintf(error_msg, "Illegal element type: %s for the typed list: %s", str1, str2);
-            break;
-        case E_VARIABLE_IS_NOT_AN_LIST:
-            sprintf(error_msg, "Variable '%s' is not an list!", str1);
-            break;
-        case E_INDEX_OUT_OF_RANGE:
-            sprintf(error_msg, "Index out of range: %lld for list: %s", lld1, str1);
-            break;
-        case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
-            sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);
-            break;
-        case E_VARIABLE_IS_NOT_A_DICTIONARY:
-            sprintf(error_msg, "Variable '%s' is not a dictionary!", str1);
-            break;
-        case E_UNDEFINED_KEY:
-            sprintf(error_msg, "Undefined key: %s for dictionary: %s", str1, str2);
-            break;
-        case E_UNRECOGNIZED_COMPLEX_DATA_TYPE:
-            sprintf(error_msg, "Unrecognized complex data type: %s for variable: %s", str1, str2);
-            break;
-        case E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION:
-            sprintf(error_msg, "Illegal variable type: %s for function: %s", str1, str2);
-            break;
-        case E_UNDEFINED_FUNCTION:
-            sprintf(error_msg, "Undefined function: %s in %s", str1, str2);
-            break;
-        case E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED:
-            sprintf(error_msg, "Memory allocation for the function is failed!");
-            break;
-        case E_UNEXPECTED_VALUE_TYPE:
-            sprintf(error_msg, "Unexpected value type: %llu for variable: %s", llu1, str1);
-            break;
-        case E_FUNCTION_DID_NOT_RETURN_ANYTHING:
-            sprintf(error_msg, "The function '%s' did not return anything!", str1);
-            break;
-        case E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH:
-            sprintf(error_msg, "The module %s is either empty or not exists on the path!", str1);
-            break;
-        case E_NO_VARIABLE_WITH_ID:
-            sprintf(error_msg, "No variable with given id: %llu is found!", llu1);
-            break;
-        case E_INDEX_OUT_OF_RANGE_STRING:
-            sprintf(error_msg, "Index out of range: %lld for string: %s", lld1, str1);
-            break;
-        case E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING:
-            sprintf(error_msg, "Illegal character assignment for string: %s", str1);
-            break;
-        case E_NOT_A_CHARACTER:
-            sprintf(error_msg, "Right hand side of the assignment is not a character for string: %s", str1);
-            break;
-        case E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH:
-            sprintf(error_msg, "Program file does not exists on the given path: %s", str1);
-            break;
-        case E_INCORRECT_FUNCTION_ARGUMENT_COUNT:
-            sprintf(error_msg, "Incorrect argument count for function: %s", str1);
-            break;
-        case E_NOT_A_LIST:
-            sprintf(error_msg, "'%s' is not a list!", str1);
-            break;
-        case E_NOT_A_DICT:
-            sprintf(error_msg, "'%s' is not a dictionary!", str1);
-            break;
-        case E_RAISED_FROM_AN_EXTENSION:
-            sprintf(error_msg, "%s", str1);
-            break;
-        case E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER:
-            sprintf(error_msg, "Illegal variable type for function parameter: %s of function: %s", str1, str2);
-            break;
-        case E_UNEXPECTED_ACCESSOR_DATA_TYPE:
-            sprintf(error_msg, "Unexpected accessor data type: %s for variable: %s", str1, str2);
-            break;
-        case E_NEGATIVE_ITERATION_COUNT:
-            sprintf(error_msg, "Negative iteration count: %lld", lld1);
-            break;
-        case E_BREAK_CALL_OUTSIDE_LOOP:
-            sprintf(error_msg, "Call to a function with `break` from outside a loop: %s", str1);
-            break;
-        case E_CONTINUE_CALL_OUTSIDE_LOOP:
-            sprintf(error_msg, "Call to a function with `continue` from outside a loop: %s", str1);
-            break;
-        case E_BREAK_CALL_MULTILINE_LOOP:
-            sprintf(error_msg, "Call to a function with `break` from a multiline loop: %s", str1);
-            break;
-        case E_CONTINUE_CALL_MULTILINE_LOOP:
-            sprintf(error_msg, "Call to a function with `continue` from a multiline loop: %s", str1);
-            break;
-        default:
-            sprintf(error_msg, "Unkown error.");
-            break;
+    switch (code) {
+    case E_UNKNOWN_VARIABLE_TYPE:
+        sprintf(error_msg, "Unknown variable type: %s for variable: %s", str1, str2);
+        break;
+    case E_VARIABLE_ALREADY_DEFINED:
+        sprintf(error_msg, "The variable name '%s' is already defined!", str1);
+        break;
+    case E_UNDEFINED_VARIABLE:
+        sprintf(error_msg, "Undefined variable: %s", str1);
+        break;
+    case E_MEMORY_ALLOCATION_FOR_LIST_FAILED:
+        sprintf(error_msg, "Memory allocation for list '%s' is failed!", str1);
+        break;
+    case E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST:
+        sprintf(error_msg, "Illegal element type: %s for the typed list: %s", str1, str2);
+        break;
+    case E_VARIABLE_IS_NOT_AN_LIST:
+        sprintf(error_msg, "Variable '%s' is not an list!", str1);
+        break;
+    case E_INDEX_OUT_OF_RANGE:
+        sprintf(error_msg, "Index out of range: %lld for list: %s", lld1, str1);
+        break;
+    case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
+        sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);
+        break;
+    case E_VARIABLE_IS_NOT_A_DICTIONARY:
+        sprintf(error_msg, "Variable '%s' is not a dictionary!", str1);
+        break;
+    case E_UNDEFINED_KEY:
+        sprintf(error_msg, "Undefined key: %s for dictionary: %s", str1, str2);
+        break;
+    case E_UNRECOGNIZED_COMPLEX_DATA_TYPE:
+        sprintf(error_msg, "Unrecognized complex data type: %s for variable: %s", str1, str2);
+        break;
+    case E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION:
+        sprintf(error_msg, "Illegal variable type: %s for function: %s", str1, str2);
+        break;
+    case E_UNDEFINED_FUNCTION:
+        sprintf(error_msg, "Undefined function: %s in %s", str1, str2);
+        break;
+    case E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED:
+        sprintf(error_msg, "Memory allocation for the function is failed!");
+        break;
+    case E_UNEXPECTED_VALUE_TYPE:
+        sprintf(error_msg, "Unexpected value type: %llu for variable: %s", llu1, str1);
+        break;
+    case E_FUNCTION_DID_NOT_RETURN_ANYTHING:
+        sprintf(error_msg, "The function '%s' did not return anything!", str1);
+        break;
+    case E_MODULE_IS_EMPTY_OR_NOT_EXISTS_ON_PATH:
+        sprintf(error_msg, "The module %s is either empty or not exists on the path!", str1);
+        break;
+    case E_NO_VARIABLE_WITH_ID:
+        sprintf(error_msg, "No variable with given id: %llu is found!", llu1);
+        break;
+    case E_INDEX_OUT_OF_RANGE_STRING:
+        sprintf(error_msg, "Index out of range: %lld for string: %s", lld1, str1);
+        break;
+    case E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING:
+        sprintf(error_msg, "Illegal character assignment for string: %s", str1);
+        break;
+    case E_NOT_A_CHARACTER:
+        sprintf(error_msg, "Right hand side of the assignment is not a character for string: %s", str1);
+        break;
+    case E_PROGRAM_FILE_DOES_NOT_EXISTS_ON_PATH:
+        sprintf(error_msg, "Program file does not exists on the given path: %s", str1);
+        break;
+    case E_INCORRECT_FUNCTION_ARGUMENT_COUNT:
+        sprintf(error_msg, "Incorrect argument count for function: %s", str1);
+        break;
+    case E_NOT_A_LIST:
+        sprintf(error_msg, "'%s' is not a list!", str1);
+        break;
+    case E_NOT_A_DICT:
+        sprintf(error_msg, "'%s' is not a dictionary!", str1);
+        break;
+    case E_RAISED_FROM_AN_EXTENSION:
+        sprintf(error_msg, "%s", str1);
+        break;
+    case E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER:
+        sprintf(error_msg, "Illegal variable type for function parameter: %s of function: %s", str1, str2);
+        break;
+    case E_UNEXPECTED_ACCESSOR_DATA_TYPE:
+        sprintf(error_msg, "Unexpected accessor data type: %s for variable: %s", str1, str2);
+        break;
+    case E_NEGATIVE_ITERATION_COUNT:
+        sprintf(error_msg, "Negative iteration count: %lld", lld1);
+        break;
+    case E_BREAK_CALL_OUTSIDE_LOOP:
+        sprintf(error_msg, "Call to a function with `break` from outside a loop: %s", str1);
+        break;
+    case E_CONTINUE_CALL_OUTSIDE_LOOP:
+        sprintf(error_msg, "Call to a function with `continue` from outside a loop: %s", str1);
+        break;
+    case E_BREAK_CALL_MULTILINE_LOOP:
+        sprintf(error_msg, "Call to a function with `break` from a multiline loop: %s", str1);
+        break;
+    case E_CONTINUE_CALL_MULTILINE_LOOP:
+        sprintf(error_msg, "Call to a function with `continue` from a multiline loop: %s", str1);
+        break;
+    default:
+        sprintf(error_msg, "Unkown error.");
+        break;
     }
 
     sprintf(error_msg_out, "  %s", error_msg);

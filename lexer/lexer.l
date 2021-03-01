@@ -181,21 +181,20 @@ static int custom_input(char *buf, int result, int max_size) {
 
 %{
 
-switch (phase)
-{
-    case INIT_PREPARSE:
-        phase = PREPARSE;
-        return START_PREPARSE;
-        break;
-    case INIT_PROGRAM:
-        phase = PROGRAM;
-        return START_PROGRAM;
-        break;
-    case INIT_JSON_PARSE:
-        phase = JSON_PARSE;
-        return START_JSON_PARSE;
-    default:
-        break;
+switch (phase) {
+case INIT_PREPARSE:
+    phase = PREPARSE;
+    return START_PREPARSE;
+    break;
+case INIT_PROGRAM:
+    phase = PROGRAM;
+    return START_PROGRAM;
+    break;
+case INIT_JSON_PARSE:
+    phase = JSON_PARSE;
+    return START_JSON_PARSE;
+default:
+    break;
 }
 
 %}
