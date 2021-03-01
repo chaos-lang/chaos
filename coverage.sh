@@ -21,6 +21,7 @@ llvm-cov show /usr/local/bin/chaos -instr-profile=chaos.profdata \
     ./Chaos.c \
     ./ast/*.c \
     ./compiler/*.c \
+    ./vm/*.c \
     ./interpreter/*.c \
     ./lexer/*.c \
     ./parser/*.c \
