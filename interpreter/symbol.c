@@ -24,13 +24,13 @@
 #include "symbol.h"
 
 char *type_names[] = {
+    "Void",
     "Boolean",
     "Number",
     "String",
     "Any",
     "List",
-    "Dictionary",
-    "Void"
+    "Dictionary"
 };
 
 char *value_type_names[] = {

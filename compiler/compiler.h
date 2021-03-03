@@ -39,11 +39,10 @@ typedef struct i64_array {
 i64_array* compile(ASTRoot* ast_root);
 void compileStmtList(i64_array* program, StmtList* stmt_list);
 void compileStmt(i64_array* program, Stmt* stmt);
-void compileExpr(i64_array* program, Expr* expr);
+unsigned short compileExpr(i64_array* program, Expr* expr);
 void compileDecl(i64_array* program, Decl* decl);
 void push_instr(i64_array* program, i64 el);
 i64 popProgram(i64_array* program);
-void expandStack(i64_array* program, i64 stack);
 void freeProgram(i64_array* program);
 i64_array* initProgram();
 

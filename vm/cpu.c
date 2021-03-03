@@ -183,6 +183,7 @@ void execute(cpu *c)
     case LNOT:
         c->r[c->dest] = !c->r[c->dest];
         c->pc++;
+        break;
     case PRNT:
         switch (c->r[R0]) {
         case V_BOOL:

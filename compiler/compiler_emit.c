@@ -139,7 +139,7 @@ void emitBytecode(cpu *c)
         c->pc += 2;
         break;
     case BNOT:
-        printf("%s %s %s\n", "BNOT", getRegName(c->dest), getRegName(c->src));
+        printf("%s %s\n", "BNOT", getRegName(c->dest));
         c->pc++;
         break;
     case BXOR:
@@ -155,8 +155,9 @@ void emitBytecode(cpu *c)
         c->pc += 2;
         break;
     case LNOT:
-        printf("%s %s %s\n", "LNOT", getRegName(c->dest), getRegName(c->src));
+        printf("%s %s\n", "LNOT", getRegName(c->dest));
         c->pc++;
+        break;
     case PRNT:
         printf("%s\n", "PRNT");
         break;

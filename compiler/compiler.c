@@ -56,10 +56,11 @@ void compileStmt(i64_array* program, Stmt* stmt)
     }
 }
 
-void compileExpr(i64_array* program, Expr* expr)
+unsigned short compileExpr(i64_array* program, Expr* expr)
 {
     size_t len;
     Symbol* symbol;
+    unsigned short type;
     i64 addr;
     switch (expr->kind) {
     case BasicLit_kind:
@@ -72,6 +73,7 @@ void compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1);
             push_instr(program, expr->v.basic_lit->value.b ? 1 : 0);
+            return 1;
             break;
         case V_INT:
             push_instr(program, LII);
@@ -81,6 +83,7 @@ void compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1);
             push_instr(program, expr->v.basic_lit->value.i);
+            return 2;
             break;
         case V_FLOAT:
             push_instr(program, LII);
@@ -100,6 +103,7 @@ void compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R2);
             push_instr(program, frac);
+            return 3;
             break;
         case V_STRING:
             len = strlen(expr->v.basic_lit->value.s);
@@ -119,6 +123,7 @@ void compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1);
             push_instr(program, len);
+            return 4;
             break;
         default:
             break;
@@ -184,20 +189,57 @@ void compileExpr(i64_array* program, Expr* expr)
             break;
         }
         break;
+    case UnaryExpr_kind:
+        type = compileExpr(program, expr->v.unary_expr->x);
+        switch (expr->v.unary_expr->op) {
+        case ADD_tok:
+            push_instr(program, LII);
+            push_instr(program, R3);
+            push_instr(program, 1);
+
+            push_instr(program, MUL);
+            push_instr(program, R1);
+            push_instr(program, R3);
+            break;
+        case SUB_tok:
+            push_instr(program, LII);
+            push_instr(program, R3);
+            push_instr(program, -1);
+
+            push_instr(program, MUL);
+            push_instr(program, R1);
+            push_instr(program, R3);
+            break;
+        case NOT_tok:
+            push_instr(program, LNOT);
+            push_instr(program, R1);
+            break;
+        case TILDE_tok:
+            push_instr(program, BNOT);
+            push_instr(program, R1);
+            break;
+        default:
+            break;
+        }
+        return type;
+        break;
     default:
         break;
     }
+
+    return 0;
 }
 
 void compileDecl(i64_array* program, Decl* decl)
 {
     size_t len;
     Symbol* symbol;
+    unsigned short type;
     switch (decl->kind) {
     case VarDecl_kind:
-        compileExpr(program, decl->v.var_decl->expr);
+        type = compileExpr(program, decl->v.var_decl->expr);
 
-        switch (decl->v.var_decl->expr->v.basic_lit->value_type) {
+        switch (type) {
         case V_BOOL:
             symbol = addSymbolBool(
                 decl->v.var_decl->ident->v.ident->name,
@@ -283,26 +325,12 @@ void compileDecl(i64_array* program, Decl* decl)
 
 void push_instr(i64_array* program, i64 el)
 {
-    if (program->capacity == 0)
-        program->arr = (i64*)malloc(++(program->capacity) * sizeof(i64*));
-    else
-        program->arr = (i64*)realloc(program->arr, ++(program->capacity) * sizeof(i64*));
-
-    program->arr[program->size] = el;
-    program->size++;
+    program->arr[program->size++] = el;
 }
 
 i64 popProgram(i64_array* program)
 {
     return program->arr[program->size--];
-}
-
-void expandStack(i64_array* program, i64 stack)
-{
-    if (program->capacity == 0)
-        program->arr = (i64*)malloc((program->capacity += stack) * sizeof(i64*));
-    else
-        program->arr = (i64*)realloc(program->arr, (program->capacity += stack) * sizeof(i64*));
 }
 
 void freeProgram(i64_array* program)
@@ -313,9 +341,10 @@ void freeProgram(i64_array* program)
 
 i64_array* initProgram()
 {
-    i64_array* program = (i64_array*)malloc(1 * sizeof(i64_array*));
-    program->capacity = 0;
+    i64_array* program = malloc(sizeof *program);
+    program->capacity = USHRT_MAX * 32;
+    program->arr = (i64*)malloc(program->capacity * sizeof(i64));
     program->size = 0;
-    program->heap = USHRT_MAX * 32;
+    program->heap = USHRT_MAX * 2;
     return program;
 }
