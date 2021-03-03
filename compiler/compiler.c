@@ -73,7 +73,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1);
             push_instr(program, expr->v.basic_lit->value.b ? 1 : 0);
-            return 1;
             break;
         case V_INT:
             push_instr(program, LII);
@@ -83,7 +82,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1);
             push_instr(program, expr->v.basic_lit->value.i);
-            return 2;
             break;
         case V_FLOAT:
             push_instr(program, LII);
@@ -103,7 +101,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R2);
             push_instr(program, frac);
-            return 3;
             break;
         case V_STRING:
             len = strlen(expr->v.basic_lit->value.s);
@@ -123,11 +120,11 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1);
             push_instr(program, len);
-            return 4;
             break;
         default:
             break;
         }
+        return expr->v.basic_lit->value_type + 1;
         break;
     case Ident_kind:
         symbol = getSymbol(expr->v.ident->name);
@@ -239,7 +236,7 @@ void compileDecl(i64_array* program, Decl* decl)
     case VarDecl_kind:
         type = compileExpr(program, decl->v.var_decl->expr);
 
-        switch (type) {
+        switch (type - 1) {
         case V_BOOL:
             symbol = addSymbolBool(
                 decl->v.var_decl->ident->v.ident->name,
