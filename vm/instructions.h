@@ -31,7 +31,7 @@ enum instr {
 	LII,
 	PUSH, POP,
 	INC, DEC,
-	ADD, SUB, MUL, DIV,
+	ADD, SUB, MUL, DIV, MOD,
 	JLZ, JGZ, JEZ, JNZ, JMP,
 	SHL, SHR,
 	BAND, BOR, BNOT, BXOR,

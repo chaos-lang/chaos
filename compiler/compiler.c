@@ -67,25 +67,25 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
             push_instr(program, LII);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, V_BOOL);
 
             push_instr(program, LII);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
             push_instr(program, LII);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, V_INT);
 
             push_instr(program, LII);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
             push_instr(program, LII);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, V_FLOAT);
 
             i64 ipart;
@@ -95,30 +95,30 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             sscanf(buf, "%lld.%lld", &ipart, &frac);
 
             push_instr(program, LII);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, ipart);
 
             push_instr(program, LII);
-            push_instr(program, R2);
+            push_instr(program, R2A);
             push_instr(program, frac);
             break;
         case V_STRING:
             len = strlen(expr->v.basic_lit->value.s);
             for (size_t i = len; i > 0; i--) {
                 push_instr(program, LII);
-                push_instr(program, R0);
+                push_instr(program, R0A);
                 push_instr(program, expr->v.basic_lit->value.s[i - 1] - '0');
 
                 push_instr(program, PUSH);
-                push_instr(program, R0);
+                push_instr(program, R0A);
             }
 
             push_instr(program, LII);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, V_STRING);
 
             push_instr(program, LII);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, len);
             break;
         default:
@@ -132,88 +132,155 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         switch (symbol->value_type) {
         case V_BOOL:
             push_instr(program, LDI);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, addr++);
 
             push_instr(program, LDI);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, addr++);
             break;
         case V_INT:
             push_instr(program, LDI);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, addr++);
 
             push_instr(program, LDI);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, addr++);
             break;
         case V_FLOAT:
             push_instr(program, LDI);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, addr++);
 
             push_instr(program, LDI);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, addr++);
 
             push_instr(program, LDI);
-            push_instr(program, R2);
+            push_instr(program, R2A);
             push_instr(program, addr++);
             break;
         case V_STRING:
             push_instr(program, LDI);
-            push_instr(program, R0);
+            push_instr(program, R0A);
             push_instr(program, addr++);
 
             push_instr(program, LDI);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             push_instr(program, addr++);
 
             len = strlen(symbol->value.s);
             addr += len - 1;
             for (size_t i = len; i > 0; i--) {
                 push_instr(program, LDI);
-                push_instr(program, R2);
+                push_instr(program, R2A);
                 push_instr(program, addr--);
 
                 push_instr(program, PUSH);
-                push_instr(program, R2);
+                push_instr(program, R2A);
             }
             addr += len - 1;
             break;
         default:
             break;
         }
+        return symbol->value_type + 1;
+        break;
+    case BinaryExpr_kind:
+        type = compileExpr(program, expr->v.binary_expr->y);
+        shift_registers(program, 4);
+        compileExpr(program, expr->v.binary_expr->x);
+        switch (expr->v.binary_expr->op) {
+        case ADD_tok:
+            push_instr(program, ADD);
+            break;
+        case SUB_tok:
+            push_instr(program, SUB);
+            break;
+        case MUL_tok:
+            push_instr(program, MUL);
+            break;
+        case QUO_tok:
+            push_instr(program, DIV);
+            break;
+        case REM_tok:
+            push_instr(program, MOD);
+            break;
+        case AND_tok:
+            push_instr(program, BAND);
+            break;
+        case OR_tok:
+            push_instr(program, BOR);
+            break;
+        case XOR_tok:
+            push_instr(program, BXOR);
+            break;
+        case SHL_tok:
+            push_instr(program, SHL);
+            break;
+        case SHR_tok:
+            push_instr(program, SHR);
+            break;
+        case EQL_tok:
+            push_instr(program, CMP);
+            break;
+        case NEQ_tok:
+            push_instr(program, CMP);
+            break;
+        case GTR_tok:
+            push_instr(program, CMP);
+            break;
+        case LSS_tok:
+            push_instr(program, CMP);
+            break;
+        case GEQ_tok:
+            push_instr(program, CMP);
+            break;
+        case LEQ_tok:
+            push_instr(program, CMP);
+            break;
+        case LAND_tok:
+            push_instr(program, LAND);
+            break;
+        case LOR_tok:
+            push_instr(program, LOR);
+            break;
+        default:
+            break;
+        }
+        push_instr(program, R1A);
+        push_instr(program, R1B);
+        return type;
         break;
     case UnaryExpr_kind:
         type = compileExpr(program, expr->v.unary_expr->x);
         switch (expr->v.unary_expr->op) {
         case ADD_tok:
             push_instr(program, LII);
-            push_instr(program, R3);
+            push_instr(program, R3A);
             push_instr(program, 1);
 
             push_instr(program, MUL);
-            push_instr(program, R1);
-            push_instr(program, R3);
+            push_instr(program, R1A);
+            push_instr(program, R3A);
             break;
         case SUB_tok:
             push_instr(program, LII);
-            push_instr(program, R3);
+            push_instr(program, R3A);
             push_instr(program, -1);
 
             push_instr(program, MUL);
-            push_instr(program, R1);
-            push_instr(program, R3);
+            push_instr(program, R1A);
+            push_instr(program, R3A);
             break;
         case NOT_tok:
             push_instr(program, LNOT);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             break;
         case TILDE_tok:
             push_instr(program, BNOT);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             break;
         default:
             break;
@@ -246,11 +313,11 @@ void compileDecl(i64_array* program, Decl* decl)
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R0);
+            push_instr(program, R0A);
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             break;
         case V_INT:
             symbol = addSymbolInt(
@@ -261,11 +328,11 @@ void compileDecl(i64_array* program, Decl* decl)
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R0);
+            push_instr(program, R0A);
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R1);
+            push_instr(program, R1A);
             break;
         case V_FLOAT:
             symbol = addSymbolFloat(
@@ -276,15 +343,15 @@ void compileDecl(i64_array* program, Decl* decl)
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R0);
+            push_instr(program, R0A);
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R1);
+            push_instr(program, R1A);
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R2);
+            push_instr(program, R2A);
             break;
         case V_STRING:
             symbol = addSymbolString(
@@ -295,20 +362,20 @@ void compileDecl(i64_array* program, Decl* decl)
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R0);
+            push_instr(program, R0A);
 
             push_instr(program, STI);
             push_instr(program, program->heap++);
-            push_instr(program, R1);
+            push_instr(program, R1A);
 
             len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
             for (size_t i = len; i > 0; i--) {
                 push_instr(program, POP);
-                push_instr(program, R0);
+                push_instr(program, R0A);
 
                 push_instr(program, STI);
                 push_instr(program, program->heap++);
-                push_instr(program, R0);
+                push_instr(program, R0A);
             }
             break;
         default:
@@ -344,4 +411,14 @@ i64_array* initProgram()
     program->size = 0;
     program->heap = USHRT_MAX * 2;
     return program;
+}
+
+void shift_registers(i64_array* program, size_t shift)
+{
+    size_t len = NUM_REGISTERS / 2;
+    for (size_t i = 0; i < shift; i++) {
+        push_instr(program, MOV);
+        push_instr(program, i + len);
+        push_instr(program, i);
+    }
 }

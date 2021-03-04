@@ -36,11 +36,3 @@ void set_flags(cpu *c, i64 a, i64 b)
 	c->ltz = (res < 0);
 	c->gtz = (res > 0);
 }
-
-void fset_flags(cpu *c, f64 a, f64 b)
-{
-	f64 res = a - b;
-	c->zero = (res == 0);
-	c->ltz = (res < 0);
-	c->gtz = (res > 0);
-}

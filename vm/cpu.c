@@ -22,7 +22,12 @@
 
 #include "cpu.h"
 
-cpu *new_cpu(i64 *memory, i64 mem_size)
+char *reg_names[] = {
+    "R0A", "R1A", "R2A", "R3A", "R4A", "R5A", "R6A", "R7A",
+    "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
+};
+
+cpu *new_cpu(i64 *memory, i64 mem_size, bool debug)
 {
 	cpu *c = malloc(sizeof(cpu));
 	c->mem = memory;
@@ -30,6 +35,7 @@ cpu *new_cpu(i64 *memory, i64 mem_size)
 	c->max_mem = mem_size;
 	c->pc = -1;
 	c->inst = 0;
+    c->debug = debug;
 	return c;
 }
 
@@ -57,6 +63,7 @@ void fetch(cpu *c)
 void execute(cpu *c)
 {
     size_t len;
+    char *buf = NULL;
 
 	switch (c->inst) {
     case CLF:
@@ -114,6 +121,10 @@ void execute(cpu *c)
         break;
     case DIV:
         c->r[c->dest] /= c->r[c->src];
+        c->pc += 2;
+        break;
+    case MOD:
+        c->r[c->dest] %= c->r[c->src];
         c->pc += 2;
         break;
     case JLZ:
@@ -185,21 +196,25 @@ void execute(cpu *c)
         c->pc++;
         break;
     case PRNT:
-        switch (c->r[R0]) {
+        switch (c->r[R0A]) {
         case V_BOOL:
-            printf("%s\n", c->r[R1] ? "true" : "false");
+            printf("%s\n", c->r[R1A] ? "true" : "false");
             break;
         case V_INT:
-            printf("%lld\n", c->r[R1]);
+            printf("%lld\n", c->r[R1A]);
             break;
         case V_FLOAT:
-            printf("%lld.%lld\n", c->r[R1], c->r[R2]);
+            buf = snprintf_concat_int(buf, "%lld.", c->r[R1A]);
+            buf = snprintf_concat_int(buf, "%lld\n", c->r[R2A]);
+            printf("%lg\n", atof(buf));
+            free(buf);
+            buf = NULL;
             break;
         case V_STRING:
-            len = c->r[R1];
+            len = c->r[R1A];
             for (size_t i = 0; i < len; i++) {
-                c->r[R1] = c->mem[c->sp++];
-                printf("%c", (int)c->r[R1] + '0');
+                c->r[R1A] = c->mem[c->sp++];
+                printf("%c", (int)c->r[R1A] + '0');
             }
             printf("\n");
             break;
@@ -210,4 +225,20 @@ void execute(cpu *c)
     default:
         break;
 	}
+
+    if (c->debug)
+        print_registers(c);
+}
+
+void print_registers(cpu *c)
+{
+    for (int i = 0; i < NUM_REGISTERS; i++) {
+        printf("[%s: %lld] ", getRegName(i), c->r[i]);
+    }
+    printf("\n");
+}
+
+char *getRegName(i64 i)
+{
+    return reg_names[i];
 }

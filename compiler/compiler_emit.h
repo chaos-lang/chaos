@@ -29,6 +29,5 @@
 void emit(i64_array* program);
 void print_cpu(cpu *c);
 void emitBytecode(cpu *c);
-char *getRegName(i64 i);
 
 #endif

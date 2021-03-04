@@ -23,11 +23,8 @@
 #ifndef KAOS_COMPILER_H
 #define KAOS_COMPILER_H
 
-#include <math.h>
-
 #include "../ast/ast.h"
-#include "../vm/types.h"
-#include "../vm/instructions.h"
+#include "../vm/cpu.h"
 
 typedef struct i64_array {
     i64* arr;
@@ -45,5 +42,6 @@ void push_instr(i64_array* program, i64 el);
 i64 popProgram(i64_array* program);
 void freeProgram(i64_array* program);
 i64_array* initProgram();
+void shift_registers(i64_array* program, size_t shift);
 
 #endif

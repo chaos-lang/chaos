@@ -26,10 +26,11 @@
 #define byte unsigned char
 #define u64 unsigned long long
 #define i64 long long
-#define f64 double
+#define f64 long double
 
 enum registers {
-	R0, R1, R2, R3, R4, R5, R6, R7,
+	R0A, R1A, R2A, R3A, R4A, R5A, R6A, R7A,
+    R0B, R1B, R2B, R3B, R4B, R5B, R6B, R7B,
 	NUM_REGISTERS
 };
 
@@ -40,7 +41,7 @@ typedef struct {
 	// registers
 	i64 pc;
 	i64 sp;
-	i64 r[8];
+	i64 r[NUM_REGISTERS];
 
 	// instruction parts
 	i64 inst;
@@ -51,6 +52,8 @@ typedef struct {
 	i64 zero;
 	i64 ltz;
 	i64 gtz;
+
+    bool debug;
 } cpu;
 
 #endif

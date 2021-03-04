@@ -25,17 +25,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "types.h"
 #include "instructions.h"
 #include "flags.h"
 
 #include "../enums.h"
+#include "../utilities/helpers.h"
 
-cpu *new_cpu(i64 *memory, i64 mem_size);
+cpu *new_cpu(i64 *memory, i64 mem_size, bool debug);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void fetch(cpu *c);
 void execute(cpu *c);
+void print_registers(cpu *c);
+char *getRegName(i64 i);
 
 #endif

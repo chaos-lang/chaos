@@ -22,13 +22,9 @@
 
 #include "compiler_emit.h"
 
-char *reg_names[] = {
-    "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"
-};
-
 void emit(i64_array* program)
 {
-    cpu *c = new_cpu(program->arr, program->size);
+    cpu *c = new_cpu(program->arr, program->size, false);
     print_cpu(c);
     free_cpu(c);
 }
@@ -102,6 +98,10 @@ void emitBytecode(cpu *c)
         printf("%s %s %s\n", "DIV", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
+    case MOD:
+        printf("%s %s %s\n", "MOD", getRegName(c->dest), getRegName(c->src));
+        c->pc += 2;
+        break;
     case JLZ:
         printf("%s\n", "JLZ");
         c->pc++;
@@ -162,9 +162,4 @@ void emitBytecode(cpu *c)
         printf("%s\n", "PRNT");
         break;
 	}
-}
-
-char *getRegName(i64 i)
-{
-    return reg_names[i];
 }
