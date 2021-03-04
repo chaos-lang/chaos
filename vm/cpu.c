@@ -108,23 +108,58 @@ void execute(cpu *c)
         c->pc++;
         break;
     case ADD:
-        c->r[c->dest] += c->r[c->src];
+        if (c->r[R0A] == V_FLOAT) {
+            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1]);
+            f64 f2 = build_f64(c->r[c->src], c->r[c->src + 1]);
+            f1 = f1 + f2;
+            load_f64(c, f1);
+        } else {
+            c->r[c->dest] += c->r[c->src];
+        }
         c->pc += 2;
         break;
     case SUB:
-        c->r[c->dest] -= c->r[c->src];
+        if (c->r[R0A] == V_FLOAT) {
+            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1]);
+            f64 f2 = build_f64(c->r[c->src], c->r[c->src + 1]);
+            f1 = f1 - f2;
+            load_f64(c, f1);
+        } else {
+            c->r[c->dest] -= c->r[c->src];
+        }
         c->pc += 2;
         break;
     case MUL:
-        c->r[c->dest] *= c->r[c->src];
+        if (c->r[R0A] == V_FLOAT) {
+            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1]);
+            f64 f2 = build_f64(c->r[c->src], c->r[c->src + 1]);
+            f1 = f1 * f2;
+            load_f64(c, f1);
+        } else {
+            c->r[c->dest] *= c->r[c->src];
+        }
         c->pc += 2;
         break;
     case DIV:
-        c->r[c->dest] /= c->r[c->src];
+        if (c->r[R0A] == V_FLOAT) {
+            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1]);
+            f64 f2 = build_f64(c->r[c->src], c->r[c->src + 1]);
+            f1 = f1 / f2;
+            load_f64(c, f1);
+        } else {
+            c->r[c->dest] /= c->r[c->src];
+        }
         c->pc += 2;
         break;
     case MOD:
-        c->r[c->dest] %= c->r[c->src];
+        if (c->r[R0A] == V_FLOAT) {
+            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1]);
+            f64 f2 = build_f64(c->r[c->src], c->r[c->src + 1]);
+            f1 = fmodl(f1, f2);
+            load_f64(c, f1);
+        } else {
+            c->r[c->dest] %= c->r[c->src];
+        }
         c->pc += 2;
         break;
     case JLZ:
@@ -241,4 +276,19 @@ void print_registers(cpu *c)
 char *getRegName(i64 i)
 {
     return reg_names[i];
+}
+
+f64 build_f64(i64 ipart, i64 frac)
+{
+    f64 exp = floor(log10l((f64)frac)) + 1;
+    return (f64)ipart + (f64)frac * powl(10.0, -exp);
+}
+
+void load_f64(cpu *c, f64 f)
+{
+    char *buf = NULL;
+    buf = snprintf_concat_float(buf, "%Lf", f);
+    sscanf(buf, "%lld.%lld", &c->r[c->dest], &c->r[c->dest + 1]);
+    free(buf);
+    buf = NULL;
 }

@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "types.h"
 #include "instructions.h"
@@ -41,5 +42,7 @@ void fetch(cpu *c);
 void execute(cpu *c);
 void print_registers(cpu *c);
 char *getRegName(i64 i);
+f64 build_f64(i64 ipart, i64 frac);
+void load_f64(cpu *c, f64 f);
 
 #endif

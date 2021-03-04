@@ -93,6 +93,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             char *buf = NULL;
             buf = snprintf_concat_float(buf, "%Lf", expr->v.basic_lit->value.f);
             sscanf(buf, "%lld.%lld", &ipart, &frac);
+            free(buf);
 
             push_instr(program, LII);
             push_instr(program, R1A);
