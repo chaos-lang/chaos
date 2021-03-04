@@ -28,5 +28,6 @@
 
 void clear_flags(cpu *c);
 void set_flags(cpu *c, i64 a, i64 b);
+void fset_flags(cpu *c, f64 a, f64 b);
 
 #endif

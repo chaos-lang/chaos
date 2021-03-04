@@ -195,63 +195,191 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         switch (expr->v.binary_expr->op) {
         case ADD_tok:
             push_instr(program, ADD);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case SUB_tok:
             push_instr(program, SUB);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case MUL_tok:
             push_instr(program, MUL);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case QUO_tok:
             push_instr(program, DIV);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case REM_tok:
             push_instr(program, MOD);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case AND_tok:
             push_instr(program, BAND);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case OR_tok:
             push_instr(program, BOR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case XOR_tok:
             push_instr(program, BXOR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case SHL_tok:
             push_instr(program, SHL);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case SHR_tok:
             push_instr(program, SHR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case EQL_tok:
             push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 7);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
             break;
         case NEQ_tok:
             push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JNZ);
+            push_instr(program, program->size + 7);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
             break;
         case GTR_tok:
             push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JGZ);
+            push_instr(program, program->size + 7);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
             break;
         case LSS_tok:
             push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JLZ);
+            push_instr(program, program->size + 7);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
             break;
         case GEQ_tok:
             push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 9);
+            push_instr(program, JGZ);
+            push_instr(program, program->size + 7);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
             break;
         case LEQ_tok:
             push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 9);
+            push_instr(program, JLZ);
+            push_instr(program, program->size + 7);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
             break;
         case LAND_tok:
             push_instr(program, LAND);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         case LOR_tok:
             push_instr(program, LOR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         default:
             break;
         }
-        push_instr(program, R1A);
-        push_instr(program, R1B);
         return type;
         break;
     case UnaryExpr_kind:

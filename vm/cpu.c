@@ -70,7 +70,13 @@ void execute(cpu *c)
         clear_flags(c);
         break;
     case CMP:
-        set_flags(c, c->r[c->dest], c->r[c->src]);
+        if (c->r[R0A] == V_FLOAT) {
+            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1]);
+            f64 f2 = build_f64(c->r[c->src], c->r[c->src + 1]);
+            fset_flags(c, f1, f2);
+        } else {
+            set_flags(c, c->r[c->dest], c->r[c->src]);
+        }
         c->pc += 2;
         break;
     case CMPI:
