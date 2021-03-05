@@ -90,10 +90,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
             i64 ipart;
             i64 frac;
-            char *buf = NULL;
-            buf = snprintf_concat_float(buf, "%Lf", expr->v.basic_lit->value.f);
-            sscanf(buf, "%lld.%lld", &ipart, &frac);
-            free(buf);
+            i64 leading_zeros = parse_f64(expr->v.basic_lit->value.f, &ipart, &frac);
 
             push_instr(program, LII);
             push_instr(program, R1A);
@@ -102,6 +99,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R2A);
             push_instr(program, frac);
+
+            push_instr(program, LII);
+            push_instr(program, R3A);
+            push_instr(program, leading_zeros);
             break;
         case V_STRING:
             len = strlen(expr->v.basic_lit->value.s);
@@ -387,21 +388,29 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         switch (expr->v.unary_expr->op) {
         case ADD_tok:
             push_instr(program, LII);
-            push_instr(program, R3A);
+            push_instr(program, R0B);
+            push_instr(program, V_INT);
+
+            push_instr(program, LII);
+            push_instr(program, R1B);
             push_instr(program, 1);
 
             push_instr(program, MUL);
             push_instr(program, R1A);
-            push_instr(program, R3A);
+            push_instr(program, R1B);
             break;
         case SUB_tok:
             push_instr(program, LII);
-            push_instr(program, R3A);
+            push_instr(program, R0B);
+            push_instr(program, V_INT);
+
+            push_instr(program, LII);
+            push_instr(program, R1B);
             push_instr(program, -1);
 
             push_instr(program, MUL);
             push_instr(program, R1A);
-            push_instr(program, R3A);
+            push_instr(program, R1B);
             break;
         case NOT_tok:
             push_instr(program, LNOT);
