@@ -45,5 +45,6 @@ char *getRegName(i64 i);
 f64 build_f64(i64 ipart, i64 frac, i64 leading_zeros);
 i64 parse_f64(f64 f, i64* ipart, i64* frac);
 void load_f64(cpu *c, f64 f);
+void get_f64_operands(cpu *c, f64* f1, f64* f2);
 
 #endif

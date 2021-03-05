@@ -70,13 +70,9 @@ void execute(cpu *c)
         break;
     case CMP:
         if (c->r[R0A] == V_FLOAT) {
-            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+            f64 f1;
             f64 f2;
-            if (c->r[R0B] == V_FLOAT) {
-                f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
+            get_f64_operands(c, &f1, &f2);
             fset_flags(c, f1, f2);
         } else {
             set_flags(c, c->r[c->dest], c->r[c->src]);
@@ -119,13 +115,9 @@ void execute(cpu *c)
         break;
     case ADD:
         if (c->r[R0A] == V_FLOAT) {
-            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+            f64 f1;
             f64 f2;
-            if (c->r[R0B] == V_FLOAT) {
-                f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
+            get_f64_operands(c, &f1, &f2);
             f1 = f1 + f2;
             load_f64(c, f1);
         } else {
@@ -135,13 +127,9 @@ void execute(cpu *c)
         break;
     case SUB:
         if (c->r[R0A] == V_FLOAT) {
-            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+            f64 f1;
             f64 f2;
-            if (c->r[R0B] == V_FLOAT) {
-                f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
+            get_f64_operands(c, &f1, &f2);
             f1 = f1 - f2;
             load_f64(c, f1);
         } else {
@@ -151,13 +139,9 @@ void execute(cpu *c)
         break;
     case MUL:
         if (c->r[R0A] == V_FLOAT) {
-            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+            f64 f1;
             f64 f2;
-            if (c->r[R0B] == V_FLOAT) {
-                f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
+            get_f64_operands(c, &f1, &f2);
             f1 = f1 * f2;
             load_f64(c, f1);
         } else {
@@ -167,13 +151,9 @@ void execute(cpu *c)
         break;
     case DIV:
         if (c->r[R0A] == V_FLOAT) {
-            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+            f64 f1;
             f64 f2;
-            if (c->r[R0B] == V_FLOAT) {
-                f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
+            get_f64_operands(c, &f1, &f2);
             f1 = f1 / f2;
             load_f64(c, f1);
         } else {
@@ -183,13 +163,9 @@ void execute(cpu *c)
         break;
     case MOD:
         if (c->r[R0A] == V_FLOAT) {
-            f64 f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+            f64 f1;
             f64 f2;
-            if (c->r[R0B] == V_FLOAT) {
-                f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
+            get_f64_operands(c, &f1, &f2);
             f1 = fmodl(f1, f2);
             load_f64(c, f1);
         } else {
@@ -335,4 +311,14 @@ i64 parse_f64(f64 f, i64* ipart, i64* frac)
 void load_f64(cpu *c, f64 f)
 {
     c->r[c->dest + 2] = parse_f64(f, &c->r[c->dest], &c->r[c->dest + 1]);
+}
+
+void get_f64_operands(cpu *c, f64* f1, f64* f2)
+{
+    *f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
+    if (c->r[R0B] == V_FLOAT) {
+        *f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
+    } else {
+        *f2 = (f64)c->r[c->src];
+    }
 }
