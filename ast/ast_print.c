@@ -295,7 +295,7 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
         case V_FLOAT:
             printf(
                 "%*c\"value_type\": \"float\",\n"
-                "%*c\"value\": \"%Lg\"\n",
+                "%*c\"value\": \"%lg\"\n",
                 indent,
                 __KAOS_INDENT_CHAR__,
                 indent,
@@ -305,7 +305,7 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
             break;
         case V_STRING:
             printf(
-                "%*c\"value_type\": \"int\",\n"
+                "%*c\"value_type\": \"string\",\n"
                 "%*c\"value\": \"%s\"\n",
                 indent,
                 __KAOS_INDENT_CHAR__,

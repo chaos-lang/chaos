@@ -50,8 +50,9 @@ typedef struct Symbol {
         bool b;
         long long i;
         char *s;
-        long double f;
+        double f;
     } value;
+    size_t len;
     short sign;
     enum ValueType value_type;
     struct Symbol* previous;
@@ -119,6 +120,7 @@ void updateSymbolInt(char *name, long long i);
 Symbol* addSymbolFloat(char *name, long double f);
 void updateSymbolFloat(char *name, long double f);
 Symbol* addSymbolString(char *name, char *s);
+Symbol* addSymbolStringNew(char *name, char *s, size_t len);
 void updateSymbolString(char *name, char *s);
 void addSymbolList(char *name);
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type);

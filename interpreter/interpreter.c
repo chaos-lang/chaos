@@ -787,7 +787,7 @@ eval_node_label:
         printf("%lld\n", ast_node->right->value.i);
         break;
     case AST_PRINT_MIXED_EXPRESSION:
-        printf("%Lg\n", ast_node->right->value.f);
+        printf("%lg\n", ast_node->right->value.f);
         break;
     case AST_PRINT_STRING:
         out = escape_the_sequences_in_string_literal(ast_node->value.s);
@@ -810,7 +810,7 @@ eval_node_label:
     case AST_PRINT_INTERACTIVE_MIXED_EXPRESSION:
 #ifndef CHAOS_COMPILER
         if (is_interactive)
-            printf("%Lg\n", ast_node->right->value.f);
+            printf("%lg\n", ast_node->right->value.f);
 #endif
         break;
     case AST_ECHO_VAR:
@@ -823,7 +823,7 @@ eval_node_label:
         printf("%lld", ast_node->right->value.i);
         break;
     case AST_ECHO_MIXED_EXPRESSION:
-        printf("%Lg", ast_node->right->value.f);
+        printf("%lg", ast_node->right->value.f);
         break;
     case AST_ECHO_STRING:
         out = escape_the_sequences_in_string_literal(ast_node->value.s);

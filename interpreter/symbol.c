@@ -634,6 +634,15 @@ Symbol* addSymbolString(char *name, char *s) {
     return addSymbol(name, K_STRING, value, V_STRING);
 }
 
+Symbol* addSymbolStringNew(char *name, char *s, size_t len) {
+    union Value value;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
+    Symbol* symbol = addSymbol(name, K_STRING, value, V_STRING);
+    symbol->len = len;
+    return symbol;
+}
+
 void updateSymbolString(char *name, char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
@@ -1292,7 +1301,7 @@ char* symbolValueByTypeCastingToString(Symbol* symbol) {
         strcpy(result, val);
         return result;
     case V_FLOAT:
-        sprintf(buffer, "%Lg", symbol->value.f);
+        sprintf(buffer, "%lg", symbol->value.f);
         val = buffer;
         result = malloc(1 + strlen(val));
         strcpy(result, val);

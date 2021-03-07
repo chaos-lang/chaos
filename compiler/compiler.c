@@ -58,7 +58,6 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
 unsigned short compileExpr(i64_array* program, Expr* expr)
 {
-    size_t len;
     Symbol* symbol;
     unsigned short type;
     i64 addr;
@@ -88,24 +87,16 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R0A);
             push_instr(program, V_FLOAT);
 
-            i64 ipart;
-            i64 frac;
-            i64 leading_zeros = parse_f64(expr->v.basic_lit->value.f, &ipart, &frac);
+            i64 f;
+            f64 _f = expr->v.basic_lit->value.f;
+            memcpy(&f, &_f, sizeof f);
 
             push_instr(program, LII);
             push_instr(program, R1A);
-            push_instr(program, ipart);
-
-            push_instr(program, LII);
-            push_instr(program, R2A);
-            push_instr(program, frac);
-
-            push_instr(program, LII);
-            push_instr(program, R3A);
-            push_instr(program, leading_zeros);
+            push_instr(program, f);
             break;
-        case V_STRING:
-            len = strlen(expr->v.basic_lit->value.s);
+        case V_STRING: {
+            size_t len = strlen(expr->v.basic_lit->value.s);
             for (size_t i = len; i > 0; i--) {
                 push_instr(program, LII);
                 push_instr(program, R0A);
@@ -123,6 +114,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1A);
             push_instr(program, len);
             break;
+        }
         default:
             break;
         }
@@ -158,12 +150,8 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LDI);
             push_instr(program, R1A);
             push_instr(program, addr++);
-
-            push_instr(program, LDI);
-            push_instr(program, R2A);
-            push_instr(program, addr++);
             break;
-        case V_STRING:
+        case V_STRING: {
             push_instr(program, LDI);
             push_instr(program, R0A);
             push_instr(program, addr++);
@@ -172,7 +160,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1A);
             push_instr(program, addr++);
 
-            len = strlen(symbol->value.s);
+            size_t len = symbol->len;
             addr += len - 1;
             for (size_t i = len; i > 0; i--) {
                 push_instr(program, LDI);
@@ -184,6 +172,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             }
             addr += len - 1;
             break;
+        }
         default:
             break;
         }
@@ -434,7 +423,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
 void compileDecl(i64_array* program, Decl* decl)
 {
-    size_t len;
     Symbol* symbol;
     unsigned short type;
     switch (decl->kind) {
@@ -486,15 +474,28 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, STI);
             push_instr(program, program->heap++);
             push_instr(program, R1A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R2A);
             break;
-        case V_STRING:
-            symbol = addSymbolString(
+        case V_STRING: {
+            size_t len = 0;
+
+            switch (decl->v.var_decl->expr->kind) {
+            case BasicLit_kind:
+                len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
+                break;
+            case BinaryExpr_kind:
+                len =
+                    strlen(decl->v.var_decl->expr->v.binary_expr->x->v.basic_lit->value.s)
+                    +
+                    strlen(decl->v.var_decl->expr->v.binary_expr->y->v.basic_lit->value.s);
+                break;
+            default:
+                break;
+            }
+
+            symbol = addSymbolStringNew(
                 decl->v.var_decl->ident->v.ident->name,
-                decl->v.var_decl->expr->v.basic_lit->value.s
+                "",
+                len
             );
             symbol->addr = program->heap;
 
@@ -506,7 +507,6 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, program->heap++);
             push_instr(program, R1A);
 
-            len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
             for (size_t i = len; i > 0; i--) {
                 push_instr(program, POP);
                 push_instr(program, R0A);
@@ -516,6 +516,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 push_instr(program, R0A);
             }
             break;
+        }
         default:
             break;
         }

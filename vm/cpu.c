@@ -36,6 +36,9 @@ cpu *new_cpu(i64 *memory, i64 mem_size, bool debug)
 	c->pc = -1;
 	c->inst = 0;
     c->debug = debug;
+    for (unsigned i = 0; i < NUM_REGISTERS; i++) {
+        c->r[i] = 0;
+    }
 	return c;
 }
 
@@ -62,8 +65,6 @@ void fetch(cpu *c)
 
 void execute(cpu *c)
 {
-    size_t len;
-
 	switch (c->inst) {
     case CLF:
         clear_flags(c);
@@ -72,7 +73,14 @@ void execute(cpu *c)
         if (c->r[R0A] == V_FLOAT) {
             f64 f1;
             f64 f2;
-            get_f64_operands(c, &f1, &f2);
+            i64 i1 = c->r[c->dest];
+            i64 i2 = c->r[c->src];
+            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0B] == V_FLOAT) {
+                memcpy(&f2, &i2, sizeof f2);
+            } else {
+                f2 = (f64)c->r[c->src];
+            }
             fset_flags(c, f1, f2);
         } else {
             set_flags(c, c->r[c->dest], c->r[c->src]);
@@ -117,9 +125,18 @@ void execute(cpu *c)
         if (c->r[R0A] == V_FLOAT) {
             f64 f1;
             f64 f2;
-            get_f64_operands(c, &f1, &f2);
+            i64 i1 = c->r[c->dest];
+            i64 i2 = c->r[c->src];
+            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0B] == V_FLOAT) {
+                memcpy(&f2, &i2, sizeof f2);
+            } else {
+                f2 = (f64)c->r[c->src];
+            }
             f1 = f1 + f2;
-            load_f64(c, f1);
+            i64 i;
+            memcpy(&i, &f1, sizeof f1);
+            c->r[c->dest] = i;
         } else {
             c->r[c->dest] += c->r[c->src];
         }
@@ -129,9 +146,18 @@ void execute(cpu *c)
         if (c->r[R0A] == V_FLOAT) {
             f64 f1;
             f64 f2;
-            get_f64_operands(c, &f1, &f2);
+            i64 i1 = c->r[c->dest];
+            i64 i2 = c->r[c->src];
+            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0B] == V_FLOAT) {
+                memcpy(&f2, &i2, sizeof f2);
+            } else {
+                f2 = (f64)c->r[c->src];
+            }
             f1 = f1 - f2;
-            load_f64(c, f1);
+            i64 i;
+            memcpy(&i, &f1, sizeof f1);
+            c->r[c->dest] = i;
         } else {
             c->r[c->dest] -= c->r[c->src];
         }
@@ -141,9 +167,18 @@ void execute(cpu *c)
         if (c->r[R0A] == V_FLOAT) {
             f64 f1;
             f64 f2;
-            get_f64_operands(c, &f1, &f2);
+            i64 i1 = c->r[c->dest];
+            i64 i2 = c->r[c->src];
+            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0B] == V_FLOAT) {
+                memcpy(&f2, &i2, sizeof f2);
+            } else {
+                f2 = (f64)c->r[c->src];
+            }
             f1 = f1 * f2;
-            load_f64(c, f1);
+            i64 i;
+            memcpy(&i, &f1, sizeof f1);
+            c->r[c->dest] = i;
         } else {
             c->r[c->dest] *= c->r[c->src];
         }
@@ -153,9 +188,18 @@ void execute(cpu *c)
         if (c->r[R0A] == V_FLOAT) {
             f64 f1;
             f64 f2;
-            get_f64_operands(c, &f1, &f2);
+            i64 i1 = c->r[c->dest];
+            i64 i2 = c->r[c->src];
+            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0B] == V_FLOAT) {
+                memcpy(&f2, &i2, sizeof f2);
+            } else {
+                f2 = (f64)c->r[c->src];
+            }
             f1 = f1 / f2;
-            load_f64(c, f1);
+            i64 i;
+            memcpy(&i, &f1, sizeof f1);
+            c->r[c->dest] = i;
         } else {
             c->r[c->dest] /= c->r[c->src];
         }
@@ -165,9 +209,18 @@ void execute(cpu *c)
         if (c->r[R0A] == V_FLOAT) {
             f64 f1;
             f64 f2;
-            get_f64_operands(c, &f1, &f2);
+            i64 i1 = c->r[c->dest];
+            i64 i2 = c->r[c->src];
+            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0B] == V_FLOAT) {
+                memcpy(&f2, &i2, sizeof f2);
+            } else {
+                f2 = (f64)c->r[c->src];
+            }
             f1 = fmodl(f1, f2);
-            load_f64(c, f1);
+            i64 i;
+            memcpy(&i, &f1, sizeof f1);
+            c->r[c->dest] = i;
         } else {
             c->r[c->dest] %= c->r[c->src];
         }
@@ -249,17 +302,22 @@ void execute(cpu *c)
         case V_INT:
             printf("%lld\n", c->r[R1A]);
             break;
-        case V_FLOAT:
-            printf("%Lg\n", build_f64(c->r[R1A], c->r[R2A], c->r[R3A]));
+        case V_FLOAT: {
+            i64 i = c->r[R1A];
+            f64 f;
+            memcpy(&f, &i, sizeof f);
+            printf("%lg\n", f);
             break;
-        case V_STRING:
-            len = c->r[R1A];
+        }
+        case V_STRING: {
+            size_t len = c->r[R1A];
             for (size_t i = 0; i < len; i++) {
                 c->r[R1A] = c->mem[c->sp++];
                 printf("%c", (int)c->r[R1A] + '0');
             }
             printf("\n");
             break;
+        }
         default:
             break;
         }
@@ -283,42 +341,4 @@ void print_registers(cpu *c)
 char *getRegName(i64 i)
 {
     return reg_names[i];
-}
-
-f64 build_f64(i64 ipart, i64 frac, i64 leading_zeros)
-{
-    int sign = (ipart < 0) ? -1 : 1;
-    ipart = sign * ipart;
-    f64 exp = (frac == 0) ? 0 : floor(log10l((f64)frac)) + 1;
-    if (leading_zeros > 0)
-        exp += leading_zeros;
-    return sign * ((f64)ipart + (f64)frac * powl(10.0, -exp));
-}
-
-i64 parse_f64(f64 f, i64* ipart, i64* frac)
-{
-    int frac_start;
-    int frac_end;
-    char *buf = NULL;
-    buf = snprintf_concat_float(buf, "%Lf", f);
-    sscanf(buf, "%lld.%n%lld%n", ipart, &frac_start, frac, &frac_end);
-    free(buf);
-
-    int digits = (*frac == 0) ? 0 : log10l((f64)*frac);
-    return frac_end - (frac_start + digits) - 1;
-}
-
-void load_f64(cpu *c, f64 f)
-{
-    c->r[c->dest + 2] = parse_f64(f, &c->r[c->dest], &c->r[c->dest + 1]);
-}
-
-void get_f64_operands(cpu *c, f64* f1, f64* f2)
-{
-    *f1 = build_f64(c->r[c->dest], c->r[c->dest + 1], c->r[c->dest + 2]);
-    if (c->r[R0B] == V_FLOAT) {
-        *f2 = build_f64(c->r[c->src], c->r[c->src + 1], c->r[c->src + 2]);
-    } else {
-        *f2 = (f64)c->r[c->src];
-    }
 }

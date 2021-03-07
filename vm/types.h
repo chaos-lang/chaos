@@ -26,7 +26,7 @@
 #define byte unsigned char
 #define u64 unsigned long long
 #define i64 long long
-#define f64 long double
+#define f64 double
 
 enum registers {
 	R0A, R1A, R2A, R3A, R4A, R5A, R6A, R7A,
