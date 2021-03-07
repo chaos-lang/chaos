@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-OPTS=`getopt \
+OPTS=$(getopt \
 -o ns --long no-shell \
--- "$@"`
+-- "$@")
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 eval set -- "$OPTS"
 
@@ -24,19 +24,19 @@ while true; do
 done
 
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 
 failed=false
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
-    out=$(<"$DIR/$testname.out")
+    out=$(cat "$DIR/$testname.out")
 
     echo "(interpreter) Running test: ${testname}"
 
-    test=$(chaos tests/$filename 2>&1)
-    if [ "$test" == "$out" ]
+    test=$(chaos "tests/$filename" 2>&1)
+    if [ "$test" = "$out" ]
     then
         echo "OK"
     else
@@ -46,14 +46,14 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     fi
 done
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
-    out=$(<"$DIR/$testname.out")
+    out=$(cat "$DIR/$testname.out")
 
     SKIP_TESTS="nonewline function decision everything syntax_error preemptive"
 
-    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+    if echo "$SKIP_TESTS" | grep -w "$testname" > /dev/null; then
         continue
     fi
 
@@ -61,11 +61,11 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 
     cd tests/
 
-    test=$(cat $filename | chaos 2>&1 | sed "s|.\[1;41m\s*||g" | sed "s|.\[0;41m\s*||g" \
+    test=$(cat "$filename" | chaos 2>&1 | sed "s|.\[1;41m\s*||g" | sed "s|.\[0;41m\s*||g" \
     | sed "s|.\[1;44m\s*||g" | sed "s|\s*.\[0m||g" | sed "s|.\[5;42m\s*||g" | sed "s|.\[0;90m.*||g" \
     | sed "s|.*\/chaos|File: \"~/chaos|g")
 
-    if [ "$test" == "$out" ]
+    if [ "$test" = "$out" ]
     then
         echo "OK"
     else
@@ -78,7 +78,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
 done
 
 if [ "$SHELL" = true ] ; then
-    $DIR/shell/interpreter.sh
+    "$DIR/shell/interpreter.sh"
 fi
 
 if [ "$failed" = true ] ; then

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 UNAME_S=$(uname -s)
 
@@ -7,8 +7,8 @@ test_spell() {
         printf '%s\n' "Removing directory: $1"
         rm -rf "$1"
     fi
-    git clone https://github.com/chaos-lang/$1.git --depth 1 && \
-    cd $1/ && \
+    git clone "https://github.com/chaos-lang/$1.git" --depth 1 && \
+    cd "$1"/ && \
     make && \
     make test && \
     make test-compiler && \
@@ -28,12 +28,12 @@ test_spell() {
 
 echo "Testing all official spells"
 
-SPELL_LIST=(math string array json)
+SPELL_LIST="math string array json"
 
 mkdir -p .build && \
 cd .build && \
 
-for spell in ${SPELL_LIST[*]}
+for spell in $SPELL_LIST
 do
-    test_spell $spell || exit 1
+    test_spell "$spell" || exit 1
 done

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 extra_flags=""
 EXTRA_FLAGS_ENABLED=false
@@ -19,21 +19,21 @@ while getopts ":e:" opt; do
     esac
 done
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 
 failed=false
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
-    out=$(<"$DIR/$testname.out")
+    out=$(cat "$DIR/$testname.out")
 
     echo "(compiler) Compiling test: ${testname}"
 
     if [ "$EXTRA_FLAGS_ENABLED" = true ] ; then
-        cout=$(chaos -c tests/rosetta/$filename -o $testname -e "$extra_flags")
+        cout=$(chaos -c "tests/rosetta/$filename" -o "$testname" -e "$extra_flags")
     else
-        cout=$(chaos -c tests/rosetta/$filename -o $testname)
+        cout=$(chaos -c "tests/rosetta/$filename" -o "$testname")
     fi
     status=$?
 
@@ -47,15 +47,15 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     fi
 done
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
-    out=$(<"$DIR/$testname.out")
+    out=$(cat "$DIR/$testname.out")
 
     echo "(compiler) Running test: ${testname}"
 
-    test=$(build/$testname)
-    if [ "$test" == "$out" ]
+    test="build/$testname"
+    if [ "$test" = "$out" ]
     then
         echo "OK"
     else
