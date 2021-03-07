@@ -51,6 +51,65 @@ void compileStmt(i64_array* program, Stmt* stmt)
     case DeclStmt_kind:
         compileDecl(program, stmt->v.decl_stmt->decl);
         break;
+    case AssignStmt_kind: {
+        compileExpr(program, stmt->v.assign_stmt->x);
+        shift_registers(program, 4);
+        compileExpr(program, stmt->v.assign_stmt->y);
+        Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
+        i64 addr = symbol->addr;
+        switch (symbol->type) {
+        case V_BOOL:
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R1A);
+            break;
+        case V_INT:
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R1A);
+            break;
+        case V_FLOAT:
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R1A);
+            break;
+        case V_STRING: {
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R1A);
+
+            size_t len = symbol->len;
+            for (size_t i = 0; i < len; i++) {
+                push_instr(program, POP);
+                push_instr(program, R2A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R2A);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
     default:
         break;
     }
