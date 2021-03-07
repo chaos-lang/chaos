@@ -94,7 +94,7 @@ long long getVariableInt(char *name) {
     return getSymbolValueInt(name);
 }
 
-long double getVariableFloat(char *name) {
+double getVariableFloat(char *name) {
     return getSymbolValueFloat(name);
 }
 
@@ -112,7 +112,7 @@ long long getVariableIntByTypeCasting(char *name) {
     return symbolValueByTypeCastingToInt(symbol);
 }
 
-long double getVariableFloatByTypeCasting(char *name) {
+double getVariableFloatByTypeCasting(char *name) {
     Symbol* symbol = getSymbol(name);
     return symbolValueByTypeCastingToFloat(symbol);
 }
@@ -143,7 +143,7 @@ long long getListElementInt(char *name, long long i) {
     return _getSymbolValueInt(symbol);
 }
 
-long double getListElementFloat(char *name, long long i) {
+double getListElementFloat(char *name, long long i) {
     Symbol* symbol = getListElement(getSymbol(name), i);
     if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
@@ -169,7 +169,7 @@ long long getListElementIntByTypeCasting(char *name, long long i) {
     return symbolValueByTypeCastingToInt(symbol);
 }
 
-long double getListElementFloatByTypeCasting(char *name, long long i) {
+double getListElementFloatByTypeCasting(char *name, long long i) {
     Symbol* symbol = getListElement(getSymbol(name), i);
     return symbolValueByTypeCastingToFloat(symbol);
 }
@@ -229,7 +229,7 @@ long long getDictElementInt(char *name, char *key) {
     return _getSymbolValueInt(symbol);
 }
 
-long double getDictElementFloat(char *name, char *key) {
+double getDictElementFloat(char *name, char *key) {
     Symbol* symbol = getDictElement(getSymbol(name), key);
     if (symbol->value_type != V_INT && symbol->value_type != V_FLOAT) {
         throw_error(E_UNEXPECTED_VALUE_TYPE, getValueTypeName(symbol->value_type), symbol->name);
@@ -255,7 +255,7 @@ long long getDictElementIntByTypeCasting(char *name, char *key) {
     return symbolValueByTypeCastingToInt(symbol);
 }
 
-long double getDictElementFloatByTypeCasting(char *name, char *key) {
+double getDictElementFloatByTypeCasting(char *name, char *key) {
     Symbol* symbol = getDictElement(getSymbol(name), key);
     return symbolValueByTypeCastingToFloat(symbol);
 }
@@ -305,7 +305,7 @@ void returnVariableInt(long long i) {
     returnVariable(symbol);
 }
 
-void returnVariableFloat(long double f) {
+void returnVariableFloat(double f) {
     Symbol* symbol = addSymbolFloat(NULL, f);
     returnVariable(symbol);
 }
@@ -323,7 +323,7 @@ void createVariableInt(char *name, long long i) {
     addSymbolInt(name, i);
 }
 
-void createVariableFloat(char *name, long double f) {
+void createVariableFloat(char *name, double f) {
     addSymbolFloat(name, f);
 }
 

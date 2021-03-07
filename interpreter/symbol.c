@@ -243,20 +243,20 @@ char* _getSymbolValueString(Symbol* symbol) {
     return "";
 }
 
-long double getSymbolValueFloat(char *name) {
+double getSymbolValueFloat(char *name) {
     Symbol* symbol = getSymbol(name);
     return _getSymbolValueFloat(symbol);
 }
 
-long double _getSymbolValueFloat(Symbol* symbol) {
-    long double value;
+double _getSymbolValueFloat(Symbol* symbol) {
+    double value;
     switch (symbol->value_type) {
     case V_BOOL:
         value = symbol->value.b ? 1.0 : 0.0;
         return value;
         break;
     case V_INT:
-        value = (long double)symbol->value.i;
+        value = (double)symbol->value.i;
         return value;
         break;
     case V_FLOAT:
@@ -615,13 +615,13 @@ void updateSymbolInt(char *name, long long i) {
     updateSymbol(name, K_NUMBER, value, V_INT);
 }
 
-Symbol* addSymbolFloat(char *name, long double f) {
+Symbol* addSymbolFloat(char *name, double f) {
     union Value value;
     value.f = f;
     return addSymbol(name, K_NUMBER, value, V_FLOAT);
 }
 
-void updateSymbolFloat(char *name, long double f) {
+void updateSymbolFloat(char *name, double f) {
     union Value value;
     value.f = f;
     updateSymbol(name, K_NUMBER, value, V_FLOAT);
@@ -989,7 +989,7 @@ void updateComplexElementInt(long long i) {
     updateComplexElementWrapper(K_NUMBER, value, V_INT);
 }
 
-void updateComplexElementFloat(long double f) {
+void updateComplexElementFloat(double f) {
     union Value value;
     value.f = f;
     updateComplexElementWrapper(K_NUMBER, value, V_FLOAT);
@@ -1150,7 +1150,7 @@ void addSymbolAnyInt(char *name, long long i) {
     addSymbol(name, K_ANY, value, V_INT);
 }
 
-void addSymbolAnyFloat(char *name, long double f) {
+void addSymbolAnyFloat(char *name, double f) {
     union Value value;
     value.f = f;
     addSymbol(name, K_ANY, value, V_FLOAT);
@@ -1270,12 +1270,12 @@ long long symbolValueByTypeCastingToInt(Symbol* symbol) {
     }
 }
 
-long double symbolValueByTypeCastingToFloat(Symbol* symbol) {
+double symbolValueByTypeCastingToFloat(Symbol* symbol) {
     switch (symbol->value_type) {
     case V_BOOL:
         return symbol->value.b ? 1.0 : 0.0;
     case V_INT:
-        return (long double) symbol->value.i;
+        return (double) symbol->value.i;
     case V_FLOAT:
         return symbol->value.f;
     case V_STRING:

@@ -83,7 +83,7 @@ ASTNode* addASTNodeInt(enum ASTNodeType node_type, int lineno, char *strings[], 
     return ast_node;
 }
 
-ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long double f, ASTNode* node) {
+ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, double f, ASTNode* node) {
     union Value value;
     value.f = f;
     ASTNode* ast_node = addASTNodeBase(node_type, lineno, strings, strings_size, value, V_FLOAT);
@@ -519,7 +519,7 @@ Expr* basicLitInt(long long i, int lineno)
     return expr;
 }
 
-Expr* basicLitFloat(long double f, int lineno)
+Expr* basicLitFloat(double f, int lineno)
 {
     union Value value;
     value.f = f;

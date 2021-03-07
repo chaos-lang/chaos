@@ -525,7 +525,7 @@ void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
     addSymbolToFunctionParameters(symbol, true);
 }
 
-void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
+void addFunctionOptionalParameterFloat(char *secondary_name, double f) {
     Symbol* symbol = addSymbolFloat(NULL, f);
     symbol->secondary_name = malloc(1 + strlen(secondary_name));
     strcpy(symbol->secondary_name, secondary_name);
@@ -604,7 +604,7 @@ void addFunctionCallParameterInt(long long i) {
     addSymbolToFunctionParameters(symbol, false);
 }
 
-void addFunctionCallParameterFloat(long double f) {
+void addFunctionCallParameterFloat(double f) {
     initFunctionCall();
     union Value value;
     value.f = f;

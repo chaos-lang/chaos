@@ -366,8 +366,8 @@ eval_node_label:
 
     Symbol* symbol;
     FunctionCall* function_call = NULL;
-    long double l_value;
-    long double r_value;
+    double l_value;
+    double r_value;
     long long exit_code;
     char *_module = NULL;
     char *out = NULL;
@@ -904,12 +904,12 @@ eval_node_label:
         break;
     case AST_MIXED_EXPRESSION_PLUS:
         if (ast_node->left->value_type == V_INT) {
-            l_value = (long double) ast_node->left->value.i;
+            l_value = (double) ast_node->left->value.i;
         } else {
             l_value = ast_node->left->value.f;
         }
         if (ast_node->right->value_type == V_INT) {
-            r_value = (long double) ast_node->right->value.i;
+            r_value = (double) ast_node->right->value.i;
         } else {
             r_value = ast_node->right->value.f;
         }
@@ -918,12 +918,12 @@ eval_node_label:
         break;
     case AST_MIXED_EXPRESSION_MINUS:
         if (ast_node->left->value_type == V_INT) {
-            l_value = (long double) ast_node->left->value.i;
+            l_value = (double) ast_node->left->value.i;
         } else {
             l_value = ast_node->left->value.f;
         }
         if (ast_node->right->value_type == V_INT) {
-            r_value = (long double) ast_node->right->value.i;
+            r_value = (double) ast_node->right->value.i;
         } else {
             r_value = ast_node->right->value.f;
         }
@@ -932,12 +932,12 @@ eval_node_label:
         break;
     case AST_MIXED_EXPRESSION_MULTIPLY:
         if (ast_node->left->value_type == V_INT) {
-            l_value = (long double) ast_node->left->value.i;
+            l_value = (double) ast_node->left->value.i;
         } else {
             l_value = ast_node->left->value.f;
         }
         if (ast_node->right->value_type == V_INT) {
-            r_value = (long double) ast_node->right->value.i;
+            r_value = (double) ast_node->right->value.i;
         } else {
             r_value = ast_node->right->value.f;
         }
@@ -946,12 +946,12 @@ eval_node_label:
         break;
     case AST_MIXED_EXPRESSION_DIVIDE:
         if (ast_node->left->value_type == V_INT) {
-            l_value = (long double) ast_node->left->value.i;
+            l_value = (double) ast_node->left->value.i;
         } else {
             l_value = ast_node->left->value.f;
         }
         if (ast_node->right->value_type == V_INT) {
-            r_value = (long double) ast_node->right->value.i;
+            r_value = (double) ast_node->right->value.i;
         } else {
             r_value = ast_node->right->value.f;
         }

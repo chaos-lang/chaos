@@ -51,7 +51,7 @@ extern bool is_complex_parsing;
 %union {
     bool bval;
     long long ival;
-    long double fval;
+    double fval;
     char *sval;
     unsigned long long lluval;
     Expr* expr;

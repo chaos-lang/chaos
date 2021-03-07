@@ -145,7 +145,7 @@ char *snprintf_concat_int(char *s1, char *format, long long i)
     return s1;
 }
 
-char *snprintf_concat_float(char *s1, char *format, long double f)
+char *snprintf_concat_float(char *s1, char *format, double f)
 {
     char *tmp;
     size_t len;

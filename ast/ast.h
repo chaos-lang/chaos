@@ -343,7 +343,7 @@ ASTNode* addASTNodeBase(enum ASTNodeType node_type, int lineno, char *strings[],
 ASTNode* addASTNode(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size);
 ASTNode* addASTNodeBool(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, bool b, ASTNode* node);
 ASTNode* addASTNodeInt(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long long i, ASTNode* node);
-ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, long double f, ASTNode* node);
+ASTNode* addASTNodeFloat(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, double f, ASTNode* node);
 ASTNode* addASTNodeString(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, char *s, ASTNode* node);
 ASTNode* addASTNodeBranch(enum ASTNodeType node_type, int lineno, ASTNode* l_node, ASTNode* r_node);
 ASTNode* addASTNodeAssign(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, ASTNode* node);
@@ -763,7 +763,7 @@ AST* ast(int lineno);
 Expr* buildExpr(enum ExprKind kind, int lineno);
 Expr* basicLitBool(bool b, int lineno);
 Expr* basicLitInt(long long i, int lineno);
-Expr* basicLitFloat(long double f, int lineno);
+Expr* basicLitFloat(double f, int lineno);
 Expr* basicLitString(char *s, int lineno);
 Expr* ident(char *s, int lineno);
 Expr* binaryExpr(Expr* x, enum Token op, Expr* y, int lineno);
