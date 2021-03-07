@@ -117,9 +117,6 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
 unsigned short compileExpr(i64_array* program, Expr* expr)
 {
-    Symbol* symbol;
-    unsigned short type;
-    i64 addr;
     switch (expr->kind) {
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
@@ -179,9 +176,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
         return expr->v.basic_lit->value_type + 1;
         break;
-    case Ident_kind:
-        symbol = getSymbol(expr->v.ident->name);
-        addr = symbol->addr;
+    case Ident_kind: {
+        Symbol* symbol = getSymbol(expr->v.ident->name);
+        i64 addr = symbol->addr;
         switch (symbol->value_type) {
         case V_BOOL:
             push_instr(program, LDI);
@@ -237,8 +234,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
         return symbol->value_type + 1;
         break;
-    case BinaryExpr_kind:
-        type = compileExpr(program, expr->v.binary_expr->y);
+    }
+    case BinaryExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
         shift_registers(program, 4);
         compileExpr(program, expr->v.binary_expr->x);
         switch (expr->v.binary_expr->op) {
@@ -431,8 +429,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
         return type;
         break;
-    case UnaryExpr_kind:
-        type = compileExpr(program, expr->v.unary_expr->x);
+    }
+    case UnaryExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.unary_expr->x);
         switch (expr->v.unary_expr->op) {
         case ADD_tok:
             push_instr(program, LII);
@@ -473,6 +472,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
         return type;
         break;
+    }
     default:
         break;
     }
@@ -482,15 +482,13 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
 void compileDecl(i64_array* program, Decl* decl)
 {
-    Symbol* symbol;
-    unsigned short type;
     switch (decl->kind) {
-    case VarDecl_kind:
-        type = compileExpr(program, decl->v.var_decl->expr);
+    case VarDecl_kind: {
+        enum ValueType type = compileExpr(program, decl->v.var_decl->expr);
 
         switch (type - 1) {
-        case V_BOOL:
-            symbol = addSymbolBool(
+        case V_BOOL: {
+            Symbol* symbol = addSymbolBool(
                 decl->v.var_decl->ident->v.ident->name,
                 decl->v.var_decl->expr->v.basic_lit->value.b
             );
@@ -504,8 +502,9 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, program->heap++);
             push_instr(program, R1A);
             break;
-        case V_INT:
-            symbol = addSymbolInt(
+        }
+        case V_INT: {
+            Symbol* symbol = addSymbolInt(
                 decl->v.var_decl->ident->v.ident->name,
                 decl->v.var_decl->expr->v.basic_lit->value.i
             );
@@ -519,8 +518,9 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, program->heap++);
             push_instr(program, R1A);
             break;
-        case V_FLOAT:
-            symbol = addSymbolFloat(
+        }
+        case V_FLOAT: {
+            Symbol* symbol = addSymbolFloat(
                 decl->v.var_decl->ident->v.ident->name,
                 decl->v.var_decl->expr->v.basic_lit->value.f
             );
@@ -534,6 +534,7 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, program->heap++);
             push_instr(program, R1A);
             break;
+        }
         case V_STRING: {
             size_t len = 0;
 
@@ -551,7 +552,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
 
-            symbol = addSymbolStringNew(
+            Symbol* symbol = addSymbolStringNew(
                 decl->v.var_decl->ident->v.ident->name,
                 "",
                 len
@@ -580,6 +581,7 @@ void compileDecl(i64_array* program, Decl* decl)
             break;
         }
         break;
+    }
     default:
         break;
     }
