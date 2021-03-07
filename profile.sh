@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "Compiling with -fprofile-generate"
 make clean && \

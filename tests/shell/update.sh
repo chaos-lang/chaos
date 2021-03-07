@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-SUB="$( basename $DIR )"
+DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
+SUB="$( basename "$DIR" )"
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
     rm "$DIR/$testname.out"
     cat "$DIR/$filename" | chaos > "$DIR/$testname.out" 2>&1

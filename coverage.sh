@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 export LLVM_PROFILE_FILE="$PWD/.coverage/chaos-%p.profraw" && \
 make clean && \
@@ -13,7 +13,7 @@ make test-official-spells && \
 make rosetta-install-clang && \
 make rosetta-test && \
 make rosetta-test-compiler && \
-llvm-profdata merge -output=chaos.profdata $PWD/.coverage/chaos-*.profraw && \
+llvm-profdata merge -output=chaos.profdata "$PWD/.coverage/chaos-*.profraw && \
 rm $PWD/.coverage/chaos-*.profraw && \
 llvm-cov show /usr/local/bin/chaos -instr-profile=chaos.profdata > coverage.txt && \
 llvm-cov report /usr/local/bin/chaos -instr-profile=chaos.profdata -use-color && \
@@ -26,4 +26,4 @@ llvm-cov show /usr/local/bin/chaos -instr-profile=chaos.profdata \
     ./parser/*.c \
     ./preemptive/*.c \
     ./utilities/*.c \
-    -path-equivalence -use-color --format html > /tmp/coverage.html
+    -path-equivalence -use-color --format html > /tmp/coverage.html"

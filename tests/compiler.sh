@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 extra_flags=""
 EXTRA_FLAGS_ENABLED=false
@@ -19,27 +19,27 @@ while getopts ":e:" opt; do
     esac
 done
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 
 failed=false
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
-    out=$(<"$DIR/$testname.out")
+    out=$(cat "$DIR/$testname.out")
 
     SKIP_TESTS="syntax_error preemptive"
 
-    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+    if echo "$SKIP_TESTS" | grep -w "$testname" > /dev/null; then
         continue
     fi
 
     echo "(compiler) Compiling test: ${testname}"
 
     if [ "$EXTRA_FLAGS_ENABLED" = true ] ; then
-        cout=$(chaos -c tests/$filename -o $testname -e "$extra_flags" 2>&1)
+        cout=$(chaos -c "tests/$filename" -o "$testname" -e "$extra_flags" 2>&1)
     else
-        cout=$(chaos -c tests/$filename -o $testname 2>&1)
+        cout=$(chaos -c "tests/$filename" -o "$testname" 2>&1)
     fi
     status=$?
 
@@ -53,21 +53,21 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     fi
 done
 
-for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
-    filename=$(basename $filepath)
+for filepath in $(find "$DIR" -maxdepth 1 -name '*.kaos'); do
+    filename=$(basename "$filepath")
     testname="${filename%.*}"
-    out=$(<"$DIR/$testname.out")
+    out=$(cat "$DIR/$testname.out")
 
     SKIP_TESTS="syntax_error preemptive"
 
-    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+    if echo "$SKIP_TESTS" | grep -w "$testname" > /dev/null; then
         continue
     fi
 
     echo "(compiler) Running test: ${testname}"
 
-    test=$(build/$testname 2>&1)
-    if [ "$test" == "$out" ]
+    test=$("build/$testname" 2>&1)
+    if [ "$test" = "$out" ]
     then
         echo "OK"
     else
