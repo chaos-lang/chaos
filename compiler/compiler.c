@@ -473,6 +473,60 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         return type;
         break;
     }
+    case IndexExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.index_expr->x);
+        shift_registers(program, 4);
+        compileExpr(program, expr->v.index_expr->index);
+        switch (type - 1) {
+        case V_BOOL:
+            break;
+        case V_INT:
+            break;
+        case V_FLOAT:
+            break;
+        case V_STRING: {
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_STRING);
+
+            push_instr(program, MOV);
+            push_instr(program, R2A);
+            push_instr(program, R1A);
+
+            push_instr(program, LII);
+            push_instr(program, R3A);
+            push_instr(program, -1);
+
+            push_instr(program, POP);
+            push_instr(program, R1A);
+
+            push_instr(program, ADD);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, CMP);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, JNZ);
+            push_instr(program, program->size - 10);
+
+            push_instr(program, PUSH);
+            push_instr(program, R1A);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+            break;
+        }
+        case V_VOID:
+            break;
+        default:
+            break;
+        }
+        return type;
+        break;
+    }
     default:
         break;
     }
