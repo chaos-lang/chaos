@@ -40,7 +40,7 @@ void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void fetch(cpu *c);
 void execute(cpu *c);
-void print_registers(cpu *c);
+void print_registers(cpu *c, i64 pc_start);
 char *getRegName(i64 i);
 
 #endif

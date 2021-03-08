@@ -65,6 +65,8 @@ void fetch(cpu *c)
 
 void execute(cpu *c)
 {
+    i64 pc_start = c->pc;
+
 	switch (c->inst) {
     case CLF:
         clear_flags(c);
@@ -327,11 +329,12 @@ void execute(cpu *c)
 	}
 
     if (c->debug)
-        print_registers(c);
+        print_registers(c, pc_start);
 }
 
-void print_registers(cpu *c)
+void print_registers(cpu *c, i64 pc_start)
 {
+    printf("[PC: %lld] ", pc_start);
     for (int i = 0; i < NUM_REGISTERS; i++) {
         printf("[%s: %lld] ", getRegName(i), c->r[i]);
     }

@@ -40,6 +40,8 @@ void print_cpu(cpu *c)
 
 void emitBytecode(cpu *c)
 {
+    printf("[PC: %lld] ", c->pc);
+
 	switch (c->inst) {
     case CLF:
         printf("%s\n", "CLF");
@@ -103,24 +105,19 @@ void emitBytecode(cpu *c)
         c->pc += 2;
         break;
     case JLZ:
-        printf("%s\n", "JLZ");
-        c->pc++;
+        printf("%s %lld\n", "JLZ", c->mem[++c->pc]);
         break;
     case JGZ:
-        printf("%s\n", "JGZ");
-        c->pc++;
+        printf("%s %lld\n", "JGZ", c->mem[++c->pc]);
         break;
     case JEZ:
-        printf("%s\n", "JEZ");
-        c->pc++;
+        printf("%s %lld\n", "JEZ", c->mem[++c->pc]);
         break;
     case JNZ:
-        printf("%s\n", "JNZ");
-        c->pc++;
+        printf("%s %lld\n", "JNZ", c->mem[++c->pc]);
         break;
     case JMP:
-        printf("%s\n", "JMP");
-        c->pc++;
+        printf("%s %lld\n", "JMP", c->mem[++c->pc]);
         break;
     case SHL:
         printf("%s %s %s\n", "SHL", getRegName(c->dest), getRegName(c->src));
