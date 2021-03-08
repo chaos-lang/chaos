@@ -602,6 +602,8 @@ void compileDecl(i64_array* program, Decl* decl)
                     +
                     strlen(decl->v.var_decl->expr->v.binary_expr->y->v.basic_lit->value.s);
                 break;
+            case IndexExpr_kind:
+                len = 1;
             default:
                 break;
             }
