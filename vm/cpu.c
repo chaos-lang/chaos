@@ -110,7 +110,7 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case LDR:
-        c->r[c->r[c->dest]] = c->mem[c->src];
+        c->r[c->dest] = c->mem[c->r[c->src]];
         c->pc += 2;
         break;
     case LII:
