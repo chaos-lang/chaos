@@ -62,8 +62,16 @@ void emitBytecode(cpu *c)
         printf("%s %lld %s\n", "STI", c->dest, getRegName(c->src));
         c->pc += 2;
         break;
+    case STR:
+        printf("%s %s %s\n", "STR", getRegName(c->dest), getRegName(c->src));
+        c->pc += 2;
+        break;
     case LDI:
         printf("%s %s %lld\n", "LDI", getRegName(c->dest), c->src);
+        c->pc += 2;
+        break;
+    case LDR:
+        printf("%s %s %s\n", "LDR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LII:

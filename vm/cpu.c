@@ -101,8 +101,16 @@ void execute(cpu *c)
         c->mem[c->dest] = c->r[c->src];
         c->pc += 2;
         break;
+    case STR:
+        c->mem[c->r[c->dest]] = c->r[c->src];
+        c->pc += 2;
+        break;
     case LDI:
         c->r[c->dest] = c->mem[c->src];
+        c->pc += 2;
+        break;
+    case LDR:
+        c->r[c->r[c->dest]] = c->mem[c->src];
         c->pc += 2;
         break;
     case LII:

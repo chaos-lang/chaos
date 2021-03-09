@@ -168,6 +168,7 @@ Symbol* getSymbol(char *name) {
     Symbol* symbol = findSymbol(name);
     if (symbol != NULL)
         return symbol;
+    *(int*)0 = 0;
     throw_error(E_UNDEFINED_VARIABLE, name);
     return NULL;
 }

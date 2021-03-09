@@ -27,7 +27,7 @@ enum instr {
 	CLF,
 	CMP, CMPI,
 	MOV,
-	STI, LDI,
+	STI, LDI, STR, LDR,
 	LII,
 	PUSH, POP,
 	INC, DEC,
