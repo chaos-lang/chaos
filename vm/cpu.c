@@ -326,6 +326,7 @@ void execute(cpu *c)
                 c->r[R1A] = c->mem[c->sp++];
                 s[i] = (int)c->r[R1A] + '0';
             }
+            s[len] = '\0';
             printf("%s", escape_the_sequences_in_string_literal(s));
             free(s);
             break;
