@@ -44,8 +44,29 @@ void compileStmtList(i64_array* program, StmtList* stmt_list)
 void compileStmt(i64_array* program, Stmt* stmt)
 {
     switch (stmt->kind) {
+    case EchoStmt_kind:
+        compileExpr(program, stmt->v.echo_stmt->x);
+        push_instr(program, PRNT);
+        break;
     case PrintStmt_kind:
         compileExpr(program, stmt->v.print_stmt->x);
+        push_instr(program, PRNT);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, '\n' - '0');
+
+        push_instr(program, PUSH);
+        push_instr(program, R0A);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_STRING);
+
+        push_instr(program, LII);
+        push_instr(program, R1A);
+        push_instr(program, 1);
+
         push_instr(program, PRNT);
         break;
     case DeclStmt_kind:

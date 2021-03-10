@@ -307,16 +307,16 @@ void execute(cpu *c)
     case PRNT:
         switch (c->r[R0A]) {
         case V_BOOL:
-            printf("%s\n", c->r[R1A] ? "true" : "false");
+            printf("%s", c->r[R1A] ? "true" : "false");
             break;
         case V_INT:
-            printf("%lld\n", c->r[R1A]);
+            printf("%lld", c->r[R1A]);
             break;
         case V_FLOAT: {
             i64 i = c->r[R1A];
             f64 f;
             memcpy(&f, &i, sizeof f);
-            printf("%lg\n", f);
+            printf("%lg", f);
             break;
         }
         case V_STRING: {
@@ -326,7 +326,8 @@ void execute(cpu *c)
                 c->r[R1A] = c->mem[c->sp++];
                 s[i] = (int)c->r[R1A] + '0';
             }
-            printf("%s\n", escape_the_sequences_in_string_literal(s));
+            printf("%s", escape_the_sequences_in_string_literal(s));
+            free(s);
             break;
         }
         default:
