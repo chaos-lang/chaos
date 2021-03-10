@@ -321,11 +321,12 @@ void execute(cpu *c)
         }
         case V_STRING: {
             size_t len = c->r[R1A];
+            char *s = malloc(len + 1);
             for (size_t i = 0; i < len; i++) {
                 c->r[R1A] = c->mem[c->sp++];
-                printf("%c", (int)c->r[R1A] + '0');
+                s[i] = (int)c->r[R1A] + '0';
             }
-            printf("\n");
+            printf("%s\n", escape_the_sequences_in_string_literal(s));
             break;
         }
         default:
