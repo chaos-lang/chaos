@@ -149,10 +149,11 @@ void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, 
 void removeComplexElementByLeftRightBracketStack(char *name);
 void removeComplexElement(Symbol* complex, unsigned long long symbol_id);
 void addSymbolDict(char *name);
-void addSymbolAnyString(char *name, char *s);
-void addSymbolAnyInt(char *name, long long i);
-void addSymbolAnyFloat(char *name, double f);
-void addSymbolAnyBool(char *name, bool b);
+Symbol* addSymbolAnyStringNew(char *name, char *s, size_t len);
+Symbol* addSymbolAnyString(char *name, char *s);
+Symbol* addSymbolAnyInt(char *name, long long i);
+Symbol* addSymbolAnyFloat(char *name, double f);
+Symbol* addSymbolAnyBool(char *name, bool b);
 Symbol* getDictElement(Symbol* symbol, char *key);
 FunctionCall* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);

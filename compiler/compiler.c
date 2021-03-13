@@ -75,13 +75,21 @@ void compileStmt(i64_array* program, Stmt* stmt)
     case AssignStmt_kind: {
         compileExpr(program, stmt->v.assign_stmt->x);
         shift_registers(program, 8);
-        compileExpr(program, stmt->v.assign_stmt->y);
+        enum ValueType value_type = compileExpr(program, stmt->v.assign_stmt->y) - 1;
         switch (stmt->v.assign_stmt->x->kind) {
         case Ident_kind: {
             Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
             i64 addr = symbol->addr;
-            switch (symbol->type) {
+            if (symbol->type != K_ANY)
+                value_type = symbol->value_type;
+            switch (value_type) {
             case V_BOOL:
+                if (symbol->type != K_ANY) {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_BOOL);
+                }
+
                 push_instr(program, STI);
                 push_instr(program, addr++);
                 push_instr(program, R0A);
@@ -91,6 +99,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R1A);
                 break;
             case V_INT:
+                if (symbol->type != K_ANY) {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_INT);
+                }
+
                 push_instr(program, STI);
                 push_instr(program, addr++);
                 push_instr(program, R0A);
@@ -100,6 +114,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R1A);
                 break;
             case V_FLOAT:
+                if (symbol->type != K_ANY) {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_FLOAT);
+                }
+
                 push_instr(program, STI);
                 push_instr(program, addr++);
                 push_instr(program, R0A);
@@ -109,6 +129,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R1A);
                 break;
             case V_STRING: {
+                if (symbol->type != K_ANY) {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_STRING);
+                }
+
                 push_instr(program, STI);
                 push_instr(program, addr++);
                 push_instr(program, R0A);
@@ -671,14 +697,23 @@ void compileDecl(i64_array* program, Decl* decl)
 {
     switch (decl->kind) {
     case VarDecl_kind: {
-        enum ValueType type = compileExpr(program, decl->v.var_decl->expr);
+        enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
+        enum Type type = decl->v.var_decl->type_spec->v.type_spec->type;
 
-        switch (type - 1) {
+        switch (value_type) {
         case V_BOOL: {
-            Symbol* symbol = addSymbolBool(
-                decl->v.var_decl->ident->v.ident->name,
-                decl->v.var_decl->expr->v.basic_lit->value.b
-            );
+            Symbol* symbol;
+            if (type == K_ANY) {
+                symbol = addSymbolAnyBool(
+                    decl->v.var_decl->ident->v.ident->name,
+                    decl->v.var_decl->expr->v.basic_lit->value.b
+                );
+            } else {
+                symbol = addSymbolBool(
+                    decl->v.var_decl->ident->v.ident->name,
+                    decl->v.var_decl->expr->v.basic_lit->value.b
+                );
+            }
             symbol->addr = program->heap;
 
             push_instr(program, STI);
@@ -691,10 +726,18 @@ void compileDecl(i64_array* program, Decl* decl)
             break;
         }
         case V_INT: {
-            Symbol* symbol = addSymbolInt(
-                decl->v.var_decl->ident->v.ident->name,
-                decl->v.var_decl->expr->v.basic_lit->value.i
-            );
+            Symbol* symbol;
+            if (type == K_ANY) {
+                symbol = addSymbolAnyInt(
+                    decl->v.var_decl->ident->v.ident->name,
+                    decl->v.var_decl->expr->v.basic_lit->value.i
+                );
+            } else {
+                symbol = addSymbolInt(
+                    decl->v.var_decl->ident->v.ident->name,
+                    decl->v.var_decl->expr->v.basic_lit->value.i
+                );
+            }
             symbol->addr = program->heap;
 
             push_instr(program, STI);
@@ -707,10 +750,18 @@ void compileDecl(i64_array* program, Decl* decl)
             break;
         }
         case V_FLOAT: {
-            Symbol* symbol = addSymbolFloat(
-                decl->v.var_decl->ident->v.ident->name,
-                decl->v.var_decl->expr->v.basic_lit->value.f
-            );
+            Symbol* symbol;
+            if (type == K_ANY) {
+                symbol = addSymbolAnyFloat(
+                    decl->v.var_decl->ident->v.ident->name,
+                    decl->v.var_decl->expr->v.basic_lit->value.f
+                );
+            } else {
+                symbol = addSymbolFloat(
+                    decl->v.var_decl->ident->v.ident->name,
+                    decl->v.var_decl->expr->v.basic_lit->value.f
+                );
+            }
             symbol->addr = program->heap;
 
             push_instr(program, STI);
@@ -741,11 +792,20 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
 
-            Symbol* symbol = addSymbolStringNew(
-                decl->v.var_decl->ident->v.ident->name,
-                "",
-                len
-            );
+            Symbol* symbol;
+            if (type == K_ANY) {
+                symbol = addSymbolAnyStringNew(
+                    decl->v.var_decl->ident->v.ident->name,
+                    "",
+                    len
+                );
+            } else {
+                symbol = addSymbolStringNew(
+                    decl->v.var_decl->ident->v.ident->name,
+                    "",
+                    len
+                );
+            }
             symbol->addr = program->heap;
 
             push_instr(program, STI);

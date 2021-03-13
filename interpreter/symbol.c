@@ -168,7 +168,6 @@ Symbol* getSymbol(char *name) {
     Symbol* symbol = findSymbol(name);
     if (symbol != NULL)
         return symbol;
-    *(int*)0 = 0;
     throw_error(E_UNDEFINED_VARIABLE, name);
     return NULL;
 }
@@ -1138,29 +1137,38 @@ Symbol* getDictElement(Symbol* symbol, char *key) {
     return NULL;
 }
 
-void addSymbolAnyString(char *name, char *s) {
+Symbol* addSymbolAnyStringNew(char *name, char *s, size_t len) {
     union Value value;
     value.s = malloc(1 + strlen(s));
     strcpy(value.s, s);
-    addSymbol(name, K_ANY, value, V_STRING);
+    Symbol* symbol = addSymbol(name, K_ANY, value, V_STRING);
+    symbol->len = len;
+    return symbol;
 }
 
-void addSymbolAnyInt(char *name, long long i) {
+Symbol* addSymbolAnyString(char *name, char *s) {
+    union Value value;
+    value.s = malloc(1 + strlen(s));
+    strcpy(value.s, s);
+    return addSymbol(name, K_ANY, value, V_STRING);
+}
+
+Symbol* addSymbolAnyInt(char *name, long long i) {
     union Value value;
     value.i = i;
-    addSymbol(name, K_ANY, value, V_INT);
+    return addSymbol(name, K_ANY, value, V_INT);
 }
 
-void addSymbolAnyFloat(char *name, double f) {
+Symbol* addSymbolAnyFloat(char *name, double f) {
     union Value value;
     value.f = f;
-    addSymbol(name, K_ANY, value, V_FLOAT);
+    return addSymbol(name, K_ANY, value, V_FLOAT);
 }
 
-void addSymbolAnyBool(char *name, bool b) {
+Symbol* addSymbolAnyBool(char *name, bool b) {
     union Value value;
     value.b = b;
-    addSymbol(name, K_ANY, value, V_BOOL);
+    return addSymbol(name, K_ANY, value, V_BOOL);
 }
 
 FunctionCall* getCurrentScope() {
