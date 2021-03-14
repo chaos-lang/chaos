@@ -140,7 +140,7 @@ void removeSymbol(Symbol* symbol) {
 }
 
 void freeSymbol(Symbol* symbol) {
-    if (symbol->value_type == V_STRING) free(symbol->value.s);
+    // if (symbol->value_type == V_STRING) free(symbol->value.s);
     if (symbol->children_count > 0) free(symbol->children);
     free(symbol->key);
     free(symbol->name);
