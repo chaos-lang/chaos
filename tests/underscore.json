@@ -11,7 +11,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -39,7 +39,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -67,7 +67,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -95,7 +95,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -129,7 +129,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -177,7 +177,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -225,7 +225,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -273,7 +273,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },

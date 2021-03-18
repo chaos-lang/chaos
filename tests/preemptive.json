@@ -17,7 +17,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -56,7 +56,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -73,7 +73,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -111,7 +111,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -128,7 +128,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -166,7 +166,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -183,7 +183,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -222,7 +222,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -234,7 +234,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -246,7 +246,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -263,7 +263,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -290,7 +290,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Number",
+                                            "type": "Boolean",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -397,7 +397,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -409,7 +409,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -421,7 +421,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -438,7 +438,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -465,7 +465,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Number",
+                                            "type": "Boolean",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -576,7 +576,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -593,7 +593,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -631,7 +631,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -643,7 +643,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -655,7 +655,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -672,7 +672,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -699,7 +699,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Number",
+                                            "type": "Boolean",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -806,7 +806,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -818,7 +818,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -830,7 +830,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -847,7 +847,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -874,7 +874,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Number",
+                                            "type": "Boolean",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -985,7 +985,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -1002,7 +1002,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1022,7 +1022,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1072,7 +1072,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1084,7 +1084,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Any",
+                                            "type": "String",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1096,7 +1096,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -1129,7 +1129,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1178,7 +1178,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -1195,7 +1195,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1215,7 +1215,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1269,7 +1269,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -1322,7 +1322,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -1339,7 +1339,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Dictionary",
+                                            "type": "List",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1377,7 +1377,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Any",
+                                            "type": "String",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1386,7 +1386,7 @@
                                         },
                                         "expr": {
                                             "_type": "BasicLit",
-                                            "value_type": "int",
+                                            "value_type": "string",
                                             "value": "hello"
                                         }
                                     }
@@ -1431,7 +1431,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -1476,7 +1476,7 @@
                                             },
                                             {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "hello"
                                             }
                                         ]
@@ -1502,7 +1502,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -1519,7 +1519,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1539,7 +1539,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Any",
+                                            "type": "String",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1548,7 +1548,7 @@
                                         },
                                         "expr": {
                                             "_type": "BasicLit",
-                                            "value_type": "int",
+                                            "value_type": "string",
                                             "value": "hello"
                                         }
                                     }
@@ -1559,7 +1559,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Number",
+                                            "type": "Boolean",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1617,7 +1617,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -1644,7 +1644,7 @@
                                             },
                                             {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "hello"
                                             },
                                             {
@@ -1675,7 +1675,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Dictionary",
+                                "type": "List",
                                 "sub_type_spec": null
                             }
                         },
@@ -1692,7 +1692,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Void",
+                                            "type": "Dictionary",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1709,7 +1709,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "a"
                                                     },
                                                     "value": {
@@ -1722,7 +1722,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "b"
                                                     },
                                                     "value": {
@@ -1735,7 +1735,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "c"
                                                     },
                                                     "value": {
@@ -1775,7 +1775,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Void",
+                                "type": "Dictionary",
                                 "sub_type_spec": null
                             }
                         },
@@ -1792,7 +1792,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Void",
+                                            "type": "Dictionary",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1809,7 +1809,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "a"
                                                     },
                                                     "value": {
@@ -1822,7 +1822,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "b"
                                                     },
                                                     "value": {
@@ -1835,7 +1835,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "c"
                                                     },
                                                     "value": {
@@ -1875,7 +1875,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Dictionary",
+                                "type": "List",
                                 "sub_type_spec": null
                             }
                         },
@@ -1892,7 +1892,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1912,7 +1912,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Void",
+                                            "type": "Dictionary",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -1929,7 +1929,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "a"
                                                     },
                                                     "value": {
@@ -1942,7 +1942,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "b"
                                                     },
                                                     "value": {
@@ -1955,7 +1955,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "c"
                                                     },
                                                     "value": {
@@ -2025,7 +2025,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Void",
+                                "type": "Dictionary",
                                 "sub_type_spec": null
                             }
                         },
@@ -2042,7 +2042,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2062,7 +2062,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Void",
+                                            "type": "Dictionary",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2079,7 +2079,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "a"
                                                     },
                                                     "value": {
@@ -2092,7 +2092,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "b"
                                                     },
                                                     "value": {
@@ -2105,7 +2105,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "c"
                                                     },
                                                     "value": {
@@ -2175,7 +2175,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Void",
+                                "type": "Dictionary",
                                 "sub_type_spec": null
                             }
                         },
@@ -2192,7 +2192,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2226,7 +2226,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2305,7 +2305,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2332,7 +2332,7 @@
                                                     "mod": null,
                                                     "x": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "hello world"
                                                     }
                                                 }
@@ -2360,7 +2360,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2418,7 +2418,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2435,7 +2435,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Dictionary",
+                                            "type": "List",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2514,7 +2514,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2531,7 +2531,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Dictionary",
+                                            "type": "List",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2618,7 +2618,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2635,7 +2635,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Void",
+                                            "type": "Dictionary",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2652,7 +2652,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "a"
                                                     },
                                                     "value": {
@@ -2665,7 +2665,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "b"
                                                     },
                                                     "value": {
@@ -2678,7 +2678,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "c"
                                                     },
                                                     "value": {
@@ -2750,7 +2750,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -2767,7 +2767,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Void",
+                                            "type": "Dictionary",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2784,7 +2784,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "a"
                                                     },
                                                     "value": {
@@ -2797,7 +2797,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "b"
                                                     },
                                                     "value": {
@@ -2810,7 +2810,7 @@
                                                     "_type": "KeyValueExpr",
                                                     "key": {
                                                         "_type": "BasicLit",
-                                                        "value_type": "int",
+                                                        "value_type": "string",
                                                         "value": "c"
                                                     },
                                                     "value": {
@@ -2891,7 +2891,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2903,7 +2903,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2915,7 +2915,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -2932,7 +2932,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -2959,7 +2959,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "Number",
+                                            "type": "Boolean",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -3085,10 +3085,10 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": {
                                                 "_type": "TypeSpec",
-                                                "type": "Dictionary",
+                                                "type": "List",
                                                 "sub_type_spec": null
                                             }
                                         },
@@ -3101,7 +3101,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -3182,7 +3182,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -3194,7 +3194,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -3275,7 +3275,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -3287,7 +3287,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -3372,7 +3372,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -3384,7 +3384,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -3396,7 +3396,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -3413,7 +3413,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -3467,10 +3467,10 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": {
                                                 "_type": "TypeSpec",
-                                                "type": "Dictionary",
+                                                "type": "List",
                                                 "sub_type_spec": null
                                             }
                                         },
@@ -3483,7 +3483,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -3564,10 +3564,10 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": {
                                                 "_type": "TypeSpec",
-                                                "type": "Dictionary",
+                                                "type": "List",
                                                 "sub_type_spec": null
                                             }
                                         },
@@ -3580,7 +3580,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -3643,7 +3643,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Dictionary",
+                            "type": "List",
                             "sub_type_spec": null
                         },
                         "ident": {

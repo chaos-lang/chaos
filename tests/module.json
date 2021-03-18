@@ -211,7 +211,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "Number",
+                                "type": "Boolean",
                                 "sub_type_spec": null
                             }
                         },
@@ -227,7 +227,7 @@
                                     "mod": null,
                                     "x": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "in main context"
                                     }
                                 }

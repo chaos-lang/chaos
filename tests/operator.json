@@ -10,7 +10,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on boolean variables"
                     }
                 },
@@ -20,7 +20,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -40,7 +40,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -60,7 +60,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -102,7 +102,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -144,7 +144,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -186,7 +186,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -228,7 +228,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -270,7 +270,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -325,7 +325,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on boolean literals"
                     }
                 },
@@ -335,7 +335,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -379,7 +379,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -423,7 +423,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -467,7 +467,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -511,7 +511,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -555,7 +555,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -598,7 +598,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on boolean variables vs. boolean literals"
                     }
                 },
@@ -608,7 +608,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -628,7 +628,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -671,7 +671,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -714,7 +714,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -757,7 +757,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -800,7 +800,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -843,7 +843,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -892,7 +892,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on boolean literals vs. boolean variables"
                     }
                 },
@@ -902,7 +902,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -922,7 +922,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -965,7 +965,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1008,7 +1008,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1051,7 +1051,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1094,7 +1094,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1137,7 +1137,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1186,7 +1186,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on integer variables"
                     }
                 },
@@ -1196,7 +1196,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1216,7 +1216,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1236,7 +1236,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1278,7 +1278,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1320,7 +1320,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1362,7 +1362,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1404,7 +1404,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1446,7 +1446,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1501,7 +1501,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on integer literals"
                     }
                 },
@@ -1511,7 +1511,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1555,7 +1555,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1599,7 +1599,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1643,7 +1643,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1687,7 +1687,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1731,7 +1731,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1774,7 +1774,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on integer variables vs. integer literals"
                     }
                 },
@@ -1784,7 +1784,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1804,7 +1804,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1847,7 +1847,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1890,7 +1890,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1933,7 +1933,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1976,7 +1976,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2019,7 +2019,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2068,7 +2068,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on integer literals vs. integer variables"
                     }
                 },
@@ -2078,7 +2078,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2098,7 +2098,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2141,7 +2141,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2184,7 +2184,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2227,7 +2227,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2270,7 +2270,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2313,7 +2313,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2362,7 +2362,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on float variables"
                     }
                 },
@@ -2372,7 +2372,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2392,7 +2392,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2412,7 +2412,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2454,7 +2454,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2496,7 +2496,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2538,7 +2538,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2580,7 +2580,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2622,7 +2622,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2677,7 +2677,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on float literals"
                     }
                 },
@@ -2687,7 +2687,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2731,7 +2731,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2775,7 +2775,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2819,7 +2819,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2863,7 +2863,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2907,7 +2907,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2950,7 +2950,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on float variables vs. float literals"
                     }
                 },
@@ -2960,7 +2960,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2980,7 +2980,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3023,7 +3023,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3066,7 +3066,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3109,7 +3109,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3152,7 +3152,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3195,7 +3195,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3244,7 +3244,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on float literals vs. float variables"
                     }
                 },
@@ -3254,7 +3254,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3274,7 +3274,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3317,7 +3317,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3360,7 +3360,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3403,7 +3403,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3446,7 +3446,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3489,7 +3489,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3538,7 +3538,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of integer and boolean variables"
                     }
                 },
@@ -3548,7 +3548,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3568,7 +3568,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3588,7 +3588,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3630,7 +3630,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3672,7 +3672,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3714,7 +3714,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3756,7 +3756,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3798,7 +3798,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3853,7 +3853,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of integer and boolean literals"
                     }
                 },
@@ -3863,7 +3863,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3907,7 +3907,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3951,7 +3951,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3995,7 +3995,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4039,7 +4039,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4083,7 +4083,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4126,7 +4126,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of integer and float variables"
                     }
                 },
@@ -4136,7 +4136,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4156,7 +4156,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4176,7 +4176,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4218,7 +4218,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4260,7 +4260,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4302,7 +4302,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4344,7 +4344,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4386,7 +4386,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4441,7 +4441,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of integer and float literals"
                     }
                 },
@@ -4451,7 +4451,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4495,7 +4495,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4539,7 +4539,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4583,7 +4583,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4627,7 +4627,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4671,7 +4671,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4714,7 +4714,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of float and boolean variables"
                     }
                 },
@@ -4724,7 +4724,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4744,7 +4744,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4764,7 +4764,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4806,7 +4806,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4848,7 +4848,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4890,7 +4890,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4932,7 +4932,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -4974,7 +4974,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5029,7 +5029,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of float and boolean literals"
                     }
                 },
@@ -5039,7 +5039,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5083,7 +5083,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5127,7 +5127,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5171,7 +5171,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5215,7 +5215,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5259,7 +5259,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5302,7 +5302,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of boolean variables and boolean/integer/float values"
                     }
                 },
@@ -5312,7 +5312,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5332,7 +5332,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5352,7 +5352,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5395,7 +5395,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5438,7 +5438,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5481,7 +5481,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5524,7 +5524,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5568,7 +5568,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5625,7 +5625,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of boolean literals and boolean/integer/float values"
                     }
                 },
@@ -5635,7 +5635,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5679,7 +5679,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5723,7 +5723,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5767,7 +5767,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5811,7 +5811,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5855,7 +5855,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5898,7 +5898,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on boolean variables"
                     }
                 },
@@ -5908,7 +5908,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5928,7 +5928,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5948,7 +5948,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -5990,7 +5990,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6032,7 +6032,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6074,7 +6074,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6116,7 +6116,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6154,7 +6154,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6205,7 +6205,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on boolean literals"
                     }
                 },
@@ -6215,7 +6215,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6259,7 +6259,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6303,7 +6303,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6347,7 +6347,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6391,7 +6391,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6430,7 +6430,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6468,7 +6468,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on boolean variables vs. boolean literals"
                     }
                 },
@@ -6478,7 +6478,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6498,7 +6498,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6541,7 +6541,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6584,7 +6584,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6627,7 +6627,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6670,7 +6670,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6708,7 +6708,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6752,7 +6752,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on boolean literals vs. boolean variables"
                     }
                 },
@@ -6762,7 +6762,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6782,7 +6782,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6825,7 +6825,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6868,7 +6868,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6911,7 +6911,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6954,7 +6954,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -6993,7 +6993,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7038,7 +7038,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on integer variables"
                     }
                 },
@@ -7048,7 +7048,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7068,7 +7068,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7088,7 +7088,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7130,7 +7130,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7172,7 +7172,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7214,7 +7214,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7256,7 +7256,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7294,7 +7294,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7345,7 +7345,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on integer literals"
                     }
                 },
@@ -7355,7 +7355,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7399,7 +7399,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7443,7 +7443,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7487,7 +7487,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7531,7 +7531,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7570,7 +7570,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7608,7 +7608,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on integer variables vs. integer literals"
                     }
                 },
@@ -7618,7 +7618,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7638,7 +7638,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7681,7 +7681,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7724,7 +7724,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7767,7 +7767,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7810,7 +7810,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7848,7 +7848,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7892,7 +7892,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on integer literals vs. integer variables"
                     }
                 },
@@ -7902,7 +7902,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7922,7 +7922,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -7965,7 +7965,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8008,7 +8008,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8051,7 +8051,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8094,7 +8094,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8133,7 +8133,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8178,7 +8178,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on float variables"
                     }
                 },
@@ -8188,7 +8188,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8208,7 +8208,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8228,7 +8228,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8270,7 +8270,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8312,7 +8312,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8354,7 +8354,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8396,7 +8396,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8434,7 +8434,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8485,7 +8485,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on float literals"
                     }
                 },
@@ -8495,7 +8495,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8539,7 +8539,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8583,7 +8583,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8627,7 +8627,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8671,7 +8671,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8710,7 +8710,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8748,7 +8748,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on float variables vs. float literals"
                     }
                 },
@@ -8758,7 +8758,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8778,7 +8778,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8821,7 +8821,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8864,7 +8864,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8907,7 +8907,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8950,7 +8950,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -8988,7 +8988,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9032,7 +9032,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on float literals vs. float variables"
                     }
                 },
@@ -9042,7 +9042,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9062,7 +9062,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9105,7 +9105,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9148,7 +9148,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9191,7 +9191,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9234,7 +9234,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9273,7 +9273,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9318,7 +9318,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on a mix of integer and boolean variables"
                     }
                 },
@@ -9328,7 +9328,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9348,7 +9348,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9368,7 +9368,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9410,7 +9410,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9452,7 +9452,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9494,7 +9494,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9536,7 +9536,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9574,7 +9574,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9625,7 +9625,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on a mix of integer and boolean literals"
                     }
                 },
@@ -9635,7 +9635,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9679,7 +9679,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9723,7 +9723,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9767,7 +9767,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9811,7 +9811,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9850,7 +9850,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9888,7 +9888,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on a mix of integer and float variables"
                     }
                 },
@@ -9898,7 +9898,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9918,7 +9918,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9938,7 +9938,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -9980,7 +9980,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10022,7 +10022,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10064,7 +10064,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10106,7 +10106,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10144,7 +10144,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10195,7 +10195,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Logical operators on a mix of integer and float literals"
                     }
                 },
@@ -10205,7 +10205,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10249,7 +10249,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10293,7 +10293,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10337,7 +10337,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10381,7 +10381,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10420,7 +10420,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10458,7 +10458,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of boolean variables and boolean/integer/float values"
                     }
                 },
@@ -10468,7 +10468,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10488,7 +10488,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10508,7 +10508,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10551,7 +10551,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10594,7 +10594,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10637,7 +10637,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10680,7 +10680,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10719,7 +10719,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10771,7 +10771,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Relational operators on a mix of boolean literals and boolean/integer/float values"
                     }
                 },
@@ -10781,7 +10781,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10825,7 +10825,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10869,7 +10869,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10913,7 +10913,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10957,7 +10957,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -10996,7 +10996,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11034,7 +11034,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Bitwise operators on integer variables"
                     }
                 },
@@ -11044,7 +11044,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11064,7 +11064,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11084,7 +11084,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11126,7 +11126,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11168,7 +11168,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11210,7 +11210,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11248,7 +11248,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11291,7 +11291,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11347,7 +11347,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Bitwise operators on integer literals"
                     }
                 },
@@ -11357,7 +11357,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11401,7 +11401,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11445,7 +11445,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11489,7 +11489,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11528,7 +11528,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11572,7 +11572,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11615,7 +11615,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Unary operators"
                     }
                 },
@@ -11625,7 +11625,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11645,7 +11645,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11665,7 +11665,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11732,7 +11732,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11788,7 +11788,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11808,7 +11808,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11818,7 +11818,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "++",
-                            "ident": {
+                            "x": {
                                 "_type": "Ident",
                                 "name": "a"
                             },
@@ -11832,7 +11832,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11842,7 +11842,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "++",
-                            "ident": {
+                            "x": {
                                 "_type": "BasicLit",
                                 "value_type": "int",
                                 "value": "13"
@@ -11895,7 +11895,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11905,7 +11905,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "++",
-                            "ident": {
+                            "x": {
                                 "_type": "Ident",
                                 "name": "a"
                             },
@@ -11919,7 +11919,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11929,7 +11929,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "++",
-                            "ident": {
+                            "x": {
                                 "_type": "BasicLit",
                                 "value_type": "int",
                                 "value": "13"
@@ -11982,7 +11982,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -11992,7 +11992,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "--",
-                            "ident": {
+                            "x": {
                                 "_type": "Ident",
                                 "name": "a"
                             },
@@ -12006,7 +12006,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -12016,7 +12016,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "--",
-                            "ident": {
+                            "x": {
                                 "_type": "BasicLit",
                                 "value_type": "int",
                                 "value": "13"
@@ -12069,7 +12069,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -12079,7 +12079,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "--",
-                            "ident": {
+                            "x": {
                                 "_type": "Ident",
                                 "name": "a"
                             },
@@ -12093,7 +12093,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -12103,7 +12103,7 @@
                         "expr": {
                             "_type": "IncDecExpr",
                             "op": "--",
-                            "ident": {
+                            "x": {
                                 "_type": "BasicLit",
                                 "value_type": "int",
                                 "value": "13"
@@ -12162,7 +12162,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Long mathematical expressions"
                     }
                 },
@@ -12531,7 +12531,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Operator precedence for variables"
                     }
                 },
@@ -12541,7 +12541,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -12561,7 +12561,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {

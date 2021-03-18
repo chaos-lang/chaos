@@ -19,7 +19,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "hello world"
                     }
                 },
@@ -28,7 +28,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "hello world"
                     }
                 },
@@ -38,7 +38,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -47,7 +47,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "world"
                         }
                     }
@@ -65,7 +65,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "Hello\n\tWorld!"
                     }
                 }

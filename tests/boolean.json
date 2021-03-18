@@ -11,7 +11,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -31,7 +31,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {

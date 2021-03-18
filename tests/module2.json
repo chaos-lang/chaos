@@ -51,7 +51,7 @@
                                         "_type": "FieldSpec",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {
@@ -63,7 +63,7 @@
                             },
                             "result": {
                                 "_type": "TypeSpec",
-                                "type": "String",
+                                "type": "Number",
                                 "sub_type_spec": null
                             }
                         },
@@ -80,7 +80,7 @@
                                         "_type": "VarDecl",
                                         "type_spec": {
                                             "_type": "TypeSpec",
-                                            "type": "String",
+                                            "type": "Number",
                                             "sub_type_spec": null
                                         },
                                         "ident": {

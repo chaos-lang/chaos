@@ -11,7 +11,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -20,7 +20,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "string5"
                         }
                     }
@@ -34,7 +34,7 @@
                     "op": "==",
                     "y": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "string6"
                     }
                 },
@@ -52,7 +52,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -61,7 +61,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "string7"
                         }
                     }
@@ -93,7 +93,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -102,7 +102,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "string8"
                         }
                     }
@@ -134,7 +134,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -143,7 +143,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "string9"
                         }
                     }
@@ -175,7 +175,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -216,7 +216,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -239,7 +239,7 @@
                     "op": "==",
                     "y": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "string10"
                     }
                 },
@@ -257,7 +257,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -298,7 +298,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -339,7 +339,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -380,7 +380,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -403,7 +403,7 @@
                     "op": "==",
                     "y": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "string11"
                     }
                 },
@@ -421,7 +421,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -462,7 +462,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -503,7 +503,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -544,7 +544,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -567,7 +567,7 @@
                     "op": "==",
                     "y": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "string12"
                     }
                 },
@@ -585,7 +585,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -626,7 +626,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -667,7 +667,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -687,7 +687,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -743,7 +743,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -763,7 +763,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -797,7 +797,7 @@
                     "mod": null,
                     "x": {
                         "_type": "BasicLit",
-                        "value_type": "int",
+                        "value_type": "string",
                         "value": "START OF any to type safe variable assignments"
                     }
                 },
@@ -828,7 +828,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -848,7 +848,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -896,7 +896,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -960,7 +960,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -980,7 +980,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1028,7 +1028,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1092,7 +1092,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1112,7 +1112,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1160,7 +1160,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1224,7 +1224,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1244,7 +1244,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1292,7 +1292,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1356,7 +1356,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1376,7 +1376,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1424,7 +1424,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1488,7 +1488,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1497,7 +1497,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": ""
                         }
                     }
@@ -1508,7 +1508,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1556,7 +1556,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1620,7 +1620,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1629,7 +1629,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "asd"
                         }
                     }
@@ -1640,7 +1640,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1688,7 +1688,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Number",
+                            "type": "Boolean",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1752,7 +1752,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1772,7 +1772,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1820,7 +1820,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1884,7 +1884,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1904,7 +1904,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -1952,7 +1952,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2016,7 +2016,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2036,7 +2036,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2084,7 +2084,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2148,7 +2148,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2168,7 +2168,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2216,7 +2216,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2280,7 +2280,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2289,7 +2289,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "666"
                         }
                     }
@@ -2300,7 +2300,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2348,7 +2348,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2412,7 +2412,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2432,7 +2432,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2480,7 +2480,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2544,7 +2544,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2564,7 +2564,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2612,7 +2612,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2676,7 +2676,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2696,7 +2696,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2744,7 +2744,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2808,7 +2808,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2828,7 +2828,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2876,7 +2876,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2940,7 +2940,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -2949,7 +2949,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "666"
                         }
                     }
@@ -2960,7 +2960,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3008,7 +3008,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "String",
+                            "type": "Number",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3072,7 +3072,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3092,7 +3092,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3101,7 +3101,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "hey"
                         }
                     }
@@ -3140,7 +3140,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3204,7 +3204,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3224,7 +3224,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3233,7 +3233,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "hey"
                         }
                     }
@@ -3272,7 +3272,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3336,280 +3336,16 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
-                            "name": "a"
-                        },
-                        "expr": {
-                            "_type": "BasicLit",
-                            "value_type": "int",
-                            "value": "333"
-                        }
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
                             "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
                             "_type": "Ident",
-                            "name": "b"
-                        },
-                        "expr": {
-                            "_type": "BasicLit",
-                            "value_type": "int",
-                            "value": "hey"
-                        }
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "AssignStmt",
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    },
-                    "op": "==",
-                    "y": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "Any",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
-                            "name": "c"
-                        },
-                        "expr": {
-                            "_type": "Ident",
-                            "name": "a"
-                        }
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "c"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "c"
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "List",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
                             "name": "a"
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "float",
-                            "value": "333.33"
-                        }
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "Any",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
-                            "name": "b"
-                        },
-                        "expr": {
-                            "_type": "BasicLit",
-                            "value_type": "int",
-                            "value": "hey"
-                        }
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "AssignStmt",
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    },
-                    "op": "==",
-                    "y": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "Any",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
-                            "name": "c"
-                        },
-                        "expr": {
-                            "_type": "Ident",
-                            "name": "a"
-                        }
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "c"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "c"
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "List",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
-                            "name": "a"
-                        },
-                        "expr": {
-                            "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "universe"
                         }
                     }
@@ -3620,7 +3356,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3629,7 +3365,7 @@
                         },
                         "expr": {
                             "_type": "BasicLit",
-                            "value_type": "int",
+                            "value_type": "string",
                             "value": "hey"
                         }
                     }
@@ -3668,7 +3404,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Any",
+                            "type": "String",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3732,7 +3468,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3769,7 +3505,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -3806,7 +3542,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "List",
+                            "type": "Any",
                             "sub_type_spec": null
                         },
                         "ident": {

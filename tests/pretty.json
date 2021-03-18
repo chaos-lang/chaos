@@ -11,7 +11,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Dictionary",
+                            "type": "List",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -115,7 +115,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Dictionary",
+                            "type": "List",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -138,7 +138,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "a"
                                             },
                                             "value": {
@@ -151,7 +151,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "b"
                                             },
                                             "value": {
@@ -172,7 +172,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "c"
                                             },
                                             "value": {
@@ -185,7 +185,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "d"
                                             },
                                             "value": {
@@ -206,7 +206,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "e"
                                             },
                                             "value": {
@@ -219,7 +219,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "f"
                                             },
                                             "value": {
@@ -267,7 +267,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Dictionary",
+                            "type": "List",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -290,7 +290,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "a"
                                             },
                                             "value": {
@@ -316,7 +316,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "b"
                                             },
                                             "value": {
@@ -350,7 +350,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "c"
                                             },
                                             "value": {
@@ -376,7 +376,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "d"
                                             },
                                             "value": {
@@ -410,7 +410,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "e"
                                             },
                                             "value": {
@@ -436,7 +436,7 @@
                                             "_type": "KeyValueExpr",
                                             "key": {
                                                 "_type": "BasicLit",
-                                                "value_type": "int",
+                                                "value_type": "string",
                                                 "value": "f"
                                             },
                                             "value": {
@@ -497,7 +497,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Void",
+                            "type": "Dictionary",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -514,7 +514,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "a"
                                     },
                                     "value": {
@@ -527,7 +527,7 @@
                                                 "_type": "KeyValueExpr",
                                                 "key": {
                                                     "_type": "BasicLit",
-                                                    "value_type": "int",
+                                                    "value_type": "string",
                                                     "value": "a"
                                                 },
                                                 "value": {
@@ -540,7 +540,7 @@
                                                 "_type": "KeyValueExpr",
                                                 "key": {
                                                     "_type": "BasicLit",
-                                                    "value_type": "int",
+                                                    "value_type": "string",
                                                     "value": "b"
                                                 },
                                                 "value": {
@@ -556,7 +556,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "b"
                                     },
                                     "value": {
@@ -569,7 +569,7 @@
                                                 "_type": "KeyValueExpr",
                                                 "key": {
                                                     "_type": "BasicLit",
-                                                    "value_type": "int",
+                                                    "value_type": "string",
                                                     "value": "c"
                                                 },
                                                 "value": {
@@ -582,7 +582,7 @@
                                                 "_type": "KeyValueExpr",
                                                 "key": {
                                                     "_type": "BasicLit",
-                                                    "value_type": "int",
+                                                    "value_type": "string",
                                                     "value": "d"
                                                 },
                                                 "value": {
@@ -598,7 +598,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "c"
                                     },
                                     "value": {
@@ -611,7 +611,7 @@
                                                 "_type": "KeyValueExpr",
                                                 "key": {
                                                     "_type": "BasicLit",
-                                                    "value_type": "int",
+                                                    "value_type": "string",
                                                     "value": "e"
                                                 },
                                                 "value": {
@@ -624,7 +624,7 @@
                                                 "_type": "KeyValueExpr",
                                                 "key": {
                                                     "_type": "BasicLit",
-                                                    "value_type": "int",
+                                                    "value_type": "string",
                                                     "value": "f"
                                                 },
                                                 "value": {
@@ -673,7 +673,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Void",
+                            "type": "Dictionary",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -690,7 +690,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "a"
                                     },
                                     "value": {
@@ -716,7 +716,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "b"
                                     },
                                     "value": {
@@ -742,7 +742,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "c"
                                     },
                                     "value": {
@@ -801,7 +801,7 @@
                         "_type": "VarDecl",
                         "type_spec": {
                             "_type": "TypeSpec",
-                            "type": "Void",
+                            "type": "Dictionary",
                             "sub_type_spec": null
                         },
                         "ident": {
@@ -818,7 +818,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "a"
                                     },
                                     "value": {
@@ -837,7 +837,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "a"
                                                         },
                                                         "value": {
@@ -850,7 +850,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "b"
                                                         },
                                                         "value": {
@@ -871,7 +871,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "c"
                                                         },
                                                         "value": {
@@ -884,7 +884,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "d"
                                                         },
                                                         "value": {
@@ -902,7 +902,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "b"
                                     },
                                     "value": {
@@ -921,7 +921,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "e"
                                                         },
                                                         "value": {
@@ -934,7 +934,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "f"
                                                         },
                                                         "value": {
@@ -955,7 +955,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "g"
                                                         },
                                                         "value": {
@@ -968,7 +968,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "h"
                                                         },
                                                         "value": {
@@ -986,7 +986,7 @@
                                     "_type": "KeyValueExpr",
                                     "key": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
+                                        "value_type": "string",
                                         "value": "c"
                                     },
                                     "value": {
@@ -1005,7 +1005,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "x"
                                                         },
                                                         "value": {
@@ -1018,7 +1018,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "y"
                                                         },
                                                         "value": {
@@ -1039,7 +1039,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "t"
                                                         },
                                                         "value": {
@@ -1052,7 +1052,7 @@
                                                         "_type": "KeyValueExpr",
                                                         "key": {
                                                             "_type": "BasicLit",
-                                                            "value_type": "int",
+                                                            "value_type": "string",
                                                             "value": "v"
                                                         },
                                                         "value": {
