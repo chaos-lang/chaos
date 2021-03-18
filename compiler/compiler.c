@@ -392,7 +392,15 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     case BinaryExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
         shift_registers(program, 8);
+        if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
+            push_instr(program, PUSH);
+            push_instr(program, R1B);
+        }
         compileExpr(program, expr->v.binary_expr->x);
+        if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
+            push_instr(program, POP);
+            push_instr(program, R1B);
+        }
         switch (expr->v.binary_expr->op) {
         case ADD_tok:
             push_instr(program, ADD);
@@ -450,19 +458,19 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1B);
 
             push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
 
             push_instr(program, JEZ);
-            push_instr(program, program->size + 7);
+            push_instr(program, program->size + 3);
 
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 0);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
             break;
         case NEQ_tok:
             push_instr(program, CMP);
@@ -470,19 +478,19 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1B);
 
             push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
 
             push_instr(program, JNZ);
-            push_instr(program, program->size + 7);
+            push_instr(program, program->size + 3);
 
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 0);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
             break;
         case GTR_tok:
             push_instr(program, CMP);
@@ -490,19 +498,19 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1B);
 
             push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
 
             push_instr(program, JGZ);
-            push_instr(program, program->size + 7);
+            push_instr(program, program->size + 3);
 
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 0);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
             break;
         case LSS_tok:
             push_instr(program, CMP);
@@ -510,19 +518,19 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1B);
 
             push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
 
             push_instr(program, JLZ);
-            push_instr(program, program->size + 7);
+            push_instr(program, program->size + 3);
 
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 0);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
             break;
         case GEQ_tok:
             push_instr(program, CMP);
@@ -530,21 +538,21 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1B);
 
             push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
 
             push_instr(program, JEZ);
-            push_instr(program, program->size + 9);
+            push_instr(program, program->size + 5);
             push_instr(program, JGZ);
-            push_instr(program, program->size + 7);
+            push_instr(program, program->size + 3);
 
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 0);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
             break;
         case LEQ_tok:
             push_instr(program, CMP);
@@ -552,21 +560,21 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1B);
 
             push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
 
             push_instr(program, JEZ);
-            push_instr(program, program->size + 9);
+            push_instr(program, program->size + 5);
             push_instr(program, JLZ);
-            push_instr(program, program->size + 7);
+            push_instr(program, program->size + 3);
 
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 0);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
             break;
         case LAND_tok:
             push_instr(program, LAND);
@@ -627,6 +635,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         return type;
         break;
     }
+    case ParenExpr_kind:
+        return compileExpr(program, expr->v.paren_expr->x);
+        break;
     case IndexExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.index_expr->x);
         shift_registers(program, 8);
@@ -681,6 +692,58 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             break;
         default:
             break;
+        }
+        return type;
+        break;
+    }
+    case IncDecExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.incdec_expr->x);
+        switch (expr->v.incdec_expr->op) {
+        case INC_tok:
+            push_instr(program, LII);
+            push_instr(program, R1B);
+            push_instr(program, 1);
+            break;
+        case DEC_tok:
+            push_instr(program, LII);
+            push_instr(program, R1B);
+            push_instr(program, -1);
+            break;
+        default:
+            break;
+        }
+        push_instr(program, ADD);
+        push_instr(program, R1A);
+        push_instr(program, R1B);
+        if (expr->v.incdec_expr->x->kind == Ident_kind) {
+            Symbol* symbol = getSymbol(expr->v.incdec_expr->x->v.ident->name);
+            i64 addr = symbol->addr;
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R1A);
+        }
+        if (!expr->v.incdec_expr->first) {
+            switch (expr->v.incdec_expr->op) {
+            case INC_tok:
+                push_instr(program, LII);
+                push_instr(program, R1B);
+                push_instr(program, -1);
+                break;
+            case DEC_tok:
+                push_instr(program, LII);
+                push_instr(program, R1B);
+                push_instr(program, 1);
+                break;
+            default:
+                break;
+            }
+            push_instr(program, ADD);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
         }
         return type;
         break;

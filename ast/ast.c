@@ -586,11 +586,11 @@ Expr* parenExpr(Expr* x, int lineno)
     return expr;
 }
 
-Expr* incDecExpr(enum Token op, Expr* ident, bool first, int lineno)
+Expr* incDecExpr(enum Token op, Expr* x, bool first, int lineno)
 {
     IncDecExpr* incdec_expr = (struct IncDecExpr*)calloc(1, sizeof(IncDecExpr));
     incdec_expr->op = op;
-    incdec_expr->ident = ident;
+    incdec_expr->x = x;
     incdec_expr->first = first;
     Expr* expr = buildExpr(IncDecExpr_kind, lineno);
     expr->v.incdec_expr = incdec_expr;

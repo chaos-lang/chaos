@@ -72,12 +72,17 @@ void execute(cpu *c)
         clear_flags(c);
         break;
     case CMP:
-        if (c->r[R0A] == V_FLOAT) {
+        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
             i64 i1 = c->r[c->dest];
             i64 i2 = c->r[c->src];
-            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0A] == V_FLOAT) {
+                memcpy(&f1, &i1, sizeof f1);
+            } else {
+                c->r[R0A] = V_FLOAT;
+                f1 = (f64)c->r[c->dest];
+            }
             if (c->r[R0B] == V_FLOAT) {
                 memcpy(&f2, &i2, sizeof f2);
             } else {
@@ -132,12 +137,17 @@ void execute(cpu *c)
         c->pc++;
         break;
     case ADD:
-        if (c->r[R0A] == V_FLOAT) {
+        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
             i64 i1 = c->r[c->dest];
             i64 i2 = c->r[c->src];
-            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0A] == V_FLOAT) {
+                memcpy(&f1, &i1, sizeof f1);
+            } else {
+                c->r[R0A] = V_FLOAT;
+                f1 = (f64)c->r[c->dest];
+            }
             if (c->r[R0B] == V_FLOAT) {
                 memcpy(&f2, &i2, sizeof f2);
             } else {
@@ -153,12 +163,17 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case SUB:
-        if (c->r[R0A] == V_FLOAT) {
+        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
             i64 i1 = c->r[c->dest];
             i64 i2 = c->r[c->src];
-            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0A] == V_FLOAT) {
+                memcpy(&f1, &i1, sizeof f1);
+            } else {
+                c->r[R0A] = V_FLOAT;
+                f1 = (f64)c->r[c->dest];
+            }
             if (c->r[R0B] == V_FLOAT) {
                 memcpy(&f2, &i2, sizeof f2);
             } else {
@@ -174,12 +189,17 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case MUL:
-        if (c->r[R0A] == V_FLOAT) {
+        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
             i64 i1 = c->r[c->dest];
             i64 i2 = c->r[c->src];
-            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0A] == V_FLOAT) {
+                memcpy(&f1, &i1, sizeof f1);
+            } else {
+                c->r[R0A] = V_FLOAT;
+                f1 = (f64)c->r[c->dest];
+            }
             if (c->r[R0B] == V_FLOAT) {
                 memcpy(&f2, &i2, sizeof f2);
             } else {
@@ -195,12 +215,17 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case DIV:
-        if (c->r[R0A] == V_FLOAT) {
+        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
             i64 i1 = c->r[c->dest];
             i64 i2 = c->r[c->src];
-            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0A] == V_FLOAT) {
+                memcpy(&f1, &i1, sizeof f1);
+            } else {
+                c->r[R0A] = V_FLOAT;
+                f1 = (f64)c->r[c->dest];
+            }
             if (c->r[R0B] == V_FLOAT) {
                 memcpy(&f2, &i2, sizeof f2);
             } else {
@@ -216,12 +241,17 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case MOD:
-        if (c->r[R0A] == V_FLOAT) {
+        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
             i64 i1 = c->r[c->dest];
             i64 i2 = c->r[c->src];
-            memcpy(&f1, &i1, sizeof f1);
+            if (c->r[R0A] == V_FLOAT) {
+                memcpy(&f1, &i1, sizeof f1);
+            } else {
+                c->r[R0A] = V_FLOAT;
+                f1 = (f64)c->r[c->dest];
+            }
             if (c->r[R0B] == V_FLOAT) {
                 memcpy(&f2, &i2, sizeof f2);
             } else {

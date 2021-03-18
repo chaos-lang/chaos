@@ -431,7 +431,7 @@ typedef struct ParenExpr {
 
 typedef struct IncDecExpr {
     enum Token op;
-    struct Expr* ident;
+    struct Expr* x;
     bool first;
 } IncDecExpr;
 

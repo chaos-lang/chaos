@@ -387,11 +387,11 @@ void printASTExpr(Expr* expr, bool is_list, char *end)
             getToken(expr->v.incdec_expr->op)
         );
         printf(
-            "%*c\"ident\": ",
+            "%*c\"x\": ",
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTExpr(expr->v.incdec_expr->ident, false, ",\n");
+        printASTExpr(expr->v.incdec_expr->x, false, ",\n");
         printf(
             "%*c\"first\": %s\n",
             indent,
