@@ -361,6 +361,15 @@ void execute(cpu *c)
             free(s);
             break;
         }
+        case V_LIST: {
+            size_t len = c->r[R1A];
+            for (size_t i = 0; i < len; i++) {
+                c->sp++;
+                c->r[R1A] = c->mem[c->sp++];
+                printf("%lld", c->r[R1A]);
+            }
+            break;
+        }
         default:
             break;
         }

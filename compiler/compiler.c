@@ -383,6 +383,35 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             addr += len - 1;
             break;
         }
+        case V_LIST: {
+            push_instr(program, LDI);
+            push_instr(program, R0A);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R1A);
+            push_instr(program, addr++);
+
+            size_t len = symbol->len;
+            addr += len * 2 - 1;
+            for (size_t i = len; i > 0; i--) {
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+            }
+            addr += len * 2 - 1;
+            break;
+        }
         default:
             break;
         }
@@ -748,6 +777,29 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         return type;
         break;
     }
+    case CompositeLit_kind: {
+        ExprList* expr_list = expr->v.composite_lit->elts;
+        for (size_t i = 0; i < expr_list->expr_count; i++) {
+            compileExpr(program, expr_list->exprs[i]);
+            push_instr(program, PUSH);
+            push_instr(program, R1A);
+
+            push_instr(program, PUSH);
+            push_instr(program, R0A);
+
+            // push_instr(program, LDI);
+            // push_instr(program, R7A);
+            // push_instr(program, 2);
+
+            // push_instr(program, PUSH);
+            // push_instr(program, R7A);
+        }
+        compileSpec(program, expr->v.composite_lit->type);
+        push_instr(program, LII);
+        push_instr(program, R1A);
+        push_instr(program, expr_list->expr_count);
+        break;
+    }
     default:
         break;
     }
@@ -960,12 +1012,64 @@ void compileDecl(i64_array* program, Decl* decl)
             default:
                 break;
             }
+            break;
+        }
+        case K_LIST: {
+            size_t len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+
+            Symbol* symbol = addSymbolListNew(
+                decl->v.var_decl->ident->v.ident->name,
+                len
+            );
+            symbol->addr = program->heap;
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_LIST);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1A);
+
+            for (size_t i = len; i > 0; i--) {
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+            }
+            break;
         }
         default:
             break;
         }
         break;
     }
+    default:
+        break;
+    }
+}
+
+void compileSpec(i64_array* program, Spec* spec)
+{
+    switch (spec->kind) {
+    case ListType_kind:
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_LIST);
+        break;
     default:
         break;
     }
