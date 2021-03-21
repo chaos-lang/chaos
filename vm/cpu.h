@@ -42,5 +42,10 @@ void fetch(cpu *c);
 void execute(cpu *c);
 void print_registers(cpu *c, i64 pc_start);
 char *getRegName(i64 i);
+void print_bool(cpu *c);
+void print_int(cpu *c);
+void print_float(cpu *c);
+void print_string(cpu *c);
+void print_list(cpu *c);
 
 #endif

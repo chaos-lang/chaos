@@ -337,71 +337,20 @@ void execute(cpu *c)
     case PRNT:
         switch (c->r[R0A]) {
         case V_BOOL:
-            printf("%s", c->r[R1A] ? "true" : "false");
+            print_bool(c);
             break;
         case V_INT:
-            printf("%lld", c->r[R1A]);
+            print_int(c);
             break;
-        case V_FLOAT: {
-            i64 i = c->r[R1A];
-            f64 f;
-            memcpy(&f, &i, sizeof f);
-            printf("%lg", f);
+        case V_FLOAT:
+            print_float(c);
             break;
-        }
-        case V_STRING: {
-            size_t len = c->r[R1A];
-            char *s = malloc(len + 1);
-            for (size_t i = 0; i < len; i++) {
-                c->r[R1A] = c->mem[c->sp++];
-                s[i] = (int)c->r[R1A] + '0';
-            }
-            s[len] = '\0';
-            printf("%s", escape_the_sequences_in_string_literal(s));
-            free(s);
+        case V_STRING:
+            print_string(c);
             break;
-        }
-        case V_LIST: {
-            size_t len = c->r[R1A];
-            printf("[");
-            for (size_t i = 0; i < len; i++) {
-                c->r[R0A] = c->mem[c->sp++];
-                c->r[R1A] = c->mem[c->sp++];
-                switch (c->r[R0A]) {
-                case V_BOOL:
-                    printf("%s", c->r[R1A] ? "true" : "false");
-                    break;
-                case V_INT:
-                    printf("%lld", c->r[R1A]);
-                    break;
-                case V_FLOAT: {
-                    i64 i = c->r[R1A];
-                    f64 f;
-                    memcpy(&f, &i, sizeof f);
-                    printf("%lg", f);
-                    break;
-                }
-                case V_STRING: {
-                    size_t len = c->r[R1A];
-                    char *s = malloc(len + 1);
-                    for (size_t i = 0; i < len; i++) {
-                        c->r[R1A] = c->mem[c->sp++];
-                        s[i] = (int)c->r[R1A] + '0';
-                    }
-                    s[len] = '\0';
-                    printf("'%s'", escape_the_sequences_in_string_literal(s));
-                    free(s);
-                    break;
-                }
-                default:
-                    break;
-                }
-                if (i + 1 != len)
-                    printf(", ");
-            }
-            printf("]");
+        case V_LIST:
+            print_list(c);
             break;
-        }
         default:
             break;
         }
@@ -426,4 +375,67 @@ void print_registers(cpu *c, i64 pc_start)
 char *getRegName(i64 i)
 {
     return reg_names[i];
+}
+
+void print_bool(cpu *c)
+{
+    printf("%s", c->r[R1A] ? "true" : "false");
+}
+
+void print_int(cpu *c)
+{
+    printf("%lld", c->r[R1A]);
+}
+
+void print_float(cpu *c)
+{
+    i64 i = c->r[R1A];
+    f64 f;
+    memcpy(&f, &i, sizeof f);
+    printf("%lg", f);
+}
+
+void print_string(cpu *c)
+{
+    size_t len = c->r[R1A];
+    char *s = malloc(len + 1);
+    for (size_t i = 0; i < len; i++) {
+        c->r[R1A] = c->mem[c->sp++];
+        s[i] = (int)c->r[R1A] + '0';
+    }
+    s[len] = '\0';
+    printf("%s", escape_the_sequences_in_string_literal(s));
+    free(s);
+}
+
+void print_list(cpu *c)
+{
+    size_t len = c->r[R1A];
+    printf("[");
+    for (size_t i = 0; i < len; i++) {
+        c->r[R0A] = c->mem[c->sp++];
+        c->r[R1A] = c->mem[c->sp++];
+        switch (c->r[R0A]) {
+        case V_BOOL:
+            print_bool(c);
+            break;
+        case V_INT:
+            print_int(c);
+            break;
+        case V_FLOAT:
+            print_float(c);
+            break;
+        case V_STRING:
+            print_string(c);
+            break;
+        case V_LIST:
+            print_list(c);
+            break;
+        default:
+            break;
+        }
+        if (i + 1 != len)
+            printf(", ");
+    }
+    printf("]");
 }
