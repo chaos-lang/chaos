@@ -46,10 +46,10 @@ void freeProgram(i64_array* program);
 i64_array* initProgram();
 void shift_registers(i64_array* program, size_t shift);
 
-void store_bool(i64_array* program, char *name, bool b);
-void store_int(i64_array* program, char *name, i64 i);
-void store_float(i64_array* program, char *name, f64 f);
-void store_string(i64_array* program, char *name, char *s, size_t len);
+void store_bool(i64_array* program, char *name, bool b, bool is_any);
+void store_int(i64_array* program, char *name, i64 i, bool is_any);
+void store_float(i64_array* program, char *name, f64 f, bool is_any);
+void store_string(i64_array* program, char *name, char *s, size_t len, bool is_any);
 
 void load_bool(i64_array* program, char *name);
 void load_int(i64_array* program, char *name);
