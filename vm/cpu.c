@@ -363,11 +363,43 @@ void execute(cpu *c)
         }
         case V_LIST: {
             size_t len = c->r[R1A];
+            printf("[");
             for (size_t i = 0; i < len; i++) {
-                c->sp++;
+                c->r[R0A] = c->mem[c->sp++];
                 c->r[R1A] = c->mem[c->sp++];
-                printf("%lld", c->r[R1A]);
+                switch (c->r[R0A]) {
+                case V_BOOL:
+                    printf("%s", c->r[R1A] ? "true" : "false");
+                    break;
+                case V_INT:
+                    printf("%lld", c->r[R1A]);
+                    break;
+                case V_FLOAT: {
+                    i64 i = c->r[R1A];
+                    f64 f;
+                    memcpy(&f, &i, sizeof f);
+                    printf("%lg", f);
+                    break;
+                }
+                case V_STRING: {
+                    size_t len = c->r[R1A];
+                    char *s = malloc(len + 1);
+                    for (size_t i = 0; i < len; i++) {
+                        c->r[R1A] = c->mem[c->sp++];
+                        s[i] = (int)c->r[R1A] + '0';
+                    }
+                    s[len] = '\0';
+                    printf("'%s'", escape_the_sequences_in_string_literal(s));
+                    free(s);
+                    break;
+                }
+                default:
+                    break;
+                }
+                if (i + 1 != len)
+                    printf(", ");
             }
+            printf("]");
             break;
         }
         default:
