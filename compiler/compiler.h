@@ -39,10 +39,21 @@ void compileStmt(i64_array* program, Stmt* stmt);
 unsigned short compileExpr(i64_array* program, Expr* expr);
 void compileDecl(i64_array* program, Decl* decl);
 void compileSpec(i64_array* program, Spec* spec);
+
 void push_instr(i64_array* program, i64 el);
 i64 popProgram(i64_array* program);
 void freeProgram(i64_array* program);
 i64_array* initProgram();
 void shift_registers(i64_array* program, size_t shift);
+
+void store_bool(i64_array* program, char *name, bool b);
+void store_int(i64_array* program, char *name, i64 i);
+void store_float(i64_array* program, char *name, f64 f);
+void store_string(i64_array* program, char *name, char *s, size_t len);
+
+void load_bool(i64_array* program, char *name);
+void load_int(i64_array* program, char *name);
+void load_float(i64_array* program, char *name);
+void load_string(i64_array* program, char *name);
 
 #endif

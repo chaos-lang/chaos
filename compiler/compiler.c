@@ -335,52 +335,16 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         i64 addr = symbol->addr;
         switch (symbol->value_type) {
         case V_BOOL:
-            push_instr(program, LDI);
-            push_instr(program, R0A);
-            push_instr(program, addr++);
-
-            push_instr(program, LDI);
-            push_instr(program, R1A);
-            push_instr(program, addr++);
+            load_bool(program, expr->v.ident->name);
             break;
         case V_INT:
-            push_instr(program, LDI);
-            push_instr(program, R0A);
-            push_instr(program, addr++);
-
-            push_instr(program, LDI);
-            push_instr(program, R1A);
-            push_instr(program, addr++);
+            load_int(program, expr->v.ident->name);
             break;
         case V_FLOAT:
-            push_instr(program, LDI);
-            push_instr(program, R0A);
-            push_instr(program, addr++);
-
-            push_instr(program, LDI);
-            push_instr(program, R1A);
-            push_instr(program, addr++);
+            load_float(program, expr->v.ident->name);
             break;
         case V_STRING: {
-            push_instr(program, LDI);
-            push_instr(program, R0A);
-            push_instr(program, addr++);
-
-            push_instr(program, LDI);
-            push_instr(program, R1A);
-            push_instr(program, addr++);
-
-            size_t len = symbol->len;
-            addr += len - 1;
-            for (size_t i = len; i > 0; i--) {
-                push_instr(program, LDI);
-                push_instr(program, R2A);
-                push_instr(program, addr--);
-
-                push_instr(program, PUSH);
-                push_instr(program, R2A);
-            }
-            addr += len - 1;
+            load_string(program, expr->v.ident->name);
             break;
         }
         case V_LIST: {
@@ -877,58 +841,28 @@ void compileDecl(i64_array* program, Decl* decl)
         enum Type type = decl->v.var_decl->type_spec->v.type_spec->type;
 
         switch (type) {
-        case K_BOOL: {
-            Symbol* symbol = addSymbolBool(
+        case K_BOOL:
+            store_bool(
+                program,
                 decl->v.var_decl->ident->v.ident->name,
                 decl->v.var_decl->expr->v.basic_lit->value.b
             );
-            symbol->addr = program->heap;
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1A);
             break;
-        }
-        case K_NUMBER: {
-            Symbol* symbol;
+        case K_NUMBER:
             if (value_type == V_FLOAT) {
-                symbol = addSymbolFloat(
+                store_float(
+                    program,
                     decl->v.var_decl->ident->v.ident->name,
                     decl->v.var_decl->expr->v.basic_lit->value.f
                 );
-
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_FLOAT);
             } else {
-                symbol = addSymbolInt(
+                store_int(
+                    program,
                     decl->v.var_decl->ident->v.ident->name,
                     decl->v.var_decl->expr->v.basic_lit->value.i
                 );
-
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_INT);
             }
-            symbol->addr = program->heap;
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1A);
             break;
-        }
         case K_STRING: {
             size_t len = 0;
 
@@ -948,33 +882,12 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
 
-            Symbol* symbol = addSymbolStringNew(
+            store_string(
+                program,
                 decl->v.var_decl->ident->v.ident->name,
                 "",
                 len
             );
-            symbol->addr = program->heap;
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_STRING);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1A);
-
-            for (size_t i = len; i > 0; i--) {
-                push_instr(program, POP);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-            }
             break;
         }
         case K_ANY: {
@@ -1238,4 +1151,153 @@ void shift_registers(i64_array* program, size_t shift)
         push_instr(program, i + len);
         push_instr(program, i);
     }
+}
+
+void store_bool(i64_array* program, char *name, bool b)
+{
+    Symbol* symbol = addSymbolBool(name, b);
+    symbol->addr = program->heap;
+
+    push_instr(program, LII);
+    push_instr(program, R0A);
+    push_instr(program, V_BOOL);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+}
+
+void store_int(i64_array* program, char *name, i64 i)
+{
+    Symbol* symbol = addSymbolInt(name, i);
+    symbol->addr = program->heap;
+
+    push_instr(program, LII);
+    push_instr(program, R0A);
+    push_instr(program, V_INT);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+}
+
+void store_float(i64_array* program, char *name, f64 f)
+{
+    Symbol* symbol = addSymbolFloat(name, f);
+    symbol->addr = program->heap;
+
+    push_instr(program, LII);
+    push_instr(program, R0A);
+    push_instr(program, V_FLOAT);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+}
+
+void store_string(i64_array* program, char *name, char *s, size_t len)
+{
+    Symbol* symbol = addSymbolStringNew(name, s, len);
+    symbol->addr = program->heap;
+
+    push_instr(program, LII);
+    push_instr(program, R0A);
+    push_instr(program, V_STRING);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+
+    for (size_t i = len; i > 0; i--) {
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+    }
+}
+
+void load_bool(i64_array* program, char *name)
+{
+    Symbol* symbol = getSymbol(name);
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+}
+
+void load_int(i64_array* program, char *name)
+{
+    Symbol* symbol = getSymbol(name);
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+}
+
+void load_float(i64_array* program, char *name)
+{
+    Symbol* symbol = getSymbol(name);
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+}
+
+void load_string(i64_array* program, char *name)
+{
+    Symbol* symbol = getSymbol(name);
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+
+    size_t len = symbol->len;
+    addr += len - 1;
+    for (size_t i = len; i > 0; i--) {
+        push_instr(program, LDI);
+        push_instr(program, R2A);
+        push_instr(program, addr--);
+
+        push_instr(program, PUSH);
+        push_instr(program, R2A);
+    }
+    addr += len - 1;
 }
