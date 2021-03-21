@@ -665,6 +665,14 @@ Symbol* addSymbolListNew(char *name, size_t len) {
     return symbol;
 }
 
+Symbol* addSymbolDictNew(char *name, size_t len) {
+    union Value value;
+    value.i = 0;
+    Symbol* symbol = addSymbol(name, K_DICT, value, V_DICT);
+    symbol->len = len;
+    return symbol;
+}
+
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type) {
     Symbol* symbol = getSymbol(name);
     Symbol* clone_symbol = createCloneFromSymbol(clone_name, type, symbol, extra_type);

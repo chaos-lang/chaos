@@ -346,10 +346,13 @@ void execute(cpu *c)
             print_float(c);
             break;
         case V_STRING:
-            print_string(c);
+            print_string(c, false);
             break;
         case V_LIST:
             print_list(c);
+            break;
+        case V_DICT:
+            print_dict(c);
             break;
         default:
             break;
@@ -395,7 +398,7 @@ void print_float(cpu *c)
     printf("%lg", f);
 }
 
-void print_string(cpu *c)
+void print_string(cpu *c, bool quoted)
 {
     size_t len = c->r[R1A];
     char *s = malloc(len + 1);
@@ -404,7 +407,10 @@ void print_string(cpu *c)
         s[i] = (int)c->r[R1A] + '0';
     }
     s[len] = '\0';
-    printf("%s", escape_the_sequences_in_string_literal(s));
+    if (quoted)
+        printf("'%s'", escape_the_sequences_in_string_literal(s));
+    else
+        printf("%s", escape_the_sequences_in_string_literal(s));
     free(s);
 }
 
@@ -426,7 +432,46 @@ void print_list(cpu *c)
             print_float(c);
             break;
         case V_STRING:
-            print_string(c);
+            print_string(c, true);
+            break;
+        case V_LIST:
+            print_list(c);
+            break;
+        case V_DICT:
+            print_dict(c);
+            break;
+        default:
+            break;
+        }
+        if (i + 1 != len)
+            printf(", ");
+    }
+    printf("]");
+}
+
+void print_dict(cpu *c)
+{
+    size_t len = c->r[R1A];
+    printf("{");
+    for (size_t i = 0; i < len; i++) {
+        c->r[R0A] = c->mem[c->sp++];
+        c->r[R1A] = c->mem[c->sp++];
+        print_string(c, true);
+        printf(": ");
+        c->r[R0A] = c->mem[c->sp++];
+        c->r[R1A] = c->mem[c->sp++];
+        switch (c->r[R0A]) {
+        case V_BOOL:
+            print_bool(c);
+            break;
+        case V_INT:
+            print_int(c);
+            break;
+        case V_FLOAT:
+            print_float(c);
+            break;
+        case V_STRING:
+            print_string(c, true);
             break;
         case V_LIST:
             print_list(c);
@@ -437,5 +482,5 @@ void print_list(cpu *c)
         if (i + 1 != len)
             printf(", ");
     }
-    printf("]");
+    printf("}");
 }

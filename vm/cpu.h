@@ -45,7 +45,8 @@ char *getRegName(i64 i);
 void print_bool(cpu *c);
 void print_int(cpu *c);
 void print_float(cpu *c);
-void print_string(cpu *c);
+void print_string(cpu *c, bool quoted);
 void print_list(cpu *c);
+void print_dict(cpu *c);
 
 #endif

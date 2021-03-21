@@ -395,6 +395,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             size_t len = symbol->len;
             addr += len * 2 - 1;
             for (size_t i = len; i > 0; i--) {
+                // TODO: if the list value is a string, its value is not loaded
                 push_instr(program, LDI);
                 push_instr(program, R2A);
                 push_instr(program, addr--);
@@ -402,6 +403,58 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                 push_instr(program, PUSH);
                 push_instr(program, R2A);
 
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+            }
+            addr += len * 2 - 1;
+            break;
+        }
+        case V_DICT: {
+            push_instr(program, LDI);
+            push_instr(program, R0A);
+            push_instr(program, addr++);
+
+            push_instr(program, LDI);
+            push_instr(program, R1A);
+            push_instr(program, addr++);
+
+            size_t len = symbol->len;
+            addr += len * 5 - 1;
+            for (size_t i = len; i > 0; i--) {
+                // TODO: if the dict value is a string, its value is not loaded
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+
+                push_instr(program, LDI);
+                push_instr(program, R2A);
+                push_instr(program, addr--);
+
+                push_instr(program, PUSH);
+                push_instr(program, R2A);
+
+                // TODO: This is the a single char string in dict key, make it arbitrary length
                 push_instr(program, LDI);
                 push_instr(program, R2A);
                 push_instr(program, addr--);
@@ -781,24 +834,33 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         ExprList* expr_list = expr->v.composite_lit->elts;
         for (size_t i = 0; i < expr_list->expr_count; i++) {
             compileExpr(program, expr_list->exprs[i]);
-            push_instr(program, PUSH);
-            push_instr(program, R1A);
+            if (expr_list->exprs[i]->kind != KeyValueExpr_kind) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
 
-            push_instr(program, PUSH);
-            push_instr(program, R0A);
-
-            // push_instr(program, LDI);
-            // push_instr(program, R7A);
-            // push_instr(program, 2);
-
-            // push_instr(program, PUSH);
-            // push_instr(program, R7A);
+                push_instr(program, PUSH);
+                push_instr(program, R0A);
+            }
         }
         compileSpec(program, expr->v.composite_lit->type);
         push_instr(program, LII);
         push_instr(program, R1A);
         push_instr(program, expr_list->expr_count);
         break;
+    }
+    case KeyValueExpr_kind: {
+        compileExpr(program, expr->v.key_value_expr->value);
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, PUSH);
+        push_instr(program, R0A);
+        compileExpr(program, expr->v.key_value_expr->key);
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, PUSH);
+        push_instr(program, R0A);
     }
     default:
         break;
@@ -1036,6 +1098,7 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, R1A);
 
             for (size_t i = len; i > 0; i--) {
+                // TODO: if the list value is a string, its value is not stored
                 push_instr(program, POP);
                 push_instr(program, R0A);
 
@@ -1043,6 +1106,67 @@ void compileDecl(i64_array* program, Decl* decl)
                 push_instr(program, program->heap++);
                 push_instr(program, R0A);
 
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+            }
+            break;
+        }
+        case K_DICT: {
+            size_t len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+
+            Symbol* symbol = addSymbolDictNew(
+                decl->v.var_decl->ident->v.ident->name,
+                len
+            );
+            symbol->addr = program->heap;
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_DICT);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1A);
+
+            for (size_t i = len; i > 0; i--) {
+                // TODO: if the dict value is a string, its value is not stored
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, POP);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                // TODO: This is the a single char string in dict key, make it arbitrary length
                 push_instr(program, POP);
                 push_instr(program, R0A);
 
@@ -1069,6 +1193,11 @@ void compileSpec(i64_array* program, Spec* spec)
         push_instr(program, LII);
         push_instr(program, R0A);
         push_instr(program, V_LIST);
+        break;
+    case DictType_kind:
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_DICT);
         break;
     default:
         break;
