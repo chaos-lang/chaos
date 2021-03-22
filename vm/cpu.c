@@ -27,7 +27,7 @@ char *reg_names[] = {
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
 };
 
-cpu *new_cpu(i64 *memory, i64 mem_size, bool debug)
+cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, bool debug)
 {
 	cpu *c = malloc(sizeof(cpu));
 	c->mem = memory;
@@ -35,6 +35,7 @@ cpu *new_cpu(i64 *memory, i64 mem_size, bool debug)
 	c->max_mem = mem_size;
 	c->pc = -1;
 	c->inst = 0;
+    c->heap = heap;
     c->debug = debug;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
@@ -334,6 +335,18 @@ void execute(cpu *c)
         c->r[c->dest] = !c->r[c->dest];
         c->pc++;
         break;
+    case DLDR: {
+        i64 addr = c->mem[c->r[c->dest]];
+        c->r[R0A] = c->mem[addr++];
+        cpu_load_dynamic(c, addr);
+        c->pc++;
+        break;
+    }
+    case DSTR:
+        c->r[c->dest] = c->heap;
+        cpu_store_dynamic(c);
+        c->pc++;
+        break;
     case PRNT:
         switch (c->r[R0A]) {
         case V_BOOL:
@@ -483,4 +496,128 @@ void print_dict(cpu *c)
             printf(", ");
     }
     printf("}");
+}
+
+void cpu_store_dynamic(cpu *c)
+{
+    switch (c->r[R0A]) {
+        case V_BOOL:
+            cpu_store_common(c);
+            break;
+        case V_INT:
+            cpu_store_common(c);
+            break;
+        case V_FLOAT:
+            cpu_store_common(c);
+            break;
+        case V_STRING:
+            cpu_store_common(c);
+            cpu_store_string(c);
+            break;
+        case V_LIST:
+            cpu_store_common(c);
+            cpu_store_list(c);
+        case V_DICT:
+            cpu_store_common(c);
+            cpu_store_dict(c);
+        default:
+            break;
+    }
+}
+
+void cpu_store_common(cpu *c)
+{
+    c->mem[c->heap++] = c->r[R0A];
+    c->r[R1A] = c->mem[c->sp++];
+    c->mem[c->heap++] = c->r[R1A];
+}
+
+void cpu_store_string(cpu *c)
+{
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+        c->mem[c->heap++] = c->r[R0A];
+    }
+}
+
+void cpu_store_list(cpu *c)
+{
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_store_dynamic(c);
+    }
+}
+
+void cpu_store_dict(cpu *c)
+{
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_store_dynamic(c);
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_store_string(c);
+    }
+}
+
+void cpu_load_dynamic(cpu *c, i64 addr)
+{
+    switch (c->r[R0A]) {
+        case V_BOOL:
+            addr = cpu_load_common(c, addr);
+            break;
+        case V_INT:
+            addr = cpu_load_common(c, addr);
+            break;
+        case V_FLOAT:
+            addr = cpu_load_common(c, addr);
+            break;
+        case V_STRING:
+            addr = cpu_load_common(c, addr);
+            addr = cpu_load_string(c, addr);
+            break;
+        case V_LIST:
+            addr = cpu_load_common(c, addr);
+            addr = cpu_load_list(c, addr);
+        case V_DICT:
+            addr = cpu_load_common(c, addr);
+            addr = cpu_load_dict(c, addr);
+        default:
+            break;
+    }
+}
+
+i64 cpu_load_common(cpu *c, i64 addr)
+{
+    c->r[R1A] = c->mem[addr++];
+    c->mem[--c->sp] = c->r[R1A];
+    c->mem[--c->sp] = c->r[R0A];
+    return addr;
+}
+
+i64 cpu_load_string(cpu *c, i64 addr)
+{
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R2A] = c->mem[addr++];
+        c->mem[--c->sp] = c->r[R2A];
+    }
+    return addr;
+}
+
+i64 cpu_load_list(cpu *c, i64 addr)
+{
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[addr++];
+        cpu_load_dynamic(c, addr);
+    }
+    return addr;
+}
+
+i64 cpu_load_dict(cpu *c, i64 addr)
+{
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[addr++];
+        cpu_load_string(c, addr);
+        c->r[R0A] = c->mem[addr++];
+        cpu_load_dynamic(c, addr);
+    }
+    return addr;
 }

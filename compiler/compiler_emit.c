@@ -24,7 +24,7 @@
 
 void emit(i64_array* program)
 {
-    cpu *c = new_cpu(program->arr, program->size, false);
+    cpu *c = new_cpu(program->arr, program->size, program->heap, false);
     print_cpu(c);
     free_cpu(c);
 }
@@ -161,6 +161,14 @@ void emitBytecode(cpu *c)
         break;
     case LNOT:
         printf("%s %s\n", "LNOT", getRegName(c->dest));
+        c->pc++;
+        break;
+    case DLDR:
+        printf("%s %s\n", "DLDR", getRegName(c->dest));
+        c->pc++;
+        break;
+    case DSTR:
+        printf("%s %s\n", "DSTR", getRegName(c->dest));
         c->pc++;
         break;
     case PRNT:

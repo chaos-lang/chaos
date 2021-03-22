@@ -35,18 +35,32 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
-cpu *new_cpu(i64 *memory, i64 mem_size, bool debug);
+cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, bool debug);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void fetch(cpu *c);
 void execute(cpu *c);
+
 void print_registers(cpu *c, i64 pc_start);
 char *getRegName(i64 i);
+
 void print_bool(cpu *c);
 void print_int(cpu *c);
 void print_float(cpu *c);
 void print_string(cpu *c, bool quoted);
 void print_list(cpu *c);
 void print_dict(cpu *c);
+
+void cpu_store_dynamic(cpu *c);
+void cpu_store_common(cpu *c);
+void cpu_store_string(cpu *c);
+void cpu_store_list(cpu *c);
+void cpu_store_dict(cpu *c);
+
+void cpu_load_dynamic(cpu *c, i64 addr);
+i64 cpu_load_common(cpu *c, i64 addr);
+i64 cpu_load_string(cpu *c, i64 addr);
+i64 cpu_load_list(cpu *c, i64 addr);
+i64 cpu_load_dict(cpu *c, i64 addr);
 
 #endif
