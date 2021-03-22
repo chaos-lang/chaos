@@ -335,16 +335,16 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         i64 addr = symbol->addr;
         switch (symbol->value_type) {
         case V_BOOL:
-            load_bool(program, expr->v.ident->name);
+            load_bool(program, symbol);
             break;
         case V_INT:
-            load_int(program, expr->v.ident->name);
+            load_int(program, symbol);
             break;
         case V_FLOAT:
-            load_float(program, expr->v.ident->name);
+            load_float(program, symbol);
             break;
         case V_STRING: {
-            load_string(program, expr->v.ident->name);
+            load_string(program, symbol);
             break;
         }
         case V_LIST: {
@@ -845,7 +845,6 @@ void compileDecl(i64_array* program, Decl* decl)
             store_bool(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
-                decl->v.var_decl->expr->v.basic_lit->value.b,
                 false
             );
             break;
@@ -854,14 +853,12 @@ void compileDecl(i64_array* program, Decl* decl)
                 store_float(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
-                    decl->v.var_decl->expr->v.basic_lit->value.f,
                     false
                 );
             } else {
                 store_int(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
-                    decl->v.var_decl->expr->v.basic_lit->value.i,
                     false
                 );
             }
@@ -888,7 +885,6 @@ void compileDecl(i64_array* program, Decl* decl)
             store_string(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
-                "",
                 len,
                 false
             );
@@ -900,7 +896,6 @@ void compileDecl(i64_array* program, Decl* decl)
                 store_bool(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
-                    decl->v.var_decl->expr->v.basic_lit->value.b,
                     true
                 );
                 break;
@@ -908,7 +903,6 @@ void compileDecl(i64_array* program, Decl* decl)
                 store_int(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
-                    decl->v.var_decl->expr->v.basic_lit->value.i,
                     true
                 );
                 break;
@@ -917,7 +911,6 @@ void compileDecl(i64_array* program, Decl* decl)
                 store_float(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
-                    decl->v.var_decl->expr->v.basic_lit->value.f,
                     true
                 );
                 break;
@@ -944,7 +937,6 @@ void compileDecl(i64_array* program, Decl* decl)
                 store_string(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
-                    "",
                     len,
                     true
                 );
@@ -1119,13 +1111,15 @@ void shift_registers(i64_array* program, size_t shift)
     }
 }
 
-void store_bool(i64_array* program, char *name, bool b, bool is_any)
+Symbol* store_bool(i64_array* program, char *name, bool is_any)
 {
+    union Value value;
+    value.i = 0;
     Symbol* symbol;
     if (is_any)
-        symbol = addSymbolAnyBool(name, b);
+        symbol = addSymbol(name, K_ANY, value, V_BOOL);
     else {
-        symbol = addSymbolBool(name, b);
+        symbol = addSymbol(name, K_BOOL, value, V_BOOL);
         push_instr(program, LII);
         push_instr(program, R0A);
         push_instr(program, V_BOOL);
@@ -1139,15 +1133,19 @@ void store_bool(i64_array* program, char *name, bool b, bool is_any)
     push_instr(program, STI);
     push_instr(program, program->heap++);
     push_instr(program, R1A);
+
+    return symbol;
 }
 
-void store_int(i64_array* program, char *name, i64 i, bool is_any)
+Symbol* store_int(i64_array* program, char *name, bool is_any)
 {
+    union Value value;
+    value.i = 0;
     Symbol* symbol;
     if (is_any)
-        symbol = addSymbolAnyInt(name, i);
+        symbol = addSymbol(name, K_ANY, value, V_INT);
     else {
-        symbol = addSymbolInt(name, i);
+        symbol = addSymbol(name, K_NUMBER, value, V_INT);
         push_instr(program, LII);
         push_instr(program, R0A);
         push_instr(program, V_INT);
@@ -1161,15 +1159,19 @@ void store_int(i64_array* program, char *name, i64 i, bool is_any)
     push_instr(program, STI);
     push_instr(program, program->heap++);
     push_instr(program, R1A);
+
+    return symbol;
 }
 
-void store_float(i64_array* program, char *name, f64 f, bool is_any)
+Symbol* store_float(i64_array* program, char *name, bool is_any)
 {
+    union Value value;
+    value.i = 0;
     Symbol* symbol;
     if (is_any)
-        symbol = addSymbolAnyFloat(name, f);
+        symbol = addSymbol(name, K_ANY, value, V_FLOAT);
     else {
-        symbol = addSymbolFloat(name, f);
+        symbol = addSymbol(name, K_NUMBER, value, V_FLOAT);
         push_instr(program, LII);
         push_instr(program, R0A);
         push_instr(program, V_FLOAT);
@@ -1183,20 +1185,25 @@ void store_float(i64_array* program, char *name, f64 f, bool is_any)
     push_instr(program, STI);
     push_instr(program, program->heap++);
     push_instr(program, R1A);
+
+    return symbol;
 }
 
-void store_string(i64_array* program, char *name, char *s, size_t len, bool is_any)
+Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any)
 {
+    union Value value;
+    value.i = 0;
     Symbol* symbol;
     if (is_any)
-        symbol = addSymbolAnyStringNew(name, s, len);
+        symbol = addSymbol(name, K_ANY, value, V_STRING);
     else {
-        symbol = addSymbolStringNew(name, s, len);
+        symbol = addSymbol(name, K_STRING, value, V_STRING);
         push_instr(program, LII);
         push_instr(program, R0A);
         push_instr(program, V_STRING);
     }
     symbol->addr = program->heap;
+    symbol->len = len;
 
     push_instr(program, STI);
     push_instr(program, program->heap++);
@@ -1214,11 +1221,12 @@ void store_string(i64_array* program, char *name, char *s, size_t len, bool is_a
         push_instr(program, program->heap++);
         push_instr(program, R0A);
     }
+
+    return symbol;
 }
 
-void load_bool(i64_array* program, char *name)
+void load_bool(i64_array* program, Symbol* symbol)
 {
-    Symbol* symbol = getSymbol(name);
     i64 addr = symbol->addr;
 
     push_instr(program, LDI);
@@ -1230,9 +1238,8 @@ void load_bool(i64_array* program, char *name)
     push_instr(program, addr++);
 }
 
-void load_int(i64_array* program, char *name)
+void load_int(i64_array* program, Symbol* symbol)
 {
-    Symbol* symbol = getSymbol(name);
     i64 addr = symbol->addr;
 
     push_instr(program, LDI);
@@ -1244,9 +1251,8 @@ void load_int(i64_array* program, char *name)
     push_instr(program, addr++);
 }
 
-void load_float(i64_array* program, char *name)
+void load_float(i64_array* program, Symbol* symbol)
 {
-    Symbol* symbol = getSymbol(name);
     i64 addr = symbol->addr;
 
     push_instr(program, LDI);
@@ -1258,9 +1264,8 @@ void load_float(i64_array* program, char *name)
     push_instr(program, addr++);
 }
 
-void load_string(i64_array* program, char *name)
+void load_string(i64_array* program, Symbol* symbol)
 {
-    Symbol* symbol = getSymbol(name);
     i64 addr = symbol->addr;
 
     push_instr(program, LDI);
