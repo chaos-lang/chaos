@@ -38,7 +38,9 @@ char *value_type_names[] = {
     "Number",
     "Number",
     "String",
-    "Void"
+    "Void",
+    "List",
+    "Dict"
 };
 
 unsigned long long symbol_id_counter = 0;
