@@ -370,6 +370,25 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             break;
         }
         case V_DICT: {
+            size_t len = symbol->len;
+            addr += len * 2 - 1 + 2;
+            for (size_t i = len; i > 0; i--) {
+                push_instr(program, LII);
+                push_instr(program, R7A);
+                push_instr(program, addr--);
+
+                push_instr(program, DLDR);
+                push_instr(program, R7A);
+
+                push_instr(program, LII);
+                push_instr(program, R7A);
+                push_instr(program, addr--);
+
+                push_instr(program, DLDR);
+                push_instr(program, R7A);
+            }
+            addr--;
+
             push_instr(program, LDI);
             push_instr(program, R0A);
             push_instr(program, addr++);
@@ -377,48 +396,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LDI);
             push_instr(program, R1A);
             push_instr(program, addr++);
-
-            size_t len = symbol->len;
-            addr += len * 5 - 1;
-            for (size_t i = len; i > 0; i--) {
-                // TODO: if the dict value is a string, its value is not loaded
-                push_instr(program, LDI);
-                push_instr(program, R2A);
-                push_instr(program, addr--);
-
-                push_instr(program, PUSH);
-                push_instr(program, R2A);
-
-                push_instr(program, LDI);
-                push_instr(program, R2A);
-                push_instr(program, addr--);
-
-                push_instr(program, PUSH);
-                push_instr(program, R2A);
-
-                push_instr(program, LDI);
-                push_instr(program, R2A);
-                push_instr(program, addr--);
-
-                push_instr(program, PUSH);
-                push_instr(program, R2A);
-
-                push_instr(program, LDI);
-                push_instr(program, R2A);
-                push_instr(program, addr--);
-
-                push_instr(program, PUSH);
-                push_instr(program, R2A);
-
-                // TODO: This is the a single char string in dict key, make it arbitrary length
-                push_instr(program, LDI);
-                push_instr(program, R2A);
-                push_instr(program, addr--);
-
-                push_instr(program, PUSH);
-                push_instr(program, R2A);
-            }
-            addr += len * 2 - 1;
             break;
         }
         default:
@@ -995,42 +972,25 @@ void compileDecl(i64_array* program, Decl* decl)
             push_instr(program, R1A);
 
             for (size_t i = len; i > 0; i--) {
-                // TODO: if the dict value is a string, its value is not stored
                 push_instr(program, POP);
                 push_instr(program, R0A);
 
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, POP);
-                push_instr(program, R0A);
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
 
                 push_instr(program, STI);
                 push_instr(program, program->heap++);
-                push_instr(program, R0A);
+                push_instr(program, R7A);
 
                 push_instr(program, POP);
                 push_instr(program, R0A);
 
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, POP);
-                push_instr(program, R0A);
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
 
                 push_instr(program, STI);
                 push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                // TODO: This is the a single char string in dict key, make it arbitrary length
-                push_instr(program, POP);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
+                push_instr(program, R7A);
             }
             break;
         }

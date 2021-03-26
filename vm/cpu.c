@@ -489,6 +489,9 @@ void print_dict(cpu *c)
         case V_LIST:
             print_list(c);
             break;
+        case V_DICT:
+            print_dict(c);
+            break;
         default:
             break;
         }
@@ -511,15 +514,12 @@ void cpu_store_dynamic(cpu *c)
             cpu_store_common(c);
             break;
         case V_STRING:
-            cpu_store_common(c);
             cpu_store_string(c);
             break;
         case V_LIST:
-            cpu_store_common(c);
             cpu_store_list(c);
             break;
         case V_DICT:
-            cpu_store_common(c);
             cpu_store_dict(c);
             break;
         default:
@@ -536,6 +536,7 @@ void cpu_store_common(cpu *c)
 
 void cpu_store_string(cpu *c)
 {
+    cpu_store_common(c);
     for (size_t i = c->r[R1A]; i > 0; i--) {
         c->r[R0A] = c->mem[c->sp++];
         c->mem[c->heap++] = c->r[R0A];
@@ -544,6 +545,7 @@ void cpu_store_string(cpu *c)
 
 void cpu_store_list(cpu *c)
 {
+    cpu_store_common(c);
     c->heap += c->r[R1A];
     i64 _heap = c->heap - 1;
     for (size_t i = c->r[R1A]; i > 0; i--) {
@@ -555,11 +557,17 @@ void cpu_store_list(cpu *c)
 
 void cpu_store_dict(cpu *c)
 {
+    cpu_store_common(c);
+    c->heap += c->r[R1A] * 2;
+    i64 _heap = c->heap - 1;
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
-        cpu_store_dynamic(c);
+        c->mem[_heap--] = c->heap;
         c->r[R0A] = c->mem[c->sp++];
         cpu_store_string(c);
+
+        c->mem[_heap--] = c->heap;
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_store_dynamic(c);
     }
 }
 
@@ -636,14 +644,18 @@ i64 cpu_load_dict(cpu *c, i64 addr)
     c->r[R1A] = c->mem[addr++];
     i64 _R0A = c->r[R0A];
     i64 _R1A = c->r[R1A];
-    addr += c->r[R1A] - 1;
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->mem[addr--];
-        cpu_load_string(c, addr);
-        c->r[R0A] = c->mem[addr--];
+    i64 _addr = addr;
+    size_t len = c->r[R1A];
+    for (size_t i = 0; i < len; i++) {
+        addr = c->mem[_addr + 2 * i];
+        c->r[R0A] = c->mem[addr++];
         cpu_load_dynamic(c, addr);
+
+        addr = c->mem[_addr + 2 * i + 1];
+        c->r[R0A] = c->mem[addr++];
+        cpu_load_string(c, addr);
     }
-    addr += c->r[R1A] - 1;
+    addr = _addr + 2 * len;
     c->mem[--c->sp] = _R1A;
     c->mem[--c->sp] = _R0A;
     return addr;
