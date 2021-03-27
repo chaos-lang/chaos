@@ -171,6 +171,9 @@ void emitBytecode(cpu *c)
         printf("%s %s\n", "DSTR", getRegName(c->dest));
         c->pc++;
         break;
+    case DPOP:
+        printf("%s\n", "DPOP");
+        break;
     case PRNT:
         printf("%s\n", "PRNT");
         break;

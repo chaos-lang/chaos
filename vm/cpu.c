@@ -347,6 +347,9 @@ void execute(cpu *c)
         cpu_store_dynamic(c);
         c->pc++;
         break;
+    case DPOP:
+        cpu_pop_dynamic(c);
+        break;
     case PRNT:
         switch (c->r[R0A]) {
         case V_BOOL:
@@ -659,4 +662,64 @@ i64 cpu_load_dict(cpu *c, i64 addr)
     c->mem[--c->sp] = _R1A;
     c->mem[--c->sp] = _R0A;
     return addr;
+}
+
+void cpu_pop_dynamic(cpu *c)
+{
+    switch (c->r[R0A]) {
+        case V_BOOL:
+            cpu_pop_common(c);
+            break;
+        case V_INT:
+            cpu_pop_common(c);
+            break;
+        case V_FLOAT:
+            cpu_pop_common(c);
+            break;
+        case V_STRING:
+            cpu_pop_string(c);
+            break;
+        case V_LIST:
+            cpu_pop_list(c);
+            break;
+        case V_DICT:
+            cpu_pop_dict(c);
+            break;
+        default:
+            break;
+    }
+}
+
+void cpu_pop_common(cpu *c)
+{
+    c->r[R1A] = c->mem[c->sp++];
+}
+
+void cpu_pop_string(cpu *c)
+{
+    cpu_pop_common(c);
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+    }
+}
+
+void cpu_pop_list(cpu *c)
+{
+    cpu_pop_common(c);
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_pop_dynamic(c);
+    }
+}
+
+void cpu_pop_dict(cpu *c)
+{
+    cpu_pop_common(c);
+    for (size_t i = c->r[R1A]; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_pop_string(c);
+
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_pop_dynamic(c);
+    }
 }

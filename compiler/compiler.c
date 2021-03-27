@@ -705,6 +705,41 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
         case V_VOID:
             break;
+        case V_LIST:
+            push_instr(program, MOV);
+            push_instr(program, R2A);
+            push_instr(program, R1A);
+
+            push_instr(program, MOV);
+            push_instr(program, R4A);
+            push_instr(program, R1A);
+
+            push_instr(program, LII);
+            push_instr(program, R3A);
+            push_instr(program, -1);
+
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, ADD);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, CMP);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, DPOP);
+
+            push_instr(program, JNZ);
+            push_instr(program, program->size - 13);
+
+            push_instr(program, POP);
+            push_instr(program, R1A);
+            break;
         default:
             break;
         }
@@ -807,7 +842,7 @@ void compileDecl(i64_array* program, Decl* decl)
     switch (decl->kind) {
     case VarDecl_kind: {
         enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
-        enum Type type = decl->v.var_decl->type_spec->v.type_spec->type;
+        enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
 
         switch (type) {
         case K_BOOL:
@@ -1004,7 +1039,7 @@ void compileDecl(i64_array* program, Decl* decl)
     }
 }
 
-void compileSpec(i64_array* program, Spec* spec)
+unsigned short compileSpec(i64_array* program, Spec* spec)
 {
     switch (spec->kind) {
     case ListType_kind:
@@ -1017,9 +1052,16 @@ void compileSpec(i64_array* program, Spec* spec)
         push_instr(program, R0A);
         push_instr(program, V_DICT);
         break;
+    case TypeSpec_kind:
+        if (spec->v.type_spec->sub_type_spec != NULL)
+            return compileSpec(program, spec->v.type_spec->sub_type_spec);
+        else
+            return spec->v.type_spec->type;
+        break;
     default:
         break;
     }
+    return 0;
 }
 
 void push_instr(i64_array* program, i64 el)
