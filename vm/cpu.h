@@ -43,6 +43,7 @@ void execute(cpu *c);
 
 void print_registers(cpu *c, i64 pc_start);
 char *getRegName(i64 i);
+char *build_string(cpu *c, i64 len);
 
 void print_bool(cpu *c);
 void print_int(cpu *c);
@@ -68,5 +69,7 @@ void cpu_pop_common(cpu *c);
 void cpu_pop_string(cpu *c);
 void cpu_pop_list(cpu *c);
 void cpu_pop_dict(cpu *c);
+
+void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len);
 
 #endif

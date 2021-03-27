@@ -38,6 +38,7 @@ enum instr {
 	LAND, LOR, LNOT,
     DLDR, DSTR, DPOP,
     PRNT,
+    KSRCH,
 	HLT,
 	NUM_INSTRUCTIONS
 };

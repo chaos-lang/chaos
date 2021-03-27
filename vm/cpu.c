@@ -374,6 +374,10 @@ void execute(cpu *c)
             break;
         }
         break;
+    case KSRCH:
+        cpu_dict_key_search(c, c->r[c->src], c->r[c->dest]);
+        c->pc += 2;
+        break;
     default:
         break;
 	}
@@ -394,6 +398,17 @@ void print_registers(cpu *c, i64 pc_start)
 char *getRegName(i64 i)
 {
     return reg_names[i];
+}
+
+char *build_string(cpu *c, i64 len)
+{
+    char *s = malloc(len + 1);
+    for (size_t i = 0; i < len; i++) {
+        s[i] = (int)c->mem[c->sp++] + '0';
+    }
+    s[len] = '\0';
+
+    return s;
 }
 
 void print_bool(cpu *c)
@@ -417,12 +432,7 @@ void print_float(cpu *c)
 void print_string(cpu *c, bool quoted)
 {
     size_t len = c->r[R1A];
-    char *s = malloc(len + 1);
-    for (size_t i = 0; i < len; i++) {
-        c->r[R1A] = c->mem[c->sp++];
-        s[i] = (int)c->r[R1A] + '0';
-    }
-    s[len] = '\0';
+    char *s = build_string(c, len);
     if (quoted)
         printf("'%s'", escape_the_sequences_in_string_literal(s));
     else
@@ -722,4 +732,26 @@ void cpu_pop_dict(cpu *c)
         c->r[R0A] = c->mem[c->sp++];
         cpu_pop_dynamic(c);
     }
+}
+
+void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
+{
+    char *key = build_string(c, key_len - 1);
+    for (size_t i = dict_len + 1; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+        cpu_pop_common(c);
+        char *dict_key = build_string(c, c->r[R1A]);
+        c->r[R0A] = c->mem[c->sp++];
+
+        if (strcmp(dict_key, key) == 0) {
+            free(key);
+            free(dict_key);
+            cpu_pop_dynamic(c);
+            return;
+        }
+        free(dict_key);
+
+        cpu_pop_dynamic(c);
+    }
+    free(key);
 }

@@ -663,12 +663,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
         compileExpr(program, expr->v.index_expr->index);
         switch (type - 1) {
-        case V_BOOL:
-            break;
-        case V_INT:
-            break;
-        case V_FLOAT:
-            break;
         case V_STRING: {
             push_instr(program, LII);
             push_instr(program, R0A);
@@ -676,6 +670,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
             push_instr(program, MOV);
             push_instr(program, R2A);
+            push_instr(program, R1A);
+
+            push_instr(program, MOV);
+            push_instr(program, R4A);
             push_instr(program, R1A);
 
             push_instr(program, LII);
@@ -704,8 +702,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, 1);
             break;
         }
-        case V_VOID:
-            break;
         case V_LIST:
             push_instr(program, MOV);
             push_instr(program, R2A);
@@ -758,6 +754,11 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, program->size - 13);
 
             push_instr(program, POP);
+            push_instr(program, R1A);
+            break;
+        case V_DICT:
+            push_instr(program, KSRCH);
+            push_instr(program, R7B);
             push_instr(program, R1A);
             break;
         default:
