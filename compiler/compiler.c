@@ -161,26 +161,57 @@ void compileStmt(i64_array* program, Stmt* stmt)
         case IndexExpr_kind: {
             Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.index_expr->x->v.ident->name);
             i64 addr = symbol->addr;
-            push_instr(program, LII);
-            push_instr(program, R3B);
-            push_instr(program, addr);
 
-            push_instr(program, INC);
-            push_instr(program, R3B);
+            switch (symbol->value_type) {
+            case V_STRING:
+                push_instr(program, LII);
+                push_instr(program, R3B);
+                push_instr(program, addr);
 
-            push_instr(program, INC);
-            push_instr(program, R3B);
+                push_instr(program, INC);
+                push_instr(program, R3B);
 
-            push_instr(program, ADD);
-            push_instr(program, R3B);
-            push_instr(program, R4B);
+                push_instr(program, INC);
+                push_instr(program, R3B);
 
-            push_instr(program, POP);
-            push_instr(program, R1A);
+                push_instr(program, ADD);
+                push_instr(program, R3B);
+                push_instr(program, R4B);
 
-            push_instr(program, STR);
-            push_instr(program, R3B);
-            push_instr(program, R1A);
+                push_instr(program, POP);
+                push_instr(program, R1A);
+
+                push_instr(program, STR);
+                push_instr(program, R3B);
+                push_instr(program, R1A);
+                break;
+            case V_LIST:
+                push_instr(program, LII);
+                push_instr(program, R3B);
+                push_instr(program, addr);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, ADD);
+                push_instr(program, R3B);
+                push_instr(program, R4B);
+
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STR);
+                push_instr(program, R3B);
+                push_instr(program, R7A);
+            default:
+                break;
+            }
             break;
         }
         default:
