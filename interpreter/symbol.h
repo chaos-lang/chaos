@@ -64,6 +64,7 @@ typedef struct Symbol {
     enum Role role;
     struct _Function* param_of;
     long long addr;
+    bool is_dynamic;
 } Symbol;
 
 Symbol* symbol_cursor;

@@ -49,7 +49,7 @@ void shift_registers(i64_array* program, size_t shift);
 Symbol* store_bool(i64_array* program, char *name, bool is_any);
 Symbol* store_int(i64_array* program, char *name, bool is_any);
 Symbol* store_float(i64_array* program, char *name, bool is_any);
-Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any);
+Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic);
 
 void load_bool(i64_array* program, Symbol* symbol);
 void load_int(i64_array* program, Symbol* symbol);

@@ -890,6 +890,7 @@ void compileDecl(i64_array* program, Decl* decl)
             break;
         case K_STRING: {
             size_t len = 0;
+            bool is_dynamic = false;
 
             switch (decl->v.var_decl->expr->kind) {
             case BasicLit_kind:
@@ -903,6 +904,8 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             case IndexExpr_kind:
                 len = 1;
+            case Ident_kind:
+                is_dynamic = true;
             default:
                 break;
             }
@@ -911,7 +914,8 @@ void compileDecl(i64_array* program, Decl* decl)
                 program,
                 decl->v.var_decl->ident->v.ident->name,
                 len,
-                false
+                false,
+                is_dynamic
             );
             break;
         }
@@ -942,6 +946,7 @@ void compileDecl(i64_array* program, Decl* decl)
             }
             case V_STRING: {
                 size_t len = 0;
+                bool is_dynamic = false;
 
                 switch (decl->v.var_decl->expr->kind) {
                 case BasicLit_kind:
@@ -955,6 +960,10 @@ void compileDecl(i64_array* program, Decl* decl)
                     break;
                 case IndexExpr_kind:
                     len = 1;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
                 default:
                     break;
                 }
@@ -963,7 +972,8 @@ void compileDecl(i64_array* program, Decl* decl)
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     len,
-                    true
+                    true,
+                    is_dynamic
                 );
                 break;
             }
@@ -1199,7 +1209,7 @@ Symbol* store_float(i64_array* program, char *name, bool is_any)
     return symbol;
 }
 
-Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any)
+Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic)
 {
     union Value value;
     value.i = 0;
@@ -1214,22 +1224,35 @@ Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any)
     }
     symbol->addr = program->heap;
     symbol->len = len;
+    symbol->is_dynamic = is_dynamic;
 
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R0A);
+    if (is_dynamic) {
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
 
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R1A);
+        push_instr(program, DSTR);
+        push_instr(program, R7A);
 
-    for (size_t i = len; i > 0; i--) {
-        push_instr(program, POP);
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R7A);
+    } else {
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
         push_instr(program, R0A);
 
         push_instr(program, STI);
         push_instr(program, program->heap++);
-        push_instr(program, R0A);
+        push_instr(program, R1A);
+
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0A);
+        }
     }
 
     return symbol;
@@ -1278,23 +1301,37 @@ void load_string(i64_array* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
 
-    push_instr(program, LDI);
-    push_instr(program, R0A);
-    push_instr(program, addr++);
+    if (symbol->is_dynamic) {
+        push_instr(program, LII);
+        push_instr(program, R7A);
+        push_instr(program, addr++);
 
-    push_instr(program, LDI);
-    push_instr(program, R1A);
-    push_instr(program, addr++);
+        push_instr(program, DLDR);
+        push_instr(program, R7A);
 
-    size_t len = symbol->len;
-    addr += len - 1;
-    for (size_t i = len; i > 0; i--) {
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+    } else {
         push_instr(program, LDI);
-        push_instr(program, R2A);
-        push_instr(program, addr--);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
 
-        push_instr(program, PUSH);
-        push_instr(program, R2A);
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr++);
+
+        size_t len = symbol->len;
+        addr += len - 1;
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, LDI);
+            push_instr(program, R2A);
+            push_instr(program, addr--);
+
+            push_instr(program, PUSH);
+            push_instr(program, R2A);
+        }
     }
-    addr += len - 1;
 }

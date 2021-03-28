@@ -104,3 +104,16 @@ print "abc%s"
 del a
 str a = "12%s3"
 print a
+
+
+// New variable creation from another variable
+del a
+del b
+del c
+str a = 'hello world'
+str c = 'hello universe'
+str b = a
+print b
+print b
+str d = 'come on'
+print b
