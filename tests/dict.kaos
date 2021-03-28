@@ -34,6 +34,11 @@ k = 32
 print k
 print q
 
+dict z = {'a': 1, 'b': 2, 'c': 3}
+dict t = z
+print z
+print t
+
 a['a'] = 15
 print a
 

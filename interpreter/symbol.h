@@ -123,7 +123,6 @@ void updateSymbolFloat(char *name, double f);
 Symbol* addSymbolString(char *name, char *s);
 void updateSymbolString(char *name, char *s);
 void addSymbolList(char *name);
-Symbol* addSymbolDictNew(char *name, size_t len);
 Symbol* createCloneFromSymbolByName(char *clone_name, enum Type type, char *name, enum Type extra_type);
 Symbol* createCloneFromComplexElement(char *clone_name, enum Type type, char *name, enum Type extra_type);
 Symbol* createCloneFromSymbol(char *clone_name, enum Type type, Symbol* symbol, enum Type extra_type);
