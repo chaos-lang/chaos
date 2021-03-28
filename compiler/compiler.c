@@ -343,32 +343,12 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         case V_FLOAT:
             load_float(program, symbol);
             break;
-        case V_STRING: {
+        case V_STRING:
             load_string(program, symbol);
             break;
-        }
-        case V_LIST: {
-            size_t len = symbol->len;
-            addr += len + 1;
-            for (size_t i = len; i > 0; i--) {
-                push_instr(program, LII);
-                push_instr(program, R7A);
-                push_instr(program, addr--);
-
-                push_instr(program, DLDR);
-                push_instr(program, R7A);
-            }
-            addr--;
-
-            push_instr(program, LDI);
-            push_instr(program, R0A);
-            push_instr(program, addr++);
-
-            push_instr(program, LDI);
-            push_instr(program, R1A);
-            push_instr(program, addr++);
+        case V_LIST:
+            load_list(program, symbol);
             break;
-        }
         case V_DICT: {
             size_t len = symbol->len;
             addr += len * 2 - 1 + 2;
@@ -983,37 +963,26 @@ void compileDecl(i64_array* program, Decl* decl)
             break;
         }
         case K_LIST: {
-            size_t len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+            size_t len = 0;
+            bool is_dynamic = false;
 
-            Symbol* symbol = addSymbolListNew(
-                decl->v.var_decl->ident->v.ident->name,
-                len
-            );
-            symbol->addr = program->heap;
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_LIST);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1A);
-
-            for (size_t i = len; i > 0; i--) {
-                push_instr(program, POP);
-                push_instr(program, R0A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R7A);
+            switch (decl->v.var_decl->expr->kind) {
+            case CompositeLit_kind:
+                len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
             }
+
+            store_list(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                len,
+                is_dynamic
+            );
             break;
         }
         case K_DICT: {
@@ -1258,6 +1227,55 @@ Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bo
     return symbol;
 }
 
+Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
+
+    symbol->addr = program->heap;
+    symbol->len = len;
+    symbol->is_dynamic = is_dynamic;
+
+    if (is_dynamic) {
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, DSTR);
+        push_instr(program, R7A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R7A);
+    } else {
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_LIST);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, DSTR);
+            push_instr(program, R7A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R7A);
+        }
+    }
+
+    return symbol;
+}
+
 void load_bool(i64_array* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
@@ -1333,5 +1351,45 @@ void load_string(i64_array* program, Symbol* symbol)
             push_instr(program, PUSH);
             push_instr(program, R2A);
         }
+    }
+}
+
+void load_list(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    if (symbol->is_dynamic) {
+        push_instr(program, LII);
+        push_instr(program, R7A);
+        push_instr(program, addr++);
+
+        push_instr(program, DLDR);
+        push_instr(program, R7A);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+    } else {
+        size_t len = symbol->len;
+        addr += len + 1;
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, addr--);
+
+            push_instr(program, DLDR);
+            push_instr(program, R7A);
+        }
+        addr--;
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr++);
     }
 }

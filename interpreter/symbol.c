@@ -636,15 +636,6 @@ Symbol* addSymbolString(char *name, char *s) {
     return addSymbol(name, K_STRING, value, V_STRING);
 }
 
-Symbol* addSymbolStringNew(char *name, char *s, size_t len) {
-    union Value value;
-    value.s = malloc(1 + strlen(s));
-    strcpy(value.s, s);
-    Symbol* symbol = addSymbol(name, K_STRING, value, V_STRING);
-    symbol->len = len;
-    return symbol;
-}
-
 void updateSymbolString(char *name, char *s) {
     union Value value;
     value.s = malloc(1 + strlen(s));
@@ -657,14 +648,6 @@ void addSymbolList(char *name) {
     value.i = 0;
     Symbol* complex_mode = addSymbol(name, K_LIST, value, V_VOID);
     pushComplexModeStack(complex_mode);
-}
-
-Symbol* addSymbolListNew(char *name, size_t len) {
-    union Value value;
-    value.i = 0;
-    Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
-    symbol->len = len;
-    return symbol;
 }
 
 Symbol* addSymbolDictNew(char *name, size_t len) {
