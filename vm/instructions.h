@@ -36,7 +36,7 @@ enum instr {
 	SHL, SHR,
 	BAND, BOR, BNOT, BXOR,
 	LAND, LOR, LNOT,
-    DLDR, DSTR, DPOP,
+    DLDR, DSTR, DPOP, DDEL,
     PRNT,
     KSRCH,
 	HLT,

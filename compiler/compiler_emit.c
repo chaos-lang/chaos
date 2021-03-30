@@ -174,6 +174,10 @@ void emitBytecode(cpu *c)
     case DPOP:
         printf("%s\n", "DPOP");
         break;
+    case DDEL:
+        printf("%s %s %s\n", "DDEL", getRegName(c->dest), getRegName(c->src));
+        c->pc += 2;
+        break;
     case KSRCH:
         printf("%s %s %s\n", "KSRCH", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;

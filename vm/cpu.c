@@ -350,6 +350,25 @@ void execute(cpu *c)
     case DPOP:
         cpu_pop_dynamic(c);
         break;
+    case DDEL: {
+        i64 addr = c->r[c->dest];
+        addr++;
+        i64 index = c->r[c->src];
+        i64 len = c->mem[addr++];
+        c->mem[addr - 1] = len - 1;
+        if (index < 0)
+            index = len + index;
+        for (i64 i = 0; i < len; i++) {
+            if (i < index) {
+                addr++;
+                continue;
+            }
+            c->mem[addr] = c->mem[addr + 1];
+            addr++;
+        }
+        c->pc += 2;
+        break;
+    }
     case PRNT:
         switch (c->r[R0A]) {
         case V_BOOL:
