@@ -52,6 +52,7 @@ Symbol* store_float(i64_array* program, char *name, bool is_any);
 Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic);
 Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic);
 Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic);
+Symbol* store_any(i64_array* program, char *name);
 
 void load_bool(i64_array* program, Symbol* symbol);
 void load_int(i64_array* program, Symbol* symbol);

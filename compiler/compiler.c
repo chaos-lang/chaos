@@ -912,6 +912,12 @@ void compileDecl(i64_array* program, Decl* decl)
                 );
                 break;
             }
+            case V_LIST:
+                store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
+                break;
             default:
                 break;
             }
@@ -1265,6 +1271,27 @@ Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic)
             push_instr(program, R7A);
         }
     }
+
+    return symbol;
+}
+
+Symbol* store_any(i64_array* program, char *name)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol = addSymbol(name, K_ANY, value, V_VOID);
+    symbol->addr = program->heap;
+    symbol->is_dynamic = true;
+
+    push_instr(program, PUSH);
+    push_instr(program, R1A);
+
+    push_instr(program, DSTR);
+    push_instr(program, R7A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R7A);
 
     return symbol;
 }
