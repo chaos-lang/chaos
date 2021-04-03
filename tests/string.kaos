@@ -16,6 +16,9 @@ str k = 'chaos'
 k[1] = 'k'
 del k[0]
 print k
+k[-1] = 'z'
+print k
+print k[-2]
 
 
 // Multiline string literals
