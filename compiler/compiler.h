@@ -60,5 +60,6 @@ void load_float(i64_array* program, Symbol* symbol);
 void load_string(i64_array* program, Symbol* symbol);
 void load_list(i64_array* program, Symbol* symbol);
 void load_dict(i64_array* program, Symbol* symbol);
+void load_any(i64_array* program, Symbol* symbol);
 
 #endif

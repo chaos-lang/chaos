@@ -338,6 +338,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             load_dict(program, symbol);
             break;
         default:
+            load_any(program, symbol);
             break;
         }
         return symbol->value_type + 1;
@@ -1486,4 +1487,22 @@ void load_dict(i64_array* program, Symbol* symbol)
         push_instr(program, R1A);
         push_instr(program, addr++);
     }
+}
+
+void load_any(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    push_instr(program, LII);
+    push_instr(program, R7A);
+    push_instr(program, addr++);
+
+    push_instr(program, DLDR);
+    push_instr(program, R7A);
+
+    push_instr(program, POP);
+    push_instr(program, R0A);
+
+    push_instr(program, POP);
+    push_instr(program, R1A);
 }
