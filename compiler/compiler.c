@@ -153,6 +153,18 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 }
                 break;
             }
+            case V_LIST: {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
+                break;
+            }
             default:
                 break;
             }
@@ -867,8 +879,10 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             case IndexExpr_kind:
                 len = 1;
+                break;
             case Ident_kind:
                 is_dynamic = true;
+                break;
             default:
                 break;
             }
