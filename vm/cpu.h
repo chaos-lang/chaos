@@ -44,6 +44,7 @@ void execute(cpu *c);
 void print_registers(cpu *c, i64 pc_start);
 char *getRegName(i64 i);
 char *build_string(cpu *c, i64 len);
+char *build_string_from_addr(cpu *c, i64 addr);
 
 void print_bool(cpu *c);
 void print_int(cpu *c);

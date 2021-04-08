@@ -226,6 +226,46 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R3B);
                 push_instr(program, R7A);
                 break;
+            case V_DICT:
+                push_instr(program, LII);
+                push_instr(program, R3B);
+                push_instr(program, addr);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, LII);
+                push_instr(program, R0B);
+                push_instr(program, V_INT);
+
+                push_instr(program, LII);
+                push_instr(program, R5B);
+                push_instr(program, 2);
+
+                push_instr(program, MUL);
+                push_instr(program, R4B);
+                push_instr(program, R5B);
+
+                push_instr(program, ADD);
+                push_instr(program, R3B);
+                push_instr(program, R4B);
+
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STR);
+                push_instr(program, R3B);
+                push_instr(program, R7A);
+                break;
             default:
                 break;
             }

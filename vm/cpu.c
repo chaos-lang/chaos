@@ -352,19 +352,50 @@ void execute(cpu *c)
         break;
     case DDEL: {
         i64 addr = c->r[c->dest];
+        enum ValueType value_type = c->mem[addr];
         addr++;
         i64 index = c->r[c->src];
         i64 len = c->mem[addr++];
         c->mem[addr - 1] = len - 1;
         if (index < 0)
             index = len + index;
-        for (i64 i = 0; i < len; i++) {
-            if (i < index) {
+
+        switch (value_type) {
+        case V_LIST: {
+            for (i64 i = 0; i < len; i++) {
+                if (i < index) {
+                    addr++;
+                    continue;
+                }
+                c->mem[addr] = c->mem[addr + 1];
                 addr++;
-                continue;
             }
-            c->mem[addr] = c->mem[addr + 1];
-            addr++;
+            break;
+        }
+        case V_DICT: {
+            char *key = build_string(c, c->r[R1A]);
+            i64 shift_index = 0;
+            i64 _addr = addr;
+            for (size_t i = 0; i < len; i++) {
+                addr = c->mem[_addr + 2 * i + 1];
+                char *dict_key = build_string_from_addr(c, addr);
+
+                if (strcmp(dict_key, key) == 0) {
+                    shift_index = i;
+                    break;
+                }
+                free(dict_key);
+            }
+            free(key);
+
+            for (i64 i = shift_index; i < (len - 1); i++) {
+                c->mem[_addr + 2 * i + 1] = c->mem[_addr + 2 * (i + 1) + 1];
+                c->mem[_addr + 2 * i] = c->mem[_addr + 2 * (i + 1)];
+            }
+            break;
+        }
+        default:
+            break;
         }
         c->pc += 2;
         break;
@@ -424,6 +455,18 @@ char *build_string(cpu *c, i64 len)
     char *s = malloc(len + 1);
     for (size_t i = 0; i < len; i++) {
         s[i] = (int)c->mem[c->sp++] + '0';
+    }
+    s[len] = '\0';
+
+    return s;
+}
+
+char *build_string_from_addr(cpu *c, i64 addr)
+{
+    i64 len = c->mem[addr];
+    char *s = malloc(len + 1);
+    for (size_t i = 0; i < len; i++) {
+        s[i] = (int)c->mem[--addr] + '0';
     }
     s[len] = '\0';
 
