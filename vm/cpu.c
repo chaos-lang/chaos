@@ -360,8 +360,7 @@ void execute(cpu *c)
         if (index < 0)
             index = len + index;
 
-        switch (value_type) {
-        case V_LIST: {
+        if (value_type == V_STRING || value_type == V_LIST) {
             for (i64 i = 0; i < len; i++) {
                 if (i < index) {
                     addr++;
@@ -370,9 +369,7 @@ void execute(cpu *c)
                 c->mem[addr] = c->mem[addr + 1];
                 addr++;
             }
-            break;
-        }
-        case V_DICT: {
+        } else if (value_type == V_DICT) {
             char *key = build_string(c, c->r[R1A]);
             i64 shift_index = 0;
             i64 _addr = addr;
@@ -392,10 +389,6 @@ void execute(cpu *c)
                 c->mem[_addr + 2 * i + 1] = c->mem[_addr + 2 * (i + 1) + 1];
                 c->mem[_addr + 2 * i] = c->mem[_addr + 2 * (i + 1)];
             }
-            break;
-        }
-        default:
-            break;
         }
         c->pc += 2;
         break;
