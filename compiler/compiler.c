@@ -165,6 +165,18 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R7A);
                 break;
             }
+            case V_DICT: {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
+                break;
+            }
             default:
                 break;
             }
@@ -995,6 +1007,12 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
             case V_LIST:
+                store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
+                break;
+            case V_DICT:
                 store_any(
                     program,
                     decl->v.var_decl->ident->v.ident->name
