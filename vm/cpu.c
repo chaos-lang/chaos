@@ -418,7 +418,7 @@ void execute(cpu *c)
         }
         break;
     case KSRCH:
-        cpu_dict_key_search(c, c->r[c->src], c->r[c->dest]);
+        cpu_dict_key_search(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
         break;
     default:
@@ -791,7 +791,7 @@ void cpu_pop_dict(cpu *c)
 
 void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
 {
-    char *key = build_string(c, key_len - 1);
+    char *key = build_string(c, key_len);
     for (size_t i = dict_len + 1; i > 0; i--) {
         c->r[R0A] = c->mem[c->sp++];
         cpu_pop_common(c);
@@ -801,7 +801,7 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
         if (strcmp(dict_key, key) == 0) {
             free(key);
             free(dict_key);
-            cpu_pop_dynamic(c);
+            cpu_pop_common(c);
             return;
         }
         free(dict_key);
