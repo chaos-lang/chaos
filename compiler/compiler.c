@@ -680,16 +680,15 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         return compileExpr(program, expr->v.paren_expr->x);
         break;
     case IndexExpr_kind: {
-        enum ValueType type = compileExpr(program, expr->v.index_expr->x);
+        enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
         shift_registers(program, 8);
 
         push_instr(program, MOV);
         push_instr(program, R7B);
         push_instr(program, R1B);
 
-        compileExpr(program, expr->v.index_expr->index);
-        switch (type - 1) {
-        case V_STRING: {
+        enum ValueType type2 = compileExpr(program, expr->v.index_expr->index) - 1;
+        if (type1 == V_STRING) {
             push_instr(program, LII);
             push_instr(program, R0A);
             push_instr(program, V_STRING);
@@ -745,9 +744,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
-            break;
-        }
-        case V_LIST:
+        } else if ((type2 == V_VOID && type1 == V_LIST) || type2 == V_INT) {
             push_instr(program, MOV);
             push_instr(program, R2A);
             push_instr(program, R1A);
@@ -804,16 +801,12 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
             push_instr(program, POP);
             push_instr(program, R1A);
-            break;
-        case V_DICT:
+        } else if ((type2 == V_VOID && type1 == V_DICT) || type2 == V_STRING) {
             push_instr(program, KSRCH);
             push_instr(program, R7B);
             push_instr(program, R1A);
-            break;
-        default:
-            break;
         }
-        return type;
+        return type1 + 1;
         break;
     }
     case IncDecExpr_kind: {
