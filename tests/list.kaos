@@ -249,11 +249,6 @@ print a
 // Update list element or list's itself with a cross-complex assignment
 del a
 list a = [1, 2, 3]
-a = {'c': 3, 'd': 4}
-print a
-
-del a
-list a = [1, 2, 3]
 a[0] = {'c': 3, 'd': 4}
 print a
 

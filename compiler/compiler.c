@@ -154,27 +154,49 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 break;
             }
             case V_LIST: {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
+                if (symbol_x->type == K_ANY) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
 
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
 
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R7A);
+                    push_instr(program, STI);
+                    push_instr(program, addr++);
+                    push_instr(program, R7A);
+                } else {
+                    Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
+                    removeSymbol(symbol);
+                    store_list(
+                        program,
+                        stmt->v.assign_stmt->x->v.ident->name,
+                        stmt->v.assign_stmt->y->v.composite_lit->elts->expr_count,
+                        false
+                    );
+                }
                 break;
             }
             case V_DICT: {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
+                if (symbol_x->type == K_ANY) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
 
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
 
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R7A);
+                    push_instr(program, STI);
+                    push_instr(program, addr++);
+                    push_instr(program, R7A);
+                } else {
+                    Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
+                    removeSymbol(symbol);
+                    store_dict(
+                        program,
+                        stmt->v.assign_stmt->x->v.ident->name,
+                        stmt->v.assign_stmt->y->v.composite_lit->elts->expr_count,
+                        false
+                    );
+                }
                 break;
             }
             default:
