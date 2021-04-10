@@ -634,7 +634,7 @@
                         "_type": "Ident",
                         "name": "k"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -658,6 +658,103 @@
                     }
                 },
                 {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "z"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "a"
+                                    },
+                                    "value": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "1"
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "b"
+                                    },
+                                    "value": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "2"
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "c"
+                                    },
+                                    "value": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "3"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "t"
+                        },
+                        "expr": {
+                            "_type": "Ident",
+                            "name": "z"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "z"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "t"
+                    }
+                },
+                {
                     "_type": "AssignStmt",
                     "x": {
                         "_type": "IndexExpr",
@@ -671,7 +768,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -832,7 +929,7 @@
                         "_type": "Ident",
                         "name": "var1"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1455,7 +1552,7 @@
                         "_type": "Ident",
                         "name": "var5"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1474,7 +1571,7 @@
                         "_type": "Ident",
                         "name": "var6"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1509,7 +1606,7 @@
                         "_type": "Ident",
                         "name": "var7"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1528,7 +1625,7 @@
                         "_type": "Ident",
                         "name": "var8"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1563,7 +1660,7 @@
                         "_type": "Ident",
                         "name": "var9"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1582,7 +1679,7 @@
                         "_type": "Ident",
                         "name": "var10"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1617,7 +1714,7 @@
                         "_type": "Ident",
                         "name": "var11"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1636,7 +1733,7 @@
                         "_type": "Ident",
                         "name": "var12"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1655,7 +1752,7 @@
                         "_type": "Ident",
                         "name": "var13"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1674,7 +1771,7 @@
                         "_type": "Ident",
                         "name": "var14"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1693,7 +1790,7 @@
                         "_type": "Ident",
                         "name": "var15"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1712,7 +1809,7 @@
                         "_type": "Ident",
                         "name": "var16"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -1786,7 +1883,7 @@
                             "name": "s0"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -1814,7 +1911,7 @@
                             "name": "s1"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -1842,7 +1939,7 @@
                             "name": "s0"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -1870,7 +1967,7 @@
                             "name": "s1"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -1898,7 +1995,7 @@
                             "name": "s0"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -1926,7 +2023,7 @@
                             "name": "s1"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -2360,7 +2457,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "b"
@@ -2720,7 +2817,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CompositeLit",
                         "type": {
@@ -2834,7 +2931,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CompositeLit",
                         "type": {
@@ -2977,7 +3074,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CompositeLit",
                         "type": {
@@ -3080,101 +3177,6 @@
                 {
                     "_type": "AssignStmt",
                     "x": {
-                        "_type": "Ident",
-                        "name": "a"
-                    },
-                    "op": "==",
-                    "y": {
-                        "_type": "CompositeLit",
-                        "type": {
-                            "_type": "ListType"
-                        },
-                        "elts": [
-                            {
-                                "_type": "BasicLit",
-                                "value_type": "int",
-                                "value": "4"
-                            },
-                            {
-                                "_type": "BasicLit",
-                                "value_type": "int",
-                                "value": "5"
-                            },
-                            {
-                                "_type": "BasicLit",
-                                "value_type": "int",
-                                "value": "6"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "DelStmt",
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "a"
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "Dictionary",
-                            "sub_type_spec": null
-                        },
-                        "ident": {
-                            "_type": "Ident",
-                            "name": "a"
-                        },
-                        "expr": {
-                            "_type": "CompositeLit",
-                            "type": {
-                                "_type": "DictType"
-                            },
-                            "elts": [
-                                {
-                                    "_type": "KeyValueExpr",
-                                    "key": {
-                                        "_type": "BasicLit",
-                                        "value_type": "string",
-                                        "value": "a"
-                                    },
-                                    "value": {
-                                        "_type": "BasicLit",
-                                        "value_type": "int",
-                                        "value": "1"
-                                    }
-                                },
-                                {
-                                    "_type": "KeyValueExpr",
-                                    "key": {
-                                        "_type": "BasicLit",
-                                        "value_type": "string",
-                                        "value": "b"
-                                    },
-                                    "value": {
-                                        "_type": "BasicLit",
-                                        "value_type": "int",
-                                        "value": "2"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "_type": "AssignStmt",
-                    "x": {
                         "_type": "IndexExpr",
                         "x": {
                             "_type": "Ident",
@@ -3186,7 +3188,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CompositeLit",
                         "type": {
@@ -3318,7 +3320,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CompositeLit",
                         "type": {
@@ -3485,7 +3487,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -3514,7 +3516,7 @@
                             "value": "b"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -3655,7 +3657,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -3747,7 +3749,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {

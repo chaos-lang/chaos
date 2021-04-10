@@ -514,7 +514,7 @@ stmt_list:
 
 assign_stmt:
     expr T_ASSIGN expr {
-        $$ = assignStmt($1, EQL_tok, $3, yylineno);
+        $$ = assignStmt($1, ASSIGN_tok, $3, yylineno);
     }
 ;
 

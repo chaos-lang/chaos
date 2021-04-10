@@ -2072,7 +2072,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2096,7 +2096,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2154,7 +2154,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2178,7 +2178,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2236,7 +2236,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2260,7 +2260,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2318,7 +2318,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2342,7 +2342,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2402,7 +2402,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2426,7 +2426,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2486,7 +2486,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2510,7 +2510,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2717,7 +2717,7 @@
                             "value": "0"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2749,7 +2749,7 @@
                             "value": "0"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2788,7 +2788,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2820,7 +2820,7 @@
                             "value": "a"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2859,7 +2859,7 @@
                             "value": "1"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2891,7 +2891,7 @@
                             "value": "1"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2930,7 +2930,7 @@
                             "value": "b"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -2962,7 +2962,7 @@
                             "value": "b"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3001,7 +3001,7 @@
                             "value": "2"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3033,7 +3033,7 @@
                             "value": "2"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3072,7 +3072,7 @@
                             "value": "c"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3104,7 +3104,7 @@
                             "value": "c"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3143,7 +3143,7 @@
                             "value": "3"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3175,7 +3175,7 @@
                             "value": "3"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3214,7 +3214,7 @@
                             "value": "d"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3246,7 +3246,7 @@
                             "value": "d"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3285,7 +3285,7 @@
                             "value": "4"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3317,7 +3317,7 @@
                             "value": "4"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3356,7 +3356,7 @@
                             "value": "e"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3388,7 +3388,7 @@
                             "value": "e"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3427,7 +3427,7 @@
                             "value": "5"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3459,7 +3459,7 @@
                             "value": "5"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3498,7 +3498,7 @@
                             "value": "f"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -3530,7 +3530,7 @@
                             "value": "f"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "CallExpr",
                         "fun": {
@@ -5964,7 +5964,7 @@
                                                         "_type": "Ident",
                                                         "name": "r"
                                                     },
-                                                    "op": "==",
+                                                    "op": "=",
                                                     "y": {
                                                         "_type": "CallExpr",
                                                         "fun": {

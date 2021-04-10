@@ -31,7 +31,7 @@
                         "_type": "Ident",
                         "name": "var5"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -72,7 +72,7 @@
                         "_type": "Ident",
                         "name": "var6"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "float",
@@ -137,7 +137,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BinaryExpr",
                         "x": {

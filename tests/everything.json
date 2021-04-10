@@ -765,7 +765,7 @@
                                         "_type": "Ident",
                                         "name": "el"
                                     },
-                                    "op": "==",
+                                    "op": "=",
                                     "y": {
                                         "_type": "BasicLit",
                                         "value_type": "int",

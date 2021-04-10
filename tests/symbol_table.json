@@ -91,7 +91,7 @@
                         "_type": "Ident",
                         "name": "var1"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -104,7 +104,7 @@
                         "_type": "Ident",
                         "name": "var2"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -144,7 +144,7 @@
                         "_type": "Ident",
                         "name": "var5"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -177,7 +177,7 @@
                         "_type": "Ident",
                         "name": "var6"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "float",
@@ -210,7 +210,7 @@
                         "_type": "Ident",
                         "name": "var7"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -243,7 +243,7 @@
                         "_type": "Ident",
                         "name": "var8"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",

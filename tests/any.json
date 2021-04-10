@@ -31,7 +31,7 @@
                         "_type": "Ident",
                         "name": "var9"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -72,7 +72,7 @@
                         "_type": "Ident",
                         "name": "var10"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -113,7 +113,7 @@
                         "_type": "Ident",
                         "name": "var11"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -154,7 +154,7 @@
                         "_type": "Ident",
                         "name": "var12"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "float",
@@ -195,7 +195,7 @@
                         "_type": "Ident",
                         "name": "var13"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -236,7 +236,7 @@
                         "_type": "Ident",
                         "name": "var14"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -277,7 +277,7 @@
                         "_type": "Ident",
                         "name": "var15"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -318,7 +318,7 @@
                         "_type": "Ident",
                         "name": "var16"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "float",
@@ -359,7 +359,7 @@
                         "_type": "Ident",
                         "name": "var17"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -400,7 +400,7 @@
                         "_type": "Ident",
                         "name": "var18"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -441,7 +441,7 @@
                         "_type": "Ident",
                         "name": "var19"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -482,7 +482,7 @@
                         "_type": "Ident",
                         "name": "var20"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "float",
@@ -523,7 +523,7 @@
                         "_type": "Ident",
                         "name": "var21"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "float",
@@ -564,7 +564,7 @@
                         "_type": "Ident",
                         "name": "var22"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -605,7 +605,7 @@
                         "_type": "Ident",
                         "name": "var23"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "int",
@@ -646,7 +646,7 @@
                         "_type": "Ident",
                         "name": "var24"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "bool",
@@ -723,7 +723,7 @@
                         "_type": "Ident",
                         "name": "a"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "b"
@@ -884,7 +884,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1016,7 +1016,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1148,7 +1148,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1280,7 +1280,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1412,7 +1412,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1544,7 +1544,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1676,7 +1676,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1808,7 +1808,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -1940,7 +1940,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2072,7 +2072,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2204,7 +2204,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2336,7 +2336,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2468,7 +2468,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2600,7 +2600,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2732,7 +2732,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2864,7 +2864,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -2996,7 +2996,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -3128,7 +3128,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -3260,7 +3260,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"
@@ -3392,7 +3392,7 @@
                         "_type": "Ident",
                         "name": "b"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "Ident",
                         "name": "a"

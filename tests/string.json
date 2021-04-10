@@ -31,7 +31,7 @@
                         "_type": "Ident",
                         "name": "var7"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -72,7 +72,7 @@
                         "_type": "Ident",
                         "name": "var8"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -160,7 +160,7 @@
                         "_type": "Ident",
                         "name": "c"
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "IndexExpr",
                         "x": {
@@ -224,7 +224,7 @@
                             "value": "1"
                         }
                     },
-                    "op": "==",
+                    "op": "=",
                     "y": {
                         "_type": "BasicLit",
                         "value_type": "string",
@@ -252,6 +252,59 @@
                     "x": {
                         "_type": "Ident",
                         "name": "k"
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "index": {
+                            "_type": "UnaryExpr",
+                            "op": "-",
+                            "x": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "1"
+                            }
+                        }
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "z"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "k"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "index": {
+                            "_type": "UnaryExpr",
+                            "op": "-",
+                            "x": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "2"
+                            }
+                        }
                     }
                 },
                 {
@@ -837,6 +890,130 @@ world\n"
                     "x": {
                         "_type": "Ident",
                         "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "c"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello world"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "c"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello universe"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "expr": {
+                            "_type": "Ident",
+                            "name": "a"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "d"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "come on"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
                     }
                 }
             ]
