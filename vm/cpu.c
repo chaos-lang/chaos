@@ -792,13 +792,14 @@ void cpu_pop_dict(cpu *c)
 void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
 {
     char *key = build_string(c, key_len);
-    for (size_t i = dict_len + 1; i > 0; i--) {
+    for (i64 i = dict_len + 1; i > 0; i--) {
         c->r[R0A] = c->mem[c->sp++];
         cpu_pop_common(c);
         char *dict_key = build_string(c, c->r[R1A]);
         c->r[R0A] = c->mem[c->sp++];
 
         if (strcmp(dict_key, key) == 0) {
+            c->r[R4A] = dict_len - i + 1;
             free(key);
             free(dict_key);
             cpu_pop_common(c);
