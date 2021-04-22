@@ -65,6 +65,9 @@ i64 cpu_load_string(cpu *c, i64 addr);
 i64 cpu_load_list(cpu *c, i64 addr);
 i64 cpu_load_dict(cpu *c, i64 addr);
 
+void cpu_eat_string(cpu *c);
+void cpu_eat_dynamic(cpu *c);
+
 void cpu_pop_dynamic(cpu *c);
 void cpu_pop_common(cpu *c);
 void cpu_pop_string(cpu *c);
@@ -72,5 +75,6 @@ void cpu_pop_list(cpu *c);
 void cpu_pop_dict(cpu *c);
 
 void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len);
+void print_stack(cpu *c);
 
 #endif

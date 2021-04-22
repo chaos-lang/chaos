@@ -729,6 +729,53 @@ i64 cpu_load_dict(cpu *c, i64 addr)
     return addr;
 }
 
+void cpu_eat_string(cpu *c)
+{
+    i64 len = c->mem[c->sp++];
+    for (size_t i = len; i > 0; i--) {
+        c->r[R0A] = c->mem[c->sp++];
+    }
+}
+
+void cpu_eat_dynamic(cpu *c)
+{
+    i64 value_type = c->mem[c->sp++];
+    switch (value_type) {
+        case V_BOOL:
+            c->sp++;
+            break;
+        case V_INT:
+            c->sp++;
+            break;
+        case V_FLOAT:
+            c->sp++;
+            break;
+        case V_STRING: {
+            cpu_eat_string(c);
+            break;
+        }
+        case V_LIST: {
+            i64 len = c->mem[c->sp++];
+            for (size_t i = len; i > 0; i--) {
+                cpu_eat_dynamic(c);
+            }
+            break;
+        }
+        case V_DICT: {
+            i64 len = c->mem[c->sp++];
+            for (size_t i = len; i > 0; i--) {
+                c->sp++;
+                cpu_eat_string(c);
+
+                cpu_eat_dynamic(c);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 void cpu_pop_dynamic(cpu *c)
 {
     switch (c->r[R0A]) {
@@ -802,7 +849,22 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
             c->r[R4A] = dict_len - i + 1;
             free(key);
             free(dict_key);
+
+            i64 r0a = c->r[R0A];
+            i64 addr = c->heap;
+            cpu_store_dynamic(c);
+
+            while (i > 2) {
+                cpu_eat_string(c);
+                cpu_eat_dynamic(c);
+                i--;
+            }
+
+            c->r[R0A] = c->mem[addr++];
+            cpu_load_dynamic(c, addr);
             cpu_pop_common(c);
+            cpu_pop_common(c);
+            c->r[R0A] = r0a;
             return;
         }
         free(dict_key);
@@ -810,4 +872,13 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
         cpu_pop_dynamic(c);
     }
     free(key);
+}
+
+void print_stack(cpu *c)
+{
+    i64 _sp = c->sp;
+    printf("PRINT STACK:\n");
+    while (_sp < c->max_mem) {
+        printf("%lld\n", c->mem[_sp++]);
+    }
 }
