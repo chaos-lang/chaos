@@ -739,8 +739,7 @@ void cpu_eat_string(cpu *c)
 
 void cpu_eat_dynamic(cpu *c)
 {
-    i64 value_type = c->mem[c->sp++];
-    switch (value_type) {
+    switch (c->r[R0A]) {
         case V_BOOL:
             c->sp++;
             break;
@@ -850,7 +849,6 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
             free(key);
             free(dict_key);
 
-            i64 r0a = c->r[R0A];
             i64 addr = c->heap;
             cpu_store_dynamic(c);
 
@@ -862,9 +860,8 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
 
             c->r[R0A] = c->mem[addr++];
             cpu_load_dynamic(c, addr);
+            c->r[R0A] = c->mem[c->sp++];
             cpu_pop_common(c);
-            cpu_pop_common(c);
-            c->r[R0A] = r0a;
             return;
         }
         free(dict_key);
