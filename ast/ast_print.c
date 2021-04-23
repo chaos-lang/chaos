@@ -1095,9 +1095,6 @@ char *getToken(enum Token tok)
     case FALSE_tok:
         return TT_FALSE;
         break;
-    case SYMBOL_TABLE_tok:
-        return TT_SYMBOL_TABLE;
-        break;
     case FUNCTION_TABLE_tok:
         return TT_FUNCTION_TABLE;
         break;

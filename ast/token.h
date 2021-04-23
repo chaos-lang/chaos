@@ -121,7 +121,6 @@ enum Token {
     PRETTY_tok,
     TRUE_tok,
     FALSE_tok,
-    SYMBOL_TABLE_tok,
     FUNCTION_TABLE_tok,
     DEL_tok,
     RETURN_tok,
