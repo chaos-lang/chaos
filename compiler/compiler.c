@@ -46,11 +46,17 @@ void compileStmt(i64_array* program, Stmt* stmt)
     switch (stmt->kind) {
     case EchoStmt_kind:
         compileExpr(program, stmt->v.echo_stmt->x);
-        push_instr(program, PRNT);
+        if (stmt->v.echo_stmt->mod != NULL && stmt->v.echo_stmt->mod->kind == PrettySpec_kind)
+            push_instr(program, PPRNT);
+        else
+            push_instr(program, PRNT);
         break;
     case PrintStmt_kind:
         compileExpr(program, stmt->v.print_stmt->x);
-        push_instr(program, PRNT);
+        if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind)
+            push_instr(program, PPRNT);
+        else
+            push_instr(program, PRNT);
 
         push_instr(program, LII);
         push_instr(program, R0A);

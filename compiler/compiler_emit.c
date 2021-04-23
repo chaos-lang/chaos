@@ -189,5 +189,8 @@ void emitBytecode(cpu *c)
     case PRNT:
         printf("%s\n", "PRNT");
         break;
+    case PPRNT:
+        printf("%s\n", "PPRNT");
+        break;
 	}
 }

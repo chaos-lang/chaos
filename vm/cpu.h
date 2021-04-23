@@ -50,8 +50,8 @@ void print_bool(cpu *c);
 void print_int(cpu *c);
 void print_float(cpu *c);
 void print_string(cpu *c, bool quoted);
-void print_list(cpu *c);
-void print_dict(cpu *c);
+void print_list(cpu *c, bool pretty, unsigned long iter);
+void print_dict(cpu *c, bool pretty, unsigned long iter);
 
 void cpu_store_dynamic(cpu *c);
 void cpu_store_common(cpu *c);

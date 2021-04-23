@@ -408,10 +408,34 @@ void execute(cpu *c)
             print_string(c, false);
             break;
         case V_LIST:
-            print_list(c);
+            print_list(c, false, 0);
             break;
         case V_DICT:
-            print_dict(c);
+            print_dict(c, false, 0);
+            break;
+        default:
+            break;
+        }
+        break;
+    case PPRNT:
+        switch (c->r[R0A]) {
+        case V_BOOL:
+            print_bool(c);
+            break;
+        case V_INT:
+            print_int(c);
+            break;
+        case V_FLOAT:
+            print_float(c);
+            break;
+        case V_STRING:
+            print_string(c, false);
+            break;
+        case V_LIST:
+            print_list(c, true, 0);
+            break;
+        case V_DICT:
+            print_dict(c, true, 0);
             break;
         default:
             break;
@@ -499,11 +523,18 @@ void print_string(cpu *c, bool quoted)
     free(s);
 }
 
-void print_list(cpu *c)
+void print_list(cpu *c, bool pretty, unsigned long iter)
 {
     size_t len = c->r[R1A];
     printf("[");
+    if (pretty)
+        printf("\n");
+    iter++;
     for (size_t i = 0; i < len; i++) {
+        if (pretty)
+            for (unsigned long j = 0; j < iter; j++) {
+                printf(__KAOS_TAB__);
+            }
         c->r[R0A] = c->mem[c->sp++];
         c->r[R1A] = c->mem[c->sp++];
         switch (c->r[R0A]) {
@@ -520,25 +551,43 @@ void print_list(cpu *c)
             print_string(c, true);
             break;
         case V_LIST:
-            print_list(c);
+            print_list(c, pretty, iter);
             break;
         case V_DICT:
-            print_dict(c);
+            print_dict(c, pretty, iter);
             break;
         default:
             break;
         }
-        if (i + 1 != len)
-            printf(", ");
+        if (i + 1 != len) {
+            if (pretty)
+                printf(",\n");
+            else
+                printf(", ");
+        }
+    }
+    if (pretty)
+        printf("\n");
+    if (pretty) {
+        for (unsigned long j = 0; j < (iter - 1); j++) {
+            printf(__KAOS_TAB__);
+        }
     }
     printf("]");
 }
 
-void print_dict(cpu *c)
+void print_dict(cpu *c, bool pretty, unsigned long iter)
 {
     size_t len = c->r[R1A];
     printf("{");
+    if (pretty)
+        printf("\n");
+    iter++;
     for (size_t i = 0; i < len; i++) {
+        if (pretty)
+            for (unsigned long j = 0; j < iter; j++) {
+                printf(__KAOS_TAB__);
+            }
         c->r[R0A] = c->mem[c->sp++];
         c->r[R1A] = c->mem[c->sp++];
         print_string(c, true);
@@ -559,16 +608,27 @@ void print_dict(cpu *c)
             print_string(c, true);
             break;
         case V_LIST:
-            print_list(c);
+            print_list(c, pretty, iter);
             break;
         case V_DICT:
-            print_dict(c);
+            print_dict(c, pretty, iter);
             break;
         default:
             break;
         }
-        if (i + 1 != len)
-            printf(", ");
+        if (i + 1 != len) {
+            if (pretty)
+                printf(",\n");
+            else
+                printf(", ");
+        }
+    }
+    if (pretty)
+        printf("\n");
+    if (pretty) {
+        for (unsigned long j = 0; j < (iter - 1); j++) {
+            printf(__KAOS_TAB__);
+        }
     }
     printf("}");
 }

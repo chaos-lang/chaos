@@ -37,7 +37,7 @@ enum instr {
 	BAND, BOR, BNOT, BXOR,
 	LAND, LOR, LNOT,
     DLDR, DSTR, DPOP, DDEL,
-    PRNT,
+    PRNT, PPRNT,
     LIND, KSRCH,
 	HLT,
 	NUM_INSTRUCTIONS
