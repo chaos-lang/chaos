@@ -27,9 +27,7 @@ print arr2
 str list arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
 print arr3
 
-symbol_table
 del f
-symbol_table
 
 print a[2]
 print a[1]

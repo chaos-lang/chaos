@@ -66,7 +66,6 @@
 #define TT_PRETTY "pretty"
 #define TT_TRUE "true"
 #define TT_FALSE "false"
-#define TT_SYMBOL_TABLE "symbol_table"
 #define TT_FUNCTION_TABLE "function_table"
 #define TT_DEL "del"
 #define TT_RETURN "return"

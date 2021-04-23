@@ -488,17 +488,11 @@
                     }
                 },
                 {
-                    "_type": "SymbolTableStmt"
-                },
-                {
                     "_type": "DelStmt",
                     "ident": {
                         "_type": "Ident",
                         "name": "f"
                     }
-                },
-                {
-                    "_type": "SymbolTableStmt"
                 },
                 {
                     "_type": "PrintStmt",

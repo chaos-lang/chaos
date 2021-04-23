@@ -511,7 +511,6 @@ typedef struct Stmt {
         struct DeclStmt* decl_stmt;
         struct DelStmt* del_stmt;
         struct ExitStmt* exit_stmt;
-        struct SymbolTableStmt* symbol_table_stmt;
         struct FunctionTableStmt* function_table_stmt;
         struct BlockStmt* block_stmt;
         struct BreakStmt* break_stmt;
@@ -788,7 +787,6 @@ Stmt* exprStmt(Expr* x, int lineno);
 Stmt* declStmt(Decl* decl, int lineno);
 Stmt* delStmt(Expr* ident, int lineno);
 Stmt* exitStmt(Expr* x, int lineno);
-Stmt* symbolTableStmt(int lineno);
 Stmt* functionTableStmt(int lineno);
 Stmt* breakStmt(int lineno);
 Stmt* continueStmt(int lineno);

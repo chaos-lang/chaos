@@ -1224,9 +1224,6 @@
                             }
                         ]
                     }
-                },
-                {
-                    "_type": "SymbolTableStmt"
                 }
             ]
         }

@@ -5,5 +5,4 @@ print b
 num a = 3
 print a
 del b
-symbol_table
 exit

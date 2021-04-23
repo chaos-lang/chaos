@@ -29,7 +29,7 @@
 #define __KAOS_VERSION_PATCHLEVEL__ 0
 #define __KAOS_LANGUAGE_FILE_EXTENSION__ "kaos"
 #define __KAOS_LANGUAGE_MOTTO__ "Turn chaos into magic!"
-#define __KAOS_LANGUAGE_KEYWORD_COUNT__ 33
+#define __KAOS_LANGUAGE_KEYWORD_COUNT__ 32
 #define __KAOS_INTERACTIVE_MODULE_NAME__ "__interactive__."__KAOS_LANGUAGE_FILE_EXTENSION__
 #define __KAOS_MSG_LINE_LENGTH__ 1000
 #define __KAOS_BYE_BYE__ "Bye bye!"

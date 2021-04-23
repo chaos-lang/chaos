@@ -20,9 +20,7 @@ str dict dict3 = {
 }
 print dict3
 
-symbol_table
 del b
-symbol_table
 
 print a['a']
 print a["b"]

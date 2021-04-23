@@ -90,7 +90,7 @@ extern bool is_complex_parsing;
 %type<expr> module_selector alias_expr
 %type<expr> selector_expr call_expr decision_expr default_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
-%type<stmt> symbol_table_stmt function_table_stmt
+%type<stmt> function_table_stmt
 %type<stmt> block_stmt break_stmt continue_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<spec> field_spec optional_field_spec field_list_spec optional_field_list_spec
@@ -485,9 +485,6 @@ stmt:
     | exit_stmt T_NEWLINE {
         $$ = $1;
     }
-    | symbol_table_stmt T_NEWLINE {
-        $$ = $1;
-    }
     | function_table_stmt T_NEWLINE {
         $$ = $1;
     }
@@ -581,12 +578,6 @@ exit_stmt:
     }
     | T_EXIT expr {
         $$ = exitStmt($2, yylineno);
-    }
-;
-
-symbol_table_stmt:
-    T_SYMBOL_TABLE {
-        $$ = symbolTableStmt(yylineno);
     }
 ;
 

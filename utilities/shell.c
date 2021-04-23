@@ -33,7 +33,6 @@ char *suggestions[1000] = {
     "print",
     "true",
     "false",
-    "symbol_table",
     "del",
     "return",
     "times do",

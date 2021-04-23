@@ -6458,9 +6458,6 @@
                             }
                         ]
                     }
-                },
-                {
-                    "_type": "SymbolTableStmt"
                 }
             ]
         }

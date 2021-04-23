@@ -1,12 +1,9 @@
 num a = 5
 list a = [1]
 dict a = {'a': 1}
-symbol_table
 print a
 del a
-symbol_table
 print a
-symbol_table
 del a
 list a = [1]
 num a = 5

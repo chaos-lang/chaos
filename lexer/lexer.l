@@ -244,7 +244,6 @@ default:
 "pretty"                        {return T_PRETTY;}
 "true"                          {yylval.bval = 1; return T_TRUE;}
 "false"                         {yylval.bval = 0; return T_FALSE;}
-"symbol_table"                  {return T_SYMBOL_TABLE;}
 "function_table"                {return T_FUNCTION_TABLE;}
 "del"                           {return T_DEL;}
 "return"                        {return T_RETURN;}
