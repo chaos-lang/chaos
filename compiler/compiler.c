@@ -745,61 +745,8 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, R1A);
             push_instr(program, 1);
         } else if ((type2 == V_VOID && type1 == V_LIST) || type2 == V_INT) {
-            push_instr(program, MOV);
-            push_instr(program, R2A);
-            push_instr(program, R1A);
-
-            push_instr(program, LII);
-            push_instr(program, R3A);
-            push_instr(program, -1);
-
-            push_instr(program, CMP);
-            push_instr(program, R2A);
-            push_instr(program, R3A);
-
-            push_instr(program, JGZ);
-            push_instr(program, program->size + 9);
-
-            push_instr(program, MOV);
-            push_instr(program, R5A);
+            push_instr(program, LIND);
             push_instr(program, R7B);
-
-            push_instr(program, ADD);
-            push_instr(program, R5A);
-            push_instr(program, R2A);
-
-            push_instr(program, MOV);
-            push_instr(program, R2A);
-            push_instr(program, R5A);
-
-            push_instr(program, MOV);
-            push_instr(program, R4A);
-            push_instr(program, R2A);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_INT);
-
-            push_instr(program, ADD);
-            push_instr(program, R2A);
-            push_instr(program, R3A);
-
-            push_instr(program, CMP);
-            push_instr(program, R2A);
-            push_instr(program, R3A);
-
-            push_instr(program, POP);
-            push_instr(program, R0A);
-
-            push_instr(program, JEZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, DPOP);
-
-            push_instr(program, JNZ);
-            push_instr(program, program->size - 16);
-
-            push_instr(program, POP);
             push_instr(program, R1A);
         } else if ((type2 == V_VOID && type1 == V_DICT) || type2 == V_STRING) {
             push_instr(program, KSRCH);

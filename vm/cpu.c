@@ -417,6 +417,10 @@ void execute(cpu *c)
             break;
         }
         break;
+    case LIND:
+        cpu_list_index_access(c, c->r[c->dest], c->r[c->src]);
+        c->pc += 2;
+        break;
     case KSRCH:
         cpu_dict_key_search(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
@@ -835,6 +839,38 @@ void cpu_pop_dict(cpu *c)
     }
 }
 
+void cpu_list_index_access(cpu *c, i64 list_len, i64 index)
+{
+    if (index < 0)
+        index = list_len + index;
+
+    for (i64 i = 0; i < list_len; i++) {
+        if (i == index) {
+            c->r[R4A] = i;
+
+            i64 addr = c->heap;
+            c->r[R0A] = c->mem[c->sp++];
+            cpu_store_dynamic(c);
+
+            while (i < list_len - 1) {
+                c->r[R0A] = c->mem[c->sp++];
+                cpu_eat_dynamic(c);
+                i++;
+            }
+
+            c->r[R0A] = c->mem[addr++];
+            cpu_load_dynamic(c, addr);
+
+            c->r[R0A] = c->mem[c->sp++];
+            cpu_pop_common(c);
+            return;
+        } else {
+            c->r[R0A] = c->mem[c->sp++];
+            cpu_pop_dynamic(c);
+        }
+    }
+}
+
 void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
 {
     char *key = build_string(c, key_len);
@@ -860,6 +896,7 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
 
             c->r[R0A] = c->mem[addr++];
             cpu_load_dynamic(c, addr);
+
             c->r[R0A] = c->mem[c->sp++];
             cpu_pop_common(c);
             return;
