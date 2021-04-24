@@ -1107,7 +1107,7 @@ void compileDecl(i64_array* program, Decl* decl)
         break;
     }
     case ForeachAsList_kind: {
-        compileExpr(program, decl->v.times_do->x);
+        compileExpr(program, decl->v.foreach_as_list->x);
 
         i64 addr = program->heap;
         push_instr(program, STI);
@@ -1126,9 +1126,9 @@ void compileDecl(i64_array* program, Decl* decl)
         size_t len = 0;
         bool is_dynamic = false;
 
-        switch (decl->v.times_do->x->kind) {
+        switch (decl->v.foreach_as_list->x->kind) {
         case CompositeLit_kind:
-            len = decl->v.times_do->x->v.composite_lit->elts->expr_count;
+            len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
             break;
         case Ident_kind:
             is_dynamic = true;
@@ -1144,9 +1144,17 @@ void compileDecl(i64_array* program, Decl* decl)
             is_dynamic
         );
 
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr + 1);
+
         push_instr(program, LII);
         push_instr(program, R2A);
         push_instr(program, 1);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_INT);
 
         push_instr(program, CMP);
         push_instr(program, R1A);
@@ -1174,22 +1182,14 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, R4A);
         push_instr(program, R3A);
 
-        store_int(
+        Symbol* el_symbol = store_any(
             program,
-            decl->v.foreach_as_list->el->v.ident->name,
-            false
+            decl->v.foreach_as_list->el->v.ident->name
         );
 
         compileStmt(program, decl->v.foreach_as_list->body);
 
-        Symbol* symbol = getSymbol(decl->v.foreach_as_list->el->v.ident->name);
-        removeSymbol(symbol);
-
-        program->arr[loop_start] = program->size;
-
-        push_instr(program, LII);
-        push_instr(program, R2A);
-        push_instr(program, 1);
+        removeSymbol(el_symbol);
 
         push_instr(program, LII);
         push_instr(program, R3A);
@@ -1203,9 +1203,8 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, R1A);
         push_instr(program, addr);
 
-        push_instr(program, SUB);
+        push_instr(program, DEC);
         push_instr(program, R1A);
-        push_instr(program, R2A);
 
         push_instr(program, STI);
         push_instr(program, addr);
@@ -1217,6 +1216,8 @@ void compileDecl(i64_array* program, Decl* decl)
 
         push_instr(program, JGZ);
         push_instr(program, loop_start);
+
+        program->arr[loop_start] = program->size - 1;
         break;
     }
     default:

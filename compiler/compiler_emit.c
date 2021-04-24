@@ -186,6 +186,9 @@ void emitBytecode(cpu *c)
         printf("%s %s %s\n", "KSRCH", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
+    case DEBUG:
+        printf("%s\n", "DEBUG");
+        break;
     case PRNT:
         printf("%s\n", "PRNT");
         break;
