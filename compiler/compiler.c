@@ -342,6 +342,10 @@ void compileStmt(i64_array* program, Stmt* stmt)
         }
         break;
     }
+    case BlockStmt_kind: {
+        compileStmtList(program, stmt->v.block_stmt->stmt_list);
+        break;
+    }
     default:
         break;
     }
@@ -1040,6 +1044,66 @@ void compileDecl(i64_array* program, Decl* decl)
         default:
             break;
         }
+        break;
+    }
+    case TimesDo_kind: {
+        compileExpr(program, decl->v.times_do->x);
+
+        i64 addr = program->heap;
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, JLZ);
+        i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        compileStmt(program, decl->v.times_do->body);
+
+        program->arr[loop_start] = program->size;
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, LII);
+        push_instr(program, R3A);
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr);
+
+        push_instr(program, SUB);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, STI);
+        push_instr(program, addr);
+        push_instr(program, R1A);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R3A);
+
+        push_instr(program, JGZ);
+        push_instr(program, loop_start);
         break;
     }
     default:
