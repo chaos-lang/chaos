@@ -826,6 +826,7 @@ void cpu_eat_dynamic(cpu *c)
         case V_LIST: {
             i64 len = c->mem[c->sp++];
             for (size_t i = len; i > 0; i--) {
+                c->r[R0A] = c->mem[c->sp++];
                 cpu_eat_dynamic(c);
             }
             break;
@@ -833,9 +834,10 @@ void cpu_eat_dynamic(cpu *c)
         case V_DICT: {
             i64 len = c->mem[c->sp++];
             for (size_t i = len; i > 0; i--) {
-                c->sp++;
+                c->r[R0A] = c->mem[c->sp++];
                 cpu_eat_string(c);
 
+                c->r[R0A] = c->mem[c->sp++];
                 cpu_eat_dynamic(c);
             }
             break;
