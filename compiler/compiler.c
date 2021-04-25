@@ -1220,6 +1220,164 @@ void compileDecl(i64_array* program, Decl* decl)
         program->arr[loop_start] = program->size - 1;
         break;
     }
+    case ForeachAsDict_kind: {
+        compileExpr(program, decl->v.foreach_as_dict->x);
+
+        i64 addr = program->heap;
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+
+        size_t len = 0;
+        bool is_dynamic = false;
+
+        switch (decl->v.foreach_as_dict->x->kind) {
+        case CompositeLit_kind:
+            len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
+            break;
+        case Ident_kind:
+            is_dynamic = true;
+            break;
+        default:
+            break;
+        }
+
+        Symbol* _symbol = store_dict(
+            program,
+            NULL,
+            len,
+            is_dynamic
+        );
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr + 1);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_INT);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, JLZ);
+        i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R4A);
+        push_instr(program, addr + 2);
+
+        push_instr(program, MOV);
+        push_instr(program, R3A);
+        push_instr(program, R4A);
+
+        push_instr(program, SUB);
+        push_instr(program, R3A);
+        push_instr(program, R1A);
+
+        load_list(program, _symbol);
+
+        push_instr(program, DEC);
+        push_instr(program, R3A);
+
+        push_instr(program, LII);
+        push_instr(program, R4A);
+        push_instr(program, 0);
+
+        push_instr(program, CMP);
+        push_instr(program, R3A);
+        push_instr(program, R4A);
+
+        push_instr(program, JLZ);
+        push_instr(program, program->size + 10);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, DPOP);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, DPOP);
+
+        push_instr(program, DEC);
+        push_instr(program, R3A);
+
+        push_instr(program, JMP);
+        push_instr(program, program->size - 18);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+
+        Symbol* key_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->key->v.ident->name
+        );
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+
+        Symbol* value_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->value->v.ident->name
+        );
+
+        compileStmt(program, decl->v.foreach_as_dict->body);
+
+        removeSymbol(key_symbol);
+        removeSymbol(value_symbol);
+
+        push_instr(program, LII);
+        push_instr(program, R3A);
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr);
+
+        push_instr(program, DEC);
+        push_instr(program, R1A);
+
+        push_instr(program, STI);
+        push_instr(program, addr);
+        push_instr(program, R1A);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R3A);
+
+        push_instr(program, JGZ);
+        push_instr(program, loop_start);
+
+        program->arr[loop_start] = program->size - 1;
+        break;
+    }
     default:
         break;
     }
