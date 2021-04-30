@@ -38,6 +38,7 @@ char *value_type_names[] = {
     "Number",
     "Number",
     "String",
+    "Any",
     "Void",
     "List",
     "Dict"

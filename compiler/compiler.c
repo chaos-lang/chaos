@@ -81,7 +81,7 @@ void compileStmt(i64_array* program, Stmt* stmt)
     case AssignStmt_kind: {
         compileExpr(program, stmt->v.assign_stmt->x);
         shift_registers(program, 8);
-        enum ValueType value_type = compileExpr(program, stmt->v.assign_stmt->y) - 1;
+        compileExpr(program, stmt->v.assign_stmt->y);
         switch (stmt->v.assign_stmt->x->kind) {
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
@@ -90,7 +90,7 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
             i64 addr = symbol_x->addr;
             if (symbol_x->type == K_ANY)
-                symbol_x->value_type = value_type;
+                symbol_x->value_type = V_ANY;
             else if (symbol_x->type == K_NUMBER && symbol_y != NULL && (
                 symbol_y->value_type == V_INT || symbol_y->value_type == V_FLOAT
             ))
@@ -157,6 +157,18 @@ void compileStmt(i64_array* program, Stmt* stmt)
                     push_instr(program, addr++);
                     push_instr(program, R2A);
                 }
+                break;
+            }
+            case V_ANY: {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
                 break;
             }
             case V_LIST: {
@@ -754,11 +766,11 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             push_instr(program, LII);
             push_instr(program, R1A);
             push_instr(program, 1);
-        } else if ((type2 == V_VOID && type1 == V_LIST) || type2 == V_INT) {
+        } else if ((type2 == V_ANY && type1 == V_LIST) || type2 == V_INT) {
             push_instr(program, LIND);
             push_instr(program, R7B);
             push_instr(program, R1A);
-        } else if ((type2 == V_VOID && type1 == V_DICT) || type2 == V_STRING) {
+        } else if ((type2 == V_ANY && type1 == V_DICT) || type2 == V_STRING) {
             push_instr(program, KSRCH);
             push_instr(program, R7B);
             push_instr(program, R1A);
@@ -1683,7 +1695,7 @@ Symbol* store_any(i64_array* program, char *name)
 {
     union Value value;
     value.i = 0;
-    Symbol* symbol = addSymbol(name, K_ANY, value, V_VOID);
+    Symbol* symbol = addSymbol(name, K_ANY, value, V_ANY);
     symbol->addr = program->heap;
     symbol->is_dynamic = true;
 
