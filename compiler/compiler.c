@@ -75,6 +75,9 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
         push_instr(program, PRNT);
         break;
+    case ExprStmt_kind:
+        compileExpr(program, stmt->v.expr_stmt->x);
+        break;
     case DeclStmt_kind:
         compileDecl(program, stmt->v.decl_stmt->decl);
         break;
