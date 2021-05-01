@@ -29,31 +29,31 @@
 #define f64 double
 
 enum registers {
-	R0A, R1A, R2A, R3A, R4A, R5A, R6A, R7A,
+    R0A, R1A, R2A, R3A, R4A, R5A, R6A, R7A,
     R0B, R1B, R2B, R3B, R4B, R5B, R6B, R7B,
-	NUM_REGISTERS
+    NUM_REGISTERS
 };
 
 typedef struct {
-	i64 *mem;
-	i64 max_mem;
+    i64 *mem;
+    i64 max_mem;
     i64 heap;
 
-	// registers
-	i64 pc;
-	i64 sp;
+    // registers
+    i64 pc;
+    i64 sp;
     i64 jmpb;
-	i64 r[NUM_REGISTERS];
+    i64 r[NUM_REGISTERS];
 
-	// instruction parts
-	i64 inst;
-	i64 dest;
-	i64 src;
+    // instruction parts
+    i64 inst;
+    i64 dest;
+    i64 src;
 
-	// flags
-	i64 zero;
-	i64 ltz;
-	i64 gtz;
+    // flags
+    i64 zero;
+    i64 ltz;
+    i64 gtz;
 
     bool debug;
 } cpu;

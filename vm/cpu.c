@@ -29,46 +29,46 @@ char *reg_names[] = {
 
 cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, i64 start, bool debug)
 {
-	cpu *c = malloc(sizeof(cpu));
-	c->mem = memory;
-	c->sp = mem_size - 1;
-	c->max_mem = mem_size;
-	c->pc = -1 + start;
-	c->inst = 0;
+    cpu *c = malloc(sizeof(cpu));
+    c->mem = memory;
+    c->sp = mem_size - 1;
+    c->max_mem = mem_size;
+    c->pc = -1 + start;
+    c->inst = 0;
     c->heap = heap;
     c->debug = debug;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
     }
-	return c;
+    return c;
 }
 
 void free_cpu(cpu *c)
 {
-	free(c);
+    free(c);
 }
 
 void run_cpu(cpu *c)
 {
-	while (c->inst != HLT) {
-		fetch(c);
-		execute(c);
-	}
+    while (c->inst != HLT) {
+        fetch(c);
+        execute(c);
+    }
 }
 
 void fetch(cpu *c)
 {
-	c->pc++;
-	c->inst = c->mem[c->pc];
-	c->dest = c->mem[c->pc + 1];
-	c->src = c->mem[c->pc + 2];
+    c->pc++;
+    c->inst = c->mem[c->pc];
+    c->dest = c->mem[c->pc + 1];
+    c->src = c->mem[c->pc + 2];
 }
 
 void execute(cpu *c)
 {
     i64 pc_start = c->pc;
 
-	switch (c->inst) {
+    switch (c->inst) {
     case CLF:
         clear_flags(c);
         break;
@@ -464,7 +464,7 @@ void execute(cpu *c)
         break;
     default:
         break;
-	}
+    }
 
     if (c->debug)
         print_registers(c, pc_start);
