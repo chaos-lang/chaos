@@ -169,6 +169,7 @@ _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type
     strcpy(function_mode->name, name);
     function_mode->type = type;
     function_mode->secondary_type = secondary_type;
+    function_mode->parameters = NULL;
     function_mode->parameter_count = 0;
     function_mode->optional_parameter_count = 0;
 
@@ -203,6 +204,15 @@ _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type
     freeFunctionParametersMode();
 
     return function_mode;
+}
+
+void addFunctionParameterNew(Symbol* parameter) {
+    function_mode->parameter_count++;
+    function_mode->parameters = realloc(
+        function_mode->parameters,
+        sizeof(Symbol) * function_mode->parameter_count
+    );
+    function_mode->parameters[function_mode->parameter_count - 1] = parameter;
 }
 
 void endFunction() {

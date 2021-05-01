@@ -120,6 +120,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif
 
 _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type);
+void addFunctionParameterNew(Symbol* parameter);
 
 void endFunction();
 void freeFunctionParametersMode();

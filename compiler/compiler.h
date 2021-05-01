@@ -39,6 +39,7 @@ void compileStmtList(i64_array* program, StmtList* stmt_list);
 void compileStmt(i64_array* program, Stmt* stmt);
 unsigned short compileExpr(i64_array* program, Expr* expr);
 void compileDecl(i64_array* program, Decl* decl);
+void compileSpecList(i64_array* program, SpecList* spec_list);
 unsigned short compileSpec(i64_array* program, Spec* spec);
 
 void push_instr(i64_array* program, i64 el);

@@ -889,6 +889,21 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     case CallExpr_kind: {
         _Function* function = getFunction(expr->v.call_expr->fun->v.ident->name, NULL);
 
+        ExprList* expr_list = expr->v.call_expr->args;
+
+        for (unsigned long i = 0; i < expr_list->expr_count; i++) {
+            compileExpr(program, expr_list->exprs[i]);
+            i64 addr = function->parameters[i]->addr;
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R1A);
+        }
+
         push_instr(program, SJMPB);
         push_instr(program, program->size + 2);
 
@@ -1427,6 +1442,7 @@ void compileDecl(i64_array* program, Decl* decl)
     case FuncDecl_kind: {
         _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
         function->addr = program->size - 1;
+        compileSpec(program, decl->v.func_decl->type);
         compileStmt(program, decl->v.func_decl->body);
         push_instr(program, JMPB);
         endFunction();
@@ -1434,6 +1450,13 @@ void compileDecl(i64_array* program, Decl* decl)
     }
     default:
         break;
+    }
+}
+
+void compileSpecList(i64_array* program, SpecList* spec_list)
+{
+    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
+        compileSpec(program, spec_list->specs[i - 1]);
     }
 }
 
@@ -1456,6 +1479,30 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         else
             return spec->v.type_spec->type;
         break;
+    case FuncType_kind:
+        compileSpec(program, spec->v.func_type->params);
+        compileSpec(program, spec->v.func_type->result);
+        break;
+    case FieldListSpec_kind:
+        compileSpecList(program, spec->v.field_list_spec->list);
+        break;
+    case FieldSpec_kind: {
+        enum Type type = compileSpec(program, spec->v.field_spec->type_spec);
+
+        switch (type) {
+        case K_NUMBER: {
+            union Value value;
+            value.i = 0;
+            Symbol* parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_INT);
+            parameter->addr = program->heap;
+            addFunctionParameterNew(parameter);
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
     default:
         break;
     }
