@@ -42,6 +42,7 @@ typedef struct {
 	// registers
 	i64 pc;
 	i64 sp;
+    i64 jmpb;
 	i64 r[NUM_REGISTERS];
 
 	// instruction parts

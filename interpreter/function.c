@@ -156,6 +156,55 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
 }
 
+_Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type) {
+    bool context_is_module_context = false;
+    if (function_names_buffer.size > 0 && !isInFunctionNamesBuffer(name))
+        context_is_module_context = true;
+
+    removeFunctionIfDefined(name);
+    function_mode = (struct _Function*)calloc(1, sizeof(_Function));
+    function_mode->name = malloc(1 + strlen(name));
+    function_mode->line_no = kaos_lineno;
+
+    strcpy(function_mode->name, name);
+    function_mode->type = type;
+    function_mode->secondary_type = secondary_type;
+    function_mode->parameter_count = 0;
+    function_mode->optional_parameter_count = 0;
+
+    function_mode->decision_expressions.capacity = 0;
+    function_mode->decision_expressions.size = 0;
+
+    function_mode->decision_functions.capacity = 0;
+    function_mode->decision_functions.size = 0;
+
+    unsigned short parent_context = 1;
+    if (module_path_stack.size > 1) parent_context = 2;
+    char *context = module_path_stack.arr[module_path_stack.size - parent_context];
+    char *module_context = module_path_stack.arr[module_path_stack.size - 1];
+    char *module = module_stack.arr[module_stack.size - 1];
+    function_mode->context = malloc(1 + strlen(context_is_module_context ? module_context : context));
+    strcpy(function_mode->context, context_is_module_context ? module_context : context);
+    function_mode->module_context = malloc(1 + strlen(module_context));
+    strcpy(function_mode->module_context, module_context);
+    function_mode->module = malloc(1 + strlen(module));
+    strcpy(function_mode->module, module);
+
+    if (start_function == NULL) {
+        start_function = function_mode;
+        end_function = function_mode;
+    } else {
+        end_function->next = function_mode;
+        function_mode->previous = end_function;
+        end_function = function_mode;
+        end_function->next = NULL;
+    }
+
+    freeFunctionParametersMode();
+
+    return function_mode;
+}
+
 void endFunction() {
     if (function_mode == NULL) return;
     function_mode = NULL;

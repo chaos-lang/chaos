@@ -27,13 +27,13 @@ char *reg_names[] = {
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
 };
 
-cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, bool debug)
+cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, i64 start, bool debug)
 {
 	cpu *c = malloc(sizeof(cpu));
 	c->mem = memory;
 	c->sp = mem_size - 1;
 	c->max_mem = mem_size;
-	c->pc = -1;
+	c->pc = -1 + start;
 	c->inst = 0;
     c->heap = heap;
     c->debug = debug;
@@ -60,8 +60,8 @@ void fetch(cpu *c)
 {
 	c->pc++;
 	c->inst = c->mem[c->pc];
-	c->dest = c->mem[c->pc+1];
-	c->src = c->mem[c->pc+2];
+	c->dest = c->mem[c->pc + 1];
+	c->src = c->mem[c->pc + 2];
 }
 
 void execute(cpu *c)
@@ -298,6 +298,13 @@ void execute(cpu *c)
     case JMP:
         ++(c->pc);
         c->pc = c->mem[c->pc];
+        break;
+    case JMPB:
+        c->pc = c->jmpb;
+        break;
+    case SJMPB:
+        c->jmpb = c->dest;
+        c->pc++;
         break;
     case SHL:
         c->r[c->dest] <<= c->r[c->src];

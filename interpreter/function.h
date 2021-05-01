@@ -66,6 +66,7 @@ typedef struct _Function {
     char *context;
     char *module_context;
     char *module;
+    long long addr;
     bool is_dynamic;
 } _Function;
 
@@ -117,6 +118,8 @@ void startFunction(char *name, enum Type type, enum Type secondary_type, char* c
 #else
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif
+
+_Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type);
 
 void endFunction();
 void freeFunctionParametersMode();

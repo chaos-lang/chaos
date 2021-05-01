@@ -31,6 +31,7 @@ typedef struct i64_array {
     size_t capacity;
     size_t size;
     i64 heap;
+    i64 start;
 } i64_array;
 
 i64_array* compile(ASTRoot* ast_root);

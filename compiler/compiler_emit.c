@@ -24,7 +24,7 @@
 
 void emit(i64_array* program)
 {
-    cpu *c = new_cpu(program->arr, program->size, program->heap, false);
+    cpu *c = new_cpu(program->arr, program->size, program->heap, 0, false);
     print_cpu(c);
     free_cpu(c);
 }
@@ -185,6 +185,13 @@ void emitBytecode(cpu *c)
     case KSRCH:
         printf("%s %s %s\n", "KSRCH", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
+        break;
+    case JMPB:
+        printf("%s\n", "JMPB");
+        break;
+    case SJMPB:
+        printf("%s %lld\n", "SJMPB", c->dest);
+        c->pc++;
         break;
     case DEBUG:
         printf("%s\n", "DEBUG");

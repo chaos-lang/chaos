@@ -39,6 +39,7 @@ enum instr {
     DLDR, DSTR, DPOP, DDEL,
     PRNT, PPRNT,
     LIND, KSRCH,
+    JMPB, SJMPB,
     DEBUG,
 	HLT,
 	NUM_INSTRUCTIONS

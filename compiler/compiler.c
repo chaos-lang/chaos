@@ -27,7 +27,27 @@ i64_array* compile(ASTRoot* ast_root)
     i64_array* program = initProgram();
 
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
-        compileStmtList(program, ast_root->files[i]->stmt_list);
+        StmtList* stmt_list = ast_root->files[i]->stmt_list;
+
+        // Compile functions
+        for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
+            Stmt* stmt = stmt_list->stmts[i - 1];
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind)
+                compileStmt(program, stmt);
+        }
+
+        program->start = program->size;
+
+        // Compile other statements
+        for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
+            Stmt* stmt = stmt_list->stmts[i - 1];
+            if (
+                (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
+                ||
+                (stmt->kind != DeclStmt_kind)
+            )
+                compileStmt(program, stmt);
+        }
     }
 
     push_instr(program, HLT);
@@ -864,6 +884,17 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
         push_instr(program, PUSH);
         push_instr(program, R0A);
+        break;
+    }
+    case CallExpr_kind: {
+        _Function* function = getFunction(expr->v.call_expr->fun->v.ident->name, NULL);
+
+        push_instr(program, SJMPB);
+        push_instr(program, program->size + 2);
+
+        push_instr(program, JMP);
+        push_instr(program, function->addr);
+        break;
     }
     default:
         break;
@@ -1391,6 +1422,14 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, loop_start);
 
         program->arr[loop_start] = program->size - 1;
+        break;
+    }
+    case FuncDecl_kind: {
+        _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
+        function->addr = program->size - 1;
+        compileStmt(program, decl->v.func_decl->body);
+        push_instr(program, JMPB);
+        endFunction();
         break;
     }
     default:
