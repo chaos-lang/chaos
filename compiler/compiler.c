@@ -855,6 +855,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     }
     case CompositeLit_kind: {
         ExprList* expr_list = expr->v.composite_lit->elts;
+        enum ValueType value_type = V_LIST;
         for (size_t i = 0; i < expr_list->expr_count; i++) {
             compileExpr(program, expr_list->exprs[i]);
             if (expr_list->exprs[i]->kind != KeyValueExpr_kind) {
@@ -863,12 +864,15 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
                 push_instr(program, PUSH);
                 push_instr(program, R0A);
+            } else {
+                value_type = V_DICT;
             }
         }
         compileSpec(program, expr->v.composite_lit->type);
         push_instr(program, LII);
         push_instr(program, R1A);
         push_instr(program, expr_list->expr_count);
+        return value_type + 1;
         break;
     }
     case KeyValueExpr_kind: {
@@ -892,16 +896,250 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         ExprList* expr_list = expr->v.call_expr->args;
 
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
-            compileExpr(program, expr_list->exprs[expr_list->expr_count - i]);
-            i64 addr = function->parameters[i - 1]->addr;
+            Expr* expr = expr_list->exprs[expr_list->expr_count - i];
+            enum ValueType value_type = compileExpr(program, expr) - 1;
+            Symbol* parameter = function->parameters[i - 1];
+            i64 addr = parameter->addr;
+
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, program->heap);
 
             push_instr(program, STI);
             push_instr(program, addr++);
-            push_instr(program, R0A);
+            push_instr(program, R7A);
 
-            push_instr(program, STI);
-            push_instr(program, addr++);
-            push_instr(program, R1A);
+            switch (value_type) {
+            case V_BOOL:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_BOOL);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            case V_INT:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_INT);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            case V_FLOAT:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_FLOAT);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            case V_STRING: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case BasicLit_kind:
+                    len = strlen(expr->v.basic_lit->value.s);
+                    break;
+                case BinaryExpr_kind:
+                    len =
+                        strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
+                        +
+                        strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
+                    break;
+                case IndexExpr_kind:
+                    len = 1;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_STRING);
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R0A);
+                    }
+                }
+                break;
+            }
+            case V_ANY: {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R7A);
+                break;
+            }
+            case V_LIST: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_LIST);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    program->heap += len;
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+                    }
+                    program->heap += len;
+                }
+                break;
+            }
+            case V_DICT: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_DICT);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    program->heap += len * 2;
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+                    }
+                    program->heap += len * 2;
+                }
+                break;
+            }
+            default:
+                break;
+            }
         }
 
         push_instr(program, SJMPB);
@@ -1495,19 +1733,19 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
         switch (type) {
         case K_BOOL:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_BOOL);
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
             break;
         case K_NUMBER:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_INT);
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
             break;
         case K_STRING:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_STRING);
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
             break;
         case K_LIST:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_LIST);
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
             break;
         case K_DICT:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_DICT);
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
             break;
         default:
             break;
