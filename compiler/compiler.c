@@ -891,9 +891,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
         ExprList* expr_list = expr->v.call_expr->args;
 
-        for (unsigned long i = 0; i < expr_list->expr_count; i++) {
-            compileExpr(program, expr_list->exprs[i]);
-            i64 addr = function->parameters[i]->addr;
+        for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+            compileExpr(program, expr_list->exprs[expr_list->expr_count - i]);
+            i64 addr = function->parameters[i - 1]->addr;
 
             push_instr(program, STI);
             push_instr(program, addr++);
@@ -1489,18 +1489,33 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
     case FieldSpec_kind: {
         enum Type type = compileSpec(program, spec->v.field_spec->type_spec);
 
+        Symbol* parameter = NULL;
+        union Value value;
+        value.i = 0;
+
         switch (type) {
-        case K_NUMBER: {
-            union Value value;
-            value.i = 0;
-            Symbol* parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_INT);
-            parameter->addr = program->heap;
-            addFunctionParameterNew(parameter);
+        case K_BOOL:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_BOOL);
             break;
-        }
+        case K_NUMBER:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_INT);
+            break;
+        case K_STRING:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_STRING);
+            break;
+        case K_LIST:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_LIST);
+            break;
+        case K_DICT:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_DICT);
+            break;
         default:
             break;
         }
+
+        parameter->addr = program->heap;
+        program->heap += 2;
+        addFunctionParameterNew(parameter);
         break;
     }
     default:
