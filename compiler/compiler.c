@@ -377,10 +377,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
         }
         break;
     }
-    case BlockStmt_kind: {
+    case BlockStmt_kind:
         compileStmtList(program, stmt->v.block_stmt->stmt_list);
         break;
-    }
+    case ReturnStmt_kind:
+        compileExpr(program, stmt->v.return_stmt->x);
+        break;
     default:
         break;
     }
