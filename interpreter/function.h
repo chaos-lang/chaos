@@ -66,7 +66,8 @@ typedef struct _Function {
     char *context;
     char *module_context;
     char *module;
-    long long addr;
+    long long optional_parameters_addr;
+    long long body_addr;
     bool is_dynamic;
 } _Function;
 
