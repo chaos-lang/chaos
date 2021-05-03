@@ -201,6 +201,22 @@ _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type
         end_function->next = NULL;
     }
 
+    FunctionCall* function_call;
+    if (function_call_start == NULL) {
+        function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+        function_call->start_symbol = NULL;
+        function_call->end_symbol = NULL;
+    } else {
+        function_call = function_call_start;
+    }
+    function_call_start = NULL;
+    function_call->function = function_mode;
+#ifndef CHAOS_COMPILER
+    function_call->dont_pop_module_stack = false;
+#endif
+
+    scope_override = function_call;
+
     freeFunctionParametersMode();
 
     return function_mode;
@@ -216,6 +232,7 @@ void addFunctionParameterNew(Symbol* parameter) {
 }
 
 void endFunction() {
+    scope_override = NULL;
     if (function_mode == NULL) return;
     function_mode = NULL;
     freeFunctionParametersMode();
