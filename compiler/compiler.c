@@ -979,7 +979,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     push_instr(program, R7A);
 
                     push_instr(program, STI);
-                    push_instr(program, program->heap++);
+                    push_instr(program, addr - 1);
                     push_instr(program, R7A);
                 } else {
                     push_instr(program, STI);
@@ -1080,7 +1080,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                         push_instr(program, R7A);
 
                         push_instr(program, STI);
-                        push_instr(program, program->heap++);
+                        push_instr(program, addr - 1);
                         push_instr(program, R7A);
                     } else {
                         push_instr(program, STI);
@@ -1125,7 +1125,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                         push_instr(program, R7A);
 
                         push_instr(program, STI);
-                        push_instr(program, program->heap++);
+                        push_instr(program, addr - 1);
                         push_instr(program, R7A);
                     } else {
                         push_instr(program, LII);
@@ -1179,7 +1179,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                         push_instr(program, R7A);
 
                         push_instr(program, STI);
-                        push_instr(program, program->heap++);
+                        push_instr(program, addr - 1);
                         push_instr(program, R7A);
                     } else {
                         push_instr(program, LII);
@@ -1248,7 +1248,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     push_instr(program, R7A);
 
                     push_instr(program, STI);
-                    push_instr(program, program->heap++);
+                    push_instr(program, addr - 1);
                     push_instr(program, R7A);
                 } else {
                     push_instr(program, LII);
@@ -1302,7 +1302,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     push_instr(program, R7A);
 
                     push_instr(program, STI);
-                    push_instr(program, program->heap++);
+                    push_instr(program, addr - 1);
                     push_instr(program, R7A);
                 } else {
                     push_instr(program, LII);
