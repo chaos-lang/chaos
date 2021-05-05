@@ -178,8 +178,8 @@ int initParser(int argc, char** argv) {
         switchBuffer(program_code, INIT_PROGRAM);
     }
 
-    initMainFunction();
     initASTRoot();
+    initMainFunction();
 
     main_interpreted_module = NULL;
 
@@ -192,10 +192,12 @@ int initParser(int argc, char** argv) {
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         !is_interactive ? is_interactive : printf("%s ", __KAOS_SHELL_INDICATOR__);
 #   endif
-        main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-        strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
+        main_interpreted_module = malloc(1 + strlen(_ast_root->files[_ast_root->file_count - 1]->module_path));
+        strcpy(main_interpreted_module, _ast_root->files[_ast_root->file_count - 1]->module_path);
         yyparse();
-        if (print_ast) {
+        bool printed_ast = false;
+        if (print_ast && !printed_ast) {
+            printed_ast = true;
             if (debug_enabled)
                 printf("Abstract Syntax Tree (AST):\n");
             printAST(_ast_root);
@@ -203,6 +205,14 @@ int initParser(int argc, char** argv) {
                 break;
         }
         i64_array* program = compile(_ast_root);
+        if (print_ast && !printed_ast) {
+            printed_ast = true;
+            if (debug_enabled)
+                printf("Abstract Syntax Tree (AST):\n");
+            printAST(_ast_root);
+            if (!debug_enabled)
+                break;
+        }
         if (debug_enabled) {
             printf("\nBytecode:\n");
             emit(program);

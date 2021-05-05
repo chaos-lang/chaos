@@ -1014,18 +1014,24 @@ Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno)
 void initASTRoot()
 {
     _ast_root = (struct ASTRoot*)calloc(1, sizeof(ASTRoot));
+    addFile();
+}
+
+void addFile()
+{
     File* file = (struct File*)calloc(1, sizeof(File));
-    _ast_root->files = realloc(
-        _ast_root->files,
-        sizeof(File) * ++_ast_root->file_count
-    );
-    _ast_root->files[0] = file;
+    file->imports_handled = false;
     StmtList* stmt_list = (struct StmtList*)calloc(1, sizeof(StmtList));
     stmt_list->stmt_count = 0;
     file->stmt_list = stmt_list;
     SpecList* imports = (struct SpecList*)calloc(1, sizeof(SpecList));
     imports->spec_count = 0;
     file->imports = imports;
+    _ast_root->files = realloc(
+        _ast_root->files,
+        sizeof(File) * ++_ast_root->file_count
+    );
+    _ast_root->files[_ast_root->file_count - 1] = file;
 }
 
 void addExpr(ExprList* expr_list, Expr* expr)

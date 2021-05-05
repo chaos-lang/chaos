@@ -32,8 +32,9 @@ void initMainContext() {
 
     char *module_path_with_extension = malloc(1 + strlen(program_file_path));
     strcpy(module_path_with_extension, program_file_path);
-    pushModuleStack(module_path_with_extension, "");
-    free(module_path_with_extension);
+    _ast_root->files[_ast_root->file_count - 1]->module = "";
+    _ast_root->files[_ast_root->file_count - 1]->module_path = module_path_with_extension;
+    // free(module_path_with_extension);
 }
 
 void appendModuleToModuleBuffer(char *name) {
@@ -45,9 +46,10 @@ void prependModuleToModuleBuffer(char *name) {
 }
 
 void handleModuleImport(char *module_name, bool directly_import) {
+    addFile();
     char *module_path = resolveModulePath(module_name, directly_import);
     moduleImportParse(module_path);
-    moduleImportCleanUp(module_path);
+    // moduleImportCleanUp(module_path);
 }
 
 void moduleImportParse(char *module_path) {
@@ -73,8 +75,8 @@ char* resolveModulePath(char *module_name, bool directly_import) {
     char *module_path;
     char *relative_path = "";
 
-    module_path = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
-    strcpy(module_path, module_path_stack.arr[module_path_stack.size - 1]);
+    module_path = malloc(strlen(_ast_root->files[_ast_root->file_count - 2]->module_path) + 1);
+    strcpy(module_path, _ast_root->files[_ast_root->file_count - 2]->module_path);
     if (strchr(module_path, __KAOS_PATH_SEPARATOR_ASCII__) == NULL) {
         free(module_path);
         module_path = "";
@@ -116,10 +118,11 @@ char* resolveModulePath(char *module_name, bool directly_import) {
 
     module_path = searchSpellsIfNotExits(module_path, relative_path);
 
-    pushModuleStack(module_path, module);
+    _ast_root->files[_ast_root->file_count - 1]->module = module;
+    _ast_root->files[_ast_root->file_count - 1]->module_path = module_path;
 
     freeModulesBuffer();
-    free(module);
+    // free(module);
     free(relative_path);
     return module_path;
 }
@@ -172,7 +175,7 @@ void freeModuleStack() {
 }
 
 char* getCurrentModule() {
-    return module_path_stack.arr[module_path_stack.size - 1];
+    return _ast_root->files[_ast_root->file_count - 1]->module_path;
 }
 
 char* getMainModuleDir() {

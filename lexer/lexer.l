@@ -59,8 +59,8 @@ void injectCode(char *code, enum Phase phase_arg) {
         phase_arg = PREPARSE;
     }
 
-    char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-    strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
+    char *interpreted_module = malloc(1 + strlen(_ast_root->files[_ast_root->file_count - 1]->module_path));
+    strcpy(interpreted_module, _ast_root->files[_ast_root->file_count - 1]->module_path);
 // #ifndef CHAOS_COMPILER
 //     interpret(interpreted_module, phase_arg, false);
 // #else

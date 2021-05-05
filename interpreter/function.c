@@ -462,9 +462,9 @@ _Function* getFunction(char *name, char *module) {
         &&
         function_call_stack.size > 0
         &&
-        strcmp(function_call_stack.arr[function_call_stack.size - 1]->function->module, "") != 0
+        strcmp(_ast_root->files[_ast_root->file_count - 1]->module, "") != 0
     )
-        module = function_call_stack.arr[function_call_stack.size - 1]->function->module;
+        module = _ast_root->files[_ast_root->file_count - 1]->module;
 
     function_cursor = start_function;
     while (function_cursor != NULL) {
@@ -474,9 +474,9 @@ _Function* getFunction(char *name, char *module) {
         }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         criteria = criteria && (
-            strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - 1]) == 0
+            strcmp(function_cursor->context, _ast_root->files[_ast_root->file_count - 1]->module_path) == 0
             ||
-            strcmp(function_cursor->module_context, module_path_stack.arr[module_path_stack.size - 1]) == 0
+            strcmp(function_cursor->module_context, _ast_root->files[_ast_root->file_count - 1]->module_path) == 0
         );
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {

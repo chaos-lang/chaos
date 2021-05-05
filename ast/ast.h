@@ -742,6 +742,9 @@ typedef struct SpecList {
 typedef struct File {
     struct SpecList* imports;
     struct StmtList* stmt_list;
+    char *module;
+    char *module_path;
+    bool imports_handled;
 } File;
 
 typedef struct ASTRoot {
@@ -811,6 +814,7 @@ Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno);
 Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno);
 Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno);
 void initASTRoot();
+void addFile();
 void addExpr(ExprList* expr_list, Expr* expr);
 void addSpec(SpecList* spec_list, Spec* spec);
 void addStmt(StmtList* stmt_list, Stmt* stmt);

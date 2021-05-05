@@ -25,33 +25,63 @@
 i64_array* compile(ASTRoot* ast_root)
 {
     i64_array* program = initProgram();
+    compileImports(ast_root, program);
 
+    // Compile functions in all parsed files
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
-        StmtList* stmt_list = ast_root->files[i]->stmt_list;
+        File* file = ast_root->files[i];
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
 
-        // Compile functions
-        for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
-            Stmt* stmt = stmt_list->stmts[i - 1];
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind)
                 compileStmt(program, stmt);
         }
 
-        program->start = program->size;
+        popModuleStack();
+    }
 
-        // Compile other statements
-        for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
-            Stmt* stmt = stmt_list->stmts[i - 1];
-            if (
-                (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
-                ||
-                (stmt->kind != DeclStmt_kind)
-            )
-                compileStmt(program, stmt);
-        }
+    StmtList* stmt_list = ast_root->files[0]->stmt_list;
+
+    program->start = program->size;
+
+    // Compile other statements in the first parsed file
+    for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+        Stmt* stmt = stmt_list->stmts[j - 1];
+        if (
+            (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
+            ||
+            (stmt->kind != DeclStmt_kind)
+        )
+            compileStmt(program, stmt);
     }
 
     push_instr(program, HLT);
     return program;
+}
+
+void compileImports(ASTRoot* ast_root, i64_array* program)
+{
+    while (true) {
+        bool all_imports_handled = true;
+        for (unsigned long i = 0; i < ast_root->file_count; i++) {
+            File* file = ast_root->files[i];
+            if (file->imports_handled)
+                continue;
+            all_imports_handled = false;
+
+            SpecList* spec_list = file->imports;
+            for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
+                Spec* spec = spec_list->specs[i - 1];
+                compileSpec(program, spec);
+            }
+            file->imports_handled = true;
+        }
+
+        if (all_imports_handled)
+            break;
+    }
 }
 
 void compileStmtList(i64_array* program, StmtList* stmt_list)
@@ -893,7 +923,20 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         break;
     }
     case CallExpr_kind: {
-        _Function* function = getFunction(expr->v.call_expr->fun->v.ident->name, NULL);
+        _Function* function = NULL;
+        switch (expr->v.call_expr->fun->kind) {
+        case Ident_kind:
+            function = getFunction(expr->v.call_expr->fun->v.ident->name, NULL);
+            break;
+        case SelectorExpr_kind:
+            function = getFunction(
+                expr->v.call_expr->fun->v.selector_expr->sel->v.ident->name,
+                expr->v.call_expr->fun->v.selector_expr->x->v.ident->name
+            );
+            break;
+        default:
+            break;
+        }
 
         ExprList* expr_list = expr->v.call_expr->args;
 
@@ -2459,6 +2502,12 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         default:
             break;
         }
+        break;
+    }
+    case ImportSpec_kind: {
+        char* name = spec->v.import_spec->module_selector->v.module_selector->x->v.ident->name;
+        appendModuleToModuleBuffer(name);
+        handleModuleImport(name, false);
         break;
     }
     default:
