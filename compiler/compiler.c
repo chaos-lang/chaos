@@ -30,6 +30,7 @@ i64_array* compile(ASTRoot* ast_root)
     // Compile functions in all parsed files
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
         File* file = ast_root->files[i];
+        current_file_index = i;
         StmtList* stmt_list = file->stmt_list;
         pushModuleStack(file->module_path, file->module);
 
@@ -43,6 +44,7 @@ i64_array* compile(ASTRoot* ast_root)
     }
 
     StmtList* stmt_list = ast_root->files[0]->stmt_list;
+    current_file_index = 0;
 
     program->start = program->size;
 
@@ -2507,6 +2509,14 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
     case ImportSpec_kind: {
         char* name = spec->v.import_spec->module_selector->v.module_selector->x->v.ident->name;
         appendModuleToModuleBuffer(name);
+        if (
+            spec->v.import_spec->module_selector->v.module_selector->sel != NULL
+            &&
+            spec->v.import_spec->module_selector->v.module_selector->sel->kind == ModuleSelector_kind
+        ) {
+            name = spec->v.import_spec->module_selector->v.module_selector->sel->v.module_selector->x->v.ident->name;
+            appendModuleToModuleBuffer(name);
+        }
         handleModuleImport(name, false);
         break;
     }

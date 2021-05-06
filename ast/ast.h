@@ -744,6 +744,7 @@ typedef struct File {
     struct StmtList* stmt_list;
     char *module;
     char *module_path;
+    char *context;
     bool imports_handled;
 } File;
 

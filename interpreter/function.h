@@ -98,6 +98,8 @@ typedef struct function_call_array {
 
 function_call_array function_call_stack;
 
+unsigned long current_file_index;
+
 FunctionCall* function_call_start;
 FunctionCall* scopeless;
 FunctionCall* scope_override;

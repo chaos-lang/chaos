@@ -477,6 +477,8 @@ char* getAstNodeTypeName(unsigned i) {
 
 // NEW AST START
 
+ASTRoot* _ast_root = NULL;
+
 AST* ast(int lineno)
 {
     AST* ast = (struct AST*)calloc(1, sizeof(AST));

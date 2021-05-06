@@ -157,10 +157,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 }
 
 _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type) {
-    bool context_is_module_context = false;
-    if (function_names_buffer.size > 0 && !isInFunctionNamesBuffer(name))
-        context_is_module_context = true;
-
     removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->name = malloc(1 + strlen(name));
@@ -179,15 +175,9 @@ _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type
     function_mode->decision_functions.capacity = 0;
     function_mode->decision_functions.size = 0;
 
-    unsigned short parent_context = 1;
-    if (module_path_stack.size > 1) parent_context = 2;
-    char *context = module_path_stack.arr[module_path_stack.size - parent_context];
-    char *module_context = module_path_stack.arr[module_path_stack.size - 1];
     char *module = module_stack.arr[module_stack.size - 1];
-    function_mode->context = malloc(1 + strlen(context_is_module_context ? module_context : context));
-    strcpy(function_mode->context, context_is_module_context ? module_context : context);
-    function_mode->module_context = malloc(1 + strlen(module_context));
-    strcpy(function_mode->module_context, module_context);
+    function_mode->context = _ast_root->files[_ast_root->file_count - 2]->module_path;
+    function_mode->module_context = _ast_root->files[_ast_root->file_count - 1]->module_path;
     function_mode->module = malloc(1 + strlen(module));
     strcpy(function_mode->module, module);
 
@@ -457,15 +447,6 @@ void callFunctionCleanUpCommon() {
 }
 
 _Function* getFunction(char *name, char *module) {
-    if (
-        module == NULL
-        &&
-        function_call_stack.size > 0
-        &&
-        strcmp(_ast_root->files[_ast_root->file_count - 1]->module, "") != 0
-    )
-        module = _ast_root->files[_ast_root->file_count - 1]->module;
-
     function_cursor = start_function;
     while (function_cursor != NULL) {
         if (module == NULL && strcmp(function_cursor->module, "") != 0) {
@@ -474,9 +455,7 @@ _Function* getFunction(char *name, char *module) {
         }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         criteria = criteria && (
-            strcmp(function_cursor->context, _ast_root->files[_ast_root->file_count - 1]->module_path) == 0
-            ||
-            strcmp(function_cursor->module_context, _ast_root->files[_ast_root->file_count - 1]->module_path) == 0
+            strcmp(function_cursor->context, _ast_root->files[current_file_index]->module_path) == 0
         );
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {
@@ -856,8 +835,6 @@ void freeFunction(_Function* function) {
     free(function->decision_expressions.arr);
     free(function->decision_functions.arr);
     free(function->decision_default);
-    free(function->context);
-    free(function->module_context);
     free(function->module);
     if (function->is_dynamic)
         free(function->node);
