@@ -35,6 +35,7 @@ typedef struct i64_array {
 } i64_array;
 
 i64_array* compile(ASTRoot* ast_root);
+void fillCallJumps(i64_array* program);
 void compileImports(ASTRoot* ast_root, i64_array* program);
 void compileStmtList(i64_array* program, StmtList* stmt_list);
 void compileStmt(i64_array* program, Stmt* stmt);

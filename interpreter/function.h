@@ -123,7 +123,8 @@ void startFunction(char *name, enum Type type, enum Type secondary_type, char* c
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif
 
-_Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type);
+_Function* declareFunction(char *name, enum Type type, enum Type secondary_type);
+_Function* startFunctionNew(char *name, char *module);
 void addFunctionParameterNew(Symbol* parameter);
 
 void endFunction();

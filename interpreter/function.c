@@ -156,42 +156,48 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
 }
 
-_Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type) {
+_Function* declareFunction(char *name, enum Type type, enum Type secondary_type) {
     removeFunctionIfDefined(name);
-    function_mode = (struct _Function*)calloc(1, sizeof(_Function));
-    function_mode->name = malloc(1 + strlen(name));
-    function_mode->line_no = kaos_lineno;
+    _Function* function = (struct _Function*)calloc(1, sizeof(_Function));
+    function->name = malloc(1 + strlen(name));
+    function->line_no = kaos_lineno;
 
-    strcpy(function_mode->name, name);
-    function_mode->type = type;
-    function_mode->secondary_type = secondary_type;
-    function_mode->parameters = NULL;
-    function_mode->parameter_count = 0;
-    function_mode->optional_parameter_count = 0;
+    strcpy(function->name, name);
+    function->type = type;
+    function->secondary_type = secondary_type;
+    function->parameters = NULL;
+    function->parameter_count = 0;
+    function->optional_parameter_count = 0;
 
-    function_mode->decision_expressions.capacity = 0;
-    function_mode->decision_expressions.size = 0;
+    function->decision_expressions.capacity = 0;
+    function->decision_expressions.size = 0;
 
-    function_mode->decision_functions.capacity = 0;
-    function_mode->decision_functions.size = 0;
+    function->decision_functions.capacity = 0;
+    function->decision_functions.size = 0;
 
     char *module = module_stack.arr[module_stack.size - 1];
     unsigned short parent_context = 1;
     if (_ast_root->file_count > 1) parent_context = 2;
-    function_mode->context = _ast_root->files[_ast_root->file_count - parent_context]->module_path;
-    function_mode->module_context = _ast_root->files[_ast_root->file_count - 1]->module_path;
-    function_mode->module = malloc(1 + strlen(module));
-    strcpy(function_mode->module, module);
+    function->context = _ast_root->files[_ast_root->file_count - parent_context]->module_path;
+    function->module_context = _ast_root->files[_ast_root->file_count - 1]->module_path;
+    function->module = malloc(1 + strlen(module));
+    strcpy(function->module, module);
 
     if (start_function == NULL) {
-        start_function = function_mode;
-        end_function = function_mode;
+        start_function = function;
+        end_function = function;
     } else {
-        end_function->next = function_mode;
-        function_mode->previous = end_function;
-        end_function = function_mode;
+        end_function->next = function;
+        function->previous = end_function;
+        end_function = function;
         end_function->next = NULL;
     }
+
+    return function;
+}
+
+_Function* startFunctionNew(char *name, char *module) {
+    function_mode = getFunction(name, module);
 
     FunctionCall* function_call;
     if (function_call_start == NULL) {
@@ -449,6 +455,8 @@ void callFunctionCleanUpCommon() {
 }
 
 _Function* getFunction(char *name, char *module) {
+    unsigned short context_index = current_file_index;
+    if (context_index > 0) context_index--;
     function_cursor = start_function;
     while (function_cursor != NULL) {
         if (module == NULL && strcmp(function_cursor->module, "") != 0) {
@@ -457,7 +465,7 @@ _Function* getFunction(char *name, char *module) {
         }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         criteria = criteria && (
-            strcmp(function_cursor->context, _ast_root->files[current_file_index]->module_path) == 0
+            strcmp(function_cursor->context, _ast_root->files[context_index]->module_path) == 0
         );
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {

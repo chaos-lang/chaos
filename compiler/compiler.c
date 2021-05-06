@@ -22,9 +22,14 @@
 
 #include "compiler.h"
 
+i64_array* call_body_jumps;
+i64_array* call_optional_jumps;
+
 i64_array* compile(ASTRoot* ast_root)
 {
     i64_array* program = initProgram();
+    call_body_jumps = initProgram();
+    call_optional_jumps = initProgram();
     compileImports(ast_root, program);
 
     // Compile functions in all parsed files
@@ -34,6 +39,16 @@ i64_array* compile(ASTRoot* ast_root)
         StmtList* stmt_list = file->stmt_list;
         pushModuleStack(file->module_path, file->module);
 
+        // Declare functions
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
+                Decl* decl = stmt->v.decl_stmt->decl;
+                declareFunction(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
+            }
+        }
+
+        // Compile functions
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
             Stmt* stmt = stmt_list->stmts[j - 1];
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind)
@@ -60,7 +75,23 @@ i64_array* compile(ASTRoot* ast_root)
     }
 
     push_instr(program, HLT);
+    fillCallJumps(program);
     return program;
+}
+
+void fillCallJumps(i64_array* program)
+{
+    for (unsigned long i = 0; i < call_optional_jumps->size; i++) {
+        i64 addr = call_optional_jumps->arr[i];
+        _Function* function = (void *)program->arr[addr];
+        program->arr[addr] = function->optional_parameters_addr;
+    }
+
+    for (unsigned long i = 0; i < call_body_jumps->size; i++) {
+        i64 addr = call_body_jumps->arr[i];
+        _Function* function = (void *)program->arr[addr];
+        program->arr[addr] = function->body_addr;
+    }
 }
 
 void compileImports(ASTRoot* ast_root, i64_array* program)
@@ -948,7 +979,8 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         push_instr(program, program->size + 2);
 
         push_instr(program, JMP);
-        push_instr(program, function->optional_parameters_addr);
+        push_instr(program, (i64)(void *)function);
+        push_instr(call_optional_jumps, program->size - 1);
 
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
             Expr* expr = expr_list->exprs[expr_list->expr_count - i];
@@ -1407,7 +1439,8 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         push_instr(program, program->size + 2);
 
         push_instr(program, JMP);
-        push_instr(program, function->body_addr);
+        push_instr(program, (i64)(void *)function);
+        push_instr(call_body_jumps, program->size - 1);
         return function->value_type + 1;
         break;
     }
@@ -1940,7 +1973,10 @@ void compileDecl(i64_array* program, Decl* decl)
         break;
     }
     case FuncDecl_kind: {
-        _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
+        _Function* function = startFunctionNew(
+            decl->v.func_decl->name->v.ident->name,
+            module_stack.arr[module_stack.size - 1]
+        );
         function->optional_parameters_addr = program->size - 1;
         compileSpec(program, decl->v.func_decl->type);
         push_instr(program, JMPB);
