@@ -412,9 +412,11 @@ void compileStmt(i64_array* program, Stmt* stmt)
     case BlockStmt_kind:
         compileStmtList(program, stmt->v.block_stmt->stmt_list);
         break;
-    case ReturnStmt_kind:
-        compileExpr(program, stmt->v.return_stmt->x);
+    case ReturnStmt_kind: {
+        enum ValueType value_type = compileExpr(program, stmt->v.return_stmt->x) - 1;
+        function_mode->value_type = value_type;
         break;
+    }
     default:
         break;
     }
@@ -1406,6 +1408,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
         push_instr(program, JMP);
         push_instr(program, function->body_addr);
+        return function->value_type + 1;
         break;
     }
     default:

@@ -37,6 +37,8 @@ cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, i64 start, bool debug)
     c->inst = 0;
     c->heap = heap;
     c->debug = debug;
+    c->jmpb = (i64*)malloc(USHRT_MAX * 32 * sizeof(i64));
+    c->jmpbp = 0;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
     }
@@ -300,10 +302,10 @@ void execute(cpu *c)
         c->pc = c->mem[c->pc];
         break;
     case JMPB:
-        c->pc = c->jmpb;
+        c->pc = c->jmpb[--c->jmpbp];
         break;
     case SJMPB:
-        c->jmpb = c->dest;
+        c->jmpb[c->jmpbp++] = c->dest;
         c->pc++;
         break;
     case SHL:

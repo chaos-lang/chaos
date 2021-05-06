@@ -176,7 +176,9 @@ _Function* startFunctionNew(char *name, enum Type type, enum Type secondary_type
     function_mode->decision_functions.size = 0;
 
     char *module = module_stack.arr[module_stack.size - 1];
-    function_mode->context = _ast_root->files[_ast_root->file_count - 2]->module_path;
+    unsigned short parent_context = 1;
+    if (_ast_root->file_count > 1) parent_context = 2;
+    function_mode->context = _ast_root->files[_ast_root->file_count - parent_context]->module_path;
     function_mode->module_context = _ast_root->files[_ast_root->file_count - 1]->module_path;
     function_mode->module = malloc(1 + strlen(module));
     strcpy(function_mode->module, module);

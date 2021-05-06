@@ -57,6 +57,7 @@ typedef struct _Function {
     unsigned short optional_parameter_count;
     enum Type type;
     enum Type secondary_type;
+    enum ValueType value_type;
     struct Symbol* symbol;
     struct _Function* previous;
     struct _Function* next;

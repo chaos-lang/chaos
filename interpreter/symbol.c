@@ -35,8 +35,8 @@ char *type_names[] = {
 
 char *value_type_names[] = {
     "Boolean",
-    "Number",
-    "Number",
+    "Integer",
+    "Float",
     "String",
     "Any",
     "Void",
