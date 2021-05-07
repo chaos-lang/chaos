@@ -124,8 +124,9 @@ void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif
 
 _Function* declareFunction(char *name, enum Type type, enum Type secondary_type);
+void startFunctionScope(_Function* function);
 _Function* startFunctionNew(char *name, char *module);
-void addFunctionParameterNew(Symbol* parameter);
+void addFunctionParameterNew(_Function* function, Symbol* parameter);
 
 void endFunction();
 void freeFunctionParametersMode();

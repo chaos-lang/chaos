@@ -76,8 +76,20 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
     symbol->value = value;
     symbol->value_type = value_type;
     symbol->children_count = 0;
-    symbol->scope = isComplexMode() ? scopeless : getCurrentScope();
     symbol->role = DEFAULT;
+
+    updateSymbolScope(symbol);
+
+    addSymbolToComplex(symbol);
+#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__) && !defined(CHAOS_COMPILER)
+    add_suggestion(name);
+#endif
+
+    return symbol;
+}
+
+void updateSymbolScope(Symbol* symbol) {
+    symbol->scope = isComplexMode() ? scopeless : getCurrentScope();
 
     if (symbol->scope->start_symbol == NULL) {
         symbol->scope->start_symbol = symbol;
@@ -88,13 +100,6 @@ Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType 
         symbol->scope->end_symbol = symbol;
         symbol->scope->end_symbol->next = NULL;
     }
-
-    addSymbolToComplex(symbol);
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__) && !defined(CHAOS_COMPILER)
-    add_suggestion(name);
-#endif
-
-    return symbol;
 }
 
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {
@@ -369,6 +374,10 @@ void printSymbolValue(Symbol* symbol, bool is_complex, bool pretty, bool escaped
 }
 
 char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bool escaped, unsigned long iter, char *encoded, bool double_quotes) {
+    if (symbol->value_type == V_REF) {
+        encoded = strcat_ext(encoded, "(ref)");
+        return encoded;
+    }
     switch (symbol->type) {
     case K_BOOL:
         switch (symbol->value_type) {
@@ -400,7 +409,7 @@ char* encodeSymbolValueToString(Symbol* symbol, bool is_complex, bool pretty, bo
         }
         return encoded;
     case K_STRING:
-        if (symbol->value_type == V_VOID) {
+        if (symbol->value_type == V_VOID || symbol->value.s == NULL) {
             return strcat_ext(encoded, "N/A");
         }
         if (is_complex) {
@@ -562,10 +571,10 @@ void printSymbolTable() {
         Symbol *symbol;
         if (i == 0) {
             symbol = scopeless->start_symbol;
-            printf("[scope]: %s\n", scopeless->function->name);
+            printf("[scope]: %s %p\n", scopeless->function->name, (void *)scopeless->function);
         } else {
             symbol = function_call_stack.arr[i - 1]->start_symbol;
-            printf("[scope]: %s\n", function_call_stack.arr[i - 1]->function->name);
+            printf("[scope]: %s %p\n", function_call_stack.arr[i - 1]->function->name, (void *)function_call_stack.arr[i - 1]->function);
         }
 
         printf("\t[start] =>\n");

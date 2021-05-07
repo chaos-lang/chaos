@@ -88,6 +88,7 @@ Symbol* variable_complex_element;
 unsigned long long variable_complex_element_symbol_id;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
+void updateSymbolScope(Symbol* symbol);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);

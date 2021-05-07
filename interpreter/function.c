@@ -196,9 +196,7 @@ _Function* declareFunction(char *name, enum Type type, enum Type secondary_type)
     return function;
 }
 
-_Function* startFunctionNew(char *name, char *module) {
-    function_mode = getFunction(name, module);
-
+void startFunctionScope(_Function* function) {
     FunctionCall* function_call;
     if (function_call_start == NULL) {
         function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
@@ -208,28 +206,38 @@ _Function* startFunctionNew(char *name, char *module) {
         function_call = function_call_start;
     }
     function_call_start = NULL;
-    function_call->function = function_mode;
+    function_call->function = function;
 #ifndef CHAOS_COMPILER
     function_call->dont_pop_module_stack = false;
 #endif
 
     scope_override = function_call;
+    pushExecutedFunctionStack(function_call);
+}
 
-    freeFunctionParametersMode();
+_Function* startFunctionNew(char *name, char *module) {
+    function_mode = getFunction(name, module);
+
+    startFunctionScope(function_mode);
+    for (unsigned short i = 0; i < function_mode->parameter_count; i++) {
+        updateSymbolScope(function_mode->parameters[i]);
+    }
 
     return function_mode;
 }
 
-void addFunctionParameterNew(Symbol* parameter) {
-    function_mode->parameter_count++;
-    function_mode->parameters = realloc(
-        function_mode->parameters,
-        sizeof(Symbol) * function_mode->parameter_count
+void addFunctionParameterNew(_Function* function, Symbol* parameter) {
+    function->parameter_count++;
+    function->parameters = realloc(
+        function->parameters,
+        sizeof(Symbol) * function->parameter_count
     );
-    function_mode->parameters[function_mode->parameter_count - 1] = parameter;
+    function->parameters[function->parameter_count - 1] = parameter;
+    parameter->param_of = function;
 }
 
 void endFunction() {
+    popExecutedFunctionStack();
     scope_override = NULL;
     if (function_mode == NULL) return;
     function_mode = NULL;

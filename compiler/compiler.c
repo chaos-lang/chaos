@@ -44,7 +44,12 @@ i64_array* compile(ASTRoot* ast_root)
             Stmt* stmt = stmt_list->stmts[j - 1];
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
                 Decl* decl = stmt->v.decl_stmt->decl;
-                declareFunction(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
+                function_mode = declareFunction(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
+                startFunctionScope(function_mode);
+                function_mode->optional_parameters_addr = program->size - 1;
+                compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+                push_instr(program, JMPB);
+                endFunction();
             }
         }
 
@@ -2007,9 +2012,6 @@ void compileDecl(i64_array* program, Decl* decl)
             decl->v.func_decl->name->v.ident->name,
             module_stack.arr[module_stack.size - 1]
         );
-        function->optional_parameters_addr = program->size - 1;
-        compileSpec(program, decl->v.func_decl->type);
-        push_instr(program, JMPB);
         function->body_addr = program->size - 1;
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
@@ -2088,7 +2090,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
         parameter->addr = program->heap;
         program->heap += 2;
-        addFunctionParameterNew(parameter);
+        addFunctionParameterNew(function_mode, parameter);
         break;
     }
     case OptionalFieldSpec_kind: {
@@ -2124,7 +2126,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         parameter->addr = program->heap;
         program->heap += 2;
 
-        addFunctionParameterNew(parameter);
+        addFunctionParameterNew(function_mode, parameter);
 
         // Load the default value
         Expr* expr = spec->v.optional_field_spec->expr;
