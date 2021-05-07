@@ -1444,6 +1444,34 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         return function->value_type + 1;
         break;
     }
+    case DecisionExpr_kind: {
+        compileExpr(program, expr->v.decision_expr->bool_expr);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 0);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, JEZ);
+        i64 jump_point = program->size;
+        push_instr(program, 0);
+
+        compileStmt(program, expr->v.decision_expr->outcome);
+
+        push_instr(program, JMPB);
+
+        program->arr[jump_point] = program->size - 1;
+        break;
+    }
+    case DefaultExpr_kind: {
+        compileStmt(program, expr->v.default_expr->outcome);
+
+        push_instr(program, JMPB);
+        break;
+    }
     default:
         break;
     }
@@ -1982,6 +2010,8 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, JMPB);
         function->body_addr = program->size - 1;
         compileStmt(program, decl->v.func_decl->body);
+        if (decl->v.func_decl->decision != NULL)
+            compileSpec(program, decl->v.func_decl->decision);
         push_instr(program, JMPB);
         endFunction();
         break;
@@ -2557,6 +2587,21 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
             appendModuleToModuleBuffer(name);
         }
         handleModuleImport(name, false);
+        break;
+    }
+    case DecisionBlock_kind: {
+        push_instr(program, SJMPB);
+        i64 jump_back_point = program->size;
+        push_instr(program, 0);
+
+        ExprList* expr_list = spec->v.decision_block->decisions;
+        for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+            compileExpr(program, expr_list->exprs[i - 1]);
+        }
+
+        push_instr(program, JMPB);
+
+        program->arr[jump_back_point] = program->size - 1;
         break;
     }
     default:
