@@ -446,6 +446,8 @@ void compileStmt(i64_array* program, Stmt* stmt)
     case ReturnStmt_kind: {
         enum ValueType value_type = compileExpr(program, stmt->v.return_stmt->x) - 1;
         function_mode->value_type = value_type;
+
+        push_instr(program, JMPB);
         break;
     }
     default:
