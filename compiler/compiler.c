@@ -308,6 +308,22 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 }
                 break;
             }
+            case V_REF: {
+                push_instr(program, LII);
+                push_instr(program, R7A);
+                push_instr(program, program->heap);
+
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
+                break;
+            }
             default:
                 break;
             }
@@ -317,9 +333,13 @@ void compileStmt(i64_array* program, Stmt* stmt)
             Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.index_expr->x->v.ident->name);
             i64 addr = symbol->addr;
 
-            switch (symbol->value_type) {
-            case V_STRING:
-                push_instr(program, LII);
+            switch (symbol->type) {
+            case K_STRING:
+                if (symbol->value_type == V_REF) {
+                    push_instr(program, LDI);
+                } else {
+                    push_instr(program, LII);
+                }
                 push_instr(program, R3B);
                 push_instr(program, addr);
 
@@ -340,8 +360,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R3B);
                 push_instr(program, R1A);
                 break;
-            case V_LIST:
-                push_instr(program, LII);
+            case K_LIST:
+                if (symbol->value_type == V_REF) {
+                    push_instr(program, LDI);
+                } else {
+                    push_instr(program, LII);
+                }
                 push_instr(program, R3B);
                 push_instr(program, addr);
 
@@ -369,8 +393,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 push_instr(program, R3B);
                 push_instr(program, R7A);
                 break;
-            case V_DICT:
-                push_instr(program, LII);
+            case K_DICT:
+                if (symbol->value_type == V_REF) {
+                    push_instr(program, LDI);
+                } else {
+                    push_instr(program, LII);
+                }
                 push_instr(program, R3B);
                 push_instr(program, addr);
 
@@ -897,13 +925,31 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         if (expr->v.incdec_expr->x->kind == Ident_kind) {
             Symbol* symbol = getSymbol(expr->v.incdec_expr->x->v.ident->name);
             i64 addr = symbol->addr;
-            push_instr(program, STI);
-            push_instr(program, addr++);
-            push_instr(program, R0A);
+            if (symbol->value_type == V_REF) {
+                push_instr(program, LII);
+                push_instr(program, R7A);
+                push_instr(program, program->heap);
 
-            push_instr(program, STI);
-            push_instr(program, addr++);
-            push_instr(program, R1A);
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+            } else {
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R1A);
+            }
         }
         if (!expr->v.incdec_expr->first) {
             switch (expr->v.incdec_expr->op) {
@@ -1614,6 +1660,12 @@ void compileDecl(i64_array* program, Decl* decl)
                 );
                 break;
             case V_DICT:
+                store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
+                break;
+            case V_REF:
                 store_any(
                     program,
                     decl->v.var_decl->ident->v.ident->name
@@ -3077,7 +3129,7 @@ void load_any(i64_array* program, Symbol* symbol)
 
     push_instr(program, LII);
     push_instr(program, R7A);
-    push_instr(program, addr++);
+    push_instr(program, addr);
 
     push_instr(program, DLDR);
     push_instr(program, R7A);
