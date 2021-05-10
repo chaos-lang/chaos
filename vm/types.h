@@ -36,7 +36,10 @@ enum registers {
 
 typedef struct {
     i64 *mem;
+    i64 **mems;
+    i64 memp;
     i64 max_mem;
+    i64 stack_size;
     i64 heap;
 
     // registers

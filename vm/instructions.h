@@ -40,6 +40,7 @@ enum instr {
     PRNT, PPRNT,
     LIND, KSRCH,
     JMPB, SJMPB,
+    CALL, CALLX,
     DEBUG,
     HLT,
     NUM_INSTRUCTIONS

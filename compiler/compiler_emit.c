@@ -193,6 +193,12 @@ void emitBytecode(cpu *c)
         printf("%s %lld\n", "SJMPB", c->dest);
         c->pc++;
         break;
+    case CALL:
+        printf("%s\n", "CALL");
+        break;
+    case CALLX:
+        printf("%s\n", "CALLX");
+        break;
     case DEBUG:
         printf("%s\n", "DEBUG");
         break;

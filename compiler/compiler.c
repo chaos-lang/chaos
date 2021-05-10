@@ -477,8 +477,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
         compileStmtList(program, stmt->v.block_stmt->stmt_list);
         break;
     case ReturnStmt_kind: {
-        enum ValueType value_type = compileExpr(program, stmt->v.return_stmt->x) - 1;
+        ReturnStmt* return_stmt = stmt->v.return_stmt;
+        enum ValueType value_type = compileExpr(program, return_stmt->x) - 1;
         function_mode->value_type = value_type;
+
+        if (!return_stmt->dont_push_callx)
+            push_instr(program, CALLX);
 
         push_instr(program, JMPB);
         break;
@@ -1489,7 +1493,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
 
         push_instr(program, SJMPB);
-        push_instr(program, program->size + 2);
+        push_instr(program, program->size + 3);
+
+        push_instr(program, CALL);
 
         push_instr(program, JMP);
         push_instr(program, (i64)(void *)function);
@@ -1511,6 +1517,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         push_instr(program, JEZ);
         i64 jump_point = program->size;
         push_instr(program, 0);
+
+        // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
+        if (expr->v.decision_expr->outcome->kind == ReturnStmt_kind)
+            expr->v.decision_expr->outcome->v.return_stmt->dont_push_callx = true;
 
         compileStmt(program, expr->v.decision_expr->outcome);
 
@@ -2068,7 +2078,11 @@ void compileDecl(i64_array* program, Decl* decl)
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
             compileSpec(program, decl->v.func_decl->decision);
+
+        push_instr(program, CALLX);
+
         push_instr(program, JMPB);
+
         endFunction();
         break;
     }
@@ -2685,10 +2699,10 @@ void freeProgram(i64_array* program)
 i64_array* initProgram()
 {
     i64_array* program = malloc(sizeof *program);
-    program->capacity = USHRT_MAX * 32;
+    program->capacity = USHRT_MAX * 1;
     program->arr = (i64*)malloc(program->capacity * sizeof(i64));
     program->size = 0;
-    program->heap = USHRT_MAX * 2;
+    program->heap = USHRT_MAX * 0.5;
     return program;
 }
 

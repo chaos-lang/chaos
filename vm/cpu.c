@@ -31,13 +31,16 @@ cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, i64 start, bool debug)
 {
     cpu *c = malloc(sizeof(cpu));
     c->mem = memory;
+    c->mems = (i64**)malloc(mem_size * sizeof(i64*));
+    c->memp = 0;
     c->sp = mem_size - 1;
     c->max_mem = mem_size;
+    c->stack_size = heap;
     c->pc = -1 + start;
     c->inst = 0;
-    c->heap = heap;
+    c->heap = c->stack_size;
     c->debug = debug;
-    c->jmpb = (i64*)malloc(USHRT_MAX * 32 * sizeof(i64));
+    c->jmpb = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
     c->jmpbp = 0;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
@@ -308,6 +311,28 @@ void execute(cpu *c)
         c->jmpb[c->jmpbp++] = c->dest;
         c->pc++;
         break;
+    case CALL: {
+        i64 *new_mem = (i64*)malloc(c->max_mem * sizeof(i64));
+        c->mems[c->memp++] = c->mem;
+        memcpy(new_mem, c->mem, c->max_mem * sizeof(i64));
+        c->mem = new_mem;
+        c->mems[c->memp++] = c->mem;
+        break;
+    }
+    case CALLX: {
+        i64 *new_mem = c->mems[--c->memp];
+        // --c->memp;  // TODO: remove this if above is enabled
+        c->mem = c->mems[--c->memp];
+        // TODO: memcpy or memmove is probably faster then a for loop
+        // memmove(c->mem, &new_mem[c->max_mem - c->stack_size - 1], c->stack_size * sizeof(i64));
+        // memcpy(&c->mem[c->max_mem - c->stack_size - 1], &new_mem[c->max_mem - c->stack_size - 1], c->stack_size * sizeof(i64));
+        for (size_t i = c->max_mem; i > c->stack_size; i--) {
+            c->mem[i] = new_mem[i];
+        }
+        // TODO: Is it freed?
+        // free(new_mem);
+        break;
+    }
     case SHL:
         c->r[c->dest] <<= c->r[c->src];
         c->pc += 2;

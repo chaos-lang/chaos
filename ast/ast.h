@@ -526,6 +526,7 @@ typedef struct AssignStmt {
 
 typedef struct ReturnStmt {
     struct Expr* x;
+    bool dont_push_callx;
 } ReturnStmt;
 
 typedef struct PrintStmt {

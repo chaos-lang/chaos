@@ -715,6 +715,7 @@ Stmt* returnStmt(Expr* x, int lineno)
 {
     ReturnStmt* return_stmt = (struct ReturnStmt*)calloc(1, sizeof(ReturnStmt));
     return_stmt->x = x;
+    return_stmt->dont_push_callx = false;
     Stmt* stmt = buildStmt(ReturnStmt_kind, lineno);
     stmt->v.return_stmt = return_stmt;
     return stmt;
