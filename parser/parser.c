@@ -218,7 +218,7 @@ int initParser(int argc, char** argv) {
             emit(program);
             printf("\nProgram Output:\n");
         }
-        cpu *c = new_cpu(program->arr, program->capacity, program->heap, program->start, debug_enabled);
+        cpu *c = new_cpu(program->arr, program->heap, program->start, debug_enabled);
         run_cpu(c);
         free_cpu(c);
         // if (!is_interactive) {

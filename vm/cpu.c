@@ -27,18 +27,19 @@ char *reg_names[] = {
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
 };
 
-cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, i64 start, bool debug)
+cpu *new_cpu(i64 *program, i64 heap_size, i64 start, bool debug)
 {
     cpu *c = malloc(sizeof(cpu));
-    c->mem = memory;
-    c->mems = (i64**)malloc(mem_size * sizeof(i64*));
+    c->program = program;
+    c->mems = (i64**)malloc(USHRT_MAX * 2 * sizeof(i64*));
     c->memp = 0;
-    c->sp = mem_size - 1;
-    c->max_mem = mem_size;
-    c->stack_size = heap;
+    c->mem = (i64*)malloc(USHRT_MAX * 0.5 * sizeof(i64));
+    c->stack = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
+    c->sp = USHRT_MAX * 2 - 1;
+    c->heap_size = heap_size;
     c->pc = -1 + start;
     c->inst = 0;
-    c->heap = c->stack_size;
+    c->heap = heap_size;
     c->debug = debug;
     c->jmpb = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
     c->jmpbp = 0;
@@ -64,9 +65,9 @@ void run_cpu(cpu *c)
 void fetch(cpu *c)
 {
     c->pc++;
-    c->inst = c->mem[c->pc];
-    c->dest = c->mem[c->pc + 1];
-    c->src = c->mem[c->pc + 2];
+    c->inst = c->program[c->pc];
+    c->dest = c->program[c->pc + 1];
+    c->src = c->program[c->pc + 2];
 }
 
 void execute(cpu *c)
@@ -109,11 +110,11 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case STI:
-        c->mem[c->dest] = c->r[c->src];
+        cpu_store(c, c->dest, c->r[c->src]);
         c->pc += 2;
         break;
     case STR:
-        c->mem[c->r[c->dest]] = c->r[c->src];
+        cpu_store(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
         break;
     case LDI:
@@ -129,10 +130,10 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case PUSH:
-        c->mem[--c->sp] = c->r[c->mem[++c->pc]];
+        c->stack[--c->sp] = c->r[c->program[++c->pc]];
         break;
     case POP:
-        c->r[c->mem[++c->pc]] = c->mem[c->sp++];
+        c->r[c->program[++c->pc]] = c->stack[c->sp++];
         break;
     case INC:
         c->r[c->dest]++;
@@ -275,34 +276,34 @@ void execute(cpu *c)
     case JLZ:
         if (c->ltz) {
             ++(c->pc);
-            c->pc = c->mem[c->pc];
+            c->pc = c->program[c->pc];
         }
         else c->pc++;
         break;
     case JGZ:
         if (c->gtz) {
             ++(c->pc);
-            c->pc = c->mem[c->pc];
+            c->pc = c->program[c->pc];
         }
         else c->pc++;
         break;
     case JEZ:
         if (c->zero) {
             ++(c->pc);
-            c->pc = c->mem[c->pc];
+            c->pc = c->program[c->pc];
         }
         else c->pc++;
         break;
     case JNZ:
         if (!c->zero) {
             ++(c->pc);
-            c->pc = c->mem[c->pc];
+            c->pc = c->program[c->pc];
         }
         else c->pc++;
         break;
     case JMP:
         ++(c->pc);
-        c->pc = c->mem[c->pc];
+        c->pc = c->program[c->pc];
         break;
     case JMPB:
         c->pc = c->jmpb[--c->jmpbp];
@@ -312,23 +313,24 @@ void execute(cpu *c)
         c->pc++;
         break;
     case CALL: {
-        i64 *new_mem = (i64*)malloc(c->max_mem * sizeof(i64));
+        i64 *new_mem = (i64*)malloc(USHRT_MAX * 0.5 * sizeof(i64));
         c->mems[c->memp++] = c->mem;
-        memcpy(new_mem, c->mem, c->max_mem * sizeof(i64));
+        memcpy(new_mem, c->mem, USHRT_MAX * 0.5 * sizeof(i64));
         c->mem = new_mem;
         c->mems[c->memp++] = c->mem;
         break;
     }
     case CALLX: {
-        i64 *new_mem = c->mems[--c->memp];
+        // i64 *new_mem = c->mems[--c->memp];
+        --c->memp;
         // --c->memp;  // TODO: remove this if above is enabled
         c->mem = c->mems[--c->memp];
         // TODO: memcpy or memmove is probably faster then a for loop
         // memmove(c->mem, &new_mem[c->max_mem - c->stack_size - 1], c->stack_size * sizeof(i64));
         // memcpy(&c->mem[c->max_mem - c->stack_size - 1], &new_mem[c->max_mem - c->stack_size - 1], c->stack_size * sizeof(i64));
-        for (size_t i = c->max_mem; i > c->stack_size; i--) {
-            c->mem[i] = new_mem[i];
-        }
+        // for (size_t i = c->max_mem; i > c->stack_size; i--) {
+        //     c->mem[i] = new_mem[i];
+        // }
         // TODO: Is it freed?
         // free(new_mem);
         break;
@@ -390,7 +392,7 @@ void execute(cpu *c)
         addr++;
         i64 index = c->r[c->src];
         i64 len = c->mem[addr++];
-        c->mem[addr - 1] = len - 1;
+        cpu_store(c, addr - 1, len - 1);
         if (index < 0)
             index = len + index;
 
@@ -400,7 +402,7 @@ void execute(cpu *c)
                     addr++;
                     continue;
                 }
-                c->mem[addr] = c->mem[addr + 1];
+                cpu_store(c, addr, c->mem[addr + 1]);
                 addr++;
             }
         } else if (value_type == V_DICT) {
@@ -420,8 +422,8 @@ void execute(cpu *c)
             free(key);
 
             for (i64 i = shift_index; i < (len - 1); i++) {
-                c->mem[_addr + 2 * i + 1] = c->mem[_addr + 2 * (i + 1) + 1];
-                c->mem[_addr + 2 * i] = c->mem[_addr + 2 * (i + 1)];
+                cpu_store(c, _addr + 2 * i + 1, c->mem[_addr + 2 * (i + 1) + 1]);
+                cpu_store(c, _addr + 2 * i, c->mem[_addr + 2 * (i + 1)]);
             }
         }
         c->pc += 2;
@@ -515,7 +517,7 @@ char *build_string(cpu *c, i64 len)
 {
     char *s = malloc(len + 1);
     for (size_t i = 0; i < len; i++) {
-        s[i] = (int)c->mem[c->sp++] + '0';
+        s[i] = (int)c->stack[c->sp++] + '0';
     }
     s[len] = '\0';
 
@@ -575,8 +577,8 @@ void print_list(cpu *c, bool pretty, unsigned long iter)
             for (unsigned long j = 0; j < iter; j++) {
                 printf(__KAOS_TAB__);
             }
-        c->r[R0A] = c->mem[c->sp++];
-        c->r[R1A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
+        c->r[R1A] = c->stack[c->sp++];
         switch (c->r[R0A]) {
         case V_BOOL:
             print_bool(c);
@@ -628,12 +630,12 @@ void print_dict(cpu *c, bool pretty, unsigned long iter)
             for (unsigned long j = 0; j < iter; j++) {
                 printf(__KAOS_TAB__);
             }
-        c->r[R0A] = c->mem[c->sp++];
-        c->r[R1A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
+        c->r[R1A] = c->stack[c->sp++];
         print_string(c, true);
         printf(": ");
-        c->r[R0A] = c->mem[c->sp++];
-        c->r[R1A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
+        c->r[R1A] = c->stack[c->sp++];
         switch (c->r[R0A]) {
         case V_BOOL:
             print_bool(c);
@@ -701,17 +703,17 @@ void cpu_store_dynamic(cpu *c)
 
 void cpu_store_common(cpu *c)
 {
-    c->mem[c->heap++] = c->r[R0A];
-    c->r[R1A] = c->mem[c->sp++];
-    c->mem[c->heap++] = c->r[R1A];
+    cpu_store(c, c->heap++, c->r[R0A]);
+    c->r[R1A] = c->stack[c->sp++];
+    cpu_store(c, c->heap++, c->r[R1A]);
 }
 
 void cpu_store_string(cpu *c)
 {
     cpu_store_common(c);
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
-        c->mem[c->heap++] = c->r[R0A];
+        c->r[R0A] = c->stack[c->sp++];
+        cpu_store(c, c->heap++, c->r[R0A]);
     }
 }
 
@@ -721,8 +723,8 @@ void cpu_store_list(cpu *c)
     c->heap += c->r[R1A];
     i64 _heap = c->heap - 1;
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->mem[_heap--] = c->heap;
-        c->r[R0A] = c->mem[c->sp++];
+        cpu_store(c, _heap--, c->heap);
+        c->r[R0A] = c->stack[c->sp++];
         cpu_store_dynamic(c);
     }
 }
@@ -733,12 +735,12 @@ void cpu_store_dict(cpu *c)
     c->heap += c->r[R1A] * 2;
     i64 _heap = c->heap - 1;
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->mem[_heap--] = c->heap;
-        c->r[R0A] = c->mem[c->sp++];
+        cpu_store(c, _heap--, c->heap);
+        c->r[R0A] = c->stack[c->sp++];
         cpu_store_string(c);
 
-        c->mem[_heap--] = c->heap;
-        c->r[R0A] = c->mem[c->sp++];
+        cpu_store(c, _heap--, c->heap);
+        c->r[R0A] = c->stack[c->sp++];
         cpu_store_dynamic(c);
     }
 }
@@ -772,8 +774,8 @@ void cpu_load_dynamic(cpu *c, i64 addr)
 i64 cpu_load_common(cpu *c, i64 addr)
 {
     c->r[R1A] = c->mem[addr++];
-    c->mem[--c->sp] = c->r[R1A];
-    c->mem[--c->sp] = c->r[R0A];
+    c->stack[--c->sp] = c->r[R1A];
+    c->stack[--c->sp] = c->r[R0A];
     return addr;
 }
 
@@ -785,11 +787,11 @@ i64 cpu_load_string(cpu *c, i64 addr)
     addr += c->r[R1A] - 1;
     for (size_t i = c->r[R1A]; i > 0; i--) {
         c->r[R2A] = c->mem[addr--];
-        c->mem[--c->sp] = c->r[R2A];
+        c->stack[--c->sp] = c->r[R2A];
     }
     addr += c->r[R1A] - 1;
-    c->mem[--c->sp] = _R1A;
-    c->mem[--c->sp] = _R0A;
+    c->stack[--c->sp] = _R1A;
+    c->stack[--c->sp] = _R0A;
     return addr;
 }
 
@@ -806,8 +808,8 @@ i64 cpu_load_list(cpu *c, i64 addr)
         cpu_load_dynamic(c, addr);
     }
     addr = _addr + len;
-    c->mem[--c->sp] = _R1A;
-    c->mem[--c->sp] = _R0A;
+    c->stack[--c->sp] = _R1A;
+    c->stack[--c->sp] = _R0A;
     return addr;
 }
 
@@ -828,16 +830,16 @@ i64 cpu_load_dict(cpu *c, i64 addr)
         cpu_load_string(c, addr);
     }
     addr = _addr + 2 * len;
-    c->mem[--c->sp] = _R1A;
-    c->mem[--c->sp] = _R0A;
+    c->stack[--c->sp] = _R1A;
+    c->stack[--c->sp] = _R0A;
     return addr;
 }
 
 void cpu_eat_string(cpu *c)
 {
-    i64 len = c->mem[c->sp++];
+    i64 len = c->stack[c->sp++];
     for (size_t i = len; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
     }
 }
 
@@ -858,20 +860,20 @@ void cpu_eat_dynamic(cpu *c)
             break;
         }
         case V_LIST: {
-            i64 len = c->mem[c->sp++];
+            i64 len = c->stack[c->sp++];
             for (size_t i = len; i > 0; i--) {
-                c->r[R0A] = c->mem[c->sp++];
+                c->r[R0A] = c->stack[c->sp++];
                 cpu_eat_dynamic(c);
             }
             break;
         }
         case V_DICT: {
-            i64 len = c->mem[c->sp++];
+            i64 len = c->stack[c->sp++];
             for (size_t i = len; i > 0; i--) {
-                c->r[R0A] = c->mem[c->sp++];
+                c->r[R0A] = c->stack[c->sp++];
                 cpu_eat_string(c);
 
-                c->r[R0A] = c->mem[c->sp++];
+                c->r[R0A] = c->stack[c->sp++];
                 cpu_eat_dynamic(c);
             }
             break;
@@ -909,14 +911,14 @@ void cpu_pop_dynamic(cpu *c)
 
 void cpu_pop_common(cpu *c)
 {
-    c->r[R1A] = c->mem[c->sp++];
+    c->r[R1A] = c->stack[c->sp++];
 }
 
 void cpu_pop_string(cpu *c)
 {
     cpu_pop_common(c);
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
     }
 }
 
@@ -924,7 +926,7 @@ void cpu_pop_list(cpu *c)
 {
     cpu_pop_common(c);
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
         cpu_pop_dynamic(c);
     }
 }
@@ -933,10 +935,10 @@ void cpu_pop_dict(cpu *c)
 {
     cpu_pop_common(c);
     for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
         cpu_pop_string(c);
 
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
         cpu_pop_dynamic(c);
     }
 }
@@ -951,11 +953,11 @@ void cpu_list_index_access(cpu *c, i64 list_len, i64 index)
             c->r[R4A] = i;
 
             i64 addr = c->heap;
-            c->r[R0A] = c->mem[c->sp++];
+            c->r[R0A] = c->stack[c->sp++];
             cpu_store_dynamic(c);
 
             while (i < list_len - 1) {
-                c->r[R0A] = c->mem[c->sp++];
+                c->r[R0A] = c->stack[c->sp++];
                 cpu_eat_dynamic(c);
                 i++;
             }
@@ -963,11 +965,11 @@ void cpu_list_index_access(cpu *c, i64 list_len, i64 index)
             c->r[R0A] = c->mem[addr++];
             cpu_load_dynamic(c, addr);
 
-            c->r[R0A] = c->mem[c->sp++];
+            c->r[R0A] = c->stack[c->sp++];
             cpu_pop_common(c);
             return;
         } else {
-            c->r[R0A] = c->mem[c->sp++];
+            c->r[R0A] = c->stack[c->sp++];
             cpu_pop_dynamic(c);
         }
     }
@@ -977,10 +979,10 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
 {
     char *key = build_string(c, key_len);
     for (i64 i = dict_len + 1; i > 0; i--) {
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
         cpu_pop_common(c);
         char *dict_key = build_string(c, c->r[R1A]);
-        c->r[R0A] = c->mem[c->sp++];
+        c->r[R0A] = c->stack[c->sp++];
 
         if (strcmp(dict_key, key) == 0) {
             c->r[R4A] = dict_len - i + 1;
@@ -999,7 +1001,7 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
             c->r[R0A] = c->mem[addr++];
             cpu_load_dynamic(c, addr);
 
-            c->r[R0A] = c->mem[c->sp++];
+            c->r[R0A] = c->stack[c->sp++];
             cpu_pop_common(c);
             return;
         }
@@ -1017,4 +1019,14 @@ void print_stack(cpu *c)
     while (_sp < c->max_mem) {
         printf("%lld\n", c->mem[_sp++]);
     }
+}
+
+void cpu_store(cpu *c, i64 heap, i64 value)
+{
+    // printf("cpu_store %lld %lld\n", heap, value);
+    // if (heap > c->heap_size) {
+    //     c->heap_size = heap;
+    //     c->mem = (i64*)realloc(c->mem, c->heap_size * sizeof(i64));
+    // }
+    c->mem[heap] = value;
 }

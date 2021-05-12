@@ -2682,6 +2682,11 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
 void push_instr(i64_array* program, i64 el)
 {
+    if (program->capacity == 0) {
+        program->arr = (i64*)malloc((++program->capacity) * sizeof(i64));
+    } else {
+        program->arr = (i64*)realloc(program->arr, (++program->capacity) * sizeof(i64));
+    }
     program->arr[program->size++] = el;
 }
 
@@ -2699,10 +2704,10 @@ void freeProgram(i64_array* program)
 i64_array* initProgram()
 {
     i64_array* program = malloc(sizeof *program);
-    program->capacity = USHRT_MAX * 1;
-    program->arr = (i64*)malloc(program->capacity * sizeof(i64));
+    program->capacity = 0;
+    program->arr = NULL;
     program->size = 0;
-    program->heap = USHRT_MAX * 0.5;
+    program->heap = 0;
     return program;
 }
 

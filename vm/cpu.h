@@ -35,7 +35,7 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
-cpu *new_cpu(i64 *memory, i64 mem_size, i64 heap, i64 start, bool debug);
+cpu *new_cpu(i64 *program, i64 heap_size, i64 start, bool debug);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void fetch(cpu *c);
@@ -77,5 +77,7 @@ void cpu_pop_dict(cpu *c);
 void cpu_list_index_access(cpu *c, i64 list_len, i64 index);
 void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len);
 void print_stack(cpu *c);
+
+void cpu_store(cpu *c, i64 heap, i64 value);
 
 #endif

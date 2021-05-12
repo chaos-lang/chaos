@@ -24,7 +24,7 @@
 
 void emit(i64_array* program)
 {
-    cpu *c = new_cpu(program->arr, program->size, program->heap, 0, false);
+    cpu *c = new_cpu(program->arr, program->heap, 0, false);
     print_cpu(c);
     free_cpu(c);
 }
@@ -79,10 +79,10 @@ void emitBytecode(cpu *c)
         c->pc += 2;
         break;
     case PUSH:
-        printf("%s %s\n", "PUSH", getRegName(c->mem[++c->pc]));
+        printf("%s %s\n", "PUSH", getRegName(c->program[++c->pc]));
         break;
     case POP:
-        printf("%s %s\n", "POP", getRegName(c->mem[++c->pc]));
+        printf("%s %s\n", "POP", getRegName(c->program[++c->pc]));
         break;
     case INC:
         printf("%s %s\n", "INC", getRegName(c->dest));
@@ -113,19 +113,19 @@ void emitBytecode(cpu *c)
         c->pc += 2;
         break;
     case JLZ:
-        printf("%s %lld\n", "JLZ", c->mem[++c->pc]);
+        printf("%s %lld\n", "JLZ", c->program[++c->pc]);
         break;
     case JGZ:
-        printf("%s %lld\n", "JGZ", c->mem[++c->pc]);
+        printf("%s %lld\n", "JGZ", c->program[++c->pc]);
         break;
     case JEZ:
-        printf("%s %lld\n", "JEZ", c->mem[++c->pc]);
+        printf("%s %lld\n", "JEZ", c->program[++c->pc]);
         break;
     case JNZ:
-        printf("%s %lld\n", "JNZ", c->mem[++c->pc]);
+        printf("%s %lld\n", "JNZ", c->program[++c->pc]);
         break;
     case JMP:
-        printf("%s %lld\n", "JMP", c->mem[++c->pc]);
+        printf("%s %lld\n", "JMP", c->program[++c->pc]);
         break;
     case SHL:
         printf("%s %s %s\n", "SHL", getRegName(c->dest), getRegName(c->src));

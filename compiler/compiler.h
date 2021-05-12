@@ -28,8 +28,8 @@
 
 typedef struct i64_array {
     i64* arr;
-    size_t capacity;
-    size_t size;
+    i64 capacity;
+    i64 size;
     i64 heap;
     i64 start;
 } i64_array;
