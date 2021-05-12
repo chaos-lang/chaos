@@ -33,10 +33,10 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, bool debug)
     c->program = program;
     c->mems = (i64**)malloc(USHRT_MAX * 2 * sizeof(i64*));
     c->memp = 0;
-    c->mem = (i64*)malloc(USHRT_MAX * 0.5 * sizeof(i64));
+    c->mem = (i64*)malloc((heap_size + 1) * sizeof(i64));
     c->stack = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
     c->sp = USHRT_MAX * 2 - 1;
-    c->heap_size = heap_size;
+    c->heap_size = heap_size + 1;
     c->pc = -1 + start;
     c->inst = 0;
     c->heap = heap_size;
@@ -313,26 +313,17 @@ void execute(cpu *c)
         c->pc++;
         break;
     case CALL: {
-        i64 *new_mem = (i64*)malloc(USHRT_MAX * 0.5 * sizeof(i64));
+        i64 *new_mem = (i64*)malloc(c->heap_size * sizeof(i64));
         c->mems[c->memp++] = c->mem;
-        memcpy(new_mem, c->mem, USHRT_MAX * 0.5 * sizeof(i64));
+        memcpy(new_mem, c->mem, c->heap_size * sizeof(i64));
         c->mem = new_mem;
         c->mems[c->memp++] = c->mem;
         break;
     }
     case CALLX: {
-        // i64 *new_mem = c->mems[--c->memp];
         --c->memp;
-        // --c->memp;  // TODO: remove this if above is enabled
         c->mem = c->mems[--c->memp];
-        // TODO: memcpy or memmove is probably faster then a for loop
-        // memmove(c->mem, &new_mem[c->max_mem - c->stack_size - 1], c->stack_size * sizeof(i64));
-        // memcpy(&c->mem[c->max_mem - c->stack_size - 1], &new_mem[c->max_mem - c->stack_size - 1], c->stack_size * sizeof(i64));
-        // for (size_t i = c->max_mem; i > c->stack_size; i--) {
-        //     c->mem[i] = new_mem[i];
-        // }
-        // TODO: Is it freed?
-        // free(new_mem);
+        free(c->mems[c->memp + 1]);
         break;
     }
     case SHL:
@@ -1023,10 +1014,9 @@ void print_stack(cpu *c)
 
 void cpu_store(cpu *c, i64 heap, i64 value)
 {
-    // printf("cpu_store %lld %lld\n", heap, value);
-    // if (heap > c->heap_size) {
-    //     c->heap_size = heap;
-    //     c->mem = (i64*)realloc(c->mem, c->heap_size * sizeof(i64));
-    // }
+    if (heap > (c->heap_size - 1)) {
+        c->heap_size = heap + 1;
+        c->mem = (i64*)realloc(c->mem, c->heap_size * sizeof(i64));
+    }
     c->mem[heap] = value;
 }
