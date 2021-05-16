@@ -31,17 +31,17 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
     c->program = program;
-    c->mems = (i64**)malloc(USHRT_MAX * 2 * sizeof(i64*));
+    c->mems = (i64**)malloc(USHRT_MAX * 256 * sizeof(i64*));
     c->memp = 0;
     c->mem = (i64*)malloc((heap_size + 1) * sizeof(i64));
-    c->stack = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
+    c->stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     c->sp = USHRT_MAX * 2 - 1;
     c->heap_size = heap_size + 1;
     c->pc = -1 + start;
     c->inst = 0;
     c->heap = heap_size;
     c->debug_level = debug_level;
-    c->jmpb = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
+    c->jmpb = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     c->jmpbp = 0;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
