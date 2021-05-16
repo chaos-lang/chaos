@@ -35,7 +35,7 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, bool debug);
+cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void fetch(cpu *c);

@@ -108,8 +108,14 @@ __strcmp_ssse3 () at ../sysdeps/x86_64/multiarch/../strcmp.S:173
 
 ### Is there a debug mode?
 
-The Chaos interpreter has an option `-d` to enable the debug mode which tells you the details about
-the parsing and execution order using the Abstract Syntax Tree (AST):
+The Chaos interpreter has an option `-d` to set the debug level. There are four debug levels:
+
+ - `0`: No debug
+ - `1`: Print AST and exit
+ - `2`: Print Bytecode and exit
+ - `3`: Execute the program while printing the register states per instruction
+
+TODO: Fix the example below.
 
 ```
 $ chaos -d

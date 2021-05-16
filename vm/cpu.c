@@ -27,7 +27,7 @@ char *reg_names[] = {
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
 };
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, bool debug)
+cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
     c->program = program;
@@ -40,7 +40,7 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, bool debug)
     c->pc = -1 + start;
     c->inst = 0;
     c->heap = heap_size;
-    c->debug = debug;
+    c->debug_level = debug_level;
     c->jmpb = (i64*)malloc(USHRT_MAX * 2 * sizeof(i64));
     c->jmpbp = 0;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
@@ -486,7 +486,7 @@ void execute(cpu *c)
         break;
     }
 
-    if (c->debug)
+    if (c->debug_level > 2)
         print_registers(c, pc_start);
 }
 

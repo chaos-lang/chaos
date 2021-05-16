@@ -32,7 +32,7 @@ static struct option long_options[] =
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'v'},
     {"license", no_argument, NULL, 'l'},
-    {"debug", no_argument, NULL, 'd'},
+    {"debug", required_argument, NULL, 'd'},
     {"compile", required_argument, NULL, 'c'},
     {"output", required_argument, NULL, 'o'},
     {"extra", required_argument, NULL, 'e'},
@@ -43,6 +43,7 @@ static struct option long_options[] =
 
 int initParser(int argc, char** argv) {
     debug_enabled = false;
+    unsigned short debug_level = 0;
     bool compiler_mode = false;
     bool compiler_fopen_fail = false;
     bool print_ast = false;
@@ -52,7 +53,7 @@ int initParser(int argc, char** argv) {
     // char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvldc:o:e:k:a:", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvld:c:o:e:k:a:", long_options, NULL)) != -1)
     {
         switch (opt) {
         case 'h':
@@ -64,10 +65,10 @@ int initParser(int argc, char** argv) {
         case 'l':
             print_license();
             exit(0);
-        case 'd':
-            debug_enabled = true;
-            print_ast = true;
+        case 'd': {
+            debug_level = atoi(optarg);
             break;
+        }
         case 'c':
             compiler_mode = true;
             program_file = optarg;
@@ -113,7 +114,7 @@ int initParser(int argc, char** argv) {
     if (fp == NULL) {
         if (argc == 1) {
             fp = stdin;
-        } else if (debug_enabled && argc == 2) {
+        } else if (debug_level > 0 && argc == 3) {
             fp = stdin;
         } else if (!compiler_fopen_fail) {
             program_file = argv[argc - 1];
@@ -195,30 +196,27 @@ int initParser(int argc, char** argv) {
         main_interpreted_module = malloc(1 + strlen(_ast_root->files[_ast_root->file_count - 1]->module_path));
         strcpy(main_interpreted_module, _ast_root->files[_ast_root->file_count - 1]->module_path);
         yyparse();
-        bool printed_ast = false;
-        if (print_ast && !printed_ast) {
-            printed_ast = true;
-            if (debug_enabled)
-                printf("Abstract Syntax Tree (AST):\n");
+
+        if (print_ast || debug_level > 0) {
+            printf("Abstract Syntax Tree (AST):\n");
             printAST(_ast_root);
-            if (!debug_enabled)
-                break;
+            if (debug_level == 1)
+                exit(0);
         }
+
         i64_array* program = compile(_ast_root);
-        if (print_ast && !printed_ast) {
-            printed_ast = true;
-            if (debug_enabled)
-                printf("Abstract Syntax Tree (AST):\n");
-            printAST(_ast_root);
-            if (!debug_enabled)
-                break;
-        }
-        if (debug_enabled) {
+
+        if (debug_level > 1) {
             printf("\nBytecode:\n");
             emit(program);
-            printf("\nProgram Output:\n");
+            if (debug_level == 2)
+                exit(0);
         }
-        cpu *c = new_cpu(program->arr, program->heap, program->start, debug_enabled);
+
+        if (debug_level > 2)
+            printf("\nProgram Output:\n");
+
+        cpu *c = new_cpu(program->arr, program->heap, program->start, debug_level);
         run_cpu(c);
         free_cpu(c);
         // if (!is_interactive) {

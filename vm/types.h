@@ -62,7 +62,7 @@ typedef struct {
     i64 ltz;
     i64 gtz;
 
-    bool debug;
+    unsigned short debug_level;
 } cpu;
 
 #endif

@@ -1,5 +1,6 @@
 SHELL=/bin/bash
 
+.PHONY: help.h
 .ONESHELL:
 
 UNAME_S := $(shell uname -s)

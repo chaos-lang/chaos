@@ -3,7 +3,7 @@ Usage: chaos [options] <file> [--] [args...]
     -h, --help          Print this help text.
     -v, --version       Version number.
     -l, --license       Print the license.
-    -d, --debug         Debug the execution of a program.
+    -d, --debug         Set the debug level. [0, 1, 2, 3]
     -c, --compile       Compile a Chaos program into machine code.
     -o, --output        Binary output filename. Must be used with the -c / --compile option.
     -e, --extra         Extra flags to inject into C compiler command.
