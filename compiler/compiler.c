@@ -487,6 +487,12 @@ void compileStmt(i64_array* program, Stmt* stmt)
         push_instr(program, JMPB);
         break;
     }
+    case ExitStmt_kind: {
+        compileExpr(program, stmt->v.exit_stmt->x);
+
+        push_instr(program, EXIT);
+        break;
+    }
     default:
         break;
     }

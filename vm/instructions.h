@@ -42,7 +42,7 @@ enum instr {
     JMPB, SJMPB,
     CALL, CALLX,
     DEBUG,
-    HLT,
+    HLT, EXIT,
     NUM_INSTRUCTIONS
 };
 

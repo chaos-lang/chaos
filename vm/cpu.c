@@ -476,6 +476,9 @@ void execute(cpu *c)
         cpu_dict_key_search(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
         break;
+    case EXIT:
+        exit(c->r[R1A]);
+        break;
     case DEBUG:
         printf("\n");
         print_registers(c, pc_start);
