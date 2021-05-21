@@ -496,7 +496,7 @@ stmt_list:
         $$->stmt_count = 0;
         addStmt($$, $1);
     }
-    | T_NEWLINE {
+    | {
         $$ = (struct StmtList*)calloc(1, sizeof(StmtList));
         $$->stmt_count = 0;
     }
