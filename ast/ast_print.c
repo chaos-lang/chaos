@@ -200,7 +200,7 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         if (stmt->v.exit_stmt->x == NULL)
-            printf("\n");
+            printf("null\n");
         else
             printASTExpr(stmt->v.exit_stmt->x, false, "\n");
         break;

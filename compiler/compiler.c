@@ -488,7 +488,13 @@ void compileStmt(i64_array* program, Stmt* stmt)
         break;
     }
     case ExitStmt_kind: {
-        compileExpr(program, stmt->v.exit_stmt->x);
+        if (stmt->v.exit_stmt->x == NULL) {
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+        } else {
+            compileExpr(program, stmt->v.exit_stmt->x);
+        }
 
         push_instr(program, EXIT);
         break;
