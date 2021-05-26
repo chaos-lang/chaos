@@ -1542,6 +1542,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         break;
     }
     case DefaultExpr_kind: {
+        // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
+        if (expr->v.default_expr->outcome->kind == ReturnStmt_kind)
+            expr->v.default_expr->outcome->v.return_stmt->dont_push_callx = true;
+
         compileStmt(program, expr->v.default_expr->outcome);
 
         push_instr(program, JMPB);
