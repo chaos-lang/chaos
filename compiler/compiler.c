@@ -2712,16 +2712,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         break;
     }
     case ImportSpec_kind: {
-        char* name = spec->v.import_spec->module_selector->v.module_selector->x->v.ident->name;
-        appendModuleToModuleBuffer(name);
-        if (
-            spec->v.import_spec->module_selector->v.module_selector->sel != NULL
-            &&
-            spec->v.import_spec->module_selector->v.module_selector->sel->kind == ModuleSelector_kind
-        ) {
-            name = spec->v.import_spec->module_selector->v.module_selector->sel->v.module_selector->x->v.ident->name;
-            appendModuleToModuleBuffer(name);
-        }
+        char* name = compile_module_selector(spec->v.import_spec->module_selector);
         handleModuleImport(name, false);
         break;
     }
@@ -3224,4 +3215,19 @@ void load_any(i64_array* program, Symbol* symbol)
 
     push_instr(program, POP);
     push_instr(program, R1A);
+}
+
+char* compile_module_selector(Expr* module_selector)
+{
+    char* name = module_selector->v.module_selector->x->v.ident->name;
+    appendModuleToModuleBuffer(name);
+    if (
+        module_selector->v.module_selector->sel != NULL
+        &&
+        module_selector->v.module_selector->sel->kind == ModuleSelector_kind
+    ) {
+        return compile_module_selector(module_selector->v.module_selector->sel);
+    } else {
+        return name;
+    }
 }
