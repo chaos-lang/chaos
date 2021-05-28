@@ -43,6 +43,10 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug_level)
     c->debug_level = debug_level;
     c->jmpb = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     c->jmpbp = 0;
+    c->brk = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
+    c->brkp = 0;
+    c->cont = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
+    c->contp = 0;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
     }
@@ -310,6 +314,20 @@ void execute(cpu *c)
         break;
     case SJMPB:
         c->jmpb[c->jmpbp++] = c->dest;
+        c->pc++;
+        break;
+    case BRK:
+        c->pc = c->brk[--c->brkp];
+        break;
+    case SBRK:
+        c->brk[c->brkp++] = c->dest;
+        c->pc++;
+        break;
+    case CONT:
+        c->pc = c->cont[--c->contp];
+        break;
+    case SCONT:
+        c->cont[c->contp++] = c->dest;
         c->pc++;
         break;
     case CALL: {

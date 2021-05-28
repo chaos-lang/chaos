@@ -499,6 +499,14 @@ void compileStmt(i64_array* program, Stmt* stmt)
         push_instr(program, EXIT);
         break;
     }
+    case BreakStmt_kind: {
+        push_instr(program, BRK);
+        break;
+    }
+    case ContinueStmt_kind: {
+        push_instr(program, CONT);
+        break;
+    }
     default:
         break;
     }
@@ -1773,13 +1781,24 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, R1A);
         push_instr(program, R2A);
 
+        push_instr(program, SBRK);
+        i64 break_point = program->size;
+        push_instr(program, 0);
+
         push_instr(program, JLZ);
         i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, SCONT);
+        i64 continue_point = program->size;
         push_instr(program, 0);
 
         compileStmt(program, decl->v.times_do->body);
 
         program->arr[loop_start] = program->size;
+
+        push_instr(program, CONT);
+        program->arr[continue_point] = program->size - 1;
 
         push_instr(program, LII);
         push_instr(program, R2A);
@@ -1811,6 +1830,9 @@ void compileDecl(i64_array* program, Decl* decl)
 
         push_instr(program, JGZ);
         push_instr(program, loop_start);
+
+        push_instr(program, BRK);
+        program->arr[break_point] = program->size - 1;
         break;
     }
     case ForeachAsList_kind: {
@@ -1867,8 +1889,16 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, R1A);
         push_instr(program, R2A);
 
+        push_instr(program, SBRK);
+        i64 break_point = program->size;
+        push_instr(program, 0);
+
         push_instr(program, JLZ);
         i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, SCONT);
+        i64 continue_point = program->size;
         push_instr(program, 0);
 
         push_instr(program, LDI);
@@ -1895,6 +1925,9 @@ void compileDecl(i64_array* program, Decl* decl)
         );
 
         compileStmt(program, decl->v.foreach_as_list->body);
+
+        push_instr(program, CONT);
+        program->arr[continue_point] = program->size - 1;
 
         removeSymbol(el_symbol);
 
@@ -1925,6 +1958,9 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, loop_start);
 
         program->arr[loop_start] = program->size - 1;
+
+        push_instr(program, BRK);
+        program->arr[break_point] = program->size - 1;
         break;
     }
     case ForeachAsDict_kind: {
@@ -1981,8 +2017,16 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, R1A);
         push_instr(program, R2A);
 
+        push_instr(program, SBRK);
+        i64 break_point = program->size;
+        push_instr(program, 0);
+
         push_instr(program, JLZ);
         i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, SCONT);
+        i64 continue_point = program->size;
         push_instr(program, 0);
 
         push_instr(program, LDI);
@@ -2053,6 +2097,9 @@ void compileDecl(i64_array* program, Decl* decl)
 
         compileStmt(program, decl->v.foreach_as_dict->body);
 
+        push_instr(program, CONT);
+        program->arr[continue_point] = program->size - 1;
+
         removeSymbol(key_symbol);
         removeSymbol(value_symbol);
 
@@ -2083,6 +2130,9 @@ void compileDecl(i64_array* program, Decl* decl)
         push_instr(program, loop_start);
 
         program->arr[loop_start] = program->size - 1;
+
+        push_instr(program, BRK);
+        program->arr[break_point] = program->size - 1;
         break;
     }
     case FuncDecl_kind: {

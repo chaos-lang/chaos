@@ -40,6 +40,7 @@ enum instr {
     PRNT, PPRNT,
     LIND, KSRCH,
     JMPB, SJMPB,
+    BRK, SBRK, CONT, SCONT,
     CALL, CALLX,
     DEBUG,
     HLT, EXIT,

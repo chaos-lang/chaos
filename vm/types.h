@@ -50,6 +50,10 @@ typedef struct {
     i64 sp;
     i64 *jmpb;
     i64 jmpbp;
+    i64 *brk;
+    i64 brkp;
+    i64 *cont;
+    i64 contp;
     i64 r[NUM_REGISTERS];
 
     // instruction parts
