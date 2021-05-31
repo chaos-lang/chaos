@@ -32,10 +32,11 @@ void initMainContext() {
 
     char *module_path_with_extension = malloc(1 + strlen(program_file_path));
     strcpy(module_path_with_extension, program_file_path);
+    pushModuleStack(module_path_with_extension, "");
     if (_ast_root != NULL && _ast_root->file_count > 0) {
         _ast_root->files[_ast_root->file_count - 1]->module = "";
         _ast_root->files[_ast_root->file_count - 1]->module_path = module_path_with_extension;
-        _ast_root->files[_ast_root->file_count - 1]->context = "";
+        _ast_root->files[_ast_root->file_count - 1]->context = module_path_with_extension;
     }
 }
 
@@ -47,9 +48,9 @@ void prependModuleToModuleBuffer(char *name) {
     prepend_to_array(&modules_buffer, name);
 }
 
-void handleModuleImport(char *module_name, bool directly_import) {
+void handleModuleImport(char *module_name, bool directly_import, char *parent_context) {
     addFile();
-    char *module_path = resolveModulePath(module_name, directly_import);
+    char *module_path = resolveModulePath(module_name, directly_import, parent_context);
     moduleImportParse(module_path);
     // moduleImportCleanUp(module_path);
 }
@@ -69,7 +70,7 @@ void moduleImportParse(char *module_path) {
     }
 }
 
-char* resolveModulePath(char *module_name, bool directly_import) {
+char* resolveModulePath(char *module_name, bool directly_import, char *parent_context) {
 #ifndef CHAOS_COMPILER
     if (is_interactive)
         ast_interactive_cursor = ast_node_cursor;
@@ -77,8 +78,8 @@ char* resolveModulePath(char *module_name, bool directly_import) {
     char *module_path;
     char *relative_path = "";
 
-    module_path = malloc(strlen(_ast_root->files[_ast_root->file_count - 2]->module_path) + 1);
-    strcpy(module_path, _ast_root->files[_ast_root->file_count - 2]->module_path);
+    module_path = malloc(strlen(parent_context) + 1);
+    strcpy(module_path, parent_context);
     if (strchr(module_path, __KAOS_PATH_SEPARATOR_ASCII__) == NULL) {
         free(module_path);
         module_path = "";
@@ -118,8 +119,8 @@ char* resolveModulePath(char *module_name, bool directly_import) {
     relative_path = strcat_ext(relative_path, ".");
     relative_path = strcat_ext(relative_path, __KAOS_LANGUAGE_FILE_EXTENSION__);
 
-    char *context = malloc(strlen(_ast_root->files[_ast_root->file_count - 2]->module_path) + 1);
-    strcpy(context, _ast_root->files[_ast_root->file_count - 2]->module_path);
+    char *context = malloc(strlen(parent_context) + 1);
+    strcpy(context, parent_context);
 
     module_path = searchSpellsIfNotExits(module_path, relative_path);
 

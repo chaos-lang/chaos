@@ -25,14 +25,18 @@
 i64_array* call_body_jumps;
 i64_array* call_optional_jumps;
 
+File* import_parent_context = NULL;
+
 i64_array* compile(ASTRoot* ast_root)
 {
     i64_array* program = initProgram();
     call_body_jumps = initProgram();
     call_optional_jumps = initProgram();
+
+    // Compile imports
     compileImports(ast_root, program);
 
-    // Compile functions in all parsed files
+    // Declare functions in all parsed files
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
         File* file = ast_root->files[i];
         current_file_index = i;
@@ -44,7 +48,14 @@ i64_array* compile(ASTRoot* ast_root)
             Stmt* stmt = stmt_list->stmts[j - 1];
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
                 Decl* decl = stmt->v.decl_stmt->decl;
-                function_mode = declareFunction(decl->v.func_decl->name->v.ident->name, K_VOID, K_VOID);
+                function_mode = declareFunction(
+                    decl->v.func_decl->name->v.ident->name,
+                    file->module,
+                    file->module_path,
+                    file->context,
+                    K_VOID,
+                    K_VOID
+                );
                 startFunctionScope(function_mode);
                 function_mode->optional_parameters_addr = program->size - 1;
                 compileSpec(program, decl->v.func_decl->type->v.func_type->params);
@@ -52,6 +63,16 @@ i64_array* compile(ASTRoot* ast_root)
                 endFunction();
             }
         }
+
+        popModuleStack();
+    }
+
+    // Compile functions in all parsed files
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
 
         // Compile functions
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
@@ -105,6 +126,7 @@ void compileImports(ASTRoot* ast_root, i64_array* program)
         bool all_imports_handled = true;
         for (unsigned long i = 0; i < ast_root->file_count; i++) {
             File* file = ast_root->files[i];
+            import_parent_context = file;
             if (file->imports_handled)
                 continue;
             all_imports_handled = false;
@@ -2136,10 +2158,7 @@ void compileDecl(i64_array* program, Decl* decl)
         break;
     }
     case FuncDecl_kind: {
-        _Function* function = startFunctionNew(
-            decl->v.func_decl->name->v.ident->name,
-            module_stack.arr[module_stack.size - 1]
-        );
+        _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
         function->body_addr = program->size - 1;
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
@@ -2713,7 +2732,14 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
     }
     case ImportSpec_kind: {
         char* name = compile_module_selector(spec->v.import_spec->module_selector);
-        handleModuleImport(name, false);
+        if (spec->v.import_spec->ident != NULL) {
+            handleModuleImport(spec->v.import_spec->ident->v.ident->name, false, import_parent_context->module_path);
+        } else {
+            if (spec->v.import_spec->asterisk != NULL)
+                handleModuleImport(name, true, import_parent_context->module_path);
+            else
+                handleModuleImport(name, false, import_parent_context->module_path);
+        }
         break;
     }
     case DecisionBlock_kind: {

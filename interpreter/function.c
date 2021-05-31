@@ -156,7 +156,7 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
 }
 
-_Function* declareFunction(char *name, enum Type type, enum Type secondary_type) {
+_Function* declareFunction(char *name, char *module, char *module_path, char *context, enum Type type, enum Type secondary_type) {
     removeFunctionIfDefined(name);
     _Function* function = (struct _Function*)calloc(1, sizeof(_Function));
     function->name = malloc(1 + strlen(name));
@@ -175,11 +175,8 @@ _Function* declareFunction(char *name, enum Type type, enum Type secondary_type)
     function->decision_functions.capacity = 0;
     function->decision_functions.size = 0;
 
-    char *module = module_stack.arr[module_stack.size - 1];
-    unsigned short parent_context = 1;
-    if (_ast_root->file_count > 1) parent_context = 2;
-    function->context = _ast_root->files[_ast_root->file_count - parent_context]->module_path;
-    function->module_context = _ast_root->files[_ast_root->file_count - 1]->module_path;
+    function->context = context;
+    function->module_context = module_path;
     function->module = malloc(1 + strlen(module));
     strcpy(function->module, module);
 
@@ -215,8 +212,8 @@ void startFunctionScope(_Function* function) {
     pushExecutedFunctionStack(function_call);
 }
 
-_Function* startFunctionNew(char *name, char *module) {
-    function_mode = getFunction(name, module);
+_Function* startFunctionNew(char *name) {
+    function_mode = getFunctionByModuleContext(name, _ast_root->files[current_file_index]->module_path);
 
     startFunctionScope(function_mode);
     for (unsigned short i = 0; i < function_mode->parameter_count; i++) {
@@ -463,8 +460,6 @@ void callFunctionCleanUpCommon() {
 }
 
 _Function* getFunction(char *name, char *module) {
-    unsigned short context_index = current_file_index;
-    if (context_index > 0) context_index--;
     function_cursor = start_function;
     while (function_cursor != NULL) {
         if (module == NULL && strcmp(function_cursor->module, "") != 0) {
@@ -473,7 +468,7 @@ _Function* getFunction(char *name, char *module) {
         }
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         criteria = criteria && (
-            strcmp(function_cursor->context, _ast_root->files[context_index]->module_path) == 0
+            strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - 1]) == 0
         );
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {

@@ -254,13 +254,13 @@ register_functions_label:
         prependModuleToModuleBuffer(ast_node->strings[0]);
         break;
     case AST_MODULE_IMPORT:
-        handleModuleImport(NULL, false);
+        // handleModuleImport(NULL, false);
         break;
     case AST_MODULE_IMPORT_AS:
-        handleModuleImport(ast_node->strings[0], false);
+        // handleModuleImport(ast_node->strings[0], false);
         break;
     case AST_MODULE_IMPORT_PARTIAL:
-        handleModuleImport(NULL, true);
+        // handleModuleImport(NULL, true);
         break;
     case AST_DECISION_DEFINE:
         decision_mode->decision_node = ast_node->right;
