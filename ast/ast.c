@@ -1030,6 +1030,9 @@ void addFile()
     SpecList* imports = (struct SpecList*)calloc(1, sizeof(SpecList));
     imports->spec_count = 0;
     file->imports = imports;
+    ExprList* aliases = (struct ExprList*)calloc(1, sizeof(ExprList));
+    aliases->expr_count = 0;
+    file->aliases = aliases;
     _ast_root->files = realloc(
         _ast_root->files,
         sizeof(File) * ++_ast_root->file_count

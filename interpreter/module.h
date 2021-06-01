@@ -44,7 +44,6 @@ extern unsigned short module_parsing;
 void initMainContext();
 void appendModuleToModuleBuffer(char *name);
 void prependModuleToModuleBuffer(char *name);
-void handleModuleImport(char *module_name, bool directly_import, char *parent_context);
 void moduleImportParse(char *module_path);
 char* resolveModulePath(char *module_name, bool directly_import, char *parent_context);
 void moduleImportCleanUp(char *module_path);

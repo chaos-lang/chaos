@@ -25,6 +25,7 @@
 
 #include "../ast/ast.h"
 #include "../vm/cpu.h"
+#include "../interpreter/module_new.h"
 
 typedef struct i64_array {
     i64* arr;

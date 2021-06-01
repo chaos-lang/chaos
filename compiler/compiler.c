@@ -48,6 +48,18 @@ i64_array* compile(ASTRoot* ast_root)
             Stmt* stmt = stmt_list->stmts[j - 1];
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
                 Decl* decl = stmt->v.decl_stmt->decl;
+
+                if (file->aliases->expr_count != 0) {
+                    bool _continue = true;
+                    for (unsigned long i = 0; i < file->aliases->expr_count; i++) {
+                        if (strcmp(decl->v.func_decl->name->v.ident->name, file->aliases->exprs[i]->v.alias_expr->name->v.ident->name) == 0)
+                            _continue = false;
+                    }
+
+                    if (_continue)
+                        continue;
+                }
+
                 function_mode = declareFunction(
                     decl->v.func_decl->name->v.ident->name,
                     file->module,
@@ -77,8 +89,22 @@ i64_array* compile(ASTRoot* ast_root)
         // Compile functions
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
             Stmt* stmt = stmt_list->stmts[j - 1];
-            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind)
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
+                Decl* decl = stmt->v.decl_stmt->decl;
+
+                if (file->aliases->expr_count != 0) {
+                    bool _continue = true;
+                    for (unsigned long i = 0; i < file->aliases->expr_count; i++) {
+                        if (strcmp(decl->v.func_decl->name->v.ident->name, file->aliases->exprs[i]->v.alias_expr->name->v.ident->name) == 0)
+                            _continue = false;
+                    }
+
+                    if (_continue)
+                        continue;
+                }
+
                 compileStmt(program, stmt);
+            }
         }
 
         popModuleStack();
@@ -2732,13 +2758,18 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
     }
     case ImportSpec_kind: {
         char* name = compile_module_selector(spec->v.import_spec->module_selector);
+        File* file = NULL;
         if (spec->v.import_spec->ident != NULL) {
-            handleModuleImport(spec->v.import_spec->ident->v.ident->name, false, import_parent_context->module_path);
+            file = handleModuleImport(spec->v.import_spec->ident->v.ident->name, false, import_parent_context->module_path);
         } else {
-            if (spec->v.import_spec->asterisk != NULL)
-                handleModuleImport(name, true, import_parent_context->module_path);
+            if (spec->v.import_spec->asterisk != NULL || spec->v.import_spec->names->expr_count > 1)
+                file = handleModuleImport(name, true, import_parent_context->module_path);
             else
-                handleModuleImport(name, false, import_parent_context->module_path);
+                file = handleModuleImport(name, false, import_parent_context->module_path);
+        }
+
+        for (unsigned long i = 0; i < spec->v.import_spec->names->expr_count; i++) {
+            addExpr(file->aliases, spec->v.import_spec->names->exprs[i]);
         }
         break;
     }

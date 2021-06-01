@@ -48,13 +48,6 @@ void prependModuleToModuleBuffer(char *name) {
     prepend_to_array(&modules_buffer, name);
 }
 
-void handleModuleImport(char *module_name, bool directly_import, char *parent_context) {
-    addFile();
-    char *module_path = resolveModulePath(module_name, directly_import, parent_context);
-    moduleImportParse(module_path);
-    // moduleImportCleanUp(module_path);
-}
-
 void moduleImportParse(char *module_path) {
     if (
         strcmp(

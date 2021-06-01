@@ -743,6 +743,7 @@ typedef struct SpecList {
 typedef struct File {
     struct SpecList* imports;
     struct StmtList* stmt_list;
+    struct ExprList* aliases;
     char *module;
     char *module_path;
     char *context;
