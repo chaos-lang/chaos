@@ -2762,7 +2762,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         if (spec->v.import_spec->ident != NULL) {
             file = handleModuleImport(spec->v.import_spec->ident->v.ident->name, false, import_parent_context->module_path);
         } else {
-            if (spec->v.import_spec->asterisk != NULL || spec->v.import_spec->names->expr_count > 1)
+            if (spec->v.import_spec->asterisk != NULL || spec->v.import_spec->names->expr_count > 0)
                 file = handleModuleImport(name, true, import_parent_context->module_path);
             else
                 file = handleModuleImport(name, false, import_parent_context->module_path);
@@ -3276,8 +3276,15 @@ void load_any(i64_array* program, Symbol* symbol)
 
 char* compile_module_selector(Expr* module_selector)
 {
-    char* name = module_selector->v.module_selector->x->v.ident->name;
+    char* name = NULL;
+    if (module_selector->v.module_selector->parent_dir_spec != NULL) {
+        name = malloc(1 + strlen(".."));
+        strcpy(name, "..");
+    } else {
+        name = module_selector->v.module_selector->x->v.ident->name;
+    }
     appendModuleToModuleBuffer(name);
+
     if (
         module_selector->v.module_selector->sel != NULL
         &&
