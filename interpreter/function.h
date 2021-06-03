@@ -69,7 +69,9 @@ typedef struct _Function {
     char *module;
     long long optional_parameters_addr;
     long long body_addr;
+    _Function* ref;
     bool is_dynamic;
+    bool is_compiled;
 } _Function;
 
 _Function* function_cursor;
@@ -133,6 +135,7 @@ void freeFunctionParametersMode();
 void resetFunctionParametersMode();
 _Function* getFunction(char *name, char *module);
 _Function* getFunctionByModuleContext(char *name, char *module_context);
+_Function* checkDuplicateFunction(char *name, char *module_path);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
 FunctionCall* callFunction(char *name, char *module);

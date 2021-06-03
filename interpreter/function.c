@@ -157,10 +157,11 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 }
 
 _Function* declareFunction(char *name, char *module, char *module_path, char *context, enum Type type, enum Type secondary_type) {
-    removeFunctionIfDefined(name);
     _Function* function = (struct _Function*)calloc(1, sizeof(_Function));
     function->name = malloc(1 + strlen(name));
     function->line_no = kaos_lineno;
+    function->is_compiled = false;
+    function->ref = NULL;
 
     strcpy(function->name, name);
     function->type = type;
@@ -214,6 +215,8 @@ void startFunctionScope(_Function* function) {
 
 _Function* startFunctionNew(char *name) {
     function_mode = getFunctionByModuleContext(name, _ast_root->files[current_file_index]->module_path);
+    if (function_mode->is_compiled)
+        return function_mode;
 
     startFunctionScope(function_mode);
     for (unsigned short i = 0; i < function_mode->parameter_count; i++) {
@@ -512,6 +515,24 @@ _Function* getFunctionByModuleContext(char *name, char *module_context) {
             (module_context == NULL || strcmp(module_context, "") == 0) ? "<module>" : module_context
         );
     }
+    return NULL;
+}
+
+_Function* checkDuplicateFunction(char *name, char *module_path) {
+    function_cursor = start_function;
+    while (function_cursor != NULL) {
+        if (
+            strcmp(function_cursor->name, name) == 0
+            &&
+            strcmp(function_cursor->module_context, module_path) == 0
+        ) {
+            _Function* function = function_cursor;
+            return function;
+        }
+
+        function_cursor = function_cursor->next;
+    }
+
     return NULL;
 }
 

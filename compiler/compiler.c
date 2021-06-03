@@ -60,6 +60,11 @@ i64_array* compile(ASTRoot* ast_root)
                         continue;
                 }
 
+                _Function* duplicate_function = (checkDuplicateFunction(
+                    decl->v.func_decl->name->v.ident->name,
+                    file->module_path
+                ));
+
                 function_mode = declareFunction(
                     decl->v.func_decl->name->v.ident->name,
                     file->module,
@@ -68,6 +73,12 @@ i64_array* compile(ASTRoot* ast_root)
                     K_VOID,
                     K_VOID
                 );
+
+                if (duplicate_function != NULL) {
+                    function_mode->ref = duplicate_function;
+                    continue;
+                }
+
                 startFunctionScope(function_mode);
                 function_mode->optional_parameters_addr = program->size - 1;
                 compileSpec(program, decl->v.func_decl->type->v.func_type->params);
@@ -78,6 +89,8 @@ i64_array* compile(ASTRoot* ast_root)
 
         popModuleStack();
     }
+
+    // printFunctionTable();
 
     // Compile functions in all parsed files
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
@@ -142,7 +155,10 @@ void fillCallJumps(i64_array* program)
     for (unsigned long i = 0; i < call_body_jumps->size; i++) {
         i64 addr = call_body_jumps->arr[i];
         _Function* function = (void *)program->arr[addr];
-        program->arr[addr] = function->body_addr;
+        if (function->ref != NULL)
+            program->arr[addr] = function->ref->body_addr;
+        else
+            program->arr[addr] = function->body_addr;
     }
 }
 
@@ -2185,6 +2201,9 @@ void compileDecl(i64_array* program, Decl* decl)
     }
     case FuncDecl_kind: {
         _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+        if (function->is_compiled)
+            break;
+
         function->body_addr = program->size - 1;
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
@@ -2194,6 +2213,7 @@ void compileDecl(i64_array* program, Decl* decl)
 
         push_instr(program, JMPB);
 
+        function_mode->is_compiled = true;
         endFunction();
         break;
     }
