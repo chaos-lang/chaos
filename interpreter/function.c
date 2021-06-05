@@ -861,7 +861,8 @@ void removeFunction(_Function* function) {
 
 void freeFunction(_Function* function) {
     free(function->name);
-    free(function->parameters);
+    if (function->ref == NULL)
+        free(function->parameters);
     for (unsigned i = 0; i < function->decision_functions.size; i++) {
         free(function->decision_expressions.arr[i]);
         free(function->decision_functions.arr[i]);

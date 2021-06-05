@@ -1038,6 +1038,7 @@ void cpu_store(cpu *c, i64 heap, i64 value)
     if (heap > (c->heap_size - 1)) {
         c->heap_size = heap + 1;
         c->mem = (i64*)realloc(c->mem, c->heap_size * sizeof(i64));
+        c->mems[c->memp - 1] = c->mem;
     }
     c->mem[heap] = value;
 }

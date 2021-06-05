@@ -76,6 +76,9 @@ i64_array* compile(ASTRoot* ast_root)
 
                 if (duplicate_function != NULL) {
                     function_mode->ref = duplicate_function;
+                    function_mode->parameter_count = duplicate_function->parameter_count;
+                    function_mode->optional_parameter_count = duplicate_function->optional_parameter_count;
+                    function_mode->parameters = duplicate_function->parameters;
                     continue;
                 }
 
