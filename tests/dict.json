@@ -4904,6 +4904,249 @@
                         "_type": "Ident",
                         "name": "a"
                     }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "a"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "DictType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "a"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "1"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "b"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "2"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "c"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "3"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "b"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "DictType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "a"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "4"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "b"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "5"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "c"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "6"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "c"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "DictType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "a"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "7"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "b"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "8"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "c"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "9"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "a"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "b"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "c"
+                        }
+                    }
                 }
             ]
         }

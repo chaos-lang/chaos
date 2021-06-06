@@ -198,9 +198,10 @@ int initParser(int argc, char** argv) {
         yyparse();
 
         if (print_ast || debug_level > 0) {
-            printf("Abstract Syntax Tree (AST):\n");
+            if (!print_ast)
+                printf("Abstract Syntax Tree (AST):\n");
             printAST(_ast_root);
-            if (debug_level == 1)
+            if (debug_level == 1 || print_ast)
                 exit(0);
         }
 

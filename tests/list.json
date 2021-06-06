@@ -5181,6 +5181,246 @@
                         "_type": "Ident",
                         "name": "a"
                     }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "ListType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "2"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "3"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "ListType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "4"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "6"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "ListType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "7"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "8"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "9"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "0"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "2"
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": "x"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": "y"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": "z"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Any",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "el"
+                        },
+                        "expr": {
+                            "_type": "IndexExpr",
+                            "x": {
+                                "_type": "Ident",
+                                "name": "a"
+                            },
+                            "index": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "el"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "g"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "el"
+                    }
                 }
             ]
         }
