@@ -56,8 +56,24 @@ i64_array* compile(ASTRoot* ast_root)
                             _continue = false;
                     }
 
-                    if (_continue)
+                    if (_continue) {
+                        function_mode = declareFunction(
+                            decl->v.func_decl->name->v.ident->name,
+                            "",
+                            file->module_path,
+                            file->module_path,
+                            K_VOID,
+                            K_VOID
+                        );
+
+                        startFunctionScope(function_mode);
+                        function_mode->optional_parameters_addr = program->size - 1;
+                        compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+                        push_instr(program, JMPB);
+                        endFunction();
+
                         continue;
+                    }
                 }
 
                 _Function* duplicate_function = (checkDuplicateFunction(
@@ -86,6 +102,23 @@ i64_array* compile(ASTRoot* ast_root)
                 function_mode->optional_parameters_addr = program->size - 1;
                 compileSpec(program, decl->v.func_decl->type->v.func_type->params);
                 push_instr(program, JMPB);
+
+                if (strcmp(file->module_path, file->context) != 0) {
+                    _Function* context_function = declareFunction(
+                        decl->v.func_decl->name->v.ident->name,
+                        "",
+                        file->module_path,
+                        file->module_path,
+                        K_VOID,
+                        K_VOID
+                    );
+
+                    context_function->ref = function_mode;
+                    context_function->parameter_count = function_mode->parameter_count;
+                    context_function->optional_parameter_count = function_mode->optional_parameter_count;
+                    context_function->parameters = function_mode->parameters;
+                }
+
                 endFunction();
             }
         }
@@ -106,19 +139,6 @@ i64_array* compile(ASTRoot* ast_root)
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
             Stmt* stmt = stmt_list->stmts[j - 1];
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
-                Decl* decl = stmt->v.decl_stmt->decl;
-
-                if (file->aliases->expr_count != 0) {
-                    bool _continue = true;
-                    for (unsigned long i = 0; i < file->aliases->expr_count; i++) {
-                        if (strcmp(decl->v.func_decl->name->v.ident->name, file->aliases->exprs[i]->v.alias_expr->name->v.ident->name) == 0)
-                            _continue = false;
-                    }
-
-                    if (_continue)
-                        continue;
-                }
-
                 compileStmt(program, stmt);
             }
         }
