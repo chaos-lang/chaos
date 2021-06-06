@@ -82,6 +82,7 @@ int defineFunction(
 #else
     startFunction(name, type, secondary_type);
 #endif
+    startFunctionScope(function_mode);
     endFunction();
     return 0;
 }

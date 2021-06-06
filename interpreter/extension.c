@@ -91,13 +91,32 @@ void callRegisterInDynamicLibrary(char* dynamic_library_path) {
 #endif
 }
 
-void callFunctionFromDynamicLibrary(_Function* function) {
+void callFunctionFromDynamicLibrary(_Function* function, cpu* c) {
     char* function_name = "";
     function_name = strcat_ext(function_name, __KAOS_EXTENSION_FUNCTION_PREFIX__);
     function_name = strcat_ext(function_name, function->name);
     dynamic_library dylib = getFunctionFromDynamicLibrary(function->module_context, function_name);
+    startFunctionScope(function);
+    populateCallParametersDynamicLibrary(function, c);
     dylib.func();
+    handleFunctionReturnDynamicLibrary(function, c);
+    endFunction();
     free(function_name);
+}
+
+void populateCallParametersDynamicLibrary(_Function* function, cpu* c) {
+    for (unsigned short i = 0; i < function->parameter_count; i++) {
+        Symbol* parameter = function->parameters[i];
+
+        c->sp++;
+        i64 value = c->stack[c->sp++];
+        addSymbolInt(parameter->secondary_name, value);
+    }
+}
+
+void handleFunctionReturnDynamicLibrary(_Function* function, cpu* c) {
+    c->r[R0A] = V_INT;
+    c->r[R1A] = function->symbol->value.i;
 }
 
 dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name) {
@@ -125,13 +144,6 @@ dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* 
 void returnVariable(Symbol* symbol) {
     scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
     function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
-        NULL,
-        symbol->type,
-        symbol,
-        symbol->secondary_type
-    );
-
-    decision_symbol_chain = createCloneFromSymbol(
         NULL,
         symbol->type,
         symbol,

@@ -1153,6 +1153,15 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             enum Type type = parameter->type;
             i64 addr = parameter->addr;
 
+            if (function->is_dynamic) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, PUSH);
+                push_instr(program, R0A);
+                continue;
+            }
+
             push_instr(program, LII);
             push_instr(program, R7A);
             push_instr(program, program->heap);
@@ -1599,14 +1608,19 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             }
         }
 
-        push_instr(program, SJMPB);
-        push_instr(program, program->size + 3);
+        if (function->is_dynamic) {
+            push_instr(program, CALLEXT);
+            push_instr(program, (i64)(void *)function);
+        } else {
+            push_instr(program, SJMPB);
+            push_instr(program, program->size + 3);
 
-        push_instr(program, CALL);
+            push_instr(program, CALL);
 
-        push_instr(program, JMP);
-        push_instr(program, (i64)(void *)function);
-        push_instr(call_body_jumps, program->size - 1);
+            push_instr(program, JMP);
+            push_instr(program, (i64)(void *)function);
+            push_instr(call_body_jumps, program->size - 1);
+        }
         return function->value_type + 1;
         break;
     }

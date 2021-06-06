@@ -379,9 +379,9 @@ FunctionCall* callFunction(char *name, char *module) {
     }
 #endif
 
-    if (function->is_dynamic) {
-        callFunctionFromDynamicLibrary(function);
-    }
+    // if (function->is_dynamic) {
+    //     callFunctionFromDynamicLibrary(function);
+    // }
 
     return function_call;
 }

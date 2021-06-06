@@ -344,6 +344,12 @@ void execute(cpu *c)
         free(c->mems[c->memp + 1]);
         break;
     }
+    case CALLEXT: {
+        _Function* function = (void *)c->dest;
+        callFunctionFromDynamicLibrary(function, c);
+        c->pc++;
+        break;
+    }
     case SHL:
         c->r[c->dest] <<= c->r[c->src];
         c->pc += 2;

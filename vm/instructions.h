@@ -41,7 +41,7 @@ enum instr {
     LIND, KSRCH,
     JMPB, SJMPB,
     BRK, SBRK, CONT, SCONT,
-    CALL, CALLX,
+    CALL, CALLX, CALLEXT,
     DEBUG,
     HLT, EXIT,
     NUM_INSTRUCTIONS

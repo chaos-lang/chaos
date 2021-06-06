@@ -213,6 +213,10 @@ void emitBytecode(cpu *c)
     case CALLX:
         printf("%s\n", "CALLX");
         break;
+    case CALLEXT:
+        printf("%s %lld\n", "CALLEXT", c->dest);
+        c->pc++;
+        break;
     case DEBUG:
         printf("%s\n", "DEBUG");
         break;
