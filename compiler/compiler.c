@@ -1139,12 +1139,14 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
         ExprList* expr_list = expr->v.call_expr->args;
 
-        push_instr(program, SJMPB);
-        push_instr(program, program->size + 2);
+        if (!function->is_dynamic) {
+            push_instr(program, SJMPB);
+            push_instr(program, program->size + 2);
 
-        push_instr(program, JMP);
-        push_instr(program, (i64)(void *)function);
-        push_instr(call_optional_jumps, program->size - 1);
+            push_instr(program, JMP);
+            push_instr(program, (i64)(void *)function);
+            push_instr(call_optional_jumps, program->size - 1);
+        }
 
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
             Expr* expr = expr_list->exprs[expr_list->expr_count - i];
@@ -1609,6 +1611,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
 
         if (function->is_dynamic) {
+            push_instr(program, LII);
+            push_instr(program, R5A);
+            push_instr(program, expr_list->expr_count);
+
             push_instr(program, CALLEXT);
             push_instr(program, (i64)(void *)function);
         } else {

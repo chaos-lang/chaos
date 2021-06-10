@@ -802,12 +802,12 @@ Symbol* finishComplexMode(char *name, enum Type type) {
         strcpy(complex_mode->name, name);
     }
     complex_mode->secondary_type = type;
-    enum Type illegal_type = isComplexIllegal(type);
-    if (illegal_type != (enum Type)-1) {
-        if (name != NULL)
-            free(name);
-        throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST, getTypeName(illegal_type), complex_mode->name);
-    }
+    // enum Type illegal_type = isComplexIllegal(type);
+    // if (illegal_type != (enum Type)-1) {
+    //     if (name != NULL)
+    //         free(name);
+    //     throw_error(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST, getTypeName(illegal_type), complex_mode->name);
+    // }
     popComplexModeStack();
     return complex_mode;
 }
