@@ -113,16 +113,18 @@ meta_start:
 ;
 
 parser:
-    | line {}
+    | parser line {
+        if (is_interactive)
+            compile_interactive();
+    }
 ;
 
-line:
-    | T_NEWLINE line {}
-    | import line {
+line: T_NEWLINE
+    | import {
         addSpec(_ast_root->files[_ast_root->file_count - 1]->imports, $1);
     }
-    | stmt line {
-        addStmt(_ast_root->files[_ast_root->file_count - 1]->stmt_list, $1);
+    | stmt {
+        addStmtLine(_ast_root->files[_ast_root->file_count - 1]->stmt_list, $1);
     }
 ;
 

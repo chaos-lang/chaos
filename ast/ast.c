@@ -1067,10 +1067,46 @@ void addSpec(SpecList* spec_list, Spec* spec)
     spec_list->specs[spec_list->spec_count - 1] = spec;
 }
 
+void addStmtLine(StmtList* stmt_list, Stmt* stmt)
+{
+    stmt_list->stmts = realloc(
+        stmt_list->stmts,
+        sizeof(Stmt) * ++stmt_list->stmt_count
+    );
+
+    for (size_t k = stmt_list->stmt_count; k > 0; k--) {
+        stmt_list->stmts[k] = stmt_list->stmts[k - 1];
+    }
+
+    stmt_list->stmts[0] = stmt;
+}
+
+void addSpecLine(SpecList* spec_list, Spec* spec)
+{
+    spec_list->specs = realloc(
+        spec_list->specs,
+        sizeof(Spec) * ++spec_list->spec_count
+    );
+
+    for (size_t k = spec_list->spec_count; k > 0; k--) {
+        spec_list->specs[k] = spec_list->specs[k - 1];
+    }
+
+    spec_list->specs[0] = spec;
+}
+
 FuncDeclCom* funcDeclCom(Spec* func_type, Expr* ident)
 {
     FuncDeclCom* func_decl_com = (struct FuncDeclCom*)calloc(1, sizeof(FuncDeclCom));
     func_decl_com->func_type = func_type;
     func_decl_com->ident = ident;
     return func_decl_com;
+}
+
+void turnLastExprStmtIntoPrintStmt()
+{
+    Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
+    if (stmt->kind == ExprStmt_kind) {
+        _ast_root->files[0]->stmt_list->stmts[0] = printStmt(NULL, stmt->v.expr_stmt->x, stmt->ast->lineno);
+    }
 }

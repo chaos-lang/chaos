@@ -60,7 +60,11 @@ char *program_code;
 char *main_interpreted_module;
 jmp_buf InteractiveShellErrorAbsorber;
 
+i64 prev_stmt_count;
+i64_array* interactive_program;
+
 int initParser(int argc, char** argv);
+void compile_interactive();
 void freeEverything();
 void yyerror(const char* s);
 

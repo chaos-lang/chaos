@@ -25,17 +25,19 @@
 void emit(i64_array* program)
 {
     cpu *c = new_cpu(program->arr, program->heap, 0, 0);
-    print_cpu(c);
+    print_cpu(c, program->hlt_count);
     free_cpu(c);
 }
 
-void print_cpu(cpu *c)
+void print_cpu(cpu *c, i64 hlt_count)
 {
-	while (c->inst != HLT) {
-		fetch(c);
-		emitBytecode(c);
-	}
-    printf("%s\n", "HLT");
+    for (i64 i = 0; i < hlt_count; i++) {
+        do {
+            fetch(c);
+            emitBytecode(c);
+        } while (c->inst != HLT);
+        printf("%s\n", "HLT");
+    }
 }
 
 void emitBytecode(cpu *c)

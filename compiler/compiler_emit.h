@@ -27,7 +27,7 @@
 #include "../vm/cpu.h"
 
 void emit(i64_array* program);
-void print_cpu(cpu *c);
+void print_cpu(cpu *c, i64 hlt_count);
 void emitBytecode(cpu *c);
 
 #endif

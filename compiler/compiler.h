@@ -33,6 +33,7 @@ typedef struct i64_array {
     i64 size;
     i64 heap;
     i64 start;
+    i64 hlt_count;
 } i64_array;
 
 i64_array* compile(ASTRoot* ast_root);
@@ -68,5 +69,7 @@ void load_dict(i64_array* program, Symbol* symbol);
 void load_any(i64_array* program, Symbol* symbol);
 
 char* compile_module_selector(Expr* module_selector);
+
+cpu *interactive_c;
 
 #endif

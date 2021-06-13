@@ -163,6 +163,7 @@ i64_array* compile(ASTRoot* ast_root)
     }
 
     push_instr(program, HLT);
+    program->hlt_count++;
     fillCallJumps(program);
     return program;
 }
@@ -2885,6 +2886,7 @@ i64_array* initProgram()
     program->arr = NULL;
     program->size = 0;
     program->heap = 0;
+    program->hlt_count = 0;
     return program;
 }
 

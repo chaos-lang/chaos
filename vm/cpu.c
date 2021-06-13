@@ -60,10 +60,10 @@ void free_cpu(cpu *c)
 
 void run_cpu(cpu *c)
 {
-    while (c->inst != HLT) {
+    do {
         fetch(c);
         execute(c);
-    }
+    } while (c->inst != HLT);
 }
 
 void fetch(cpu *c)
@@ -501,6 +501,8 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case EXIT:
+        if (is_interactive)
+            print_bye_bye();
         exit(c->r[R1A]);
         break;
     case DEBUG:

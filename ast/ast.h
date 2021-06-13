@@ -821,6 +821,9 @@ void addFile();
 void addExpr(ExprList* expr_list, Expr* expr);
 void addSpec(SpecList* spec_list, Spec* spec);
 void addStmt(StmtList* stmt_list, Stmt* stmt);
+void addStmtLine(StmtList* stmt_list, Stmt* stmt);
+void addSpecLine(SpecList* spec_list, Spec* spec);
 FuncDeclCom* funcDeclCom(Spec* func_type, Expr* ident);
+void turnLastExprStmtIntoPrintStmt();
 
 #endif

@@ -170,6 +170,8 @@ int initParser(int argc, char** argv) {
 #   endif
         greet();
         phase = INIT_PROGRAM;
+        interactive_program = initProgram();
+        interactive_c = new_cpu(interactive_program->arr, interactive_program->heap, 0, debug_level);
     } else {
         program_code = fileGetContents(program_file_path);
         size_t program_length = strlen(program_code);
@@ -183,6 +185,7 @@ int initParser(int argc, char** argv) {
     initMainFunction();
 
     main_interpreted_module = NULL;
+    prev_stmt_count = 0;
 
     do {
         if (is_interactive) {
@@ -196,6 +199,9 @@ int initParser(int argc, char** argv) {
         main_interpreted_module = malloc(1 + strlen(_ast_root->files[_ast_root->file_count - 1]->module_path));
         strcpy(main_interpreted_module, _ast_root->files[_ast_root->file_count - 1]->module_path);
         yyparse();
+
+        if (is_interactive)
+            break;
 
         if (print_ast || debug_level > 0) {
             if (!print_ast)
@@ -235,6 +241,29 @@ int initParser(int argc, char** argv) {
     return 0;
 }
 #endif
+
+void compile_interactive()
+{
+    if (_ast_root->files[0]->stmt_list->stmt_count <= prev_stmt_count)
+        return;
+    prev_stmt_count = _ast_root->files[0]->stmt_list->stmt_count;
+    turnLastExprStmtIntoPrintStmt();
+    if (interactive_c->debug_level > 0) {
+        printf("Abstract Syntax Tree (AST):\n");
+        printAST(_ast_root);
+    }
+    // printf("Compile STMT index: %lu\n", _ast_root->files[0]->stmt_list->stmt_count - 1);
+    compileStmt(interactive_program, _ast_root->files[0]->stmt_list->stmts[0]);
+    push_instr(interactive_program, HLT);
+    interactive_program->hlt_count++;
+    if (interactive_c->debug_level > 1) {
+        printf("\nBytecode:\n");
+        emit(interactive_program);
+    }
+    interactive_c->program = interactive_program->arr;
+    // printf("%lld\n", interactive_c->pc);
+    run_cpu(interactive_c);
+}
 
 void freeEverything() {
     freeAllSymbols();
