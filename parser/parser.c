@@ -171,7 +171,7 @@ int initParser(int argc, char** argv) {
         greet();
         phase = INIT_PROGRAM;
         interactive_program = initProgram();
-        interactive_c = new_cpu(interactive_program->arr, interactive_program->heap, 0, debug_level);
+        interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, debug_level);
     } else {
         program_code = fileGetContents(program_file_path);
         size_t program_length = strlen(program_code);
