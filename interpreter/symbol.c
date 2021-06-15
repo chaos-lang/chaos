@@ -46,7 +46,6 @@ char *value_type_names[] = {
 };
 
 unsigned long long symbol_id_counter = 0;
-bool is_complex_parsing = false;
 bool disable_complex_mode = false;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type) {

@@ -24,7 +24,7 @@
 
 unsigned long long ast_node_id_counter = 0;
 bool enable_branch_out = false;
-unsigned long long loops_inside_function_counter = 0;
+unsigned long long shell_indicator_block_counter = 0;
 
 ASTNode* addASTNodeBase(enum ASTNodeType node_type, int lineno, char *strings[], size_t strings_size, union Value value, enum ValueType value_type) {
     ASTNode* ast_node;
@@ -146,9 +146,9 @@ void ASTBranchOut() {
 }
 
 void ASTMergeBack() {
-    if (loops_inside_function_counter > 0)
-        loops_inside_function_counter--;
-    if (ast_node_cursor_backup != NULL && loops_inside_function_counter == 0) {
+    if (shell_indicator_block_counter > 0)
+        shell_indicator_block_counter--;
+    if (ast_node_cursor_backup != NULL && shell_indicator_block_counter == 0) {
         ast_node_cursor = ast_node_cursor_backup;
         ast_node_cursor_backup = NULL;
     }

@@ -37,6 +37,7 @@ extern void recordToken(char *token, int length);
 extern int oerrno;
 extern void yyerror(const char* s);
 extern FILE* tmp_stdin;
+extern unsigned long long shell_indicator_block_counter;
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
 #include "parser.tab.h"
@@ -211,10 +212,10 @@ default:
 "\\"                            {return T_BACKSLASH;}
 "("                             {return T_LPAREN;}
 ")"                             {return T_RPAREN;}
-"["                             {return T_LBRACK;}
-"]"                             {return T_RBRACK;}
-"{"                             {return T_LBRACE;}
-"}"                             {return T_RBRACE;}
+"["                             {shell_indicator_block_counter++; return T_LBRACK;}
+"]"                             {shell_indicator_block_counter--; return T_RBRACK;}
+"{"                             {shell_indicator_block_counter++; return T_LBRACE;}
+"}"                             {shell_indicator_block_counter--; return T_RBRACE;}
 ","                             {return T_COMMA;}
 "."                             {return T_PERIOD;}
 "=="                            {return T_EQL;}
@@ -249,9 +250,9 @@ default:
 "return"                        {return T_RETURN;}
 "default"                       {return T_DEFAULT;}
 
-"times do"                      {return T_TIMES_DO;}
-"end"                           {return T_END;}
-"foreach"                       {return T_FOREACH;}
+"times do"                      {shell_indicator_block_counter++; return T_TIMES_DO;}
+"end"                           {shell_indicator_block_counter--; return T_END;}
+"foreach"                       {shell_indicator_block_counter++; return T_FOREACH;}
 "as"                            {return T_AS;}
 "from"                          {return T_FROM;}
 "INFINITE"                      {return T_INFINITE;}
@@ -280,7 +281,7 @@ default:
 "any"                           {return T_VAR_ANY;}
 "null"                          {return T_NULL;}
 "void"                          {return T_VOID;}
-"def"                           {return T_DEF;}
+"def"                           {shell_indicator_block_counter++; return T_DEF;}
 "import"                        {return T_IMPORT;}
 "break"                         {return T_BREAK;}
 "continue"                      {return T_CONTINUE;}

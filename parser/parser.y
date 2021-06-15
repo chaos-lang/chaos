@@ -44,8 +44,7 @@ extern bool is_interactive;
 bool inject_mode = false;
 
 extern char *main_interpreted_module;
-extern unsigned long long loops_inside_function_counter;
-extern bool is_complex_parsing;
+extern unsigned long long shell_indicator_block_counter;
 %}
 
 %union {
@@ -114,8 +113,16 @@ meta_start:
 
 parser:
     | parser line {
-        if (is_interactive)
+        if (is_interactive) {
             compile_interactive();
+#   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+            if (shell_indicator_block_counter > 0) {
+                printf("%s ", __KAOS_SHELL_INDICATOR_BLOCK__);
+            } else {
+                printf("%s ", __KAOS_SHELL_INDICATOR__);
+            }
+#   endif
+        }
     }
 ;
 
