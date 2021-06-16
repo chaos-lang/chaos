@@ -120,3 +120,9 @@ print b
 print b
 str d = 'come on'
 print b
+
+// Multiple string concatenation
+print "hello" + " " + "world" + " " + "nice" + " " + "great"
+del a
+str a = "red" + " " + "blue" + " " + "green" + " " + "yellow"
+print a

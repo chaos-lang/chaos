@@ -692,14 +692,17 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     case BinaryExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
         shift_registers(program, 8);
+        i64 addr = program->heap;
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
-            push_instr(program, PUSH);
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
             push_instr(program, R1B);
         }
         compileExpr(program, expr->v.binary_expr->x);
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
-            push_instr(program, POP);
+            push_instr(program, LDI);
             push_instr(program, R1B);
+            push_instr(program, addr);
         }
         switch (expr->v.binary_expr->op) {
         case ADD_tok:
@@ -1215,10 +1218,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     len = strlen(expr->v.basic_lit->value.s);
                     break;
                 case BinaryExpr_kind:
-                    len =
-                        strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
-                        +
-                        strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
+                    is_dynamic = true;
                     break;
                 case IndexExpr_kind:
                     len = 1;
@@ -1713,10 +1713,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
                 break;
             case BinaryExpr_kind:
-                len =
-                    strlen(decl->v.var_decl->expr->v.binary_expr->x->v.basic_lit->value.s)
-                    +
-                    strlen(decl->v.var_decl->expr->v.binary_expr->y->v.basic_lit->value.s);
+                is_dynamic = true;
                 break;
             case IndexExpr_kind:
                 len = 1;
@@ -2424,10 +2421,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
                 len = strlen(expr->v.basic_lit->value.s);
                 break;
             case BinaryExpr_kind:
-                len =
-                    strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
-                    +
-                    strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
+                is_dynamic = true;
                 break;
             case IndexExpr_kind:
                 len = 1;
