@@ -23,15 +23,16 @@
 #include "compiler.h"
 
 i64_array* call_body_jumps;
+unsigned long call_body_jumps_index = 0;
 i64_array* call_optional_jumps;
+unsigned long call_optional_jumps_index = 0;
 
 File* import_parent_context = NULL;
 
 i64_array* compile(ASTRoot* ast_root)
 {
     i64_array* program = initProgram();
-    call_body_jumps = initProgram();
-    call_optional_jumps = initProgram();
+    initCallJumps();
 
     // Compile imports
     compileImports(ast_root, program);
@@ -46,81 +47,7 @@ i64_array* compile(ASTRoot* ast_root)
         // Declare functions
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
             Stmt* stmt = stmt_list->stmts[j - 1];
-            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
-                Decl* decl = stmt->v.decl_stmt->decl;
-
-                if (file->aliases->expr_count != 0) {
-                    bool _continue = true;
-                    for (unsigned long i = 0; i < file->aliases->expr_count; i++) {
-                        if (strcmp(decl->v.func_decl->name->v.ident->name, file->aliases->exprs[i]->v.alias_expr->name->v.ident->name) == 0)
-                            _continue = false;
-                    }
-
-                    if (_continue) {
-                        function_mode = declareFunction(
-                            decl->v.func_decl->name->v.ident->name,
-                            "",
-                            file->module_path,
-                            file->module_path,
-                            K_VOID,
-                            K_VOID
-                        );
-
-                        startFunctionScope(function_mode);
-                        function_mode->optional_parameters_addr = program->size - 1;
-                        compileSpec(program, decl->v.func_decl->type->v.func_type->params);
-                        push_instr(program, JMPB);
-                        endFunction();
-
-                        continue;
-                    }
-                }
-
-                _Function* duplicate_function = (checkDuplicateFunction(
-                    decl->v.func_decl->name->v.ident->name,
-                    file->module_path
-                ));
-
-                function_mode = declareFunction(
-                    decl->v.func_decl->name->v.ident->name,
-                    file->module,
-                    file->module_path,
-                    file->context,
-                    K_VOID,
-                    K_VOID
-                );
-
-                if (duplicate_function != NULL) {
-                    function_mode->ref = duplicate_function;
-                    function_mode->parameter_count = duplicate_function->parameter_count;
-                    function_mode->optional_parameter_count = duplicate_function->optional_parameter_count;
-                    function_mode->parameters = duplicate_function->parameters;
-                    continue;
-                }
-
-                startFunctionScope(function_mode);
-                function_mode->optional_parameters_addr = program->size - 1;
-                compileSpec(program, decl->v.func_decl->type->v.func_type->params);
-                push_instr(program, JMPB);
-
-                if (strcmp(file->module_path, file->context) != 0) {
-                    _Function* context_function = declareFunction(
-                        decl->v.func_decl->name->v.ident->name,
-                        "",
-                        file->module_path,
-                        file->module_path,
-                        K_VOID,
-                        K_VOID
-                    );
-
-                    context_function->ref = function_mode;
-                    context_function->parameter_count = function_mode->parameter_count;
-                    context_function->optional_parameter_count = function_mode->optional_parameter_count;
-                    context_function->parameters = function_mode->parameters;
-                }
-
-                endFunction();
-            }
+            declare_function(stmt, file, program);
         }
 
         popModuleStack();
@@ -168,15 +95,23 @@ i64_array* compile(ASTRoot* ast_root)
     return program;
 }
 
+void initCallJumps()
+{
+    call_body_jumps = initProgram();
+    call_optional_jumps = initProgram();
+}
+
 void fillCallJumps(i64_array* program)
 {
-    for (unsigned long i = 0; i < call_optional_jumps->size; i++) {
+    for (unsigned long i = call_optional_jumps_index; i < call_optional_jumps->size; i++) {
+        call_optional_jumps_index++;
         i64 addr = call_optional_jumps->arr[i];
         _Function* function = (void *)program->arr[addr];
         program->arr[addr] = function->optional_parameters_addr;
     }
 
-    for (unsigned long i = 0; i < call_body_jumps->size; i++) {
+    for (unsigned long i = call_body_jumps_index; i < call_body_jumps->size; i++) {
+        call_body_jumps_index++;
         i64 addr = call_body_jumps->arr[i];
         _Function* function = (void *)program->arr[addr];
         if (function->ref != NULL)
@@ -3353,4 +3288,86 @@ char* compile_module_selector(Expr* module_selector)
     } else {
         return name;
     }
+}
+
+bool declare_function(Stmt* stmt, File* file, i64_array* program)
+{
+    if (stmt->kind != DeclStmt_kind || stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
+        return false;
+
+    Decl* decl = stmt->v.decl_stmt->decl;
+
+    if (file->aliases->expr_count != 0) {
+        bool _return = true;
+        for (unsigned long i = 0; i < file->aliases->expr_count; i++) {
+            if (strcmp(decl->v.func_decl->name->v.ident->name, file->aliases->exprs[i]->v.alias_expr->name->v.ident->name) == 0)
+                _return = false;
+        }
+
+        if (_return) {
+            function_mode = declareFunction(
+                decl->v.func_decl->name->v.ident->name,
+                "",
+                file->module_path,
+                file->module_path,
+                K_VOID,
+                K_VOID
+            );
+
+            startFunctionScope(function_mode);
+            function_mode->optional_parameters_addr = program->size - 1;
+            compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+            push_instr(program, JMPB);
+            endFunction();
+
+            return true;
+        }
+    }
+
+    _Function* duplicate_function = (checkDuplicateFunction(
+        decl->v.func_decl->name->v.ident->name,
+        file->module_path
+    ));
+
+    function_mode = declareFunction(
+        decl->v.func_decl->name->v.ident->name,
+        file->module,
+        file->module_path,
+        file->context,
+        K_VOID,
+        K_VOID
+    );
+
+    if (duplicate_function != NULL) {
+        function_mode->ref = duplicate_function;
+        function_mode->parameter_count = duplicate_function->parameter_count;
+        function_mode->optional_parameter_count = duplicate_function->optional_parameter_count;
+        function_mode->parameters = duplicate_function->parameters;
+        return true;
+    }
+
+    startFunctionScope(function_mode);
+    function_mode->optional_parameters_addr = program->size - 1;
+    compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+    push_instr(program, JMPB);
+
+    if (strcmp(file->module_path, file->context) != 0) {
+        _Function* context_function = declareFunction(
+            decl->v.func_decl->name->v.ident->name,
+            "",
+            file->module_path,
+            file->module_path,
+            K_VOID,
+            K_VOID
+        );
+
+        context_function->ref = function_mode;
+        context_function->parameter_count = function_mode->parameter_count;
+        context_function->optional_parameter_count = function_mode->optional_parameter_count;
+        context_function->parameters = function_mode->parameters;
+    }
+
+    endFunction();
+
+    return true;
 }

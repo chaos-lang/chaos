@@ -1106,7 +1106,7 @@ FuncDeclCom* funcDeclCom(Spec* func_type, Expr* ident)
 void turnLastExprStmtIntoPrintStmt()
 {
     Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
-    if (stmt->kind == ExprStmt_kind) {
+    if (stmt->kind == ExprStmt_kind && stmt->v.expr_stmt->x->kind != CallExpr_kind) {
         _ast_root->files[0]->stmt_list->stmts[0] = printStmt(NULL, stmt->v.expr_stmt->x, stmt->ast->lineno);
     }
 }

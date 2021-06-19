@@ -172,6 +172,7 @@ int initParser(int argc, char** argv) {
         phase = INIT_PROGRAM;
         interactive_program = initProgram();
         interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, debug_level);
+        initCallJumps();
     } else {
         program_code = fileGetContents(program_file_path);
         size_t program_length = strlen(program_code);
@@ -253,16 +254,22 @@ void compile_interactive()
         printAST(_ast_root);
     }
     // printf("Compile STMT index: %lu\n", _ast_root->files[0]->stmt_list->stmt_count - 1);
-    compileStmt(interactive_program, _ast_root->files[0]->stmt_list->stmts[0]);
+    Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
+    bool is_function = declare_function(stmt, _ast_root->files[0], interactive_program);
+    compileStmt(interactive_program, stmt);
     push_instr(interactive_program, HLT);
     interactive_program->hlt_count++;
+    if (!is_function)
+        fillCallJumps(interactive_program);
     if (interactive_c->debug_level > 1) {
         printf("\nBytecode:\n");
         emit(interactive_program);
     }
     interactive_c->program = interactive_program->arr;
-    // printf("%lld\n", interactive_c->pc);
-    run_cpu(interactive_c);
+    if (is_function)
+        interactive_c->pc = interactive_program->size - 1;
+    else
+        run_cpu(interactive_c);
 }
 
 void freeEverything() {

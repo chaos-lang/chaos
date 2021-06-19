@@ -37,6 +37,7 @@ typedef struct i64_array {
 } i64_array;
 
 i64_array* compile(ASTRoot* ast_root);
+void initCallJumps();
 void fillCallJumps(i64_array* program);
 void compileImports(ASTRoot* ast_root, i64_array* program);
 void compileStmtList(i64_array* program, StmtList* stmt_list);
@@ -69,6 +70,7 @@ void load_dict(i64_array* program, Symbol* symbol);
 void load_any(i64_array* program, Symbol* symbol);
 
 char* compile_module_selector(Expr* module_selector);
+bool declare_function(Stmt* stmt, File* file, i64_array* program);
 
 cpu *interactive_c;
 
