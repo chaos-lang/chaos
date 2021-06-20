@@ -27,7 +27,7 @@ char *reg_names[] = {
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
 };
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug_level)
+cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
     c->program = program;
@@ -47,6 +47,7 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug_level)
     c->brkp = 0;
     c->cont = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     c->contp = 0;
+    c->ast_ref = ast_ref;
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
     }
@@ -79,6 +80,8 @@ void fetch(cpu *c)
     c->inst = c->program[c->pc];
     c->dest = c->program[c->pc + 1];
     c->src = c->program[c->pc + 2];
+
+    current_ast = c->ast_ref[c->pc];
 }
 
 void execute(cpu *c)

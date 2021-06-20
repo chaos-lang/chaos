@@ -27,6 +27,8 @@
 #include "../vm/cpu.h"
 #include "../interpreter/module_new.h"
 
+typedef struct i64_array i64_array;
+
 typedef struct i64_array {
     i64* arr;
     i64 capacity;
@@ -34,6 +36,7 @@ typedef struct i64_array {
     i64 heap;
     i64 start;
     i64 hlt_count;
+    i64_array* ast_ref;
 } i64_array;
 
 i64_array* compile(ASTRoot* ast_root);
@@ -48,6 +51,7 @@ void compileSpecList(i64_array* program, SpecList* spec_list);
 unsigned short compileSpec(i64_array* program, Spec* spec);
 
 void push_instr(i64_array* program, i64 el);
+void pushProgram(i64_array* program, i64 el);
 i64 popProgram(i64_array* program);
 void freeProgram(i64_array* program);
 i64_array* initProgram();

@@ -44,6 +44,7 @@ typedef struct {
     i64 stack_size;
     i64 heap_size;
     i64 heap;
+    i64 *ast_ref;
 
     // registers
     i64 pc;

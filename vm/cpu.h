@@ -35,7 +35,9 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug);
+i64 current_ast;
+
+cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void eat_until_hlt(cpu *c);

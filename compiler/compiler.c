@@ -31,6 +31,8 @@ extern bool interactively_importing;
 
 File* import_parent_context = NULL;
 
+i64 ast_ref = 0;
+
 i64_array* compile(ASTRoot* ast_root)
 {
     i64_array* program = initProgram();
@@ -128,6 +130,8 @@ void compileStmtList(i64_array* program, StmtList* stmt_list)
 
 void compileStmt(i64_array* program, Stmt* stmt)
 {
+    ast_ref = (i64)(void *)stmt->ast;
+
     switch (stmt->kind) {
     case EchoStmt_kind:
         compileExpr(program, stmt->v.echo_stmt->x);
@@ -511,6 +515,8 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
 unsigned short compileExpr(i64_array* program, Expr* expr)
 {
+    ast_ref = (i64)(void *)expr->ast;
+
     switch (expr->kind) {
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
@@ -1622,6 +1628,8 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
 void compileDecl(i64_array* program, Decl* decl)
 {
+    ast_ref = (i64)(void *)decl->ast;
+
     switch (decl->kind) {
     case VarDecl_kind: {
         enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
@@ -2218,6 +2226,8 @@ void compileSpecList(i64_array* program, SpecList* spec_list)
 
 unsigned short compileSpec(i64_array* program, Spec* spec)
 {
+    ast_ref = (i64)(void *)spec->ast;
+
     switch (spec->kind) {
     case ListType_kind:
         push_instr(program, LII);
@@ -2807,6 +2817,12 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
 void push_instr(i64_array* program, i64 el)
 {
+    pushProgram(program, el);
+    pushProgram(program->ast_ref, ast_ref);
+}
+
+void pushProgram(i64_array* program, i64 el)
+{
     if (program->capacity == 0) {
         program->arr = (i64*)malloc((++program->capacity) * sizeof(i64));
     } else {
@@ -2834,6 +2850,14 @@ i64_array* initProgram()
     program->size = 0;
     program->heap = 0;
     program->hlt_count = 0;
+
+    program->ast_ref = malloc(sizeof *program->ast_ref);
+    program->ast_ref->capacity = 0;
+    program->ast_ref->arr = NULL;
+    program->ast_ref->size = 0;
+    program->ast_ref->heap = 0;
+    program->ast_ref->hlt_count = 0;
+
     return program;
 }
 

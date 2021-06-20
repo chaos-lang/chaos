@@ -171,7 +171,7 @@ int initParser(int argc, char** argv) {
         greet();
         phase = INIT_PROGRAM;
         interactive_program = initProgram();
-        interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, debug_level);
+        interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, interactive_program->ast_ref->arr, debug_level);
         initCallJumps();
     } else {
         program_code = fileGetContents(program_file_path);
@@ -225,7 +225,7 @@ int initParser(int argc, char** argv) {
         if (debug_level > 2)
             printf("\nProgram Output:\n");
 
-        cpu *c = new_cpu(program->arr, program->heap, program->start, debug_level);
+        cpu *c = new_cpu(program->arr, program->heap, program->start, program->ast_ref->arr, debug_level);
         run_cpu(c);
         free_cpu(c);
         // if (!is_interactive) {
@@ -297,6 +297,7 @@ void compile_interactive()
         return;
 
     interactive_c->program = interactive_program->arr;
+    interactive_c->ast_ref = interactive_program->ast_ref->arr;
     if (is_function)
         interactive_c->pc = interactive_program->size - 1;
     else

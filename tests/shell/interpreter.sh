@@ -15,6 +15,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
+    SKIP_TESTS="preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+        continue
+    fi
+
     echo "(interpreter) Running test: ${SUB}/${testname}"
 
     test=$(cat $DIR/$filename | chaos 2>&1 | sed "s|.\[1;41m\s*||g" | sed "s|.\[0;41m\s*||g" \

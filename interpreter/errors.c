@@ -22,7 +22,8 @@
 
 #include "errors.h"
 
-extern int kaos_lineno;
+extern i64 current_ast;
+extern i64 ast_ref;
 extern FILE* tmp_stdin;
 
 void throw_error_var(throw_error_args in) {
@@ -244,6 +245,15 @@ void throw_error_base(
         }
     }
 
+    AST* _current_ast = NULL;
+    if (code == E_INDEX_OUT_OF_RANGE || code == E_INDEX_OUT_OF_RANGE_STRING)
+        // Runtime error
+        _current_ast = (void *)current_ast;
+    else
+        // Compile-time error
+        _current_ast = (void *)ast_ref;
+    current_ast = 0;
+
     char *function_name = NULL;
     if (is_preemptive) {
         function_name = function->name;
@@ -260,7 +270,7 @@ void throw_error_base(
         indent * 2,
         ' ',
         module_path,
-        kaos_lineno,
+        _current_ast->lineno,
         function_name != NULL ? function_name : "<module>"
     );
 
@@ -279,7 +289,7 @@ void throw_error_base(
         line = malloc(4);
         strcpy(line, "???");
     } else {
-        line = get_nth_line(fp_module, kaos_lineno);
+        line = get_nth_line(fp_module, _current_ast->lineno);
 #ifndef CHAOS_COMPILER
         if (fp_module != tmp_stdin)
 #endif

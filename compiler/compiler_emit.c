@@ -24,7 +24,7 @@
 
 void emit(i64_array* program)
 {
-    cpu *c = new_cpu(program->arr, program->heap, 0, 0);
+    cpu *c = new_cpu(program->arr, program->heap, 0, program->ast_ref->arr, 0);
     print_cpu(c, program->hlt_count);
     free_cpu(c);
 }
