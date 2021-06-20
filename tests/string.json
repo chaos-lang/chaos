@@ -1015,6 +1015,158 @@ world\n"
                         "_type": "Ident",
                         "name": "b"
                     }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BinaryExpr",
+                        "x": {
+                            "_type": "BinaryExpr",
+                            "x": {
+                                "_type": "BinaryExpr",
+                                "x": {
+                                    "_type": "BinaryExpr",
+                                    "x": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "hello"
+                                            },
+                                            "op": "+",
+                                            "y": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": " "
+                                            }
+                                        },
+                                        "op": "+",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "string",
+                                            "value": "world"
+                                        }
+                                    },
+                                    "op": "+",
+                                    "y": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": " "
+                                    }
+                                },
+                                "op": "+",
+                                "y": {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": "nice"
+                                }
+                            },
+                            "op": "+",
+                            "y": {
+                                "_type": "BasicLit",
+                                "value_type": "string",
+                                "value": " "
+                            }
+                        },
+                        "op": "+",
+                        "y": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "great"
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BinaryExpr",
+                            "x": {
+                                "_type": "BinaryExpr",
+                                "x": {
+                                    "_type": "BinaryExpr",
+                                    "x": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "BinaryExpr",
+                                                "x": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "red"
+                                                },
+                                                "op": "+",
+                                                "y": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": " "
+                                                }
+                                            },
+                                            "op": "+",
+                                            "y": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "blue"
+                                            }
+                                        },
+                                        "op": "+",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "string",
+                                            "value": " "
+                                        }
+                                    },
+                                    "op": "+",
+                                    "y": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "green"
+                                    }
+                                },
+                                "op": "+",
+                                "y": {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": " "
+                                }
+                            },
+                            "op": "+",
+                            "y": {
+                                "_type": "BasicLit",
+                                "value_type": "string",
+                                "value": "yellow"
+                            }
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
                 }
             ]
         }

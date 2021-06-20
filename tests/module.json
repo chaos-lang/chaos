@@ -18,12 +18,63 @@
                             "parent_dir_spec": null,
                             "x": {
                                 "_type": "Ident",
-                                "name": "hello"
+                                "name": "level1"
+                            },
+                            "sel": {
+                                "_type": "ModuleSelector",
+                                "parent_dir_spec": null,
+                                "x": {
+                                    "_type": "Ident",
+                                    "name": "level2"
+                                },
+                                "sel": {
+                                    "_type": "ModuleSelector",
+                                    "parent_dir_spec": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "module9"
+                                    },
+                                    "sel": null
+                                }
+                            }
+                        }
+                    },
+                    "ident": null,
+                    "names": [
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "module9"
+                            },
+                            "asname": null
+                        }
+                    ],
+                    "asterisk": null
+                },
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module8"
                             },
                             "sel": null
                         }
                     },
-                    "ident": null,
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "module_x"
+                    },
                     "names": [],
                     "asterisk": null
                 },
@@ -41,16 +92,14 @@
                             "parent_dir_spec": null,
                             "x": {
                                 "_type": "Ident",
-                                "name": "module5"
+                                "name": "module7"
                             },
                             "sel": null
                         }
                     },
                     "ident": null,
                     "names": [],
-                    "asterisk": {
-                        "_type": "AsteriskSpec"
-                    }
+                    "asterisk": null
                 },
                 {
                     "_type": "ImportSpec",
@@ -114,14 +163,16 @@
                             "parent_dir_spec": null,
                             "x": {
                                 "_type": "Ident",
-                                "name": "module7"
+                                "name": "module5"
                             },
                             "sel": null
                         }
                     },
                     "ident": null,
                     "names": [],
-                    "asterisk": null
+                    "asterisk": {
+                        "_type": "AsteriskSpec"
+                    }
                 },
                 {
                     "_type": "ImportSpec",
@@ -137,64 +188,13 @@
                             "parent_dir_spec": null,
                             "x": {
                                 "_type": "Ident",
-                                "name": "module8"
+                                "name": "hello"
                             },
                             "sel": null
                         }
                     },
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "module_x"
-                    },
-                    "names": [],
-                    "asterisk": null
-                },
-                {
-                    "_type": "ImportSpec",
-                    "module_selector": {
-                        "_type": "ModuleSelector",
-                        "parent_dir_spec": null,
-                        "x": {
-                            "_type": "Ident",
-                            "name": "modules"
-                        },
-                        "sel": {
-                            "_type": "ModuleSelector",
-                            "parent_dir_spec": null,
-                            "x": {
-                                "_type": "Ident",
-                                "name": "level1"
-                            },
-                            "sel": {
-                                "_type": "ModuleSelector",
-                                "parent_dir_spec": null,
-                                "x": {
-                                    "_type": "Ident",
-                                    "name": "level2"
-                                },
-                                "sel": {
-                                    "_type": "ModuleSelector",
-                                    "parent_dir_spec": null,
-                                    "x": {
-                                        "_type": "Ident",
-                                        "name": "module9"
-                                    },
-                                    "sel": null
-                                }
-                            }
-                        }
-                    },
                     "ident": null,
-                    "names": [
-                        {
-                            "_type": "AliasExpr",
-                            "name": {
-                                "_type": "Ident",
-                                "name": "module9"
-                            },
-                            "asname": null
-                        }
-                    ],
+                    "names": [],
                     "asterisk": null
                 }
             ],

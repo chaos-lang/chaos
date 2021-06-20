@@ -23,7 +23,10 @@
                             "sel": null
                         }
                     },
-                    "ident": null,
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "lib2"
+                    },
                     "names": [],
                     "asterisk": null
                 },
@@ -78,10 +81,7 @@
                             "sel": null
                         }
                     },
-                    "ident": {
-                        "_type": "Ident",
-                        "name": "lib2"
-                    },
+                    "ident": null,
                     "names": [],
                     "asterisk": null
                 }
