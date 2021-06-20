@@ -71,6 +71,8 @@ void load_any(i64_array* program, Symbol* symbol);
 
 char* compile_module_selector(Expr* module_selector);
 bool declare_function(Stmt* stmt, File* file, i64_array* program);
+void declare_functions(ASTRoot* ast_root, i64_array* program);
+void compile_functions(ASTRoot* ast_root, i64_array* program);
 
 cpu *interactive_c;
 

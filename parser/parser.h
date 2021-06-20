@@ -61,7 +61,9 @@ char *main_interpreted_module;
 jmp_buf InteractiveShellErrorAbsorber;
 
 i64 prev_stmt_count;
+i64 prev_import_count;
 i64_array* interactive_program;
+bool interactively_importing;
 
 int initParser(int argc, char** argv);
 void compile_interactive();

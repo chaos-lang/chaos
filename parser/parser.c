@@ -187,6 +187,7 @@ int initParser(int argc, char** argv) {
 
     main_interpreted_module = NULL;
     prev_stmt_count = 0;
+    prev_import_count = 0;
 
     do {
         if (is_interactive) {
@@ -245,26 +246,56 @@ int initParser(int argc, char** argv) {
 
 void compile_interactive()
 {
-    if (_ast_root->files[0]->stmt_list->stmt_count <= prev_stmt_count)
+    bool new_imports = _ast_root->files[0]->imports->spec_count > prev_import_count;
+    bool new_stmts = _ast_root->files[0]->stmt_list->stmt_count > prev_stmt_count;
+    if (!new_imports && !new_stmts)
         return;
+    prev_import_count = _ast_root->files[0]->imports->spec_count;
     prev_stmt_count = _ast_root->files[0]->stmt_list->stmt_count;
     turnLastExprStmtIntoPrintStmt();
     if (interactive_c->debug_level > 0) {
         printf("Abstract Syntax Tree (AST):\n");
         printAST(_ast_root);
     }
-    // printf("Compile STMT index: %lu\n", _ast_root->files[0]->stmt_list->stmt_count - 1);
-    Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
-    bool is_function = declare_function(stmt, _ast_root->files[0], interactive_program);
-    compileStmt(interactive_program, stmt);
-    push_instr(interactive_program, HLT);
-    interactive_program->hlt_count++;
-    if (!is_function)
-        fillCallJumps(interactive_program);
+
+    if (new_imports) {
+        compileImports(_ast_root, interactive_program);
+        _ast_root->files[0]->imports_handled = false;
+        declare_functions(_ast_root, interactive_program);
+        compile_functions(_ast_root, interactive_program);
+        current_file_index = 0;
+
+        push_instr(interactive_program, HLT);
+        interactive_program->hlt_count++;
+        interactive_c->pc = interactive_program->size - 1;
+        if (interactive_c->debug_level > 1) {
+            printf("\nBytecode:\n");
+            emit(interactive_program);
+        }
+
+        return;
+    }
+
+    bool any_stmts = _ast_root->files[0]->stmt_list->stmt_count > 0;
+    bool is_function = false;
+    if (any_stmts) {
+        Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
+        is_function = declare_function(stmt, _ast_root->files[0], interactive_program);
+        compileStmt(interactive_program, stmt);
+        push_instr(interactive_program, HLT);
+        interactive_program->hlt_count++;
+        if (!is_function)
+            fillCallJumps(interactive_program);
+    }
+
     if (interactive_c->debug_level > 1) {
         printf("\nBytecode:\n");
         emit(interactive_program);
     }
+
+    if (!any_stmts)
+        return;
+
     interactive_c->program = interactive_program->arr;
     if (is_function)
         interactive_c->pc = interactive_program->size - 1;

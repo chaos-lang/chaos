@@ -33,6 +33,12 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
+    SKIP_TESTS="preemptive"
+
+    if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
+        continue
+    fi
+
     echo "(interpreter) Running test: ${testname}"
 
     test=$(chaos tests/$filename 2>&1)

@@ -634,6 +634,7 @@ typedef struct ImportSpec {
     struct Expr* ident;
     struct ExprList* names;
     struct Spec* asterisk;
+    bool handled;
 } ImportSpec;
 
 typedef struct ListType {

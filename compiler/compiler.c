@@ -27,6 +27,8 @@ unsigned long call_body_jumps_index = 0;
 i64_array* call_optional_jumps;
 unsigned long call_optional_jumps_index = 0;
 
+extern bool interactively_importing;
+
 File* import_parent_context = NULL;
 
 i64_array* compile(ASTRoot* ast_root)
@@ -38,40 +40,12 @@ i64_array* compile(ASTRoot* ast_root)
     compileImports(ast_root, program);
 
     // Declare functions in all parsed files
-    for (unsigned long i = 0; i < ast_root->file_count; i++) {
-        File* file = ast_root->files[i];
-        current_file_index = i;
-        StmtList* stmt_list = file->stmt_list;
-        pushModuleStack(file->module_path, file->module);
-
-        // Declare functions
-        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
-            Stmt* stmt = stmt_list->stmts[j - 1];
-            declare_function(stmt, file, program);
-        }
-
-        popModuleStack();
-    }
+    declare_functions(ast_root, program);
 
     // printFunctionTable();
 
     // Compile functions in all parsed files
-    for (unsigned long i = 0; i < ast_root->file_count; i++) {
-        File* file = ast_root->files[i];
-        current_file_index = i;
-        StmtList* stmt_list = file->stmt_list;
-        pushModuleStack(file->module_path, file->module);
-
-        // Compile functions
-        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
-            Stmt* stmt = stmt_list->stmts[j - 1];
-            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
-                compileStmt(program, stmt);
-            }
-        }
-
-        popModuleStack();
-    }
+    compile_functions(ast_root, program);
 
     StmtList* stmt_list = ast_root->files[0]->stmt_list;
     current_file_index = 0;
@@ -2750,8 +2724,12 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         break;
     }
     case ImportSpec_kind: {
+        if (spec->v.import_spec->handled)
+            break;
+
         char* name = compile_module_selector(spec->v.import_spec->module_selector);
         File* file = NULL;
+        interactively_importing = true;
         if (spec->v.import_spec->ident != NULL) {
             file = handleModuleImport(spec->v.import_spec->ident->v.ident->name, false, import_parent_context->module_path);
         } else {
@@ -2760,10 +2738,13 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
             else
                 file = handleModuleImport(name, false, import_parent_context->module_path);
         }
+        interactively_importing = false;
 
         for (unsigned long i = 0; i < spec->v.import_spec->names->expr_count; i++) {
             addExpr(file->aliases, spec->v.import_spec->names->exprs[i]);
         }
+
+        spec->v.import_spec->handled = true;
         break;
     }
     case DecisionBlock_kind: {
@@ -3370,4 +3351,42 @@ bool declare_function(Stmt* stmt, File* file, i64_array* program)
     endFunction();
 
     return true;
+}
+
+void declare_functions(ASTRoot* ast_root, i64_array* program)
+{
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
+
+        // Declare functions
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            declare_function(stmt, file, program);
+        }
+
+        popModuleStack();
+    }
+}
+
+void compile_functions(ASTRoot* ast_root, i64_array* program)
+{
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
+
+        // Compile functions
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
+                compileStmt(program, stmt);
+            }
+        }
+
+        popModuleStack();
+    }
 }

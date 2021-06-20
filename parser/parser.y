@@ -42,6 +42,7 @@ extern bool is_interactive;
 #endif
 
 bool inject_mode = false;
+bool interactively_importing = false;
 
 extern char *main_interpreted_module;
 extern unsigned long long shell_indicator_block_counter;
@@ -128,10 +129,18 @@ parser:
 
 line: T_NEWLINE
     | import {
-        addSpec(_ast_root->files[_ast_root->file_count - 1]->imports, $1);
+        File* file = _ast_root->files[_ast_root->file_count - 1];
+        if (is_interactive && !interactively_importing)
+            file = _ast_root->files[0];
+
+        addSpec(file->imports, $1);
     }
     | stmt {
-        addStmtLine(_ast_root->files[_ast_root->file_count - 1]->stmt_list, $1);
+        File* file = _ast_root->files[_ast_root->file_count - 1];
+        if (is_interactive && !interactively_importing)
+            file = _ast_root->files[0];
+
+        addStmtLine(file->stmt_list, $1);
     }
 ;
 

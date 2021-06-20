@@ -890,6 +890,7 @@ Spec* importSpec(Expr* module_selector, Expr* ident, ExprList* names, Spec* aste
     }
     import_spec->names = names;
     import_spec->asterisk = asterisk;
+    import_spec->handled = false;
     Spec* spec = buildSpec(ImportSpec_kind, lineno);
     spec->v.import_spec = import_spec;
     return spec;
@@ -1105,6 +1106,9 @@ FuncDeclCom* funcDeclCom(Spec* func_type, Expr* ident)
 
 void turnLastExprStmtIntoPrintStmt()
 {
+    if (_ast_root->files[0]->stmt_list->stmt_count < 1)
+        return;
+
     Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
     if (stmt->kind == ExprStmt_kind && stmt->v.expr_stmt->x->kind != CallExpr_kind) {
         _ast_root->files[0]->stmt_list->stmts[0] = printStmt(NULL, stmt->v.expr_stmt->x, stmt->ast->lineno);

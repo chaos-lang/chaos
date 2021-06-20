@@ -22,6 +22,8 @@
 
 #include "module.h"
 
+extern bool interactively_importing;
+
 void initMainContext() {
     modules_buffer.capacity = 0;
     modules_buffer.size = 0;
@@ -177,8 +179,12 @@ void freeModuleStack() {
 char* getCurrentModule() {
     if (_ast_root == NULL)
         return "";
-    else
-        return _ast_root->files[_ast_root->file_count - 1]->module_path;
+    else {
+        File* file = _ast_root->files[_ast_root->file_count - 1];
+        if (is_interactive && !interactively_importing)
+            file = _ast_root->files[0];
+        return file->module_path;
+    }
 }
 
 char* getMainModuleDir() {
