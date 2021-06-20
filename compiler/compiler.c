@@ -335,6 +335,50 @@ void compileStmt(i64_array* program, Stmt* stmt)
             i64 addr = symbol->addr;
 
             switch (symbol->type) {
+            case K_STRING: {
+                switch (stmt->v.assign_stmt->y->kind) {
+                case BasicLit_kind: {
+                    if (stmt->v.assign_stmt->y->v.basic_lit->value_type != V_STRING) {
+                        throw_error(E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING, symbol->name);
+                    } else {
+                        if (strlen(stmt->v.assign_stmt->y->v.basic_lit->value.s) != 1)
+                            throw_error(E_NOT_A_CHARACTER, symbol->name);
+                    }
+                    break;
+                }
+                case Ident_kind: {
+                    Symbol* symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
+                    if (symbol_y->value_type != V_STRING)
+                        throw_error(E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING, symbol->name);
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
+            }
+            case K_LIST: {
+                switch (stmt->v.assign_stmt->x->v.index_expr->index->kind) {
+                case BasicLit_kind:
+                    if (stmt->v.assign_stmt->x->v.index_expr->index->v.basic_lit->value_type != V_INT)
+                        throw_error(E_UNEXPECTED_ACCESSOR_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+                    break;
+                case Ident_kind: {
+                    Symbol* symbol_y = getSymbol(stmt->v.assign_stmt->x->v.index_expr->index->v.ident->name);
+                    if (symbol_y->value_type != V_INT)
+                        throw_error(E_UNEXPECTED_ACCESSOR_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+
+            switch (symbol->type) {
             case K_STRING:
                 if (symbol->value_type == V_REF) {
                     push_instr(program, LDI);
@@ -458,6 +502,10 @@ void compileStmt(i64_array* program, Stmt* stmt)
         case IndexExpr_kind: {
             compileExpr(program, stmt->v.del_stmt->ident->v.index_expr->index);
             Symbol* symbol = getSymbol(stmt->v.del_stmt->ident->v.index_expr->x->v.ident->name);
+
+            if (symbol->type != K_LIST && symbol->type != K_DICT && symbol->type != K_STRING)
+                throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+
             i64 addr = symbol->addr;
 
             push_instr(program, LII);
@@ -1918,9 +1966,13 @@ void compileDecl(i64_array* program, Decl* decl)
         case CompositeLit_kind:
             len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
             break;
-        case Ident_kind:
+        case Ident_kind: {
+            Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
+            if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
+                throw_error(E_NOT_A_LIST, symbol_x->name);
             is_dynamic = true;
             break;
+        }
         default:
             break;
         }
@@ -2046,9 +2098,13 @@ void compileDecl(i64_array* program, Decl* decl)
         case CompositeLit_kind:
             len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
             break;
-        case Ident_kind:
+        case Ident_kind: {
+            Symbol* symbol_x = getSymbol(decl->v.foreach_as_dict->x->v.ident->name);
+            if (symbol_x->type != K_DICT && symbol_x->type != K_ANY)
+                throw_error(E_NOT_A_DICT, symbol_x->name);
             is_dynamic = true;
             break;
+        }
         default:
             break;
         }
