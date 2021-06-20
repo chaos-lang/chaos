@@ -497,8 +497,6 @@ _Function* getFunctionByModuleContext(char *name, char *module_context) {
     while (function_cursor != NULL) {
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         if (criteria && module_context != NULL && (
-            strcmp(function_cursor->context, module_context) == 0
-            ||
             strcmp(function_cursor->module_context, module_context) == 0
         )) {
             _Function* function = function_cursor;
