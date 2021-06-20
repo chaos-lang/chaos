@@ -43,7 +43,7 @@ enum instr {
     BRK, SBRK, CONT, SCONT,
     CALL, CALLX, CALLEXT,
     DEBUG,
-    HLT, EXIT,
+    HLT, EXIT, THRW,
     NUM_INSTRUCTIONS
 };
 

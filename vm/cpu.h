@@ -38,6 +38,7 @@
 cpu *new_cpu(i64 *program, i64 heap_size, i64 start, unsigned short debug);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
+void eat_until_hlt(cpu *c);
 void fetch(cpu *c);
 void execute(cpu *c);
 

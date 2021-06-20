@@ -231,5 +231,9 @@ void emitBytecode(cpu *c)
     case EXIT:
         printf("%s\n", "EXIT");
         break;
+    case THRW:
+        printf("%s %lld %lld\n", "THRW", c->dest, c->src);
+        c->pc++;
+        break;
 	}
 }

@@ -66,6 +66,13 @@ void run_cpu(cpu *c)
     } while (c->inst != HLT);
 }
 
+void eat_until_hlt(cpu *c)
+{
+    do {
+        fetch(c);
+    } while (c->inst != HLT);
+}
+
 void fetch(cpu *c)
 {
     c->pc++;
@@ -137,6 +144,10 @@ void execute(cpu *c)
         c->stack[--c->sp] = c->r[c->program[++c->pc]];
         break;
     case POP:
+        if (c->sp + 1 > USHRT_MAX * 2 - 1) {
+            eat_until_hlt(c);
+            throw_error(E_STACK_OVERFLOW);
+        }
         c->r[c->program[++c->pc]] = c->stack[c->sp++];
         break;
     case INC:
@@ -504,6 +515,17 @@ void execute(cpu *c)
         if (is_interactive)
             print_bye_bye();
         exit(c->r[R1A]);
+        break;
+    case THRW:
+        c->pc += 2;
+        if (c->gtz) {
+            i64 err_code = c->dest;
+            i64 i = c->r[c->src];
+            if (is_interactive) {
+                eat_until_hlt(c);
+            }
+            throw_error(err_code, NULL, NULL, i);
+        }
         break;
     case DEBUG:
         printf("\n");
@@ -967,6 +989,14 @@ void cpu_list_index_access(cpu *c, i64 list_len, i64 index)
 {
     if (index < 0)
         index = list_len + index;
+
+    if (index < 0 || index >= list_len) {
+        if (is_interactive) {
+            c->pc += 2;
+            eat_until_hlt(c);
+        }
+        throw_error(E_INDEX_OUT_OF_RANGE, NULL, NULL, index);
+    }
 
     for (i64 i = 0; i < list_len; i++) {
         if (i == index) {

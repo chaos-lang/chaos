@@ -78,7 +78,7 @@ void throw_error_base(
         sprintf(error_msg, "Variable '%s' is not an list!", str1);
         break;
     case E_INDEX_OUT_OF_RANGE:
-        sprintf(error_msg, "Index out of range: %lld for list: %s", lld1, str1);
+        sprintf(error_msg, "Index out of range: %lld for the list!", lld1);
         break;
     case E_ILLEGAL_VARIABLE_TYPE_FOR_VARIABLE:
         sprintf(error_msg, "Illegal variable type: %s, for variable: %s", str1, str2);
@@ -114,7 +114,7 @@ void throw_error_base(
         sprintf(error_msg, "No variable with given id: %llu is found!", llu1);
         break;
     case E_INDEX_OUT_OF_RANGE_STRING:
-        sprintf(error_msg, "Index out of range: %lld for string: %s", lld1, str1);
+        sprintf(error_msg, "Index out of range: %lld for the string!", lld1);
         break;
     case E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING:
         sprintf(error_msg, "Illegal character assignment for string: %s", str1);
@@ -157,6 +157,9 @@ void throw_error_base(
         break;
     case E_CONTINUE_CALL_MULTILINE_LOOP:
         sprintf(error_msg, "Call to a function with `continue` from a multiline loop: %s", str1);
+        break;
+    case E_STACK_OVERFLOW:
+        sprintf(error_msg, "Stack overflow! Report this error to https://github.com/chaos-lang/chaos/issues");
         break;
     default:
         sprintf(error_msg, "Unkown error.");

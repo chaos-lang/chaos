@@ -37,3 +37,4 @@ del a
 list a = [1, 2]
 a
 a[1] = a[2]
+a
