@@ -92,17 +92,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         __KAOS_DYNAMIC_LIBRARY_EXTENSION__
     ) == 0;
 
-    if (function_mode->is_dynamic) {
-        ASTNode* fake_ast_end;
-        fake_ast_end = (struct ASTNode*)calloc(1, sizeof(ASTNode) + 0 * sizeof *fake_ast_end->strings);
-        fake_ast_end->id = 0;
-        fake_ast_end->node_type = AST_END;
-        fake_ast_end->lineno = 0;
-        fake_ast_end->module = function_mode->module_context;
-        fake_ast_end->child = fake_ast_end;
-        function_mode->node = fake_ast_end;
-    }
-
     if (start_function == NULL) {
         start_function = function_mode;
         end_function = function_mode;
@@ -344,9 +333,6 @@ void removeFunctionIfDefined(char *name) {
             strcmp(function_cursor->module, module_stack.arr[module_stack.size - 1]) == 0
         ) {
             _Function* function = function_cursor;
-#ifndef CHAOS_COMPILER
-            function->node->dont_transpile = true;
-#endif
             removeFunction(function);
             return;
         }
@@ -557,8 +543,6 @@ void freeFunction(_Function* function) {
     free(function->decision_functions.arr);
     free(function->decision_default);
     free(function->module);
-    if (function->is_dynamic)
-        free(function->node);
     free(function);
 }
 

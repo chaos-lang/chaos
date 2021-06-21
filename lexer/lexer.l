@@ -37,7 +37,7 @@ extern void recordToken(char *token, int length);
 extern int oerrno;
 extern void yyerror(const char* s);
 extern FILE* tmp_stdin;
-extern unsigned long long shell_indicator_block_counter;
+unsigned long long shell_indicator_block_counter;
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
 #include "parser.tab.h"

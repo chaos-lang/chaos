@@ -49,8 +49,6 @@ enum BlockType { B_EXPRESSION, B_FUNCTION };
 
 typedef struct _Function {
     char *name;
-    struct ASTNode* node;
-    struct ASTNode* decision_node;
     struct Symbol** parameters;
     unsigned short parameter_count;
     unsigned short optional_parameter_count;

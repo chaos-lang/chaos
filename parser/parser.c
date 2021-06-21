@@ -44,7 +44,6 @@ static struct option long_options[] =
 };
 
 int initParser(int argc, char** argv) {
-    debug_enabled = false;
     unsigned short debug_level = 0;
     bool compiler_mode = false;
     bool compiler_fopen_fail = false;
@@ -348,7 +347,6 @@ void freeEverything() {
 #   endif
     }
 
-    free_node(ast_root_node);
     free(main_interpreted_module);
 
     fclose(stdin);
@@ -390,8 +388,6 @@ void yyerror(const char* s) {
 
 #ifndef CHAOS_COMPILER
 void absorbError() {
-    ast_interactive_cursor = ast_node_cursor;
-
     phase = INIT_PROGRAM;
     disable_complex_mode = false;
     freeComplexModeStack();
