@@ -44,8 +44,6 @@ i64_array* compile(ASTRoot* ast_root)
     // Declare functions in all parsed files
     declare_functions(ast_root, program);
 
-    // printFunctionTable();
-
     // Compile functions in all parsed files
     compile_functions(ast_root, program);
 
@@ -3575,7 +3573,7 @@ void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr
         }
     }
 
-    if (function != NULL && value_type != V_ANY) {
+    if (function != NULL && value_type != V_ANY && value_type != V_REF) {
         strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->type, value_type);
     }
 }
