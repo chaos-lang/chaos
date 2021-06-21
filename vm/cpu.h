@@ -43,6 +43,7 @@ void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void eat_until_hlt(cpu *c);
 void fetch(cpu *c);
+void fetch_without_ast_stack(cpu *c);
 void execute(cpu *c);
 
 void print_registers(cpu *c, i64 pc_start);

@@ -78,7 +78,7 @@ void run_cpu(cpu *c)
 void eat_until_hlt(cpu *c)
 {
     do {
-        fetch(c);
+        fetch_without_ast_stack(c);
     } while (c->inst != HLT);
 }
 
@@ -90,6 +90,14 @@ void fetch(cpu *c)
     c->src = c->program[c->pc + 2];
 
     ast_stack[ast_stack_p] = c->ast_ref[c->pc];
+}
+
+void fetch_without_ast_stack(cpu *c)
+{
+    c->pc++;
+    c->inst = c->program[c->pc];
+    c->dest = c->program[c->pc + 1];
+    c->src = c->program[c->pc + 2];
 }
 
 void execute(cpu *c)

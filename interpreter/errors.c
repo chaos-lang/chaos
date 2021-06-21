@@ -199,12 +199,7 @@ void throw_error_base(
             );
 
 #ifndef CHAOS_COMPILER
-            if (is_interactive &&
-                strcmp(
-                    module_path_stack.arr[0],
-                    current_ast->file->module_path
-                ) == 0
-            ) {
+            if (current_ast->file->is_interactive) {
                 fseek(tmp_stdin, 0, SEEK_SET);
                 fp_module = tmp_stdin;
             } else {
@@ -269,7 +264,7 @@ void throw_error_base(
     );
 
 #ifndef CHAOS_COMPILER
-    if (is_interactive && module_path_stack.size < 2) {
+    if (current_ast->file->is_interactive) {
         fseek(tmp_stdin, 0, SEEK_SET);
         fp_module = tmp_stdin;
     } else {
