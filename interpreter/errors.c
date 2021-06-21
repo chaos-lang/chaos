@@ -33,9 +33,8 @@ void throw_error_var(throw_error_args in) {
     char *str2 = in.str2 ? in.str2 : "";
     long long lld1 = in.lld1 ? in.lld1 : 0;
     unsigned long long llu1 = in.llu1 ? in.llu1 : 0;
-    bool is_preemptive = in.is_preemptive ? in.is_preemptive : false;
     _Function* function = in.function ? in.function : NULL;
-    throw_error_base(code, str1, str2, lld1, llu1, is_preemptive, function);
+    throw_error_base(code, str1, str2, lld1, llu1, function);
 }
 
 void throw_error_base(
@@ -43,7 +42,6 @@ void throw_error_base(
     char *str1, char *str2,
     long long lld1,
     unsigned long long llu1,
-    bool is_preemptive,
     _Function* function
 ) {
     char title_msg[__KAOS_MSG_LINE_LENGTH__];
@@ -52,13 +50,8 @@ void throw_error_base(
     char bg_color[3];
     int indent = 2;
 
-    if (is_preemptive) {
-        sprintf(bg_color, "43");
-        sprintf(title_msg, "%*cPreemptive Error:", indent, ' ');
-    } else {
-        sprintf(bg_color, "41");
-        sprintf(title_msg, "%*c%s Error (most recent call last):", indent, ' ', __KAOS_LANGUAGE_NAME__);
-    }
+    sprintf(bg_color, "41");
+    sprintf(title_msg, "%*c%s Error (most recent call last):", indent, ' ', __KAOS_LANGUAGE_NAME__);
 
     switch (code) {
     case E_UNKNOWN_VARIABLE_TYPE:
@@ -172,12 +165,7 @@ void throw_error_base(
 
     char* new_error_msg_out = str_replace(error_msg_out, "\n", "\\n");
 
-    unsigned traceback_size = 0;
-    if (is_preemptive) {
-        traceback_size = 1;
-    } else {
-        traceback_size = ast_stack_p + 1;
-    }
+    unsigned traceback_size = ast_stack_p + 1;
     int cols[2 + traceback_size * 2];
     char traceback_line_msg[traceback_size][__KAOS_MSG_LINE_LENGTH__];
     char traceback_line[traceback_size][__KAOS_MSG_LINE_LENGTH__];
@@ -185,53 +173,51 @@ void throw_error_base(
     FILE* fp_module = NULL;
     AST* current_ast = NULL;
 
-    if (!is_preemptive) {
-        for (unsigned i = 0; i < ast_stack_p; i++) {
-            // current_ast = i != 0 ? (void *)ast_stack[i - 1] : (void *)ast_stack[i];
-            current_ast = (void *)ast_stack[i];
-            sprintf(
-                traceback_line_msg[i],
-                "%*cFile: \"%s\", line %d",
-                indent * 2,
-                ' ',
-                current_ast->file->module_path,
-                current_ast->lineno
-            );
+    for (unsigned i = 0; i < ast_stack_p; i++) {
+        // current_ast = i != 0 ? (void *)ast_stack[i - 1] : (void *)ast_stack[i];
+        current_ast = (void *)ast_stack[i];
+        sprintf(
+            traceback_line_msg[i],
+            "%*cFile: \"%s\", line %d",
+            indent * 2,
+            ' ',
+            current_ast->file->module_path,
+            current_ast->lineno
+        );
 
 #ifndef CHAOS_COMPILER
-            if (current_ast->file->is_interactive) {
-                fseek(tmp_stdin, 0, SEEK_SET);
-                fp_module = tmp_stdin;
-            } else {
+        if (current_ast->file->is_interactive) {
+            fseek(tmp_stdin, 0, SEEK_SET);
+            fp_module = tmp_stdin;
+        } else {
 #endif
-                fp_module = fopen(current_ast->file->module_path, "r");
+            fp_module = fopen(current_ast->file->module_path, "r");
 #ifndef CHAOS_COMPILER
-            }
+        }
 #endif
-            char *line = NULL;
-            if (fp_module == NULL) {
+        char *line = NULL;
+        if (fp_module == NULL) {
+            line = malloc(4);
+            strcpy(line, "???");
+        } else {
+            line = get_nth_line(fp_module, current_ast->lineno);
+#ifndef CHAOS_COMPILER
+            if (fp_module != tmp_stdin)
+#endif
+                fclose(fp_module);
+            if (line == NULL) {
                 line = malloc(4);
                 strcpy(line, "???");
-            } else {
-                line = get_nth_line(fp_module, current_ast->lineno);
-#ifndef CHAOS_COMPILER
-                if (fp_module != tmp_stdin)
-#endif
-                    fclose(fp_module);
-                if (line == NULL) {
-                    line = malloc(4);
-                    strcpy(line, "???");
-                }
             }
-            sprintf(
-                traceback_line[i],
-                "%*c%s",
-                indent * 3,
-                ' ',
-                trim(line)
-            );
-            free(line);
         }
+        sprintf(
+            traceback_line[i],
+            "%*c%s",
+            indent * 3,
+            ' ',
+            trim(line)
+        );
+        free(line);
     }
 
     if (code == E_INDEX_OUT_OF_RANGE || code == E_INDEX_OUT_OF_RANGE_STRING)
@@ -340,12 +326,6 @@ void throw_error_base(
     fflush(stderr);
 
 #ifndef CHAOS_COMPILER
-    if (is_preemptive && is_interactive)
-        removeFunction(end_function);
-
-    if (is_preemptive)
-        return;
-
     if (!is_interactive) {
 #endif
         freeEverything();
