@@ -32,8 +32,6 @@
 #include "../utilities/messages.h"
 #endif
 
-#include "../interpreter/loop.h"
-
 #ifndef CHAOS_COMPILER
 #include "../compiler/compiler.h"
 #include "../compiler/compiler_emit.h"

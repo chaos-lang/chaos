@@ -244,16 +244,6 @@ void throw_error_base(
     if (ast_stack != NULL)
         ast_stack[0] = 0;
 
-    // char *function_name = NULL;
-    // if (is_preemptive) {
-    //     function_name = function->name;
-    // } else {
-    //     if (function_call_stack.size > 0) {
-    //         FunctionCall* function_call = function_call_stack.arr[function_call_stack.size - 1];
-    //         function_name = function_call->function->name;
-    //     }
-    // }
-
     sprintf(
         traceback_line_msg[traceback_size - 1],
         "%*cFile: \"%s\", line %d",

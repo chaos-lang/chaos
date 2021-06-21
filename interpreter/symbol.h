@@ -196,6 +196,6 @@ bool resolveRelGreatEqualUnknown(char* name_l, char* name_r);
 bool resolveRelSmallEqualUnknown(char* name_l, char* name_r);
 void changeSymbolScope(Symbol* symbol, FunctionCall* scope);
 
-#include "interpreter.h"
+#include "../ast/ast.h"
 
 #endif

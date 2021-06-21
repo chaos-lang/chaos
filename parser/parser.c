@@ -366,7 +366,6 @@ void yyerror(const char* s) {
 
 #ifndef CHAOS_COMPILER
     if (is_interactive) {
-        loop_mode = NULL;
         function_mode = NULL;
         if (isComplexMode()) {
             freeComplexModeStack();

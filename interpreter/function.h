@@ -49,7 +49,6 @@ enum BlockType { B_EXPRESSION, B_FUNCTION };
 
 typedef struct _Function {
     char *name;
-    int line_no;
     struct ASTNode* node;
     struct ASTNode* decision_node;
     struct Symbol** parameters;
@@ -138,16 +137,7 @@ _Function* getFunctionByModuleContext(char *name, char *module_context);
 _Function* checkDuplicateFunction(char *name, char *module_path);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
-FunctionCall* callFunction(char *name, char *module);
 
-#ifndef CHAOS_COMPILER
-void callFunctionCleanUp(FunctionCall* function_call);
-#else
-void callFunctionCleanUp(FunctionCall* function_call, bool has_decision);
-#endif
-
-void callFunctionCleanUpSymbols(FunctionCall* function_call);
-void callFunctionCleanUpCommon();
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type);
 void addFunctionOptionalParameterBool(char *secondary_name, bool b);
@@ -156,24 +146,9 @@ void addFunctionOptionalParameterFloat(char *secondary_name, double f);
 void addFunctionOptionalParameterString(char *secondary_name, char *s);
 void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type);
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional);
-void initFunctionCall();
-void addFunctionCallParameterBool(bool b);
-void addFunctionCallParameterInt(long long i);
-void addFunctionCallParameterFloat(double f);
-void addFunctionCallParameterString(char *s);
-void addFunctionCallParameterSymbol(char *name);
-void addFunctionCallParameterList(enum Type type);
 void returnSymbol(char *name);
-void printFunctionReturn(FunctionCall* function_call, char *end, bool pretty, bool escaped);
-void createCloneFromFunctionReturn(char *clone_name, enum Type type, FunctionCall* function_call, enum Type extra_type);
-void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* function_call);
-void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call);
 void initMainFunction();
 void initScopeless();
-
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-void increaseStackSize();
-#endif
 
 void removeFunction(_Function* function);
 void freeFunction(_Function* function);
@@ -181,7 +156,6 @@ void freeAllFunctions();
 bool block(enum BlockType type);
 void addBooleanDecision();
 void addDefaultDecision();
-void executeDecision(FunctionCall* function);
 void addFunctionNameToFunctionNamesBuffer(char *name);
 void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
@@ -189,7 +163,6 @@ bool isFunctionType(char *name, char *module, enum Type type);
 void setScopeless(Symbol* symbol);
 void pushExecutedFunctionStack(FunctionCall* function_call);
 void popExecutedFunctionStack();
-void freeFunctionReturn(FunctionCall* function_call);
 void decisionBreakLoop();
 void decisionContinueLoop();
 void updateDecisionSymbolChainScope();
