@@ -216,7 +216,7 @@ int initParser(int argc, char** argv) {
         i64_array* program = compile(_ast_root);
 
         if (debug_level > 1) {
-            printf("\nBytecode:\n");
+            printf("\nDebug Bytecode:\n");
             emit(program);
             if (debug_level == 2)
                 exit(0);
@@ -269,7 +269,7 @@ void compile_interactive()
         interactive_program->hlt_count++;
         interactive_c->pc = interactive_program->size - 1;
         if (interactive_c->debug_level > 1) {
-            printf("\nBytecode:\n");
+            printf("\nDebug Bytecode:\n");
             emit(interactive_program);
         }
 
@@ -289,7 +289,7 @@ void compile_interactive()
     }
 
     if (interactive_c->debug_level > 1) {
-        printf("\nBytecode:\n");
+        printf("\nDebug Bytecode:\n");
         emit(interactive_program);
     }
 

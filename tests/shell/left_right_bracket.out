@@ -1,12 +1,12 @@
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 3, in <module>
+File: "~/chaos/__interactive__.kaos", line 3
 a[f] = a
 Unexpected accessor data type: List for variable: a
 Absorbed by Interactive Shell
 [0]
 [1, 2]
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 7, in <module>
+File: "~/chaos/__interactive__.kaos", line 7
 k[0] = 1
 Undefined variable: k
 Absorbed by Interactive Shell

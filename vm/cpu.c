@@ -27,6 +27,9 @@ char *reg_names[] = {
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
 };
 
+i64* ast_stack = NULL;
+i64 ast_stack_p = 0;
+
 cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
@@ -51,12 +54,17 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned shor
     for (unsigned i = 0; i < NUM_REGISTERS; i++) {
         c->r[i] = 0;
     }
+
+    ast_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     return c;
 }
 
 void free_cpu(cpu *c)
 {
     free(c);
+    // free(ast_stack);
+    // ast_stack = NULL;
+    // ast_stack_p = 0;
 }
 
 void run_cpu(cpu *c)
@@ -81,7 +89,7 @@ void fetch(cpu *c)
     c->dest = c->program[c->pc + 1];
     c->src = c->program[c->pc + 2];
 
-    current_ast = c->ast_ref[c->pc];
+    ast_stack[ast_stack_p] = c->ast_ref[c->pc];
 }
 
 void execute(cpu *c)
@@ -350,12 +358,16 @@ void execute(cpu *c)
         memcpy(new_mem, c->mem, c->heap_size * sizeof(i64));
         c->mem = new_mem;
         c->mems[c->memp++] = c->mem;
+
+        ast_stack_p++;
         break;
     }
     case CALLX: {
         --c->memp;
         c->mem = c->mems[--c->memp];
         free(c->mems[c->memp + 1]);
+
+        ast_stack_p--;
         break;
     }
     case CALLEXT: {

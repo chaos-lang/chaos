@@ -35,7 +35,8 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
-i64 current_ast;
+i64* ast_stack;
+i64 ast_stack_p;
 
 cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level);
 void free_cpu(cpu *c);

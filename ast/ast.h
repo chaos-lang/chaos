@@ -358,8 +358,11 @@ char* getAstNodeTypeName(unsigned i);
 
 // NEW AST START
 
+typedef struct File File;
+
 typedef struct AST {
     int lineno;
+    File* file;
 } AST;
 
 
@@ -749,6 +752,7 @@ typedef struct File {
     char *module_path;
     char *context;
     bool imports_handled;
+    bool is_interactive;
 } File;
 
 typedef struct ASTRoot {

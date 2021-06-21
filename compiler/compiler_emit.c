@@ -31,209 +31,243 @@ void emit(i64_array* program)
 
 void print_cpu(cpu *c, i64 hlt_count)
 {
+    printf(
+        "%-40s %-40s %-40s %-80s %-40s\n",
+        "Program Counter",
+        "Bytecode",
+        "Line",
+        "File",
+        "Line Number"
+    );
     for (i64 i = 0; i < hlt_count; i++) {
         do {
             fetch(c);
             emitBytecode(c);
         } while (c->inst != HLT);
-        printf("%s\n", "HLT");
     }
+    printf("\n");
 }
 
 void emitBytecode(cpu *c)
 {
-    printf("[PC: %lld] ", c->pc);
+    char str_pc[40];
+    char str_inst[40];
+
+    sprintf(str_pc, "%lld", c->pc);
 
 	switch (c->inst) {
     case CLF:
-        printf("%s\n", "CLF");
+        sprintf(str_inst, "%s", "CLF");
         break;
     case CMP:
-        printf("%s %s %s\n", "CMP", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "CMP", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case CMPI:
-        printf("%s %s %lld\n", "CMPI", getRegName(c->dest), c->src);
+        sprintf(str_inst, "%s %s %lld", "CMPI", getRegName(c->dest), c->src);
         c->pc += 2;
         break;
     case MOV:
-        printf("%s %s %s\n", "MOV", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "MOV", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case STI:
-        printf("%s %lld %s\n", "STI", c->dest, getRegName(c->src));
+        sprintf(str_inst, "%s %lld %s", "STI", c->dest, getRegName(c->src));
         c->pc += 2;
         break;
     case STR:
-        printf("%s %s %s\n", "STR", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "STR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LDI:
-        printf("%s %s %lld\n", "LDI", getRegName(c->dest), c->src);
+        sprintf(str_inst, "%s %s %lld", "LDI", getRegName(c->dest), c->src);
         c->pc += 2;
         break;
     case LDR:
-        printf("%s %s %s\n", "LDR", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "LDR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LII:
-        printf("%s %s %lld\n", "LII", getRegName(c->dest), c->src);
+        sprintf(str_inst, "%s %s %lld", "LII", getRegName(c->dest), c->src);
         c->pc += 2;
         break;
     case PUSH:
-        printf("%s %s\n", "PUSH", getRegName(c->program[++c->pc]));
+        sprintf(str_inst, "%s %s", "PUSH", getRegName(c->program[++c->pc]));
         break;
     case POP:
-        printf("%s %s\n", "POP", getRegName(c->program[++c->pc]));
+        sprintf(str_inst, "%s %s", "POP", getRegName(c->program[++c->pc]));
         break;
     case INC:
-        printf("%s %s\n", "INC", getRegName(c->dest));
+        sprintf(str_inst, "%s %s", "INC", getRegName(c->dest));
         c->pc++;
         break;
     case DEC:
-        printf("%s %s\n", "DEC", getRegName(c->dest));
+        sprintf(str_inst, "%s %s", "DEC", getRegName(c->dest));
         c->pc++;
         break;
     case ADD:
-        printf("%s %s %s\n", "ADD", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "ADD", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case SUB:
-        printf("%s %s %s\n", "SUB", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "SUB", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case MUL:
-        printf("%s %s %s\n", "MUL", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "MUL", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case DIV:
-        printf("%s %s %s\n", "DIV", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "DIV", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case MOD:
-        printf("%s %s %s\n", "MOD", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "MOD", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case JLZ:
-        printf("%s %lld\n", "JLZ", c->program[++c->pc]);
+        sprintf(str_inst, "%s %lld", "JLZ", c->program[++c->pc]);
         break;
     case JGZ:
-        printf("%s %lld\n", "JGZ", c->program[++c->pc]);
+        sprintf(str_inst, "%s %lld", "JGZ", c->program[++c->pc]);
         break;
     case JEZ:
-        printf("%s %lld\n", "JEZ", c->program[++c->pc]);
+        sprintf(str_inst, "%s %lld", "JEZ", c->program[++c->pc]);
         break;
     case JNZ:
-        printf("%s %lld\n", "JNZ", c->program[++c->pc]);
+        sprintf(str_inst, "%s %lld", "JNZ", c->program[++c->pc]);
         break;
     case JMP:
-        printf("%s %lld\n", "JMP", c->program[++c->pc]);
+        sprintf(str_inst, "%s %lld", "JMP", c->program[++c->pc]);
         break;
     case SHL:
-        printf("%s %s %s\n", "SHL", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "SHL", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case SHR:
-        printf("%s %s %s\n", "SHR", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "SHR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case BAND:
-        printf("%s %s %s\n", "BAND", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "BAND", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case BOR:
-        printf("%s %s %s\n", "BOR", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "BOR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case BNOT:
-        printf("%s %s\n", "BNOT", getRegName(c->dest));
+        sprintf(str_inst, "%s %s", "BNOT", getRegName(c->dest));
         c->pc++;
         break;
     case BXOR:
-        printf("%s %s %s\n", "BXOR", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "BXOR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LAND:
-        printf("%s %s %s\n", "LAND", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "LAND", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LOR:
-        printf("%s %s %s\n", "LOR", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "LOR", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LNOT:
-        printf("%s %s\n", "LNOT", getRegName(c->dest));
+        sprintf(str_inst, "%s %s", "LNOT", getRegName(c->dest));
         c->pc++;
         break;
     case DLDR:
-        printf("%s %s\n", "DLDR", getRegName(c->dest));
+        sprintf(str_inst, "%s %s", "DLDR", getRegName(c->dest));
         c->pc++;
         break;
     case DSTR:
-        printf("%s %s\n", "DSTR", getRegName(c->dest));
+        sprintf(str_inst, "%s %s", "DSTR", getRegName(c->dest));
         c->pc++;
         break;
     case DPOP:
-        printf("%s\n", "DPOP");
+        sprintf(str_inst, "%s", "DPOP");
         break;
     case DDEL:
-        printf("%s %s %s\n", "DDEL", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "DDEL", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case LIND:
-        printf("%s %s %s\n", "LIND", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "LIND", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case KSRCH:
-        printf("%s %s %s\n", "KSRCH", getRegName(c->dest), getRegName(c->src));
+        sprintf(str_inst, "%s %s %s", "KSRCH", getRegName(c->dest), getRegName(c->src));
         c->pc += 2;
         break;
     case JMPB:
-        printf("%s\n", "JMPB");
+        sprintf(str_inst, "%s", "JMPB");
         break;
     case SJMPB:
-        printf("%s %lld\n", "SJMPB", c->dest);
+        sprintf(str_inst, "%s %lld", "SJMPB", c->dest);
         c->pc++;
         break;
     case BRK:
-        printf("%s\n", "BRK");
+        sprintf(str_inst, "%s", "BRK");
         break;
     case SBRK:
-        printf("%s %lld\n", "SBRK", c->dest);
+        sprintf(str_inst, "%s %lld", "SBRK", c->dest);
         c->pc++;
         break;
     case CONT:
-        printf("%s\n", "CONT");
+        sprintf(str_inst, "%s", "CONT");
         break;
     case SCONT:
-        printf("%s %lld\n", "SCONT", c->dest);
+        sprintf(str_inst, "%s %lld", "SCONT", c->dest);
         c->pc++;
         break;
     case CALL:
-        printf("%s\n", "CALL");
+        sprintf(str_inst, "%s", "CALL");
         break;
     case CALLX:
-        printf("%s\n", "CALLX");
+        sprintf(str_inst, "%s", "CALLX");
         break;
     case CALLEXT:
-        printf("%s %lld\n", "CALLEXT", c->dest);
+        sprintf(str_inst, "%s %lld", "CALLEXT", c->dest);
         c->pc++;
         break;
     case DEBUG:
-        printf("%s\n", "DEBUG");
+        sprintf(str_inst, "%s", "DEBUG");
         break;
     case PRNT:
-        printf("%s\n", "PRNT");
+        sprintf(str_inst, "%s", "PRNT");
         break;
     case PPRNT:
-        printf("%s\n", "PPRNT");
+        sprintf(str_inst, "%s", "PPRNT");
         break;
     case EXIT:
-        printf("%s\n", "EXIT");
+        sprintf(str_inst, "%s", "EXIT");
         break;
     case THRW:
-        printf("%s %lld %lld\n", "THRW", c->dest, c->src);
+        sprintf(str_inst, "%s %lld %lld", "THRW", c->dest, c->src);
         c->pc++;
         break;
+    case HLT:
+        sprintf(str_inst, "%s", "HLT");
 	}
+
+    FILE* fp_module = NULL;
+    AST* current_ast = (void *)ast_stack[ast_stack_p];
+    if (current_ast->file->is_interactive) {
+        fseek(tmp_stdin, 0, SEEK_SET);
+        fp_module = tmp_stdin;
+    } else {
+        fp_module = fopen(current_ast->file->module_path, "r");
+    }
+    char* line = get_nth_line(fp_module, current_ast->lineno);
+    line[strlen(line) - 1] = '\0';
+    printf(
+        "%-40s %-40s %-40s %-80s %-40d\n",
+        str_pc,
+        str_inst,
+        line,
+        current_ast->file->module_path,
+        current_ast->lineno
+    );
+    if (fp_module != tmp_stdin)
+        fclose(fp_module);
 }

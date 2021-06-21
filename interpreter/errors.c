@@ -22,7 +22,8 @@
 
 #include "errors.h"
 
-extern i64 current_ast;
+extern i64* ast_stack;
+extern i64 ast_stack_p;
 extern i64 ast_ref;
 extern FILE* tmp_stdin;
 
@@ -175,47 +176,40 @@ void throw_error_base(
     if (is_preemptive) {
         traceback_size = 1;
     } else {
-        traceback_size = function_call_stack.size + 1;
+        traceback_size = ast_stack_p + 1;
     }
     int cols[2 + traceback_size * 2];
     char traceback_line_msg[traceback_size][__KAOS_MSG_LINE_LENGTH__];
     char traceback_line[traceback_size][__KAOS_MSG_LINE_LENGTH__];
 
     FILE* fp_module = NULL;
+    AST* current_ast = NULL;
 
     if (!is_preemptive) {
-        for (unsigned i = 0; i < function_call_stack.size; i++) {
+        for (unsigned i = 0; i < ast_stack_p; i++) {
+            // current_ast = i != 0 ? (void *)ast_stack[i - 1] : (void *)ast_stack[i];
+            current_ast = (void *)ast_stack[i];
             sprintf(
                 traceback_line_msg[i],
-                "%*cFile: \"%s\", line %d, in %s",
+                "%*cFile: \"%s\", line %d",
                 indent * 2,
                 ' ',
-                i != 0 ?
-                    function_call_stack.arr[i - 1]->function->module_context
-                    :
-                    function_call_stack.arr[i]->function->module_context,
-                function_call_stack.arr[i]->lineno,
-                i != 0 ?
-                    function_call_stack.arr[i - 1]->function->name
-                    :
-                    "<module>"
+                current_ast->file->module_path,
+                current_ast->lineno
             );
 
 #ifndef CHAOS_COMPILER
             if (is_interactive &&
                 strcmp(
                     module_path_stack.arr[0],
-                    i != 0 ?
-                        function_call_stack.arr[i - 1]->function->module_context
-                        :
-                        function_call_stack.arr[i]->function->module_context
+                    current_ast->file->module_path
                 ) == 0
             ) {
                 fseek(tmp_stdin, 0, SEEK_SET);
                 fp_module = tmp_stdin;
             } else {
 #endif
-                fp_module = fopen(i != 0 ? function_call_stack.arr[i - 1]->function->module_context : function_call_stack.arr[i]->function->module_context, "r");
+                fp_module = fopen(current_ast->file->module_path, "r");
 #ifndef CHAOS_COMPILER
             }
 #endif
@@ -224,7 +218,7 @@ void throw_error_base(
                 line = malloc(4);
                 strcpy(line, "???");
             } else {
-                line = get_nth_line(fp_module, function_call_stack.arr[i]->lineno);
+                line = get_nth_line(fp_module, current_ast->lineno);
 #ifndef CHAOS_COMPILER
                 if (fp_module != tmp_stdin)
 #endif
@@ -245,33 +239,33 @@ void throw_error_base(
         }
     }
 
-    AST* _current_ast = NULL;
     if (code == E_INDEX_OUT_OF_RANGE || code == E_INDEX_OUT_OF_RANGE_STRING)
         // Runtime error
-        _current_ast = (void *)current_ast;
+        current_ast = (void *)ast_stack[ast_stack_p];
     else
         // Compile-time error
-        _current_ast = (void *)ast_ref;
-    current_ast = 0;
+        current_ast = (void *)ast_ref;
 
-    char *function_name = NULL;
-    if (is_preemptive) {
-        function_name = function->name;
-    } else {
-        if (function_call_stack.size > 0) {
-            FunctionCall* function_call = function_call_stack.arr[function_call_stack.size - 1];
-            function_name = function_call->function->name;
-        }
-    }
-    char *module_path = getCurrentModule();
+    if (ast_stack != NULL)
+        ast_stack[0] = 0;
+
+    // char *function_name = NULL;
+    // if (is_preemptive) {
+    //     function_name = function->name;
+    // } else {
+    //     if (function_call_stack.size > 0) {
+    //         FunctionCall* function_call = function_call_stack.arr[function_call_stack.size - 1];
+    //         function_name = function_call->function->name;
+    //     }
+    // }
+
     sprintf(
         traceback_line_msg[traceback_size - 1],
-        "%*cFile: \"%s\", line %d, in %s",
+        "%*cFile: \"%s\", line %d",
         indent * 2,
         ' ',
-        module_path,
-        _current_ast->lineno,
-        function_name != NULL ? function_name : "<module>"
+        current_ast->file->module_path,
+        current_ast->lineno
     );
 
 #ifndef CHAOS_COMPILER
@@ -280,7 +274,7 @@ void throw_error_base(
         fp_module = tmp_stdin;
     } else {
 #endif
-        fp_module = fopen(module_path, "r");
+        fp_module = fopen(current_ast->file->module_path, "r");
 #ifndef CHAOS_COMPILER
     }
 #endif
@@ -289,7 +283,7 @@ void throw_error_base(
         line = malloc(4);
         strcpy(line, "???");
     } else {
-        line = get_nth_line(fp_module, _current_ast->lineno);
+        line = get_nth_line(fp_module, current_ast->lineno);
 #ifndef CHAOS_COMPILER
         if (fp_module != tmp_stdin)
 #endif

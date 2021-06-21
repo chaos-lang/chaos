@@ -39,6 +39,7 @@ void initMainContext() {
         _ast_root->files[_ast_root->file_count - 1]->module = "";
         _ast_root->files[_ast_root->file_count - 1]->module_path = module_path_with_extension;
         _ast_root->files[_ast_root->file_count - 1]->context = module_path_with_extension;
+        _ast_root->files[_ast_root->file_count - 1]->is_interactive = is_interactive;
     }
 }
 

@@ -2,12 +2,12 @@
 2
 3
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 5, in <module>
+File: "~/chaos/__interactive__.kaos", line 5
 a[3]
 Index out of range: 3 for the list!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 6, in <module>
+File: "~/chaos/__interactive__.kaos", line 6
 a[123400]
 Index out of range: 123400 for the list!
 Absorbed by Interactive Shell
@@ -15,12 +15,12 @@ Absorbed by Interactive Shell
 2
 1
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 10, in <module>
+File: "~/chaos/__interactive__.kaos", line 10
 a[-4]
 Index out of range: -1 for the list!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 11, in <module>
+File: "~/chaos/__interactive__.kaos", line 11
 a[-123400]
 Index out of range: -123397 for the list!
 Absorbed by Interactive Shell
@@ -29,12 +29,12 @@ i
 k
 e
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 18, in <module>
+File: "~/chaos/__interactive__.kaos", line 18
 b[4]
 Index out of range: 4 for the string!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 19, in <module>
+File: "~/chaos/__interactive__.kaos", line 19
 b[123400]
 Index out of range: 123400 for the string!
 Absorbed by Interactive Shell
@@ -43,30 +43,30 @@ k
 i
 m
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 24, in <module>
+File: "~/chaos/__interactive__.kaos", line 24
 b[-5]
 Index out of range: -1 for the string!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 25, in <module>
+File: "~/chaos/__interactive__.kaos", line 25
 b[-123400]
 Index out of range: -123396 for the string!
 Absorbed by Interactive Shell
 []
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 31, in <module>
+File: "~/chaos/__interactive__.kaos", line 31
 num f = 5
 The variable name 'f' is already defined!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 32, in <module>
+File: "~/chaos/__interactive__.kaos", line 32
 f[0] = true
 Index out of range: 0 for the list!
 Absorbed by Interactive Shell
 []
 [1, 2]
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 39, in <module>
+File: "~/chaos/__interactive__.kaos", line 39
 a[1] = a[2]
 Index out of range: 2 for the list!
 Absorbed by Interactive Shell
