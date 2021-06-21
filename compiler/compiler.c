@@ -187,6 +187,9 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 symbol_y->value_type == V_INT || symbol_y->value_type == V_FLOAT
             ))
                 symbol_x->value_type = symbol_y->value_type;
+
+            strongly_type(symbol_x, symbol_y, NULL, stmt->v.assign_stmt->y, symbol_x->value_type);
+
             switch (symbol_x->value_type) {
             case V_BOOL:
                 push_instr(program, LII);
@@ -377,6 +380,8 @@ void compileStmt(i64_array* program, Stmt* stmt)
             default:
                 break;
             }
+
+            strongly_type(symbol, NULL, NULL, stmt->v.assign_stmt->y, symbol->value_type);
 
             switch (symbol->type) {
             case K_STRING:
@@ -1156,6 +1161,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             Expr* expr = expr_list->exprs[expr_list->expr_count - i];
             enum ValueType value_type = compileExpr(program, expr) - 1;
             Symbol* parameter = function->parameters[i - 1];
+
+            strongly_type(parameter, NULL, function, expr, value_type);
+
             enum Type type = parameter->type;
             i64 addr = parameter->addr;
 
@@ -1682,10 +1690,14 @@ void compileDecl(i64_array* program, Decl* decl)
     case VarDecl_kind: {
         enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
         enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
+        enum Type secondary_type = K_ANY;
+        if (decl->v.var_decl->type_spec->v.type_spec->sub_type_spec != NULL)
+            secondary_type = decl->v.var_decl->type_spec->v.type_spec->type;
+        Symbol* symbol = NULL;
 
         switch (type) {
         case K_BOOL:
-            store_bool(
+            symbol = store_bool(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
                 false
@@ -1693,13 +1705,13 @@ void compileDecl(i64_array* program, Decl* decl)
             break;
         case K_NUMBER:
             if (value_type == V_FLOAT) {
-                store_float(
+                symbol = store_float(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     false
                 );
             } else {
-                store_int(
+                symbol = store_int(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     false
@@ -1727,7 +1739,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
 
-            store_string(
+            symbol = store_string(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
                 len,
@@ -1739,14 +1751,14 @@ void compileDecl(i64_array* program, Decl* decl)
         case K_ANY: {
             switch (value_type) {
             case V_BOOL:
-                store_bool(
+                symbol = store_bool(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     true
                 );
                 break;
             case V_INT: {
-                store_int(
+                symbol = store_int(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     true
@@ -1754,7 +1766,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
             case V_FLOAT: {
-                store_float(
+                symbol = store_float(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     true
@@ -1785,7 +1797,7 @@ void compileDecl(i64_array* program, Decl* decl)
                     break;
                 }
 
-                store_string(
+                symbol = store_string(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     len,
@@ -1795,19 +1807,19 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
             case V_LIST:
-                store_any(
+                symbol = store_any(
                     program,
                     decl->v.var_decl->ident->v.ident->name
                 );
                 break;
             case V_DICT:
-                store_any(
+                symbol = store_any(
                     program,
                     decl->v.var_decl->ident->v.ident->name
                 );
                 break;
             case V_REF:
-                store_any(
+                symbol = store_any(
                     program,
                     decl->v.var_decl->ident->v.ident->name
                 );
@@ -1832,7 +1844,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
 
-            store_list(
+            symbol = store_list(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
                 len,
@@ -1855,7 +1867,7 @@ void compileDecl(i64_array* program, Decl* decl)
                 break;
             }
 
-            store_dict(
+            symbol = store_dict(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
                 len,
@@ -1866,6 +1878,8 @@ void compileDecl(i64_array* program, Decl* decl)
         default:
             break;
         }
+
+        symbol->secondary_type = secondary_type;
         break;
     }
     case TimesDo_kind: {
@@ -2310,6 +2324,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         break;
     case FieldSpec_kind: {
         enum Type type = compileSpec(program, spec->v.field_spec->type_spec);
+        enum Type secondary_type = K_ANY;
+        if (spec->v.field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
+            secondary_type = spec->v.field_spec->type_spec->v.type_spec->type;
 
         Symbol* parameter = NULL;
         union Value value;
@@ -2337,6 +2354,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         default:
             break;
         }
+        parameter->secondary_type = secondary_type;
 
         parameter->addr = program->heap;
         program->heap += 2;
@@ -2345,6 +2363,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
     }
     case OptionalFieldSpec_kind: {
         enum Type type = compileSpec(program, spec->v.optional_field_spec->type_spec);
+        enum Type secondary_type = K_ANY;
+        if (spec->v.optional_field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
+            secondary_type = spec->v.optional_field_spec->type_spec->v.type_spec->type;
 
         Symbol* parameter = NULL;
         union Value value;
@@ -2372,6 +2393,7 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         default:
             break;
         }
+        parameter->secondary_type = secondary_type;
 
         parameter->addr = program->heap;
         program->heap += 2;
@@ -3505,5 +3527,83 @@ void compile_functions(ASTRoot* ast_root, i64_array* program)
         }
 
         popModuleStack();
+    }
+}
+
+void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type)
+{
+    if (expr != NULL) {
+        if ((symbol_x->type == K_LIST || symbol_x->type == K_DICT) && symbol_x->secondary_type != K_ANY) {
+            switch (expr->kind) {
+            case CompositeLit_kind: {
+                CompositeLit* composite_lit = expr->v.composite_lit;
+                for (unsigned long i = composite_lit->elts->expr_count; 0 < i; i--) {
+                    Expr* elt = composite_lit->elts->exprs[i - 1];
+                    switch (elt->kind) {
+                    case CompositeLit_kind: {
+                        if (function != NULL)
+                            throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name);
+                        break;
+                    }
+                    case BasicLit_kind: {
+                        BasicLit* basic_lit = elt->v.basic_lit;
+                        strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->secondary_type, basic_lit->value_type);
+                        break;
+                    }
+                    case KeyValueExpr_kind: {
+                        KeyValueExpr* key_value_expr = elt->v.key_value_expr;
+                        if (key_value_expr->value->kind == BasicLit_kind) {
+                            BasicLit* basic_lit = key_value_expr->value->v.basic_lit;
+                            strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->secondary_type, basic_lit->value_type);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                }
+                break;
+            }
+            case BasicLit_kind: {
+                BasicLit* basic_lit = expr->v.basic_lit;
+                strongly_type_basic_check(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST, getValueTypeName(basic_lit->value_type), symbol_x->name, symbol_x->secondary_type, basic_lit->value_type);
+                break;
+            }
+            default:
+                break;
+            }
+        }
+    }
+
+    if (function != NULL && value_type != V_ANY) {
+        strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->type, value_type);
+    }
+}
+
+void strongly_type_basic_check(unsigned short code, char *str1, char *str2, enum Type type, enum ValueType value_type)
+{
+    switch (type) {
+    case K_BOOL:
+        if (value_type != V_BOOL)
+            throw_error(code, str1, str2);
+        break;
+    case K_NUMBER:
+        if (value_type != V_INT && value_type != V_FLOAT)
+            throw_error(code, str1, str2);
+        break;
+    case K_STRING:
+        if (value_type != V_STRING)
+            throw_error(code, str1, str2);
+        break;
+    case K_LIST:
+        if (value_type != V_LIST)
+            throw_error(code, str1, str2);
+        break;
+    case K_DICT:
+        if (value_type != V_DICT)
+            throw_error(code, str1, str2);
+        break;
+    default:
+        break;
     }
 }

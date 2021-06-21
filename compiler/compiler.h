@@ -78,6 +78,9 @@ bool declare_function(Stmt* stmt, File* file, i64_array* program);
 void declare_functions(ASTRoot* ast_root, i64_array* program);
 void compile_functions(ASTRoot* ast_root, i64_array* program);
 
+void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type);
+void strongly_type_basic_check(unsigned short code, char *str1, char *str2, enum Type type, enum ValueType value_type);
+
 cpu *interactive_c;
 
 #endif

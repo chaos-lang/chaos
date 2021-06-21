@@ -26,6 +26,8 @@ extern bool disable_complex_mode;
 extern char *suggestions[1000];
 extern unsigned long long suggestions_length;
 
+bool compiling_a_function = false;
+
 #ifndef CHAOS_COMPILER
 static struct option long_options[] =
 {
@@ -262,7 +264,9 @@ void compile_interactive()
         compileImports(_ast_root, interactive_program);
         _ast_root->files[0]->imports_handled = false;
         declare_functions(_ast_root, interactive_program);
+        compiling_a_function = true;
         compile_functions(_ast_root, interactive_program);
+        compiling_a_function = false;
         current_file_index = 0;
 
         push_instr(interactive_program, HLT);
@@ -281,7 +285,10 @@ void compile_interactive()
     if (any_stmts) {
         Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
         is_function = declare_function(stmt, _ast_root->files[0], interactive_program);
+        if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind)
+            compiling_a_function = true;
         compileStmt(interactive_program, stmt);
+        compiling_a_function = false;
         push_instr(interactive_program, HLT);
         interactive_program->hlt_count++;
         if (!is_function)
@@ -405,21 +412,9 @@ void absorbError() {
     fprintf(stderr, "\n");
     fflush(stderr);
 
-    if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
-    for (unsigned i = function_call_stack.size; i > 0; i--) {
-        FunctionCall* function_call = function_call_stack.arr[i - 1];
-        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
-            removeSymbol(decision_symbol_chain);
-            decision_symbol_chain = NULL;
-        }
-        // callFunctionCleanUpSymbols(function_call);
-        removeSymbolsByScope(function_call);
-        if (function_call->dont_pop_module_stack) {
-            popExecutedFunctionStack();
-        } else {
-            callFunctionCleanUpCommon();
-        }
-        free(function_call);
+    if (compiling_a_function) {
+        removeFunction(end_function);
+        compiling_a_function = false;
     }
 
     if (main_interpreted_module != NULL) {
