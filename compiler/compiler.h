@@ -1,7 +1,7 @@
 /*
  * Description: Compiler module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,50 +23,64 @@
 #ifndef KAOS_COMPILER_H
 #define KAOS_COMPILER_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#   include <windows.h>
-#else
-#   include <sys/wait.h>
-#endif
-
-#if defined(__APPLE__) && defined(__MACH__)
-#   include <sys/syslimits.h>
-#elif !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-#   include <linux/limits.h>
-#endif
-
-#include <errno.h>
-
 #include "../ast/ast.h"
-#include "../preemptive/preemptive.h"
+#include "../vm/cpu.h"
+#include "../interpreter/module_new.h"
 
-string_array transpiled_functions;
-string_array transpiled_decisions;
-string_array transpiled_modules;
+typedef struct i64_array i64_array;
 
-void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep, bool unsafe);
-ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp);
-ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
-ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
-ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent);
-bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type);
-bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator);
-void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned short indent);
-void transpile_function_call_decision(FILE *c_fp, char *module_context, char* module_context_compiler, char *name, unsigned short indent);
-void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2, unsigned short indent);
-void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp);
-void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent);
-char* compiler_getCurrentContext();
-char* compiler_getCurrentModuleContext();
-char* compiler_getCurrentModule();
-char* compiler_getFunctionModuleContext(char *name, char *module);
-bool isFunctionFromDynamicLibrary(char *name, char *module);
-bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module);
-char* fix_bs(char* str);
-void compiler_escape_module(char* module);
-void free_transpiled_functions();
-void free_transpiled_decisions();
+typedef struct i64_array {
+    i64* arr;
+    i64 capacity;
+    i64 size;
+    i64 heap;
+    i64 start;
+    i64 hlt_count;
+    i64_array* ast_ref;
+} i64_array;
+
+i64_array* compile(ASTRoot* ast_root);
+void initCallJumps();
+void fillCallJumps(i64_array* program);
+void compileImports(ASTRoot* ast_root, i64_array* program);
+void compileStmtList(i64_array* program, StmtList* stmt_list);
+void compileStmt(i64_array* program, Stmt* stmt);
+unsigned short compileExpr(i64_array* program, Expr* expr);
+void compileDecl(i64_array* program, Decl* decl);
+void compileSpecList(i64_array* program, SpecList* spec_list);
+unsigned short compileSpec(i64_array* program, Spec* spec);
+
+void push_instr(i64_array* program, i64 el);
+void pushProgram(i64_array* program, i64 el);
+i64 popProgram(i64_array* program);
+void freeProgram(i64_array* program);
+i64_array* initProgram();
+void shift_registers(i64_array* program, size_t shift);
+
+Symbol* store_bool(i64_array* program, char *name, bool is_any);
+Symbol* store_int(i64_array* program, char *name, bool is_any);
+Symbol* store_float(i64_array* program, char *name, bool is_any);
+Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic);
+Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic);
+Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic);
+Symbol* store_any(i64_array* program, char *name);
+
+void load_bool(i64_array* program, Symbol* symbol);
+void load_int(i64_array* program, Symbol* symbol);
+void load_float(i64_array* program, Symbol* symbol);
+void load_string(i64_array* program, Symbol* symbol);
+void load_list(i64_array* program, Symbol* symbol);
+void load_dict(i64_array* program, Symbol* symbol);
+void load_any(i64_array* program, Symbol* symbol);
+
+char* compile_module_selector(Expr* module_selector);
+bool declare_function(Stmt* stmt, File* file, i64_array* program);
+void declare_functions(ASTRoot* ast_root, i64_array* program);
+void compile_functions(ASTRoot* ast_root, i64_array* program);
+
+void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type);
+void strongly_type_basic_check(unsigned short code, char *str1, char *str2, enum Type type, enum ValueType value_type);
+
+cpu *interactive_c;
 
 #endif

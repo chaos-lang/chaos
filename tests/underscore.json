@@ -1,0 +1,315 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a_b"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a_b"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "_a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "2"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "_a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a_2019_b__c"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a_2019_b__c"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "_"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "4"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "_"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "a_b"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "5"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "a_b"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "_a"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "6"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "_a"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "a_2019_b__c"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "7"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "a_2019_b__c"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "_"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "8"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "_"
+                        },
+                        "args": []
+                    }
+                }
+            ]
+        }
+    ]
+}

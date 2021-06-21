@@ -1,7 +1,7 @@
 /*
  * Description: Parser of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -32,11 +32,13 @@
 #include "../utilities/messages.h"
 #endif
 
-#include "../interpreter/loop.h"
-
 #ifndef CHAOS_COMPILER
 #include "../compiler/compiler.h"
+#include "../compiler/compiler_emit.h"
 #endif
+
+#include "../ast/ast_print.h"
+#include "../vm/cpu.h"
 
 extern int yyparse();
 extern int yylex_destroy();
@@ -56,9 +58,14 @@ char *program_code;
 char *main_interpreted_module;
 jmp_buf InteractiveShellErrorAbsorber;
 
-bool global_unsafe;
+i64 prev_stmt_count;
+i64 prev_import_count;
+i64_array* interactive_program;
+bool interactively_importing;
+bool compiling_a_function;
 
 int initParser(int argc, char** argv);
+void compile_interactive();
 void freeEverything();
 void yyerror(const char* s);
 

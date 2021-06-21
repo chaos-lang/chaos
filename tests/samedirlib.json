@@ -1,0 +1,302 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Number",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f9"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "42"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "ReturnStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "z"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Number",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f8"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "expr": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "999"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "ReturnStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "z"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Number",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f7"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "z"
+                                        },
+                                        "expr": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f9"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "ReturnStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "z"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "b"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Number",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "f6"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "VarDecl",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "expr": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "Ident",
+                                                "name": "b"
+                                            },
+                                            "op": "-",
+                                            "y": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": {
+                            "_type": "DecisionBlock",
+                            "decisions": [
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "op": ">",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "1"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ReturnStmt",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        }
+                                    }
+                                },
+                                {
+                                    "_type": "DecisionExpr",
+                                    "bool_expr": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "y"
+                                        },
+                                        "op": "==",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "1"
+                                        }
+                                    },
+                                    "outcome": {
+                                        "_type": "ExprStmt",
+                                        "x": {
+                                            "_type": "CallExpr",
+                                            "fun": {
+                                                "_type": "Ident",
+                                                "name": "f7"
+                                            },
+                                            "args": []
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

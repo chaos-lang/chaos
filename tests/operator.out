@@ -83,11 +83,11 @@ true
 false
 true
 Relational operators on a mix of integer and boolean variables
-true
-false
-false
 false
 true
+false
+true
+false
 true
 Relational operators on a mix of integer and boolean literals
 false
@@ -202,8 +202,8 @@ true
 false
 false
 Logical operators on float literals
-false
-false
+true
+true
 true
 true
 false
@@ -286,13 +286,13 @@ Unary operators
 14
 5
 4
-14
+13
 4
 4
 12
 3
 4
-12
+13
 Long mathematical expressions
 8
 169.8

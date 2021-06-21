@@ -1,0 +1,174 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var5"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "5"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var5"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "7"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var5"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var6"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "float",
+                            "value": "3.2"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var6"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "float",
+                        "value": "5.4"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var6"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "UnaryExpr",
+                            "op": "-",
+                            "x": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "123"
+                            }
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "0"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BinaryExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "op": "-",
+                        "y": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                }
+            ]
+        }
+    ]
+}

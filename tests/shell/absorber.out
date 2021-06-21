@@ -1,24 +1,24 @@
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 1, in <module>
+File: "~/chaos/__interactive__.kaos", line 1
 asdas
 Undefined variable: asdas
 Absorbed by Interactive Shell
 hey
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 3, in <module>
+File: "~/chaos/__interactive__.kaos", line 3
 a = 5
 Undefined variable: a
 Absorbed by Interactive Shell
 5
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 6, in <module>
+File: "~/chaos/__interactive__.kaos", line 6
 num a = 3
 The variable name 'a' is already defined!
 Absorbed by Interactive Shell
 5
 print b
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 12, in <module>
+File: "~/chaos/__interactive__.kaos", line 12
 b()
 Undefined function: b in <module>
 Absorbed by Interactive Shell

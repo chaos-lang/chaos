@@ -1,0 +1,45 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "example"
+                        },
+                        "sel": null
+                    },
+                    "ident": null,
+                    "names": [],
+                    "asterisk": null
+                }
+            ],
+            "stmt_list": [
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "SelectorExpr",
+                            "x": {
+                                "_type": "Ident",
+                                "name": "example"
+                            },
+                            "sel": {
+                                "_type": "Ident",
+                                "name": "hello"
+                            }
+                        },
+                        "args": []
+                    }
+                }
+            ]
+        }
+    ]
+}

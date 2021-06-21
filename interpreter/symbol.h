@@ -1,7 +1,7 @@
 /*
  * Description: Symbol module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -50,8 +50,9 @@ typedef struct Symbol {
         bool b;
         long long i;
         char *s;
-        long double f;
+        double f;
     } value;
+    size_t len;
     short sign;
     enum ValueType value_type;
     struct Symbol* previous;
@@ -62,6 +63,8 @@ typedef struct Symbol {
     struct FunctionCall* scope;
     enum Role role;
     struct _Function* param_of;
+    long long addr;
+    bool is_dynamic;
 } Symbol;
 
 Symbol* symbol_cursor;
@@ -85,6 +88,7 @@ Symbol* variable_complex_element;
 unsigned long long variable_complex_element_symbol_id;
 
 Symbol* addSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
+void updateSymbolScope(Symbol* symbol);
 Symbol* updateSymbol(char *name, enum Type type, union Value value, enum ValueType value_type);
 void removeSymbolByName(char *name);
 void removeSymbol(Symbol* symbol);
@@ -96,8 +100,8 @@ Symbol* deepCopySymbol(Symbol* symbol, enum Type type, char *key);
 Symbol* deepCopyComplex(char *name, Symbol* symbol);
 char* getSymbolValueString(char *name);
 char* _getSymbolValueString(Symbol* symbol);
-long double getSymbolValueFloat(char *name);
-long double _getSymbolValueFloat(Symbol* symbol);
+double getSymbolValueFloat(char *name);
+double _getSymbolValueFloat(Symbol* symbol);
 bool getSymbolValueBool(char *name);
 bool _getSymbolValueBool(Symbol* symbol);
 long long getSymbolValueInt(char *name);
@@ -115,8 +119,8 @@ Symbol* addSymbolBool(char *name, bool b);
 void updateSymbolBool(char *name, bool b);
 Symbol* addSymbolInt(char *name, long long i);
 void updateSymbolInt(char *name, long long i);
-Symbol* addSymbolFloat(char *name, long double f);
-void updateSymbolFloat(char *name, long double f);
+Symbol* addSymbolFloat(char *name, double f);
+void updateSymbolFloat(char *name, double f);
 Symbol* addSymbolString(char *name, char *s);
 void updateSymbolString(char *name, char *s);
 void addSymbolList(char *name);
@@ -139,17 +143,18 @@ void updateComplexElementWrapper(enum Type type, union Value value, enum ValueTy
 void updateComplexElement(Symbol* complex, unsigned long long symbol_id, enum Type type, union Value value, enum ValueType value_type);
 void updateComplexElementBool(bool b);
 void updateComplexElementInt(long long i);
-void updateComplexElementFloat(long double f);
+void updateComplexElementFloat(double f);
 void updateComplexElementString(char *s);
 void updateComplexElementSymbol(Symbol* source);
 void _updateComplexElementSymbol(Symbol* complex, unsigned long long symbol_id, Symbol* source);
 void removeComplexElementByLeftRightBracketStack(char *name);
 void removeComplexElement(Symbol* complex, unsigned long long symbol_id);
 void addSymbolDict(char *name);
-void addSymbolAnyString(char *name, char *s);
-void addSymbolAnyInt(char *name, long long i);
-void addSymbolAnyFloat(char *name, long double f);
-void addSymbolAnyBool(char *name, bool b);
+Symbol* addSymbolAnyStringNew(char *name, char *s, size_t len);
+Symbol* addSymbolAnyString(char *name, char *s);
+Symbol* addSymbolAnyInt(char *name, long long i);
+Symbol* addSymbolAnyFloat(char *name, double f);
+Symbol* addSymbolAnyBool(char *name, bool b);
 Symbol* getDictElement(Symbol* symbol, char *key);
 FunctionCall* getCurrentScope();
 Symbol* getSymbolFunctionParameter(char *name);
@@ -157,7 +162,7 @@ void freeAllSymbols();
 Symbol* assignByTypeCasting(Symbol* clone_symbol, Symbol* symbol);
 bool symbolValueByTypeCastingToBool(Symbol* symbol);
 long long symbolValueByTypeCastingToInt(Symbol* symbol);
-long double symbolValueByTypeCastingToFloat(Symbol* symbol);
+double symbolValueByTypeCastingToFloat(Symbol* symbol);
 char* symbolValueByTypeCastingToString(Symbol* symbol);
 Symbol* createSymbolWithoutValueType(char *name, enum Type type);
 void removeSymbolsByScope(FunctionCall* scope);
@@ -191,6 +196,6 @@ bool resolveRelGreatEqualUnknown(char* name_l, char* name_r);
 bool resolveRelSmallEqualUnknown(char* name_l, char* name_r);
 void changeSymbolScope(Symbol* symbol, FunctionCall* scope);
 
-#include "interpreter.h"
+#include "../ast/ast.h"
 
 #endif

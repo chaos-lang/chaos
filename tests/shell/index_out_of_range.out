@@ -2,105 +2,72 @@
 2
 3
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 5, in <module>
+File: "~/chaos/__interactive__.kaos", line 5
 a[3]
-Index out of range: 3 for list: a
+Index out of range: 3 for the list!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 6, in <module>
+File: "~/chaos/__interactive__.kaos", line 6
 a[123400]
-Index out of range: 123400 for list: a
+Index out of range: 123400 for the list!
 Absorbed by Interactive Shell
 3
 2
 1
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 10, in <module>
+File: "~/chaos/__interactive__.kaos", line 10
 a[-4]
-Index out of range: -4 for list: a
+Index out of range: -1 for the list!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 11, in <module>
+File: "~/chaos/__interactive__.kaos", line 11
 a[-123400]
-Index out of range: -123400 for list: a
+Index out of range: -123397 for the list!
 Absorbed by Interactive Shell
 m
 i
 k
 e
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 18, in <module>
+File: "~/chaos/__interactive__.kaos", line 18
 b[4]
-Index out of range: 4 for string: b
+Index out of range: 4 for the string!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 19, in <module>
+File: "~/chaos/__interactive__.kaos", line 19
 b[123400]
-Index out of range: 123400 for string: b
+Index out of range: 123400 for the string!
 Absorbed by Interactive Shell
 e
 k
 i
 m
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 24, in <module>
+File: "~/chaos/__interactive__.kaos", line 24
 b[-5]
-Index out of range: -5 for string: b
+Index out of range: -1 for the string!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 25, in <module>
+File: "~/chaos/__interactive__.kaos", line 25
 b[-123400]
-Index out of range: -123400 for string: b
+Index out of range: -123396 for the string!
 Absorbed by Interactive Shell
 []
-[scope]: N/A
-	[start] =>
-		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [1, 2, 3]} =>
-		{id: 1, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 2, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 3, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 14, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: mike} =>
-		{id: 16, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
-		{id: 18, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: i} =>
-		{id: 20, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: k} =>
-		{id: 22, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: e} =>
-		{id: 26, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: e} =>
-		{id: 28, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: k} =>
-		{id: 30, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: i} =>
-		{id: 32, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
-		{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
-	[end]
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 32, in <module>
+File: "~/chaos/__interactive__.kaos", line 31
 num f = 5
 The variable name 'f' is already defined!
 Absorbed by Interactive Shell
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 33, in <module>
+File: "~/chaos/__interactive__.kaos", line 32
 f[0] = true
-Index out of range: 0 for list: f
+Index out of range: 0 for the list!
 Absorbed by Interactive Shell
 []
-[scope]: N/A
-	[start] =>
-		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [1, 2, 3]} =>
-		{id: 1, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 2, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 3, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 14, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: mike} =>
-		{id: 16, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
-		{id: 18, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: i} =>
-		{id: 20, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: k} =>
-		{id: 22, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: e} =>
-		{id: 26, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: e} =>
-		{id: 28, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: k} =>
-		{id: 30, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: i} =>
-		{id: 32, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: m} =>
-		{id: 35, name: f, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: []} =>
-	[end]
 [1, 2]
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 41, in <module>
+File: "~/chaos/__interactive__.kaos", line 39
 a[1] = a[2]
-Index out of range: 2 for list: a
+Index out of range: 2 for the list!
 Absorbed by Interactive Shell
+[1, 2]

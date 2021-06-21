@@ -1,7 +1,7 @@
 /*
  * Description: Chaos C extension interface
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ typedef struct KaosValue {
     bool b;
     long long i;
     char *s;
-    long double f;
+    double f;
 } KaosValue;
 
 int defineFunction(
@@ -53,20 +53,20 @@ int defineFunction(
 );
 bool getVariableBool(char *name);
 long long getVariableInt(char *name);
-long double getVariableFloat(char *name);
+double getVariableFloat(char *name);
 char* getVariableString(char *name);
 bool getVariableBoolByTypeCasting(char *name);
 long long getVariableIntByTypeCasting(char *name);
-long double getVariableFloatByTypeCasting(char *name);
+double getVariableFloatByTypeCasting(char *name);
 char* getVariableStringByTypeCasting(char *name);
 unsigned long getListLength(char *name);
 bool getListElementBool(char *name, long long i);
 long long getListElementInt(char *name, long long i);
-long double getListElementFloat(char *name, long long i);
+double getListElementFloat(char *name, long long i);
 char* getListElementString(char *name, long long i);
 bool getListElementBoolByTypeCasting(char *name, long long i);
 long long getListElementIntByTypeCasting(char *name, long long i);
-long double getListElementFloatByTypeCasting(char *name, long long i);
+double getListElementFloatByTypeCasting(char *name, long long i);
 char* getListElementStringByTypeCasting(char *name, long long i);
 void copyListElement(char *name, long long i);
 enum Type getListElementType(char *name, long long i);
@@ -75,11 +75,11 @@ unsigned long getDictLength(char *name);
 char* getDictKeyByIndex(char *name, long long i);
 bool getDictElementBool(char *name, char *key);
 long long getDictElementInt(char *name, char *key);
-long double getDictElementFloat(char *name, char *key);
+double getDictElementFloat(char *name, char *key);
 char* getDictElementString(char *name, char *key);
 bool getDictElementBoolByTypeCasting(char *name, char *key);
 long long getDictElementIntByTypeCasting(char *name, char *key);
-long double getDictElementFloatByTypeCasting(char *name, char *key);
+double getDictElementFloatByTypeCasting(char *name, char *key);
 char* getDictElementStringByTypeCasting(char *name, char *key);
 void copyDictElement(char *name, char *key);
 enum Type getDictElementType(char *name, char *key);
@@ -87,11 +87,11 @@ enum ValueType getDictElementValueType(char *name, char *key);
 char* dumpVariableToString(char *name, bool pretty, bool escaped, bool double_quotes);
 void returnVariableBool(bool b);
 void returnVariableInt(long long i);
-void returnVariableFloat(long double f);
+void returnVariableFloat(double f);
 void returnVariableString(char *s);
 void createVariableBool(char *name, bool b);
 void createVariableInt(char *name, long long i);
-void createVariableFloat(char *name, long double f);
+void createVariableFloat(char *name, double f);
 void createVariableString(char *name, char *s);
 void startBuildingList();
 void returnList(enum Type type);
@@ -122,20 +122,20 @@ struct Kaos {
     );
     bool (*getVariableBool)(char *name);
     long long (*getVariableInt)(char *name);
-    long double (*getVariableFloat)(char *name);
+    double (*getVariableFloat)(char *name);
     char* (*getVariableString)(char *name);
     bool (*getVariableBoolByTypeCasting)(char *name);
     long long (*getVariableIntByTypeCasting)(char *name);
-    long double (*getVariableFloatByTypeCasting)(char *name);
+    double (*getVariableFloatByTypeCasting)(char *name);
     char* (*getVariableStringByTypeCasting)(char *name);
     unsigned long (*getListLength)(char *name);
     bool (*getListElementBool)(char *name, long long i);
     long long (*getListElementInt)(char *name, long long i);
-    long double (*getListElementFloat)(char *name, long long i);
+    double (*getListElementFloat)(char *name, long long i);
     char* (*getListElementString)(char *name, long long i);
     bool (*getListElementBoolByTypeCasting)(char *name, long long i);
     long long (*getListElementIntByTypeCasting)(char *name, long long i);
-    long double (*getListElementFloatByTypeCasting)(char *name, long long i);
+    double (*getListElementFloatByTypeCasting)(char *name, long long i);
     char* (*getListElementStringByTypeCasting)(char *name, long long i);
     void (*copyListElement)(char *name, long long i);
     enum Type (*getListElementType)(char *name, long long i);
@@ -144,11 +144,11 @@ struct Kaos {
     char* (*getDictKeyByIndex)(char *name, long long i);
     bool (*getDictElementBool)(char *name, char *key);
     long long (*getDictElementInt)(char *name, char *key);
-    long double (*getDictElementFloat)(char *name, char *key);
+    double (*getDictElementFloat)(char *name, char *key);
     char* (*getDictElementString)(char *name, char *key);
     bool (*getDictElementBoolByTypeCasting)(char *name, char *key);
     long long (*getDictElementIntByTypeCasting)(char *name, char *key);
-    long double (*getDictElementFloatByTypeCasting)(char *name, char *key);
+    double (*getDictElementFloatByTypeCasting)(char *name, char *key);
     char* (*getDictElementStringByTypeCasting)(char *name, char *key);
     void (*copyDictElement)(char *name, char *key);
     enum Type (*getDictElementType)(char *name, char *key);
@@ -156,11 +156,11 @@ struct Kaos {
     char* (*dumpVariableToString)(char *name, bool pretty, bool escaped, bool double_quotes);
     void (*returnVariableBool)(bool b);
     void (*returnVariableInt)(long long i);
-    void (*returnVariableFloat)(long double f);
+    void (*returnVariableFloat)(double f);
     void (*returnVariableString)(char *s);
     void (*createVariableBool)(char *name, bool b);
     void (*createVariableInt)(char *name, long long i);
-    void (*createVariableFloat)(char *name, long double f);
+    void (*createVariableFloat)(char *name, double f);
     void (*createVariableString)(char *name, char *s);
     void (*startBuildingList)();
     void (*returnList)(enum Type type);

@@ -1,7 +1,7 @@
 /*
  * Description: Function module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -49,14 +49,12 @@ enum BlockType { B_EXPRESSION, B_FUNCTION };
 
 typedef struct _Function {
     char *name;
-    int line_no;
-    struct ASTNode* node;
-    struct ASTNode* decision_node;
     struct Symbol** parameters;
     unsigned short parameter_count;
     unsigned short optional_parameter_count;
     enum Type type;
     enum Type secondary_type;
+    enum ValueType value_type;
     struct Symbol* symbol;
     struct _Function* previous;
     struct _Function* next;
@@ -66,7 +64,11 @@ typedef struct _Function {
     char *context;
     char *module_context;
     char *module;
+    long long optional_parameters_addr;
+    long long body_addr;
+    _Function* ref;
     bool is_dynamic;
+    bool is_compiled;
 } _Function;
 
 _Function* function_cursor;
@@ -96,6 +98,8 @@ typedef struct function_call_array {
 
 function_call_array function_call_stack;
 
+unsigned long current_file_index;
+
 FunctionCall* function_call_start;
 FunctionCall* scopeless;
 FunctionCall* scope_override;
@@ -118,49 +122,31 @@ void startFunction(char *name, enum Type type, enum Type secondary_type, char* c
 void startFunction(char *name, enum Type type, enum Type secondary_type);
 #endif
 
+_Function* declareFunction(char *name, char *module, char *module_path, char *context, enum Type type, enum Type secondary_type);
+void startFunctionScope(_Function* function);
+_Function* startFunctionNew(char *name);
+void addFunctionParameterNew(_Function* function, Symbol* parameter);
+
 void endFunction();
 void freeFunctionParametersMode();
 void resetFunctionParametersMode();
 _Function* getFunction(char *name, char *module);
 _Function* getFunctionByModuleContext(char *name, char *module_context);
+_Function* checkDuplicateFunction(char *name, char *module_path);
 void removeFunctionIfDefined(char *name);
 void printFunctionTable();
-FunctionCall* callFunction(char *name, char *module);
 
-#ifndef CHAOS_COMPILER
-void callFunctionCleanUp(FunctionCall* function_call);
-#else
-void callFunctionCleanUp(FunctionCall* function_call, bool has_decision);
-#endif
-
-void callFunctionCleanUpSymbols(FunctionCall* function_call);
-void callFunctionCleanUpCommon();
 void startFunctionParameters();
 void addFunctionParameter(char *secondary_name, enum Type type, enum Type secondary_type);
 void addFunctionOptionalParameterBool(char *secondary_name, bool b);
 void addFunctionOptionalParameterInt(char *secondary_name, long long i);
-void addFunctionOptionalParameterFloat(char *secondary_name, long double f);
+void addFunctionOptionalParameterFloat(char *secondary_name, double f);
 void addFunctionOptionalParameterString(char *secondary_name, char *s);
 void addFunctionOptionalParameterComplex(char *secondary_name, enum Type type);
 void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional);
-void initFunctionCall();
-void addFunctionCallParameterBool(bool b);
-void addFunctionCallParameterInt(long long i);
-void addFunctionCallParameterFloat(long double f);
-void addFunctionCallParameterString(char *s);
-void addFunctionCallParameterSymbol(char *name);
-void addFunctionCallParameterList(enum Type type);
 void returnSymbol(char *name);
-void printFunctionReturn(FunctionCall* function_call, char *end, bool pretty, bool escaped);
-void createCloneFromFunctionReturn(char *clone_name, enum Type type, FunctionCall* function_call, enum Type extra_type);
-void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* function_call);
-void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call);
 void initMainFunction();
 void initScopeless();
-
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-void increaseStackSize();
-#endif
 
 void removeFunction(_Function* function);
 void freeFunction(_Function* function);
@@ -168,7 +154,6 @@ void freeAllFunctions();
 bool block(enum BlockType type);
 void addBooleanDecision();
 void addDefaultDecision();
-void executeDecision(FunctionCall* function);
 void addFunctionNameToFunctionNamesBuffer(char *name);
 void freeFunctionNamesBuffer();
 bool isInFunctionNamesBuffer(char *name);
@@ -176,7 +161,6 @@ bool isFunctionType(char *name, char *module, enum Type type);
 void setScopeless(Symbol* symbol);
 void pushExecutedFunctionStack(FunctionCall* function_call);
 void popExecutedFunctionStack();
-void freeFunctionReturn(FunctionCall* function_call);
 void decisionBreakLoop();
 void decisionContinueLoop();
 void updateDecisionSymbolChainScope();

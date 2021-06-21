@@ -314,32 +314,6 @@ print c
 del a
 del b
 del c
-any a = 333
-str b = "hey"
-print a
-print b
-b = a
-str c = a
-print a
-print b
-print c
-
-del a
-del b
-del c
-any a = 333.33
-str b = "hey"
-print a
-print b
-b = a
-str c = a
-print a
-print b
-print c
-
-del a
-del b
-del c
 any a = "universe"
 str b = "hey"
 print a

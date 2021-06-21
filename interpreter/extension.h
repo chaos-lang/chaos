@@ -1,7 +1,7 @@
 /*
  * Description: Extension module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -40,6 +40,9 @@ typedef FARPROC lib_func;
 typedef void (*lib_func)();
 #endif
 
+#include "../vm/types.h"
+#include "../vm/instructions.h"
+#include "../vm/cpu.h"
 #include "function.h"
 #include "../Chaos.h"
 
@@ -50,7 +53,9 @@ typedef struct dynamic_library {
 
 void initKaosApi();
 void callRegisterInDynamicLibrary(char* dynamic_library_path);
-void callFunctionFromDynamicLibrary(_Function* function);
+void callFunctionFromDynamicLibrary(_Function* function, cpu* c);
+void populateCallParametersDynamicLibrary(_Function* function, cpu* c);
+void handleFunctionReturnDynamicLibrary(_Function* function, cpu* c);
 dynamic_library getFunctionFromDynamicLibrary(char* dynamic_library_path, char* function_name);
 void returnVariable(Symbol* symbol);
 

@@ -2,7 +2,7 @@
 /*
  * Description: Lexer of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ extern void recordToken(char *token, int length);
 extern int oerrno;
 extern void yyerror(const char* s);
 extern FILE* tmp_stdin;
-extern bool global_unsafe;
+unsigned long long shell_indicator_block_counter;
 #define YY_FATAL_ERROR(msg) yy_fatal_error( msg )
 
 #include "parser.tab.h"
@@ -60,13 +60,13 @@ void injectCode(char *code, enum Phase phase_arg) {
         phase_arg = PREPARSE;
     }
 
-    char *interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-    strcpy(interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
-#ifndef CHAOS_COMPILER
-    interpret(interpreted_module, phase_arg, false, global_unsafe);
-#else
-    interpret(interpreted_module, phase_arg);
-#endif
+    char *interpreted_module = malloc(1 + strlen(_ast_root->files[_ast_root->file_count - 1]->module_path));
+    strcpy(interpreted_module, _ast_root->files[_ast_root->file_count - 1]->module_path);
+// #ifndef CHAOS_COMPILER
+//     interpret(interpreted_module, phase_arg, false);
+// #else
+//     interpret(interpreted_module, phase_arg);
+// #endif
     free(interpreted_module);
 
     yy_delete_buffer(new_buffer);
@@ -181,21 +181,20 @@ static int custom_input(char *buf, int result, int max_size) {
 
 %{
 
-switch (phase)
-{
-    case INIT_PREPARSE:
-        phase = PREPARSE;
-        return START_PREPARSE;
-        break;
-    case INIT_PROGRAM:
-        phase = PROGRAM;
-        return START_PROGRAM;
-        break;
-    case INIT_JSON_PARSE:
-        phase = JSON_PARSE;
-        return START_JSON_PARSE;
-    default:
-        break;
+switch (phase) {
+case INIT_PREPARSE:
+    phase = PREPARSE;
+    return START_PREPARSE;
+    break;
+case INIT_PROGRAM:
+    phase = PROGRAM;
+    return START_PROGRAM;
+    break;
+case INIT_JSON_PARSE:
+    phase = JSON_PARSE;
+    return START_JSON_PARSE;
+default:
+    break;
 }
 
 %}
@@ -204,56 +203,56 @@ switch (phase)
 [0-9]+\.[0-9]+                  {yylval.fval = atof(yytext); return T_FLOAT;}
 [0-9]+                          {yylval.ival = atoi(yytext); return T_INT;}
 \n                              {yylineno++; return T_NEWLINE;}
-"="                             {return T_EQUAL;}
-"+"                             {return T_PLUS;}
-"-"                             {return T_MINUS;}
-"*"                             {return T_MULTIPLY;}
-"/"                             {return T_DIVIDE;}
+"="                             {return T_ASSIGN;}
+"+"                             {return T_ADD;}
+"-"                             {return T_SUB;}
+"*"                             {return T_MUL;}
+"/"                             {return T_QUO;}
+"%"                             {return T_REM;}
 "\\"                            {return T_BACKSLASH;}
-"("                             {return T_LEFT;}
-")"                             {return T_RIGHT;}
-"["                             {return T_LEFT_BRACKET;}
-"]"                             {return T_RIGHT_BRACKET;}
-"{"                             {return T_LEFT_CURLY_BRACKET;}
-"}"                             {return T_RIGHT_CURLY_BRACKET;}
+"("                             {return T_LPAREN;}
+")"                             {return T_RPAREN;}
+"["                             {shell_indicator_block_counter++; return T_LBRACK;}
+"]"                             {shell_indicator_block_counter--; return T_RBRACK;}
+"{"                             {shell_indicator_block_counter++; return T_LBRACE;}
+"}"                             {shell_indicator_block_counter--; return T_RBRACE;}
 ","                             {return T_COMMA;}
-"."                             {return T_DOT;}
-"=="                            {return T_REL_EQUAL;}
-"!="                            {return T_REL_NOT_EQUAL;}
-">"                             {return T_REL_GREAT;}
-"<"                             {return T_REL_SMALL;}
-">="                            {return T_REL_GREAT_EQUAL;}
-"<="                            {return T_REL_SMALL_EQUAL;}
-\&\&|and                        {return T_LOGIC_AND;}
-\|\||or                         {return T_LOGIC_OR;}
-\!|not                          {return T_LOGIC_NOT;}
-"&"                             {return T_BITWISE_AND;}
-"|"                             {return T_BITWISE_OR;}
-"^"                             {return T_BITWISE_XOR;}
-"~"                             {return T_BITWISE_NOT;}
-"<<"                            {return T_BITWISE_LEFT_SHIFT;}
-">>"                            {return T_BITWISE_RIGHT_SHIFT;}
-"++"                            {return T_INCREMENT;}
-"--"                            {return T_DECREMENT;}
+"."                             {return T_PERIOD;}
+"=="                            {return T_EQL;}
+"!="                            {return T_NEQ;}
+">"                             {return T_GTR;}
+"<"                             {return T_LSS;}
+">="                            {return T_GEQ;}
+"<="                            {return T_LEQ;}
+\&\&|and                        {return T_LAND;}
+\|\||or                         {return T_LOR;}
+\!|not                          {return T_NOT;}
+"&"                             {return T_AND;}
+"|"                             {return T_OR;}
+"^"                             {return T_XOR;}
+"~"                             {return T_TILDE;}
+"<<"                            {return T_SHL;}
+">>"                            {return T_SHR;}
+"++"                            {return T_INC;}
+"--"                            {return T_DEC;}
 "//".*"\n"                      {yylineno++; return T_NEWLINE;}
 "#".*"\n"                       {yylineno++; return T_NEWLINE;}
 ":"                             {return T_COLON;}
-"exit"                          {return T_QUIT;}
-"quit"                          {return T_QUIT;}
+"exit"                          {return T_EXIT;}
+"quit"                          {return T_EXIT;}
 "print"                         {return T_PRINT;}
 "echo"                          {return T_ECHO;}
 "pretty"                        {return T_PRETTY;}
 "true"                          {yylval.bval = 1; return T_TRUE;}
 "false"                         {yylval.bval = 0; return T_FALSE;}
-"symbol_table"                  {return T_SYMBOL_TABLE;}
 "function_table"                {return T_FUNCTION_TABLE;}
 "del"                           {return T_DEL;}
 "return"                        {return T_RETURN;}
 "default"                       {return T_DEFAULT;}
 
-"times do"                      {return T_TIMES_DO;}
-"end"                           {return T_END;}
-"foreach"                       {return T_FOREACH;}
+"times do"                      {shell_indicator_block_counter++; return T_TIMES_DO;}
+"end"                           {shell_indicator_block_counter--; return T_END;}
+"foreach"                       {shell_indicator_block_counter++; return T_FOREACH;}
 "as"                            {return T_AS;}
 "from"                          {return T_FROM;}
 "INFINITE"                      {return T_INFINITE;}
@@ -282,7 +281,7 @@ switch (phase)
 "any"                           {return T_VAR_ANY;}
 "null"                          {return T_NULL;}
 "void"                          {return T_VOID;}
-"def"                           {return T_FUNCTION;}
+"def"                           {shell_indicator_block_counter++; return T_DEF;}
 "import"                        {return T_IMPORT;}
 "break"                         {return T_BREAK;}
 "continue"                      {return T_CONTINUE;}

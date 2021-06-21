@@ -1,7 +1,7 @@
 /*
  * Description: Enums module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@
 
 enum Phase { INIT_PREPARSE, PREPARSE, INIT_PROGRAM, PROGRAM, INIT_JSON_PARSE, JSON_PARSE };
 
-enum Type { K_BOOL, K_NUMBER, K_STRING, K_ANY, K_LIST, K_DICT, K_VOID };
-enum ValueType { V_BOOL, V_INT, V_FLOAT, V_STRING, V_VOID };
+enum Type { K_VOID, K_BOOL, K_NUMBER, K_STRING, K_ANY, K_LIST, K_DICT };
+enum ValueType { V_BOOL, V_INT, V_FLOAT, V_STRING, V_ANY, V_VOID, V_LIST, V_DICT, V_REF };
 enum Role { DEFAULT, PARAM, CALL_PARAM };
 
 #endif

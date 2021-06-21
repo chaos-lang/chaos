@@ -28,7 +28,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
-    SKIP_TESTS="syntax_error preemptive"
+    SKIP_TESTS="syntax_error"
 
     if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
         continue
@@ -58,7 +58,7 @@ for filepath in $(find $DIR -maxdepth 1 -name '*.kaos'); do
     testname="${filename%.*}"
     out=$(<"$DIR/$testname.out")
 
-    SKIP_TESTS="syntax_error preemptive"
+    SKIP_TESTS="syntax_error"
 
     if echo $SKIP_TESTS | grep -w $testname > /dev/null; then
         continue

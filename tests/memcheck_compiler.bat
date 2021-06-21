@@ -8,7 +8,6 @@ FOR %%f in (*.kaos) do (
     SET ignore=false
     IF "!filename:~0,5!" == "exit_" SET ignore=true
     IF "!testname!" == "syntax_error" SET ignore=true
-    IF "!testname!" == "preemptive" SET ignore=true
     IF !ignore! == true (
         ECHO.
         ECHO Ignoring memcheck for !filename!
@@ -30,7 +29,6 @@ FOR %%f in (*.kaos) do (
     SET ignore=false
     IF "!filename:~0,5!" == "exit_" SET ignore=true
     IF "!testname!" == "syntax_error" SET ignore=true
-    IF "!testname!" == "preemptive" SET ignore=true
     IF !ignore! == true (
         ECHO.
         ECHO Ignoring memcheck for !filename!

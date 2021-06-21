@@ -1,7 +1,7 @@
 /*
  * Description: Modularity feature of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,8 @@
 
 #include "module.h"
 
+extern bool interactively_importing;
+
 void initMainContext() {
     modules_buffer.capacity = 0;
     modules_buffer.size = 0;
@@ -33,7 +35,12 @@ void initMainContext() {
     char *module_path_with_extension = malloc(1 + strlen(program_file_path));
     strcpy(module_path_with_extension, program_file_path);
     pushModuleStack(module_path_with_extension, "");
-    free(module_path_with_extension);
+    if (_ast_root != NULL && _ast_root->file_count > 0) {
+        _ast_root->files[_ast_root->file_count - 1]->module = "";
+        _ast_root->files[_ast_root->file_count - 1]->module_path = module_path_with_extension;
+        _ast_root->files[_ast_root->file_count - 1]->context = module_path_with_extension;
+        _ast_root->files[_ast_root->file_count - 1]->is_interactive = is_interactive;
+    }
 }
 
 void appendModuleToModuleBuffer(char *name) {
@@ -42,12 +49,6 @@ void appendModuleToModuleBuffer(char *name) {
 
 void prependModuleToModuleBuffer(char *name) {
     prepend_to_array(&modules_buffer, name);
-}
-
-void handleModuleImport(char *module_name, bool directly_import) {
-    char *module_path = resolveModulePath(module_name, directly_import);
-    moduleImportParse(module_path);
-    moduleImportCleanUp(module_path);
 }
 
 void moduleImportParse(char *module_path) {
@@ -65,16 +66,12 @@ void moduleImportParse(char *module_path) {
     }
 }
 
-char* resolveModulePath(char *module_name, bool directly_import) {
-#ifndef CHAOS_COMPILER
-    if (is_interactive)
-        ast_interactive_cursor = ast_node_cursor;
-#endif
+char* resolveModulePath(char *module_name, bool directly_import, char *parent_context) {
     char *module_path;
     char *relative_path = "";
 
-    module_path = malloc(strlen(module_path_stack.arr[module_path_stack.size - 1]) + 1);
-    strcpy(module_path, module_path_stack.arr[module_path_stack.size - 1]);
+    module_path = malloc(strlen(parent_context) + 1);
+    strcpy(module_path, parent_context);
     if (strchr(module_path, __KAOS_PATH_SEPARATOR_ASCII__) == NULL) {
         free(module_path);
         module_path = "";
@@ -114,12 +111,17 @@ char* resolveModulePath(char *module_name, bool directly_import) {
     relative_path = strcat_ext(relative_path, ".");
     relative_path = strcat_ext(relative_path, __KAOS_LANGUAGE_FILE_EXTENSION__);
 
+    char *context = malloc(strlen(parent_context) + 1);
+    strcpy(context, parent_context);
+
     module_path = searchSpellsIfNotExits(module_path, relative_path);
 
-    pushModuleStack(module_path, module);
+    _ast_root->files[_ast_root->file_count - 1]->module = module;
+    _ast_root->files[_ast_root->file_count - 1]->module_path = module_path;
+    _ast_root->files[_ast_root->file_count - 1]->context = context;
 
     freeModulesBuffer();
-    free(module);
+    // free(module);
     free(relative_path);
     return module_path;
 }
@@ -172,14 +174,21 @@ void freeModuleStack() {
 }
 
 char* getCurrentModule() {
-    return module_path_stack.arr[module_path_stack.size - 1];
+    if (_ast_root == NULL)
+        return "";
+    else {
+        File* file = _ast_root->files[_ast_root->file_count - 1];
+        if (is_interactive && !interactively_importing)
+            file = _ast_root->files[0];
+        return file->module_path;
+    }
 }
 
 char* getMainModuleDir() {
     char *module_dir;
 
-    module_dir = malloc(strlen(module_path_stack.arr[0]) + 1);
-    strcpy(module_dir, module_path_stack.arr[0]);
+    module_dir = malloc(strlen(_ast_root->files[0]->module_path) + 1);
+    strcpy(module_dir, _ast_root->files[0]->module_path);
     if (strchr(module_dir, __KAOS_PATH_SEPARATOR_ASCII__) == NULL) {
         free(module_dir);
         return "";

@@ -1,0 +1,362 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "level1"
+                            },
+                            "sel": {
+                                "_type": "ModuleSelector",
+                                "parent_dir_spec": null,
+                                "x": {
+                                    "_type": "Ident",
+                                    "name": "level2"
+                                },
+                                "sel": {
+                                    "_type": "ModuleSelector",
+                                    "parent_dir_spec": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "module9"
+                                    },
+                                    "sel": null
+                                }
+                            }
+                        }
+                    },
+                    "ident": null,
+                    "names": [
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "module9"
+                            },
+                            "asname": null
+                        }
+                    ],
+                    "asterisk": null
+                },
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module8"
+                            },
+                            "sel": null
+                        }
+                    },
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "module_x"
+                    },
+                    "names": [],
+                    "asterisk": null
+                },
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module7"
+                            },
+                            "sel": null
+                        }
+                    },
+                    "ident": null,
+                    "names": [],
+                    "asterisk": null
+                },
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module6"
+                            },
+                            "sel": null
+                        }
+                    },
+                    "ident": null,
+                    "names": [
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "module6Function2"
+                            },
+                            "asname": null
+                        },
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "module6Function3"
+                            },
+                            "asname": null
+                        },
+                        {
+                            "_type": "AliasExpr",
+                            "name": {
+                                "_type": "Ident",
+                                "name": "module6Function5"
+                            },
+                            "asname": null
+                        }
+                    ],
+                    "asterisk": null
+                },
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module5"
+                            },
+                            "sel": null
+                        }
+                    },
+                    "ident": null,
+                    "names": [],
+                    "asterisk": {
+                        "_type": "AsteriskSpec"
+                    }
+                },
+                {
+                    "_type": "ImportSpec",
+                    "module_selector": {
+                        "_type": "ModuleSelector",
+                        "parent_dir_spec": null,
+                        "x": {
+                            "_type": "Ident",
+                            "name": "modules"
+                        },
+                        "sel": {
+                            "_type": "ModuleSelector",
+                            "parent_dir_spec": null,
+                            "x": {
+                                "_type": "Ident",
+                                "name": "hello"
+                            },
+                            "sel": null
+                        }
+                    },
+                    "ident": null,
+                    "names": [],
+                    "asterisk": null
+                }
+            ],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": []
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "mainContext"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "in main context"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "SelectorExpr",
+                            "x": {
+                                "_type": "Ident",
+                                "name": "hello"
+                            },
+                            "sel": {
+                                "_type": "Ident",
+                                "name": "hello"
+                            }
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "module5"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "module6Function2"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "module6Function3"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "module6Function5"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "SelectorExpr",
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module7"
+                            },
+                            "sel": {
+                                "_type": "Ident",
+                                "name": "module7"
+                            }
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "SelectorExpr",
+                            "x": {
+                                "_type": "Ident",
+                                "name": "module_x"
+                            },
+                            "sel": {
+                                "_type": "Ident",
+                                "name": "module8"
+                            }
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "module9"
+                        },
+                        "args": []
+                    }
+                },
+                {
+                    "_type": "ExprStmt",
+                    "x": {
+                        "_type": "CallExpr",
+                        "fun": {
+                            "_type": "Ident",
+                            "name": "mainContext"
+                        },
+                        "args": []
+                    }
+                }
+            ]
+        }
+    ]
+}

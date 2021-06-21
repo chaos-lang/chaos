@@ -11,12 +11,14 @@ str c = 'bom'
 c = a[2]
 print b
 print c
-symbol_table
 
 str k = 'chaos'
 k[1] = 'k'
 del k[0]
 print k
+k[-1] = 'z'
+print k
+print k[-2]
 
 
 // Multiline string literals
@@ -104,4 +106,23 @@ print a
 print "abc%s"
 del a
 str a = "12%s3"
+print a
+
+
+// New variable creation from another variable
+del a
+del b
+del c
+str a = 'hello world'
+str c = 'hello universe'
+str b = a
+print b
+print b
+str d = 'come on'
+print b
+
+// Multiple string concatenation
+print "hello" + " " + "world" + " " + "nice" + " " + "great"
+del a
+str a = "red" + " " + "blue" + " " + "green" + " " + "yellow"
 print a

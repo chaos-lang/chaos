@@ -1,0 +1,1174 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var7"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "string1"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var7"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "string2"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var7"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var8"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "string3"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var8"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "string4"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "var8"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hey"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "expr": {
+                            "_type": "IndexExpr",
+                            "x": {
+                                "_type": "Ident",
+                                "name": "a"
+                            },
+                            "index": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "c"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "bom"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "Ident",
+                        "name": "c"
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "2"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "c"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "chaos"
+                        }
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "1"
+                        }
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "k"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "index": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "0"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "k"
+                    }
+                },
+                {
+                    "_type": "AssignStmt",
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "index": {
+                            "_type": "UnaryExpr",
+                            "op": "-",
+                            "x": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "1"
+                            }
+                        }
+                    },
+                    "op": "=",
+                    "y": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "z"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "k"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "IndexExpr",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "k"
+                        },
+                        "index": {
+                            "_type": "UnaryExpr",
+                            "op": "-",
+                            "x": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello
+world"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "
+hello
+world
+"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "
+
+hello
+
+world
+
+"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello\nworld"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "
+hello\n
+world
+"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello
+\n
+\n\n
+world\n"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello world\n"
+                        }
+                    }
+                },
+                {
+                    "_type": "EchoStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello\tworld"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello\t\tworld"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello"world"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello'world"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello\"world"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello\'world"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "abc%s"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "12%s3"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "c"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello world"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "c"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "hello universe"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "expr": {
+                            "_type": "Ident",
+                            "name": "a"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "d"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "come on"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "b"
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BinaryExpr",
+                        "x": {
+                            "_type": "BinaryExpr",
+                            "x": {
+                                "_type": "BinaryExpr",
+                                "x": {
+                                    "_type": "BinaryExpr",
+                                    "x": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "hello"
+                                            },
+                                            "op": "+",
+                                            "y": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": " "
+                                            }
+                                        },
+                                        "op": "+",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "string",
+                                            "value": "world"
+                                        }
+                                    },
+                                    "op": "+",
+                                    "y": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": " "
+                                    }
+                                },
+                                "op": "+",
+                                "y": {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": "nice"
+                                }
+                            },
+                            "op": "+",
+                            "y": {
+                                "_type": "BasicLit",
+                                "value_type": "string",
+                                "value": " "
+                            }
+                        },
+                        "op": "+",
+                        "y": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "great"
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BinaryExpr",
+                            "x": {
+                                "_type": "BinaryExpr",
+                                "x": {
+                                    "_type": "BinaryExpr",
+                                    "x": {
+                                        "_type": "BinaryExpr",
+                                        "x": {
+                                            "_type": "BinaryExpr",
+                                            "x": {
+                                                "_type": "BinaryExpr",
+                                                "x": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "red"
+                                                },
+                                                "op": "+",
+                                                "y": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": " "
+                                                }
+                                            },
+                                            "op": "+",
+                                            "y": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "blue"
+                                            }
+                                        },
+                                        "op": "+",
+                                        "y": {
+                                            "_type": "BasicLit",
+                                            "value_type": "string",
+                                            "value": " "
+                                        }
+                                    },
+                                    "op": "+",
+                                    "y": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "green"
+                                    }
+                                },
+                                "op": "+",
+                                "y": {
+                                    "_type": "BasicLit",
+                                    "value_type": "string",
+                                    "value": " "
+                                }
+                            },
+                            "op": "+",
+                            "y": {
+                                "_type": "BasicLit",
+                                "value_type": "string",
+                                "value": "yellow"
+                            }
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                }
+            ]
+        }
+    ]
+}

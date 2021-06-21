@@ -2,11 +2,11 @@
 
 echo -e "\nINFO: Test the positional arguments (interpreter)\n"
 chaos tests/everything.kaos && echo -e "\nOK\n\n" && \
-chaos -d tests/everything.kaos && echo -e "\nOK\n\n" && \
+chaos -d 3 tests/everything.kaos && echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test no arguments (REPL)\n"
 echo "exit" | chaos && echo -e "\nOK\n\n" && \
-echo "exit" | chaos -d && echo -e "\nOK\n\n" && \
+echo "exit" | chaos -d 3 && echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test compilation variants with short options\n"
 chaos -c tests/everything.kaos && \
@@ -54,7 +54,7 @@ echo -e "\nINFO: Test other arguments\n"
 chaos -h && chaos --help && \
 chaos -v && chaos --version && \
 chaos -l && chaos --license && \
-chaos -u tests/everything.kaos && chaos --unsafe tests/everything.kaos && \
+chaos -a tests/everything.kaos && chaos --ast tests/everything.kaos && \
 echo -e "\nOK\n\n" && \
 
 echo -e "\nINFO: Test invalid argument messages with short options\n"

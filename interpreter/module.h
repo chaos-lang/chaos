@@ -1,7 +1,7 @@
 /*
  * Description: Modularity feature of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -44,9 +44,8 @@ extern unsigned short module_parsing;
 void initMainContext();
 void appendModuleToModuleBuffer(char *name);
 void prependModuleToModuleBuffer(char *name);
-void handleModuleImport(char *module_name, bool directly_import);
 void moduleImportParse(char *module_path);
-char* resolveModulePath(char *module_name, bool directly_import);
+char* resolveModulePath(char *module_name, bool directly_import, char *parent_context);
 void moduleImportCleanUp(char *module_path);
 void freeModulesBuffer();
 void pushModuleStack(char *module_path, char *module);

@@ -1,7 +1,7 @@
 /*
  * Description: Helpers module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -145,7 +145,7 @@ char *snprintf_concat_int(char *s1, char *format, long long i)
     return s1;
 }
 
-char *snprintf_concat_float(char *s1, char *format, long double f)
+char *snprintf_concat_float(char *s1, char *format, double f)
 {
     char *tmp;
     size_t len;
@@ -366,47 +366,46 @@ char* escape_the_sequences_in_string_literal(char* string) {
 
     for (long long i = 0; i < (long long) strlen(new_string); i++){
         if (new_string[i] == '\\') {
-            switch (new_string[i+1])
-            {
-                case '\\':
-                    remove_nth_char(new_string, i);
-                    break;
-                case 'a':
-                    new_string[i+1] = '\a';
-                    remove_nth_char(new_string, i);
-                    break;
-                case 'b':
-                    new_string[i+1] = '\b';
-                    remove_nth_char(new_string, i);
-                    break;
-                case 'f':
-                    new_string[i+1] = '\f';
-                    remove_nth_char(new_string, i);
-                    break;
-                case 'n':
-                    new_string[i+1] = '\n';
-                    remove_nth_char(new_string, i);
-                    break;
-                case 'r':
-                    new_string[i+1] = '\r';
-                    remove_nth_char(new_string, i);
-                    break;
-                case 't':
-                    new_string[i+1] = '\t';
-                    remove_nth_char(new_string, i);
-                    break;
-                case 'v':
-                    new_string[i+1] = '\v';
-                    remove_nth_char(new_string, i);
-                    break;
-                case '"':
-                    remove_nth_char(new_string, i);
-                    break;
-                case '\'':
-                    remove_nth_char(new_string, i);
-                    break;
-                default:
-                    break;
+            switch (new_string[i+1]) {
+            case '\\':
+                remove_nth_char(new_string, i);
+                break;
+            case 'a':
+                new_string[i+1] = '\a';
+                remove_nth_char(new_string, i);
+                break;
+            case 'b':
+                new_string[i+1] = '\b';
+                remove_nth_char(new_string, i);
+                break;
+            case 'f':
+                new_string[i+1] = '\f';
+                remove_nth_char(new_string, i);
+                break;
+            case 'n':
+                new_string[i+1] = '\n';
+                remove_nth_char(new_string, i);
+                break;
+            case 'r':
+                new_string[i+1] = '\r';
+                remove_nth_char(new_string, i);
+                break;
+            case 't':
+                new_string[i+1] = '\t';
+                remove_nth_char(new_string, i);
+                break;
+            case 'v':
+                new_string[i+1] = '\v';
+                remove_nth_char(new_string, i);
+                break;
+            case '"':
+                remove_nth_char(new_string, i);
+                break;
+            case '\'':
+                remove_nth_char(new_string, i);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -426,49 +425,48 @@ char* escape_string_literal_for_transpiler(char* string) {
             continue;
         }
 
-        switch (new_string[i])
-        {
-            case '\a':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'a';
+        switch (new_string[i]) {
+        case '\a':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 'a';
+            break;
+        case '\b':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 'b';
+            break;
+        case '\f':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 'f';
+            break;
+        case '\n':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 'n';
+            break;
+        case '\r':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 'r';
+            break;
+        case '\t':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 't';
+            break;
+        case '\v':
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = 'v';
+            break;
+        case '"':
+            if (prev_char == '\\')
                 break;
-            case '\b':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'b';
-                break;
-            case '\f':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'f';
-                break;
-            case '\n':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'n';
-                break;
-            case '\r':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'r';
-                break;
-            case '\t':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 't';
-                break;
-            case '\v':
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = 'v';
-                break;
-            case '"':
-                if (prev_char == '\\')
-                    break;
-                new_string = insert_nth_char(new_string, '\\', i);
-                new_string[i+1] = '"';
-                pass_next = true;
-                break;
-            case '\'':
-                if (prev_char == '\\')
-                    remove_nth_char(new_string, i-1);
-                break;
-            default:
-                break;
+            new_string = insert_nth_char(new_string, '\\', i);
+            new_string[i+1] = '"';
+            pass_next = true;
+            break;
+        case '\'':
+            if (prev_char == '\\')
+                remove_nth_char(new_string, i-1);
+            break;
+        default:
+            break;
         }
 
         prev_char = new_string[i];

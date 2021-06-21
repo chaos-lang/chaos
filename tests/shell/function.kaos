@@ -14,10 +14,10 @@ num def fb()
     num a = 5
     return a
 end
-fb()
+print fb()
 
 // Print the function return on function calls from modules
-module1.sub(7, 3)
+print module1.sub(7, 3)
 
 // Test for not printing function returns on function decision execution mode
 num def f1()
@@ -43,5 +43,4 @@ end {
     default : f3()
 }
 
-add(3, 5)
 print add(3, 5)

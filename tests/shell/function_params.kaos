@@ -14,7 +14,7 @@ end
 dict_as_params('foo', 'bar')
 
 
-// Wrong typed list or dictionary
+// Illegal element type for a typed list or dictionary param
 void def typed_list_as_params(str param1, num list param2)
     print param1
     print param2
@@ -29,6 +29,24 @@ void def typed_dict_as_params(str param1, num dict param2)
     print param1
     print param2
     param2['a'] = 'a'
+    print param2
+end
+
+typed_dict_as_params('foo', {'a': 'a', 'b': 2, 'c': 3})
+typed_dict_as_params('foo', {'a': 1, 'b': 2, 'c': 3})
+
+
+// Wrong typed list or dictionary
+void def typed_list_as_params(str param1, num list param2)
+    print param1
+    print param2
+end
+
+typed_list_as_params('foo', ['a', 2, 3])
+typed_list_as_params('foo', [1, 2, 3])
+
+void def typed_dict_as_params(str param1, num dict param2)
+    print param1
     print param2
 end
 

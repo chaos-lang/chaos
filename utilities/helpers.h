@@ -1,7 +1,7 @@
 /*
  * Description: Helpers module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ char *trim_string(char *str);
 char *fileGetContents(char *file_path);
 char *strcat_ext(char *s1, const char *s2);
 char *snprintf_concat_int(char *s1, char *format, long long i);
-char *snprintf_concat_float(char *s1, char *format, long double f);
+char *snprintf_concat_float(char *s1, char *format, double f);
 char *snprintf_concat_string(char *s1, char *format, char *s2);
 void prepend_to_array(string_array *array, char *str);
 void append_to_array(string_array *array, char *str);

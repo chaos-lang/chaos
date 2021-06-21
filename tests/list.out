@@ -8,89 +8,6 @@
 [true, false, true]
 [1, 2, 63.3, 12321.2]
 ['A', 'asdasdaqs', 'asdasd123123', '.']
-[scope]: N/A
-	[start] =>
-		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [1, 2, 3]} =>
-		{id: 1, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 2, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 3, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 4, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [true, false]} =>
-		{id: 5, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 6, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [3.2, 345.166]} =>
-		{id: 8, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 345.166} =>
-		{id: 9, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 3.2} =>
-		{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['a', 'b', 'c']} =>
-		{id: 11, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: c} =>
-		{id: 12, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: b} =>
-		{id: 13, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: a} =>
-		{id: 14, name: e, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['A', 'B', 'C']} =>
-		{id: 15, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: C} =>
-		{id: 16, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: B} =>
-		{id: 17, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-		{id: 18, name: f, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['A', 'asdasdad12312', 1232, 435.16, true, false]} =>
-		{id: 19, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 20, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 21, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 435.16} =>
-		{id: 22, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1232} =>
-		{id: 23, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdad12312} =>
-		{id: 24, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-		{id: 25, name: g, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['asdasdasd,', 123123]} =>
-		{id: 26, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 123123} =>
-		{id: 27, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdasd,} =>
-		{id: 28, name: arr1, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: [true, false, true]} =>
-		{id: 29, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 30, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 31, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 32, name: arr2, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: [1, 2, 63.3, 12321.2]} =>
-		{id: 33, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
-		{id: 34, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
-		{id: 35, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 36, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 37, name: arr3, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: ['A', 'asdasdaqs', 'asdasd123123', '.']} =>
-		{id: 38, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
-		{id: 39, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
-		{id: 40, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
-		{id: 41, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-	[end]
-[scope]: N/A
-	[start] =>
-		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [1, 2, 3]} =>
-		{id: 1, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 2, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 3, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 4, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [true, false]} =>
-		{id: 5, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 6, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: [3.2, 345.166]} =>
-		{id: 8, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 345.166} =>
-		{id: 9, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 3.2} =>
-		{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['a', 'b', 'c']} =>
-		{id: 11, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: c} =>
-		{id: 12, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: b} =>
-		{id: 13, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: a} =>
-		{id: 14, name: e, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['A', 'B', 'C']} =>
-		{id: 15, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: C} =>
-		{id: 16, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: B} =>
-		{id: 17, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-		{id: 25, name: g, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: ['asdasdasd,', 123123]} =>
-		{id: 26, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 123123} =>
-		{id: 27, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdasd,} =>
-		{id: 28, name: arr1, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: [true, false, true]} =>
-		{id: 29, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 30, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 31, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 32, name: arr2, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: [1, 2, 63.3, 12321.2]} =>
-		{id: 33, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
-		{id: 34, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
-		{id: 35, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 36, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 37, name: arr3, 2nd_name: (null), key: (null), scope: N/A, type: 4, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: ['A', 'asdasdaqs', 'asdasd123123', '.']} =>
-		{id: 38, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
-		{id: 39, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
-		{id: 40, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
-		{id: 41, name: (null), 2nd_name: (null), key: (null), scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-	[end]
 3
 2
 1
@@ -167,7 +84,6 @@ a
 [4, 5, 6]
 [[4, 5, 6], 2, 3]
 [[4, 5, 6], 3]
-{'c': 3, 'd': 4}
 [{'c': 3, 'd': 4}, 2, 3]
 [{'c': 3, 'd': 4}, 3]
 [[], []]
@@ -181,3 +97,7 @@ a
 [[1, 2], [3, 4], [5, 6]]
 [{'a': 1, 'b': 2}, {'c': 3, 'd': 4}, {'e': 5, 'f': 6}]
 [{'a': [1, 2], 'b': [3, 4]}, {'c': [5, 6], 'd': [7, 8]}, {'e': [9, 10], 'f': [11, 12]}]
+[1, 2, 3]
+[4, 5, 6]
+[7, 8, 9]
+g

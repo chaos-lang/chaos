@@ -5,67 +5,13 @@
 {'a': true, 'b': false}
 {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}
 {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}
-[scope]: N/A
-	[start] =>
-		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-		{id: 1, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 2, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 3, name: b, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
-		{id: 4, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 5, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 6, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-		{id: 8, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 9, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
-		{id: 11, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 12, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 13, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 14, name: dict1, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: {'a': true, 'b': false}} =>
-		{id: 15, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 16, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 17, name: dict2, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}} =>
-		{id: 18, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
-		{id: 19, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
-		{id: 20, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 21, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 22, name: dict3, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}} =>
-		{id: 23, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
-		{id: 24, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
-		{id: 25, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
-		{id: 26, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-	[end]
-[scope]: N/A
-	[start] =>
-		{id: 0, name: a, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-		{id: 1, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 2, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 7, name: c, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2}} =>
-		{id: 8, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 9, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 10, name: d, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 3, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 3}} =>
-		{id: 11, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 3} =>
-		{id: 12, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 13, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 14, name: dict1, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 0, value_type: 4, role: 0, param_of: , value: {'a': true, 'b': false}} =>
-		{id: 15, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: false} =>
-		{id: 16, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 0, 2nd_type: 0, value_type: 0, role: 0, param_of: , value: true} =>
-		{id: 17, name: dict2, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 1, value_type: 4, role: 0, param_of: , value: {'a': 1, 'b': 2, 'c': 63.3, 'd': 12321.2}} =>
-		{id: 18, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 12321.2} =>
-		{id: 19, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 1, 2nd_type: 0, value_type: 2, role: 0, param_of: , value: 63.3} =>
-		{id: 20, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 2} =>
-		{id: 21, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 1, 2nd_type: 0, value_type: 1, role: 0, param_of: , value: 1} =>
-		{id: 22, name: dict3, 2nd_name: (null), key: (null), scope: N/A, type: 5, 2nd_type: 2, value_type: 4, role: 0, param_of: , value: {'a': 'A', 'b': 'asdasdaqs', 'c': 'asdasd123123', 'd': '.'}} =>
-		{id: 23, name: (null), 2nd_name: (null), key: d, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: .} =>
-		{id: 24, name: (null), 2nd_name: (null), key: c, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasd123123} =>
-		{id: 25, name: (null), 2nd_name: (null), key: b, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: asdasdaqs} =>
-		{id: 26, name: (null), 2nd_name: (null), key: a, scope: N/A, type: 2, 2nd_type: 0, value_type: 3, role: 0, param_of: , value: A} =>
-	[end]
 1
 2
 {'a': 5, 'b': 2, 'c': 3}
 32
 {'a': 5, 'b': 2, 'c': 3}
+{'a': 1, 'b': 2, 'c': 3}
+{'a': 1, 'b': 2, 'c': 3}
 {'a': 15, 'b': 2}
 {'b': 2, 'c': 3}
 1
@@ -101,27 +47,29 @@ a
 {'a': 'd', 'b': 'b'}
 {'a': 'd', 'b': 'e'}
 {'b': true}
-{'a': 5}
+{'b': 6}
 {'a': {'a': 1, 'b': 2}, 'b': {'a': 1, 'b': 2}}
 {'a': {'a': 1, 'b': 2}, 'b': 3}
-{'b': 2, 'a': [1, 2, 3]}
+{'a': [1, 2, 3], 'b': 2}
 {'a': [1, 2, 3], 'b': 2}
 2
 2
 {'c': 3, 'd': 4}
 {'a': {'c': 3, 'd': 4}, 'b': 2}
 {'a': {'e': 5, 'f': 6}, 'b': 2}
-[4, 5, 6]
 {'a': [4, 5, 6], 'b': 2}
 {'a': [4, 5, 6], 'b': 2}
 {'a': {}, 'b': {}}
 {'a': 123, 'b': {}}
 {'a': 123, 'b': 'foo'}
-{'b': 2, 'a': 4}
-{'b': 2, 'a': 2}
+{'a': 4, 'b': 2}
+{'a': 2, 'b': 2}
 {'a': 1, 'b': 3, 'c': 2}
 {'a': 1, 'b': 3, 'c': 2}
 {'a': 1, 'b': 3, 'c': 2}
 {'a': {'a': 1, 'b': 2}, 'b': {'c': 3, 'd': 4}, 'c': {'e': 5, 'f': 6}}
 {'a': [1, 2], 'b': [3, 4], 'c': [5, 6]}
 {'a': [{'a': 1, 'b': 2}, {'c': 3, 'd': 4}], 'b': [{'e': 5, 'f': 6}, {'g': 7, 'h': 8}], 'c': [{'x': 9, 'y': 10}, {'t': 11, 'v': 12}]}
+{'a': 1, 'b': 2, 'c': 3}
+{'a': 4, 'b': 5, 'c': 6}
+{'a': 7, 'b': 8, 'c': 9}

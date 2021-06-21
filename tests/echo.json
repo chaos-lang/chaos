@@ -1,0 +1,75 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "EchoStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "int",
+                        "value": "77"
+                    }
+                },
+                {
+                    "_type": "EchoStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "hello world"
+                    }
+                },
+                {
+                    "_type": "EchoStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "hello world"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "hello"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "world"
+                        }
+                    }
+                },
+                {
+                    "_type": "EchoStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "hello"
+                    }
+                },
+                {
+                    "_type": "EchoStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "BasicLit",
+                        "value_type": "string",
+                        "value": "Hello\n\tWorld!"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,98 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Boolean",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var1"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "bool",
+                            "value": "true"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var2"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "5"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var3"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "string1"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "var4"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "float",
+                            "value": "45.6"
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "var2"
+                    }
+                }
+            ]
+        }
+    ]
+}

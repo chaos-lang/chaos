@@ -77,5 +77,3 @@ end {
 print f5(3)
 print f5(4)
 print f5(5)
-
-symbol_table

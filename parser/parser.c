@@ -1,7 +1,7 @@
 /*
  * Description: Enterance functions for the parser of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ extern bool disable_complex_mode;
 extern char *suggestions[1000];
 extern unsigned long long suggestions_length;
 
-bool global_unsafe = false;
+bool compiling_a_function = false;
 
 #ifndef CHAOS_COMPILER
 static struct option long_options[] =
@@ -34,80 +34,78 @@ static struct option long_options[] =
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'v'},
     {"license", no_argument, NULL, 'l'},
-    {"debug", no_argument, NULL, 'd'},
+    {"debug", required_argument, NULL, 'd'},
     {"compile", required_argument, NULL, 'c'},
     {"output", required_argument, NULL, 'o'},
     {"extra", required_argument, NULL, 'e'},
     {"keep", no_argument, NULL, 'k'},
-    {"unsafe", no_argument, NULL, 'u'},
+    {"ast", no_argument, NULL, 'a'},
     {NULL, 0, NULL, 0}
 };
 
 int initParser(int argc, char** argv) {
-    debug_enabled = false;
+    unsigned short debug_level = 0;
     bool compiler_mode = false;
     bool compiler_fopen_fail = false;
+    bool print_ast = false;
     char *program_file = NULL;
     char *bin_file = NULL;
-    bool keep = false;
-    bool unsafe = false;
-    char *extra_flags = NULL;
+    // bool keep = false;
+    // char *extra_flags = NULL;
 
     char opt;
-    while ((opt = getopt_long(argc, argv, "hvldc:o:e:ku", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hvld:c:o:e:k:a:", long_options, NULL)) != -1)
     {
-        switch (opt)
-        {
-            case 'h':
-                print_help();
-                exit(0);
-            case 'v':
-                printf("%d.%d.%d\n", __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__, __KAOS_VERSION_PATCHLEVEL__);
-                exit(0);
-            case 'l':
-                print_license();
-                exit(0);
-            case 'd':
-                debug_enabled = true;
-                break;
+        switch (opt) {
+        case 'h':
+            print_help();
+            exit(0);
+        case 'v':
+            printf("%d.%d.%d\n", __KAOS_VERSION_MAJOR__, __KAOS_VERSION_MINOR__, __KAOS_VERSION_PATCHLEVEL__);
+            exit(0);
+        case 'l':
+            print_license();
+            exit(0);
+        case 'd': {
+            debug_level = atoi(optarg);
+            break;
+        }
+        case 'c':
+            compiler_mode = true;
+            program_file = optarg;
+            fp = fopen(program_file, "r");
+            if (fp == NULL)
+                compiler_fopen_fail = true;
+            break;
+        case 'o':
+            bin_file = optarg;
+            break;
+        case 'e':
+            // extra_flags = optarg;
+            break;
+        case 'k':
+            // keep = true;
+            break;
+        case 'a':
+            print_ast = true;
+            break;
+        case '?':
+            switch (optopt) {
             case 'c':
-                compiler_mode = true;
-                program_file = optarg;
-                fp = fopen(program_file, "r");
-                if (fp == NULL)
-                    compiler_fopen_fail = true;
+                throwCompilerInteractiveError();
                 break;
             case 'o':
-                bin_file = optarg;
+                throwMissingOutputName();
                 break;
             case 'e':
-                extra_flags = optarg;
+                throwMissingExtraFlags();
                 break;
-            case 'k':
-                keep = true;
+            default:
+                print_help();
+                exit(E_INVALID_OPTION);
                 break;
-            case 'u':
-                unsafe = true;
-                global_unsafe = true;
-                break;
-            case '?':
-                switch (optopt)
-                {
-                    case 'c':
-                        throwCompilerInteractiveError();
-                        break;
-                    case 'o':
-                        throwMissingOutputName();
-                        break;
-                    case 'e':
-                        throwMissingExtraFlags();
-                        break;
-                    default:
-                        print_help();
-                        exit(E_INVALID_OPTION);
-                        break;
-                }
-                break;
+            }
+            break;
         }
     }
 
@@ -117,7 +115,7 @@ int initParser(int argc, char** argv) {
     if (fp == NULL) {
         if (argc == 1) {
             fp = stdin;
-        } else if (debug_enabled && argc == 2) {
+        } else if (debug_level > 0 && argc == 3) {
             fp = stdin;
         } else if (!compiler_fopen_fail) {
             program_file = argv[argc - 1];
@@ -173,6 +171,9 @@ int initParser(int argc, char** argv) {
 #   endif
         greet();
         phase = INIT_PROGRAM;
+        interactive_program = initProgram();
+        interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, interactive_program->ast_ref->arr, debug_level);
+        initCallJumps();
     } else {
         program_code = fileGetContents(program_file_path);
         size_t program_length = strlen(program_code);
@@ -182,9 +183,12 @@ int initParser(int argc, char** argv) {
         switchBuffer(program_code, INIT_PROGRAM);
     }
 
+    initASTRoot();
     initMainFunction();
 
     main_interpreted_module = NULL;
+    prev_stmt_count = 0;
+    prev_import_count = 0;
 
     do {
         if (is_interactive) {
@@ -195,16 +199,43 @@ int initParser(int argc, char** argv) {
 #   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
         !is_interactive ? is_interactive : printf("%s ", __KAOS_SHELL_INDICATOR__);
 #   endif
-        main_interpreted_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-        strcpy(main_interpreted_module, module_path_stack.arr[module_path_stack.size - 1]);
+        main_interpreted_module = malloc(1 + strlen(_ast_root->files[_ast_root->file_count - 1]->module_path));
+        strcpy(main_interpreted_module, _ast_root->files[_ast_root->file_count - 1]->module_path);
         yyparse();
-        if (!is_interactive) {
-            if (compiler_mode) {
-                compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep, unsafe);
-            } else {
-                interpret(main_interpreted_module, INIT_PREPARSE, false, unsafe);
-            }
+
+        if (is_interactive)
+            break;
+
+        if (print_ast || debug_level > 0) {
+            if (!print_ast)
+                printf("Abstract Syntax Tree (AST):\n");
+            printAST(_ast_root);
+            if (debug_level == 1 || print_ast)
+                exit(0);
         }
+
+        i64_array* program = compile(_ast_root);
+
+        if (debug_level > 1) {
+            printf("\nDebug Bytecode:\n");
+            emit(program);
+            if (debug_level == 2)
+                exit(0);
+        }
+
+        if (debug_level > 2)
+            printf("\nProgram Output:\n");
+
+        cpu *c = new_cpu(program->arr, program->heap, program->start, program->ast_ref->arr, debug_level);
+        run_cpu(c);
+        free_cpu(c);
+        // if (!is_interactive) {
+        //     if (compiler_mode) {
+        //         compile(main_interpreted_module, INIT_PREPARSE, bin_file, extra_flags, keep);
+        //     } else {
+        //         interpret(main_interpreted_module, INIT_PREPARSE, false);
+        //     }
+        // }
         if (!is_interactive) break;
     } while(!feof(yyin));
 
@@ -213,6 +244,71 @@ int initParser(int argc, char** argv) {
     return 0;
 }
 #endif
+
+void compile_interactive()
+{
+    bool new_imports = _ast_root->files[0]->imports->spec_count > prev_import_count;
+    bool new_stmts = _ast_root->files[0]->stmt_list->stmt_count > prev_stmt_count;
+    if (!new_imports && !new_stmts)
+        return;
+    prev_import_count = _ast_root->files[0]->imports->spec_count;
+    prev_stmt_count = _ast_root->files[0]->stmt_list->stmt_count;
+    turnLastExprStmtIntoPrintStmt();
+    if (interactive_c->debug_level > 0) {
+        printf("Abstract Syntax Tree (AST):\n");
+        printAST(_ast_root);
+    }
+
+    if (new_imports) {
+        compileImports(_ast_root, interactive_program);
+        _ast_root->files[0]->imports_handled = false;
+        declare_functions(_ast_root, interactive_program);
+        compiling_a_function = true;
+        compile_functions(_ast_root, interactive_program);
+        compiling_a_function = false;
+        current_file_index = 0;
+
+        push_instr(interactive_program, HLT);
+        interactive_program->hlt_count++;
+        interactive_c->pc = interactive_program->size - 1;
+        if (interactive_c->debug_level > 1) {
+            printf("\nDebug Bytecode:\n");
+            emit(interactive_program);
+        }
+
+        return;
+    }
+
+    bool any_stmts = _ast_root->files[0]->stmt_list->stmt_count > 0;
+    bool is_function = false;
+    if (any_stmts) {
+        Stmt* stmt = _ast_root->files[0]->stmt_list->stmts[0];
+        is_function = declare_function(stmt, _ast_root->files[0], interactive_program);
+        if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind)
+            compiling_a_function = true;
+        compileStmt(interactive_program, stmt);
+        compiling_a_function = false;
+        push_instr(interactive_program, HLT);
+        interactive_program->hlt_count++;
+        if (!is_function)
+            fillCallJumps(interactive_program);
+    }
+
+    if (interactive_c->debug_level > 1) {
+        printf("\nDebug Bytecode:\n");
+        emit(interactive_program);
+    }
+
+    if (!any_stmts)
+        return;
+
+    interactive_c->program = interactive_program->arr;
+    interactive_c->ast_ref = interactive_program->ast_ref->arr;
+    if (is_function)
+        interactive_c->pc = interactive_program->size - 1;
+    else
+        run_cpu(interactive_c);
+}
 
 void freeEverything() {
     freeAllSymbols();
@@ -251,7 +347,6 @@ void freeEverything() {
 #   endif
     }
 
-    free_node(ast_root_node);
     free(main_interpreted_module);
 
     fclose(stdin);
@@ -269,7 +364,6 @@ void yyerror(const char* s) {
 
 #ifndef CHAOS_COMPILER
     if (is_interactive) {
-        loop_mode = NULL;
         function_mode = NULL;
         if (isComplexMode()) {
             freeComplexModeStack();
@@ -294,11 +388,8 @@ void yyerror(const char* s) {
 
 #ifndef CHAOS_COMPILER
 void absorbError() {
-    ast_interactive_cursor = ast_node_cursor;
-
     phase = INIT_PROGRAM;
     disable_complex_mode = false;
-    preemptive_freeAllSymbols();
     freeComplexModeStack();
     freeLeftRightBracketStackSymbols();
     resetFunctionParametersMode();
@@ -316,21 +407,9 @@ void absorbError() {
     fprintf(stderr, "\n");
     fflush(stderr);
 
-    if (loop_execution_mode) longjmp(InteractiveShellLoopErrorAbsorber, 1);
-    for (unsigned i = function_call_stack.size; i > 0; i--) {
-        FunctionCall* function_call = function_call_stack.arr[i - 1];
-        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
-            removeSymbol(decision_symbol_chain);
-            decision_symbol_chain = NULL;
-        }
-        // callFunctionCleanUpSymbols(function_call);
-        removeSymbolsByScope(function_call);
-        if (function_call->dont_pop_module_stack) {
-            popExecutedFunctionStack();
-        } else {
-            callFunctionCleanUpCommon();
-        }
-        free(function_call);
+    if (compiling_a_function) {
+        removeFunction(end_function);
+        compiling_a_function = false;
     }
 
     if (main_interpreted_module != NULL) {

@@ -20,9 +20,7 @@ str dict dict3 = {
 }
 print dict3
 
-symbol_table
 del b
-symbol_table
 
 print a['a']
 print a["b"]
@@ -33,6 +31,11 @@ print q
 k = 32
 print k
 print q
+
+dict z = {'a': 1, 'b': 2, 'c': 3}
+dict t = z
+print z
+print t
 
 a['a'] = 15
 print a
@@ -189,11 +192,6 @@ print a
 // Update dictionary element or dictionary's itself with a complex assignment
 del a
 dict a = {'a': 1, 'b': 2}
-a = [4, 5, 6]
-print a
-
-del a
-dict a = {'a': 1, 'b': 2}
 a['a'] = [4, 5, 6]
 print a
 
@@ -311,3 +309,16 @@ dict a = {
     ]
 }
 print a
+
+
+// Nested dictionary eat
+del b
+dict b = {
+    'a': {'a': 1, 'b': 2, 'c': 3},
+    'b': {'a': 4, 'b': 5, 'c': 6},
+    'c': {'a': 7, 'b': 8, 'c': 9}
+}
+
+print b['a']
+print b['b']
+print b['c']

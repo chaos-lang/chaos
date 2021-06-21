@@ -1,5 +1,6 @@
 SHELL=/bin/bash
 
+.PHONY: help.h
 .ONESHELL:
 
 UNAME_S := $(shell uname -s)
@@ -17,6 +18,7 @@ requirements-dev:
 	rsync -av utilities/ /usr/local/include/chaos/utilities/
 	rsync -av lexer/ /usr/local/include/chaos/lexer/
 	rsync -av parser/ /usr/local/include/chaos/parser/
+	rsync -av vm/ /usr/local/include/chaos/vm/
 	rsync -av interpreter/ /usr/local/include/chaos/interpreter/
 	rsync -av compiler/ /usr/local/include/chaos/compiler/
 	rsync -av ast/ /usr/local/include/chaos/ast/
@@ -101,7 +103,7 @@ chaos: lex.yy.c parser.tab.c parser.tab.h
 ifeq ($(UNAME_S), Darwin)
 	export CHAOS_STACK_SIZE=-Wl,-stack_size,0x100000000
 endif
-	${CHAOS_COMPILER} -Werror -Wall -pedantic -fcommon ${CHAOS_STACK_SIZE} -DCHAOS_INTERPRETER -o chaos parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c preemptive/*.c interpreter/*.c compiler/*.c Chaos.c -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
+	${CHAOS_COMPILER} -Werror -Wall -pedantic -fcommon ${CHAOS_STACK_SIZE} -DCHAOS_INTERPRETER -o chaos parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c -lreadline -lm -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_EXTRA_FLAGS}
 
 clean:
 	rm -rf chaos parser.tab.c lex.yy.c parser.tab.h
@@ -183,14 +185,14 @@ test-cli-args:
 test-official-spells:
 	./tests/official_spells.sh
 
+test-ast:
+	./tests/ast.sh
+
 memcheck:
 	./tests/memcheck.sh
 
 memcheck-compiler:
 	./tests/memcheck_compiler.sh
-
-compile-dev:
-	gcc -DCHAOS_COMPILER -o build/main build/main.c /usr/local/include/chaos/utilities/helpers.c /usr/local/include/chaos/ast/ast.c /usr/local/include/chaos/interpreter/errors.c /usr/local/include/chaos/interpreter/extension.c /usr/local/include/chaos/interpreter/function.c /usr/local/include/chaos/interpreter/module.c /usr/local/include/chaos/interpreter/symbol.c /usr/local/include/chaos/compiler/compiler.c /usr/local/include/chaos/compiler/lib/alternative.c /usr/local/include/chaos/Chaos.c -lreadline -L/usr/local/opt/readline/lib -ldl -I/usr/local/include/chaos/ -Og -ggdb
 
 rosetta-install:
 	./tests/rosetta/install.sh

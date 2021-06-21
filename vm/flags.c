@@ -1,7 +1,7 @@
 /*
- * Description: Preemptive module of the Chaos Programming Language's source
+ * Description: CPU flags module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -20,19 +20,27 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef KAOS_PREEMPTIVE_H
-#define KAOS_PREEMPTIVE_H
+#include "flags.h"
 
-#include "../ast/ast.h"
-#include "preemptive_symbol.h"
-#include "preemptive_function.h"
+void clear_flags(cpu *c)
+{
+    c->zero = 0;
+    c->ltz = 0;
+    c->gtz = 0;
+}
 
-int preemptive_loop_length;
-bool preemptive_continue;
+void set_flags(cpu *c, i64 a, i64 b)
+{
+    i64 res = a - b;
+    c->zero = (res == 0);
+    c->ltz = (res < 0);
+    c->gtz = (res > 0);
+}
 
-void preemptive_check();
-ASTNode* check_function(ASTNode* ast_node, char *module, _Function* function);
-void check_break_continue(ASTNode* ast_node, _Function* function, int super_kaos_lineno);
-ASTNode* preemptive_walk_until_end(ASTNode* ast_node, char *module);
-
-#endif
+void fset_flags(cpu *c, f64 a, f64 b)
+{
+    f64 res = a - b;
+    c->zero = (res == 0);
+    c->ltz = (res < 0);
+    c->gtz = (res > 0);
+}

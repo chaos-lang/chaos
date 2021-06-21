@@ -7,7 +7,6 @@ for %%f in (tests\*.kaos) do (
 
     SET ignore=false
     IF "!testname!" == "syntax_error" SET ignore=true
-    IF "!testname!" == "preemptive" SET ignore=true
     IF !ignore! == true (
         ECHO.
         ECHO Ignoring !filename!
@@ -30,7 +29,6 @@ for %%f in (tests\*.kaos) do (
 
     SET ignore=false
     IF "!testname!" == "syntax_error" SET ignore=true
-    IF "!testname!" == "preemptive" SET ignore=true
     IF !ignore! == true (
         ECHO.
         ECHO Ignoring !filename!

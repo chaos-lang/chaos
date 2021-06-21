@@ -1,5 +1,5 @@
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 4, in <module>
+File: "~/chaos/__interactive__.kaos", line 4
 asdasd1()
 Undefined function: asdasd1 in <module>
 Absorbed by Interactive Shell
@@ -8,7 +8,7 @@ f2
 f3
 f5
 Chaos Error (most recent call last):
-File: "~/chaos/__interactive__.kaos", line 11, in <module>
+File: "~/chaos/__interactive__.kaos", line 11
 asdasd2()
 Undefined function: asdasd2 in <module>
 Absorbed by Interactive Shell

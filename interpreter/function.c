@@ -1,7 +1,7 @@
 /*
  * Description: Function module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ extern int kaos_lineno;
 extern int yyparse();
 
 bool decision_execution_mode = false;
-FunctionCall* function_call_start = NULL;
 
 #ifdef CHAOS_COMPILER
 extern jmp_buf LoopBreak;
@@ -50,7 +49,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
     removeFunctionIfDefined(name);
     function_mode = (struct _Function*)calloc(1, sizeof(_Function));
     function_mode->name = malloc(1 + strlen(name));
-    function_mode->line_no = kaos_lineno;
 
     strcpy(function_mode->name, name);
     function_mode->type = type;
@@ -93,17 +91,6 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
         get_filename_ext(function_mode->module_context),
         __KAOS_DYNAMIC_LIBRARY_EXTENSION__
     ) == 0;
-
-    if (function_mode->is_dynamic) {
-        ASTNode* fake_ast_end;
-        fake_ast_end = (struct ASTNode*)calloc(1, sizeof(ASTNode) + 0 * sizeof *fake_ast_end->strings);
-        fake_ast_end->id = 0;
-        fake_ast_end->node_type = AST_END;
-        fake_ast_end->lineno = 0;
-        fake_ast_end->module = function_mode->module_context;
-        fake_ast_end->child = fake_ast_end;
-        function_mode->node = fake_ast_end;
-    }
 
     if (start_function == NULL) {
         start_function = function_mode;
@@ -156,7 +143,88 @@ void startFunction(char *name, enum Type type, enum Type secondary_type) {
 #endif
 }
 
+_Function* declareFunction(char *name, char *module, char *module_path, char *context, enum Type type, enum Type secondary_type) {
+    _Function* function = (struct _Function*)calloc(1, sizeof(_Function));
+    function->name = malloc(1 + strlen(name));
+    function->is_compiled = false;
+    function->ref = NULL;
+
+    strcpy(function->name, name);
+    function->type = type;
+    function->secondary_type = secondary_type;
+    function->parameters = NULL;
+    function->parameter_count = 0;
+    function->optional_parameter_count = 0;
+
+    function->decision_expressions.capacity = 0;
+    function->decision_expressions.size = 0;
+
+    function->decision_functions.capacity = 0;
+    function->decision_functions.size = 0;
+
+    function->context = context;
+    function->module_context = module_path;
+    function->module = malloc(1 + strlen(module));
+    strcpy(function->module, module);
+
+    if (start_function == NULL) {
+        start_function = function;
+        end_function = function;
+    } else {
+        end_function->next = function;
+        function->previous = end_function;
+        end_function = function;
+        end_function->next = NULL;
+    }
+
+    return function;
+}
+
+void startFunctionScope(_Function* function) {
+    FunctionCall* function_call;
+    if (function_call_start == NULL) {
+        function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
+        function_call->start_symbol = NULL;
+        function_call->end_symbol = NULL;
+    } else {
+        function_call = function_call_start;
+    }
+    function_call_start = NULL;
+    function_call->function = function;
+#ifndef CHAOS_COMPILER
+    function_call->dont_pop_module_stack = false;
+#endif
+
+    scope_override = function_call;
+    pushExecutedFunctionStack(function_call);
+}
+
+_Function* startFunctionNew(char *name) {
+    function_mode = getFunctionByModuleContext(name, _ast_root->files[current_file_index]->module_path);
+    if (function_mode->is_compiled)
+        return function_mode;
+
+    startFunctionScope(function_mode);
+    for (unsigned short i = 0; i < function_mode->parameter_count; i++) {
+        updateSymbolScope(function_mode->parameters[i]);
+    }
+
+    return function_mode;
+}
+
+void addFunctionParameterNew(_Function* function, Symbol* parameter) {
+    function->parameter_count++;
+    function->parameters = realloc(
+        function->parameters,
+        sizeof(Symbol) * function->parameter_count
+    );
+    function->parameters[function->parameter_count - 1] = parameter;
+    parameter->param_of = function;
+}
+
 void endFunction() {
+    popExecutedFunctionStack();
+    scope_override = NULL;
     if (function_mode == NULL) return;
     function_mode = NULL;
     freeFunctionParametersMode();
@@ -181,215 +249,7 @@ void resetFunctionParametersMode() {
     freeFunctionParametersMode();
 }
 
-FunctionCall* callFunction(char *name, char *module) {
-    _Function* function = getFunction(name, module);
-    FunctionCall* function_call;
-    if (function_call_start == NULL) {
-        function_call = (struct FunctionCall*)malloc(sizeof(FunctionCall));
-        function_call->start_symbol = NULL;
-        function_call->end_symbol = NULL;
-    } else {
-        function_call = function_call_start;
-    }
-    function_call_start = NULL;
-    function_call->function = function;
-#ifndef CHAOS_COMPILER
-    function_call->dont_pop_module_stack = false;
-#endif
-
-    if (function_parameters_mode != NULL &&
-        function_parameters_mode->parameter_count < (function->parameter_count - function->optional_parameter_count)) {
-            resetFunctionParametersMode();
-            free(function_call);
-            throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
-    }
-
-    if (function->parameter_count > 0 && function_parameters_mode == NULL) {
-        resetFunctionParametersMode();
-        free(function_call);
-        throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
-    }
-
-    if (function_parameters_mode != NULL && function_parameters_mode->parameter_count > function->parameter_count) {
-        resetFunctionParametersMode();
-        free(function_call);
-        throw_error(E_INCORRECT_FUNCTION_ARGUMENT_COUNT, name);
-    }
-
-    scope_override = function_call;
-    for (unsigned short i = 0; i < function->parameter_count; i++) {
-        Symbol* parameter = function->parameters[i];
-
-        if ((i + 1) > function_parameters_mode->parameter_count) {
-            function_parameters_mode->parameters = realloc(
-                function_parameters_mode->parameters,
-                sizeof(Symbol) * ++function_parameters_mode->parameter_count
-            );
-
-            if (function_parameters_mode->parameters == NULL) {
-                resetFunctionParametersMode();
-                free(function_call);
-                throw_error(E_MEMORY_ALLOCATION_FOR_FUNCTION_FAILED, NULL);
-            }
-
-            Symbol* parameter_call = createCloneFromSymbol(
-                parameter->secondary_name,
-                parameter->type,
-                parameter,
-                parameter->secondary_type
-            );
-            parameter_call->scope = function_call;
-            parameter_call->param_of = function;
-
-            function_parameters_mode->parameters[function_parameters_mode->parameter_count - 1] = parameter_call;
-        } else {
-            Symbol* parameter_call = function_parameters_mode->parameters[i];
-
-            if (parameter->type != K_ANY && parameter->type != parameter_call->type) {
-                resetFunctionParametersMode();
-                free(function_call);
-                throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
-            }
-
-            if ((parameter->type == K_LIST || parameter->type == K_DICT) && parameter->secondary_type != K_ANY) {
-                for (unsigned long i = 0; i < parameter_call->children_count; i++) {
-                    Symbol* child = parameter_call->children[i];
-                    if (child->type != parameter->secondary_type) {
-                        resetFunctionParametersMode();
-                        free(function_call);
-                        throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, parameter->secondary_name, function->name);
-                    }
-                }
-            }
-
-            parameter_call->name = malloc(1 + strlen(parameter->secondary_name));
-            strcpy(parameter_call->name, parameter->secondary_name);
-            parameter_call->scope = function_call;
-            parameter_call->param_of = function;
-            parameter_call->secondary_type = parameter->secondary_type;
-        }
-    }
-    scope_override = NULL;
-
-    freeFunctionParametersMode();
-
-    FunctionCall* parent_scope = getCurrentScope();
-    pushExecutedFunctionStack(function_call);
-    function_call_stack.arr[function_call_stack.size - 1]->parent_scope = parent_scope;
-
-#ifndef CHAOS_COMPILER
-    if (
-        strcmp(
-            module_path_stack.arr[module_path_stack.size - 1],
-            function_call_stack.arr[function_call_stack.size - 1]->function->module_context
-        ) == 0
-        &&
-        strcmp(
-            module_stack.arr[module_stack.size - 1],
-            ""
-        ) == 0
-    ) {
-        function_call->dont_pop_module_stack = true;
-    } else {
-#endif
-        pushModuleStack(function_call_stack.arr[function_call_stack.size - 1]->function->module_context, "");
-#ifndef CHAOS_COMPILER
-    }
-#endif
-
-    if (function->is_dynamic) {
-        callFunctionFromDynamicLibrary(function);
-    }
-
-    return function_call;
-}
-
-#ifndef CHAOS_COMPILER
-void callFunctionCleanUp(FunctionCall* function_call) {
-#else
-void callFunctionCleanUp(FunctionCall* function_call, bool has_decision) {
-#endif
-
-    bool is_loop_breaked = false;
-    bool is_loop_continued = false;
-
-#ifndef CHAOS_COMPILER
-    if (setjmp(LoopBreakDecision))
-        is_loop_breaked = true;
-
-    if (setjmp(LoopContinueDecision))
-        is_loop_continued = true;
-#endif
-
-#ifdef CHAOS_COMPILER
-    if (has_decision) {
-#endif
-    if (!is_loop_breaked &&
-        !is_loop_continued
-    ) {
-        executeDecision(function_call);
-    } else {
-        callFunctionCleanUpSymbols(function_call);
-    }
-#ifdef CHAOS_COMPILER
-    } else {
-        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
-            removeSymbol(decision_symbol_chain);
-            decision_symbol_chain = NULL;
-        }
-        callFunctionCleanUpSymbols(function_call);
-    }
-#endif
-
-    if (function_call->function->type != K_VOID &&
-        function_call->function->symbol == NULL &&
-        !is_loop_breaked &&
-        !is_loop_continued
-    ) {
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
-        return;
-    }
-
-#ifndef CHAOS_COMPILER
-    if (function_call->dont_pop_module_stack) {
-        popExecutedFunctionStack();
-    } else {
-#endif
-        callFunctionCleanUpCommon();
-#ifndef CHAOS_COMPILER
-    }
-#endif
-
-    if (is_loop_breaked) {
-        free(function_call);
-        breakLoop();
-    }
-
-    if (is_loop_continued) {
-        free(function_call);
-        continueLoop();
-    }
-}
-
-void callFunctionCleanUpSymbols(FunctionCall* function_call) {
-    removeSymbolsByScope(function_call);
-}
-
-void callFunctionCleanUpCommon() {
-    popModuleStack();
-    popExecutedFunctionStack();
-}
-
 _Function* getFunction(char *name, char *module) {
-    if (
-        module == NULL
-        &&
-        function_call_stack.size > 0
-        &&
-        strcmp(function_call_stack.arr[function_call_stack.size - 1]->function->module, "") != 0
-    )
-        module = function_call_stack.arr[function_call_stack.size - 1]->function->module;
-
     function_cursor = start_function;
     while (function_cursor != NULL) {
         if (module == NULL && strcmp(function_cursor->module, "") != 0) {
@@ -399,8 +259,6 @@ _Function* getFunction(char *name, char *module) {
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         criteria = criteria && (
             strcmp(function_cursor->context, module_path_stack.arr[module_path_stack.size - 1]) == 0
-            ||
-            strcmp(function_cursor->module_context, module_path_stack.arr[module_path_stack.size - 1]) == 0
         );
         if (module != NULL) criteria = criteria && strcmp(function_cursor->module, module) == 0;
         if (criteria) {
@@ -426,8 +284,6 @@ _Function* getFunctionByModuleContext(char *name, char *module_context) {
     while (function_cursor != NULL) {
         bool criteria = function_cursor->name != NULL && strcmp(function_cursor->name, name) == 0;
         if (criteria && module_context != NULL && (
-            strcmp(function_cursor->context, module_context) == 0
-            ||
             strcmp(function_cursor->module_context, module_context) == 0
         )) {
             _Function* function = function_cursor;
@@ -447,6 +303,24 @@ _Function* getFunctionByModuleContext(char *name, char *module_context) {
     return NULL;
 }
 
+_Function* checkDuplicateFunction(char *name, char *module_path) {
+    function_cursor = start_function;
+    while (function_cursor != NULL) {
+        if (
+            strcmp(function_cursor->name, name) == 0
+            &&
+            strcmp(function_cursor->module_context, module_path) == 0
+        ) {
+            _Function* function = function_cursor;
+            return function;
+        }
+
+        function_cursor = function_cursor->next;
+    }
+
+    return NULL;
+}
+
 void removeFunctionIfDefined(char *name) {
     unsigned short parent_context = 1;
     if (module_path_stack.size > 1) parent_context = 2;
@@ -459,9 +333,6 @@ void removeFunctionIfDefined(char *name) {
             strcmp(function_cursor->module, module_stack.arr[module_stack.size - 1]) == 0
         ) {
             _Function* function = function_cursor;
-#ifndef CHAOS_COMPILER
-            function->node->dont_transpile = true;
-#endif
             removeFunction(function);
             return;
         }
@@ -525,7 +396,7 @@ void addFunctionOptionalParameterInt(char *secondary_name, long long i) {
     addSymbolToFunctionParameters(symbol, true);
 }
 
-void addFunctionOptionalParameterFloat(char *secondary_name, long double f) {
+void addFunctionOptionalParameterFloat(char *secondary_name, double f) {
     Symbol* symbol = addSymbolFloat(NULL, f);
     symbol->secondary_name = malloc(1 + strlen(secondary_name));
     strcpy(symbol->secondary_name, secondary_name);
@@ -579,60 +450,6 @@ void addSymbolToFunctionParameters(Symbol* symbol, bool is_optional) {
     function_parameters_mode->parameters[0] = symbol;
 }
 
-void initFunctionCall() {
-    if (function_call_start == NULL) {
-        function_call_start = (struct FunctionCall*)malloc(sizeof(FunctionCall));
-        function_call_start->start_symbol = NULL;
-        function_call_start->end_symbol = NULL;
-    }
-    scope_override = function_call_start;
-}
-
-void addFunctionCallParameterBool(bool b) {
-    initFunctionCall();
-    union Value value;
-    value.b = b;
-    Symbol* symbol = addSymbol(NULL, K_BOOL, value, V_BOOL);
-    addSymbolToFunctionParameters(symbol, false);
-}
-
-void addFunctionCallParameterInt(long long i) {
-    initFunctionCall();
-    union Value value;
-    value.i = i;
-    Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_INT);
-    addSymbolToFunctionParameters(symbol, false);
-}
-
-void addFunctionCallParameterFloat(long double f) {
-    initFunctionCall();
-    union Value value;
-    value.f = f;
-    Symbol* symbol = addSymbol(NULL, K_NUMBER, value, V_FLOAT);
-    addSymbolToFunctionParameters(symbol, false);
-}
-
-void addFunctionCallParameterString(char *s) {
-    initFunctionCall();
-    union Value value;
-    value.s = malloc(1 + strlen(s));
-    strcpy(value.s, s);
-    Symbol* symbol = addSymbol(NULL, K_STRING, value, V_STRING);
-    addSymbolToFunctionParameters(symbol, false);
-}
-
-void addFunctionCallParameterSymbol(char *name) {
-    initFunctionCall();
-    addSymbolToFunctionParameters(getSymbolFunctionParameter(name), false);
-}
-
-void addFunctionCallParameterList(enum Type type) {
-    initFunctionCall();
-    Symbol* symbol = finishComplexMode(NULL, type);
-    changeSymbolScope(symbol, scope_override);
-    addSymbolToFunctionParameters(symbol, false);
-}
-
 void returnSymbol(char *name) {
     Symbol* symbol = getSymbol(name);
     if (symbol->type != K_ANY &&
@@ -666,42 +483,6 @@ void returnSymbol(char *name) {
     scope_override = NULL;
 }
 
-void printFunctionReturn(FunctionCall* function_call, char *end, bool pretty, bool escaped) {
-    if (function_call->function->symbol == NULL) {
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
-        return;
-    }
-    printSymbolValueEndWith(function_call->function->symbol, end, pretty, escaped);
-    freeFunctionReturn(function_call);
-}
-
-void createCloneFromFunctionReturn(char *clone_name, enum Type type, FunctionCall* function_call, enum Type extra_type) {
-    if (function_call->function->symbol == NULL) {
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
-        return;
-    }
-    createCloneFromSymbol(clone_name, type, function_call->function->symbol, extra_type);
-    freeFunctionReturn(function_call);
-}
-
-void updateSymbolByClonningFunctionReturn(char *clone_name, FunctionCall* function_call) {
-    if (function_call->function->symbol == NULL) {
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
-        return;
-    }
-    updateSymbolByClonning(clone_name, function_call->function->symbol);
-    freeFunctionReturn(function_call);
-}
-
-void updateComplexSymbolByClonningFunctionReturn(FunctionCall* function_call) {
-    if (function_call->function->symbol == NULL) {
-        throw_error(E_FUNCTION_DID_NOT_RETURN_ANYTHING, function_call->function->name);
-        return;
-    }
-    updateComplexElementSymbol(function_call->function->symbol);
-    freeFunctionReturn(function_call);
-}
-
 void initMainFunction() {
     function_names_buffer.capacity = 0;
     function_names_buffer.size = 0;
@@ -713,7 +494,6 @@ void initMainFunction() {
     initMainContext();
     initKaosApi();
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-    increaseStackSize();
 #endif
 }
 
@@ -727,25 +507,6 @@ void initScopeless() {
     scopeless->end_symbol = NULL;
     scopeless->function = scopeless_function;
 }
-
-#if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
-void increaseStackSize() {
-    const rlim_t stack_size = ULONG_MAX; // Maximum possible stack size
-    struct rlimit rl;
-    int result;
-
-    result = getrlimit(RLIMIT_STACK, &rl);
-    if (result == 0) {
-        if (rl.rlim_cur < stack_size) {
-            rl.rlim_cur = stack_size;
-            result = setrlimit(RLIMIT_STACK, &rl);
-            // if (result != 0) {
-            //     fprintf(stderr, "setrlimit returned result = %d\n", result);
-            // }
-        }
-    }
-}
-#endif
 
 void removeFunction(_Function* function) {
     _Function* previous_function = function->previous;
@@ -772,7 +533,8 @@ void removeFunction(_Function* function) {
 
 void freeFunction(_Function* function) {
     free(function->name);
-    free(function->parameters);
+    if (function->ref == NULL)
+        free(function->parameters);
     for (unsigned i = 0; i < function->decision_functions.size; i++) {
         free(function->decision_expressions.arr[i]);
         free(function->decision_functions.arr[i]);
@@ -780,11 +542,7 @@ void freeFunction(_Function* function) {
     free(function->decision_expressions.arr);
     free(function->decision_functions.arr);
     free(function->decision_default);
-    free(function->context);
-    free(function->module_context);
     free(function->module);
-    if (function->is_dynamic)
-        free(function->node);
     free(function);
 }
 
@@ -798,25 +556,24 @@ void freeAllFunctions() {
 }
 
 bool block(enum BlockType type) {
-    switch (type)
-    {
-        case B_EXPRESSION:
-            if (decision_mode != NULL) {
-                decision_expression_mode = decision_mode;
-                decision_function_mode = NULL;
-                return true;
-            }
-            break;
-        case B_FUNCTION:
-            if (decision_mode != NULL) {
-                decision_function_mode = decision_mode;
-                decision_expression_mode = NULL;
-                return true;
-            }
-            break;
-        default:
-            return false;
-            break;
+    switch (type) {
+    case B_EXPRESSION:
+        if (decision_mode != NULL) {
+            decision_expression_mode = decision_mode;
+            decision_function_mode = NULL;
+            return true;
+        }
+        break;
+    case B_FUNCTION:
+        if (decision_mode != NULL) {
+            decision_function_mode = decision_mode;
+            decision_expression_mode = NULL;
+            return true;
+        }
+        break;
+    default:
+        return false;
+        break;
     }
     return false;
 }
@@ -839,40 +596,6 @@ void addDefaultDecision() {
     decision_buffer = "";
     decision_expression_mode = NULL;
     decision_function_mode = NULL;
-}
-
-void executeDecision(FunctionCall* function_call) {
-#ifndef CHAOS_COMPILER
-    if (function_call->function->decision_node == NULL) {
-        if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
-            removeSymbol(decision_symbol_chain);
-            decision_symbol_chain = NULL;
-        }
-        callFunctionCleanUpSymbols(function_call);
-        return;
-    }
-
-    eval_node(function_call->function->decision_node, function_call->function->module_context);
-    stop_ast_evaluation = false;
-#endif
-
-    if (decision_symbol_chain == NULL)
-        return;
-
-    if (function_call_stack.arr[function_call_stack.size - 1]->function->type != K_VOID && function_call_stack.arr[function_call_stack.size - 1]->function->symbol == NULL) {
-        scope_override = function_call_stack.arr[function_call_stack.size - 1]->parent_scope;
-        function_call_stack.arr[function_call_stack.size - 1]->function->symbol = createCloneFromSymbol(
-            NULL,
-            decision_symbol_chain->type,
-            decision_symbol_chain,
-            decision_symbol_chain->secondary_type
-        );
-        scope_override = NULL;
-    }
-    if (function_call_stack.size < 2 && decision_symbol_chain != NULL) {
-        removeSymbol(decision_symbol_chain);
-        decision_symbol_chain = NULL;
-    }
 }
 
 void addFunctionNameToFunctionNamesBuffer(char *name) {
@@ -919,35 +642,6 @@ void pushExecutedFunctionStack(FunctionCall* function_call) {
 void popExecutedFunctionStack() {
     function_call_stack.arr[function_call_stack.size - 1] = NULL;
     function_call_stack.size--;
-}
-
-void freeFunctionReturn(FunctionCall* function_call) {
-    if (function_call->function->symbol != NULL) {
-        removeSymbol(function_call->function->symbol);
-        function_call->function->symbol = NULL;
-    }
-}
-
-void decisionBreakLoop() {
-#ifdef CHAOS_COMPILER
-    callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-    free(function_call_stack.arr[function_call_stack.size - 1]);
-    callFunctionCleanUpCommon();
-    longjmp(LoopBreak, 1);
-#else
-    longjmp(LoopBreakDecision, 1);
-#endif
-}
-
-void decisionContinueLoop() {
-#ifdef CHAOS_COMPILER
-    callFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);
-    free(function_call_stack.arr[function_call_stack.size - 1]);
-    callFunctionCleanUpCommon();
-    longjmp(LoopContinue, 1);
-#else
-    longjmp(LoopContinueDecision, 1);
-#endif
 }
 
 void updateDecisionSymbolChainScope() {

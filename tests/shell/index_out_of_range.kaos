@@ -28,14 +28,13 @@ b[-123400]
 bool list f = [false]
 del f[0]
 f
-symbol_table
 num f = 5
 f[0] = true
 f
-symbol_table
 
 // Complex element to complex element assignment on itself
 del a
 list a = [1, 2]
 a
 a[1] = a[2]
+a

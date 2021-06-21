@@ -76,6 +76,13 @@ IF [%1]==[] (
         CD ..
         EXIT /B 0
     )
+) ELSE IF [%1]==[test-ast] (
+    CALL tests\ast.bat
+    IF errorlevel 1 (
+        EXIT /B 1
+    ) ELSE (
+        EXIT /B 0
+    )
 ) ELSE IF [%1]==[clean] (
     DEL chaos.exe parser.tab.c parser.tab.h lex.yy.c
     EXIT /B 0
@@ -162,7 +169,7 @@ win_bison -d parser\parser.y
 IF errorlevel 1 (
     EXIT /B 1
 )
-%compiler% -fcommon -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c parser/*.c utilities/*.c utilities/windows/*.c ast/*.c preemptive/*.c interpreter/*.c compiler/*.c Chaos.c -lshell32 -lole32 %extra_flags%
+%compiler% -fcommon -DCHAOS_INTERPRETER -o chaos.exe parser.tab.c lex.yy.c parser/*.c utilities/*.c utilities/windows/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c -lshell32 -lole32 %extra_flags%
 IF errorlevel 1 (
     EXIT /B 1
 )

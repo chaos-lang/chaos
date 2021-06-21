@@ -1,7 +1,7 @@
 /*
  * Description: Compiler module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -22,3874 +22,3586 @@
 
 #include "compiler.h"
 
-extern bool disable_complex_mode;
-extern int kaos_lineno;
+i64_array* call_body_jumps;
+unsigned long call_body_jumps_index = 0;
+i64_array* call_optional_jumps;
+unsigned long call_optional_jumps_index = 0;
 
-struct stat dir_stat = {0};
+extern bool interactively_importing;
 
-unsigned short indent_length = __KAOS_INDENT_LENGTH__;
-unsigned long long compiler_loop_counter = 0;
-unsigned long long compiler_function_counter = 0;
-unsigned long long compiler_symbol_counter = 0;
-unsigned long long extension_counter = 0;
+File* import_parent_context = NULL;
 
-char *type_strings[] = {
-    "K_BOOL",
-    "K_NUMBER",
-    "K_STRING",
-    "K_ANY",
-    "K_LIST",
-    "K_DICT",
-    "K_VOID"
-};
+i64 ast_ref = 0;
 
-char* relational_operators[] = {">", "<", ">=", "<="};
-int relational_operators_size = 4;
-char* logical_operators[] = {"&&", "||", "!"};
-int logical_operators_size = 3;
+i64_array* compile(ASTRoot* ast_root)
+{
+    i64_array* program = initProgram();
+    initCallJumps();
 
-void compile(char *module, enum Phase phase_arg, char *bin_file, char *extra_flags, bool keep, bool unsafe) {
-    ASTNode* ast_node = ast_root_node;
-    register_functions(ast_node, module);
-    if (!unsafe)
-        preemptive_check();
+    // Compile imports
+    compileImports(ast_root, program);
 
-    printf("Starting compiling...\n");
-    char *module_orig = malloc(strlen(module) + 1);
-    strcpy(module_orig, module);
-    compiler_escape_module(module);
+    // Declare functions in all parsed files
+    declare_functions(ast_root, program);
 
-    if (stat(__KAOS_BUILD_DIRECTORY__, &dir_stat) == -1) {
-        printf("Creating %s directory...\n", __KAOS_BUILD_DIRECTORY__);
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-        _mkdir(__KAOS_BUILD_DIRECTORY__);
-#else
-        mkdir(__KAOS_BUILD_DIRECTORY__, 0700);
-#endif
+    // Compile functions in all parsed files
+    compile_functions(ast_root, program);
+
+    StmtList* stmt_list = ast_root->files[0]->stmt_list;
+    current_file_index = 0;
+
+    program->start = program->size;
+
+    // Compile other statements in the first parsed file
+    for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+        Stmt* stmt = stmt_list->stmts[j - 1];
+        if (
+            (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
+            ||
+            (stmt->kind != DeclStmt_kind)
+        )
+            compileStmt(program, stmt);
     }
 
-    char c_file_path[PATH_MAX];
-    char h_file_path[PATH_MAX];
-    if (bin_file != NULL) {
-        sprintf(c_file_path, "%s%s%s.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
-        sprintf(h_file_path, "%s%s%s.h", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
-    } else {
-        sprintf(c_file_path, "%s%smain.c", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
-        sprintf(h_file_path, "%s%smain.h", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
+    push_instr(program, HLT);
+    program->hlt_count++;
+    fillCallJumps(program);
+    return program;
+}
+
+void initCallJumps()
+{
+    call_body_jumps = initProgram();
+    call_optional_jumps = initProgram();
+}
+
+void fillCallJumps(i64_array* program)
+{
+    for (unsigned long i = call_optional_jumps_index; i < call_optional_jumps->size; i++) {
+        call_optional_jumps_index++;
+        i64 addr = call_optional_jumps->arr[i];
+        _Function* function = (void *)program->arr[addr];
+        program->arr[addr] = function->optional_parameters_addr;
     }
 
-    printf("Compiling Chaos code into %s\n", c_file_path);
-
-    errno = 0;
-
-    FILE *c_fp = fopen(c_file_path, "w");
-    if (c_fp == NULL)
-    {
-        fprintf(stderr, "Cannot open file! Error no: %d\n", errno);
-        fprintf(stderr, "C source path: %s\n", c_file_path);
-        exit(1);
+    for (unsigned long i = call_body_jumps_index; i < call_body_jumps->size; i++) {
+        call_body_jumps_index++;
+        i64 addr = call_body_jumps->arr[i];
+        _Function* function = (void *)program->arr[addr];
+        if (function->ref != NULL)
+            program->arr[addr] = function->ref->body_addr;
+        else
+            program->arr[addr] = function->body_addr;
     }
+}
 
-    FILE *h_fp = fopen(h_file_path, "w");
-    if (h_fp == NULL)
-    {
-        fprintf(stderr, "Cannot open file! Error no: %d\n", errno);
-        fprintf(stderr, "C header path: %s\n", h_file_path);
-        exit(1);
+void compileImports(ASTRoot* ast_root, i64_array* program)
+{
+    while (true) {
+        bool all_imports_handled = true;
+        for (unsigned long i = 0; i < ast_root->file_count; i++) {
+            File* file = ast_root->files[i];
+            import_parent_context = file;
+            if (file->imports_handled)
+                continue;
+            all_imports_handled = false;
+
+            SpecList* spec_list = file->imports;
+            for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
+                Spec* spec = spec_list->specs[i - 1];
+                compileSpec(program, spec);
+            }
+            file->imports_handled = true;
+        }
+
+        if (all_imports_handled)
+            break;
     }
+}
 
-    if (keep) {
-        fprintf(
-            h_fp,
-            "/*\n"
-            " * Intermediate C header code generated by Chaos Programming Language\n"
-            " * Language Reference: https://chaos-lang.org\n"
-            " *\n"
-        );
-        fprintf(
-            c_fp,
-            "/*\n"
-            " * Intermediate C source code generated by Chaos Programming Language\n"
-            " * Language Reference: https://chaos-lang.org\n"
-            " *\n"
-        );
-        if (bin_file != NULL) {
-            fprintf(h_fp, " * Filename: %s.h\n", bin_file);
-            fprintf(c_fp, " * Filename: %s.c\n", bin_file);
+void compileStmtList(i64_array* program, StmtList* stmt_list)
+{
+    for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
+        compileStmt(program, stmt_list->stmts[i - 1]);
+    }
+}
+
+void compileStmt(i64_array* program, Stmt* stmt)
+{
+    ast_ref = (i64)(void *)stmt->ast;
+
+    switch (stmt->kind) {
+    case EchoStmt_kind:
+        compileExpr(program, stmt->v.echo_stmt->x);
+        if (stmt->v.echo_stmt->mod != NULL && stmt->v.echo_stmt->mod->kind == PrettySpec_kind)
+            push_instr(program, PPRNT);
+        else
+            push_instr(program, PRNT);
+        break;
+    case PrintStmt_kind:
+        compileExpr(program, stmt->v.print_stmt->x);
+        if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind)
+            push_instr(program, PPRNT);
+        else
+            push_instr(program, PRNT);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, '\n' - '0');
+
+        push_instr(program, PUSH);
+        push_instr(program, R0A);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_STRING);
+
+        push_instr(program, LII);
+        push_instr(program, R1A);
+        push_instr(program, 1);
+
+        push_instr(program, PRNT);
+        break;
+    case ExprStmt_kind:
+        compileExpr(program, stmt->v.expr_stmt->x);
+        break;
+    case DeclStmt_kind:
+        compileDecl(program, stmt->v.decl_stmt->decl);
+        break;
+    case AssignStmt_kind: {
+        compileExpr(program, stmt->v.assign_stmt->x);
+        shift_registers(program, 8);
+        compileExpr(program, stmt->v.assign_stmt->y);
+        switch (stmt->v.assign_stmt->x->kind) {
+        case Ident_kind: {
+            Symbol* symbol_x = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
+            Symbol* symbol_y = NULL;
+            if (stmt->v.assign_stmt->y->kind == Ident_kind)
+                symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
+            i64 addr = symbol_x->addr;
+            if (symbol_x->type == K_ANY)
+                symbol_x->value_type = V_ANY;
+            else if (symbol_x->type == K_NUMBER && symbol_y != NULL && (
+                symbol_y->value_type == V_INT || symbol_y->value_type == V_FLOAT
+            ))
+                symbol_x->value_type = symbol_y->value_type;
+
+            strongly_type(symbol_x, symbol_y, NULL, stmt->v.assign_stmt->y, symbol_x->value_type);
+
+            switch (symbol_x->value_type) {
+            case V_BOOL:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_BOOL);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R1A);
+                break;
+            case V_INT:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_INT);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R1A);
+                break;
+            case V_FLOAT:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_FLOAT);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R1A);
+                break;
+            case V_STRING: {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_STRING);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R1A);
+
+                size_t len = symbol_x->len;
+                for (size_t i = 0; i < len; i++) {
+                    push_instr(program, POP);
+                    push_instr(program, R2A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr++);
+                    push_instr(program, R2A);
+                }
+                break;
+            }
+            case V_ANY: {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
+                break;
+            }
+            case V_LIST: {
+                if (symbol_x->type == K_ANY) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr++);
+                    push_instr(program, R7A);
+                } else {
+                    Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
+                    removeSymbol(symbol);
+                    store_list(
+                        program,
+                        stmt->v.assign_stmt->x->v.ident->name,
+                        stmt->v.assign_stmt->y->v.composite_lit->elts->expr_count,
+                        false
+                    );
+                }
+                break;
+            }
+            case V_DICT: {
+                if (symbol_x->type == K_ANY) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr++);
+                    push_instr(program, R7A);
+                } else {
+                    Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
+                    removeSymbol(symbol);
+                    store_dict(
+                        program,
+                        stmt->v.assign_stmt->x->v.ident->name,
+                        stmt->v.assign_stmt->y->v.composite_lit->elts->expr_count,
+                        false
+                    );
+                }
+                break;
+            }
+            case V_REF: {
+                push_instr(program, LII);
+                push_instr(program, R7A);
+                push_instr(program, program->heap);
+
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        case IndexExpr_kind: {
+            Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.index_expr->x->v.ident->name);
+            i64 addr = symbol->addr;
+
+            switch (symbol->type) {
+            case K_STRING: {
+                switch (stmt->v.assign_stmt->y->kind) {
+                case BasicLit_kind: {
+                    if (stmt->v.assign_stmt->y->v.basic_lit->value_type != V_STRING) {
+                        throw_error(E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING, symbol->name);
+                    } else {
+                        if (strlen(stmt->v.assign_stmt->y->v.basic_lit->value.s) != 1)
+                            throw_error(E_NOT_A_CHARACTER, symbol->name);
+                    }
+                    break;
+                }
+                case Ident_kind: {
+                    Symbol* symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
+                    if (symbol_y->value_type != V_STRING)
+                        throw_error(E_ILLEGAL_CHARACTER_ASSIGNMENT_FOR_STRING, symbol->name);
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
+            }
+            case K_LIST: {
+                switch (stmt->v.assign_stmt->x->v.index_expr->index->kind) {
+                case BasicLit_kind:
+                    if (stmt->v.assign_stmt->x->v.index_expr->index->v.basic_lit->value_type != V_INT)
+                        throw_error(E_UNEXPECTED_ACCESSOR_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+                    break;
+                case Ident_kind: {
+                    Symbol* symbol_y = getSymbol(stmt->v.assign_stmt->x->v.index_expr->index->v.ident->name);
+                    if (symbol_y->value_type != V_INT)
+                        throw_error(E_UNEXPECTED_ACCESSOR_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+
+            strongly_type(symbol, NULL, NULL, stmt->v.assign_stmt->y, symbol->value_type);
+
+            switch (symbol->type) {
+            case K_STRING:
+                if (symbol->value_type == V_REF) {
+                    push_instr(program, LDI);
+                } else {
+                    push_instr(program, LII);
+                }
+                push_instr(program, R3B);
+                push_instr(program, addr);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, ADD);
+                push_instr(program, R3B);
+                push_instr(program, R4B);
+
+                push_instr(program, POP);
+                push_instr(program, R1A);
+
+                push_instr(program, STR);
+                push_instr(program, R3B);
+                push_instr(program, R1A);
+                break;
+            case K_LIST:
+                if (symbol->value_type == V_REF) {
+                    push_instr(program, LDI);
+                } else {
+                    push_instr(program, LII);
+                }
+                push_instr(program, R3B);
+                push_instr(program, addr);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, LII);
+                push_instr(program, R0B);
+                push_instr(program, V_INT);
+
+                push_instr(program, ADD);
+                push_instr(program, R3B);
+                push_instr(program, R4B);
+
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STR);
+                push_instr(program, R3B);
+                push_instr(program, R7A);
+                break;
+            case K_DICT:
+                if (symbol->value_type == V_REF) {
+                    push_instr(program, LDI);
+                } else {
+                    push_instr(program, LII);
+                }
+                push_instr(program, R3B);
+                push_instr(program, addr);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, INC);
+                push_instr(program, R3B);
+
+                push_instr(program, LII);
+                push_instr(program, R0B);
+                push_instr(program, V_INT);
+
+                push_instr(program, LII);
+                push_instr(program, R5B);
+                push_instr(program, 2);
+
+                push_instr(program, MUL);
+                push_instr(program, R4B);
+                push_instr(program, R5B);
+
+                push_instr(program, ADD);
+                push_instr(program, R3B);
+                push_instr(program, R4B);
+
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STR);
+                push_instr(program, R3B);
+                push_instr(program, R7A);
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    case DelStmt_kind: {
+        switch (stmt->v.del_stmt->ident->kind) {
+        case Ident_kind: {
+            Symbol* symbol = getSymbol(stmt->v.del_stmt->ident->v.ident->name);
+            removeSymbol(symbol);
+            break;
+        }
+        case IndexExpr_kind: {
+            compileExpr(program, stmt->v.del_stmt->ident->v.index_expr->index);
+            Symbol* symbol = getSymbol(stmt->v.del_stmt->ident->v.index_expr->x->v.ident->name);
+
+            if (symbol->type != K_LIST && symbol->type != K_DICT && symbol->type != K_STRING)
+                throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+
+            i64 addr = symbol->addr;
+
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, addr++);
+
+            push_instr(program, DDEL);
+            push_instr(program, R7A);
+            push_instr(program, R1A);
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    case BlockStmt_kind:
+        compileStmtList(program, stmt->v.block_stmt->stmt_list);
+        break;
+    case ReturnStmt_kind: {
+        ReturnStmt* return_stmt = stmt->v.return_stmt;
+        enum ValueType value_type = compileExpr(program, return_stmt->x) - 1;
+        function_mode->value_type = value_type;
+
+        if (!return_stmt->dont_push_callx)
+            push_instr(program, CALLX);
+
+        push_instr(program, JMPB);
+        break;
+    }
+    case ExitStmt_kind: {
+        if (stmt->v.exit_stmt->x == NULL) {
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
         } else {
-            fprintf(h_fp, " * Filename: main.h\n");
-            fprintf(c_fp, " * Filename: main.c\n");
+            compileExpr(program, stmt->v.exit_stmt->x);
         }
-        fprintf(h_fp, " */\n\n");
-        fprintf(c_fp, " */\n\n");
+
+        push_instr(program, EXIT);
+        break;
     }
-
-    if (bin_file != NULL) {
-        char *bin_file_upper = malloc(1 + strlen(bin_file));
-        strcpy(bin_file_upper, bin_file);
-        string_uppercase(bin_file_upper);
-        fprintf(h_fp, "#ifndef %s_H\n", bin_file_upper);
-        fprintf(h_fp, "#define %s_H\n\n", bin_file_upper);
-        free(bin_file_upper);
-    } else {
-        fprintf(h_fp, "#ifndef MAIN_H\n");
-        fprintf(h_fp, "#define MAIN_H\n\n");
+    case BreakStmt_kind: {
+        push_instr(program, BRK);
+        break;
     }
-
-    fprintf(c_fp, "#include <math.h>\n\n");
-
-    if (bin_file != NULL) {
-        fprintf(c_fp, "#include \"%s.h\"\n\n", bin_file);
-    } else {
-        fprintf(c_fp, "#include \"main.h\"\n\n");
+    case ContinueStmt_kind: {
+        push_instr(program, CONT);
+        break;
     }
-
-    unsigned short indent = indent_length;
-
-    const char *c_file_base =
-        "extern bool disable_complex_mode;\n\n"
-        "int kaos_lineno;\n"
-        "unsigned long long nested_loop_counter = 0;\n\n";
-
-    const char *h_file_base =
-        "#include <stdio.h>\n"
-        "#include <stdbool.h>\n\n"
-        "#include \"interpreter/function.h\"\n"
-        "#include \"interpreter/symbol.h\"\n\n"
-        "jmp_buf LoopBreak;\n"
-        "jmp_buf LoopContinue;\n\n";
-
-    fprintf(c_fp, "%s", c_file_base);
-    fprintf(h_fp, "%s", h_file_base);
-
-    transpile_functions(ast_node, module, c_fp, indent, h_fp);
-    free_transpiled_functions();
-    free_transpiled_decisions();
-
-    fprintf(c_fp, "int main(int argc, char** argv) {\n");
-
-    char *fixed_module_orig = fix_bs(module_orig);
-    free(module_orig);
-    fprintf(
-        c_fp,
-        "%*cprogram_file_path = malloc(strlen(\"%s\") + 1);\n"
-        "%*cstrcpy(program_file_path, \"%s\");\n",
-        indent,
-        ' ',
-        fixed_module_orig,
-        indent,
-        ' ',
-        fixed_module_orig
-    );
-    free(fixed_module_orig);
-
-    fprintf(
-        c_fp,
-        "%*cchar *argv0 = malloc(1 + strlen(argv[0]));\n"
-        "%*cstrcpy(argv0, argv[0]);\n",
-        indent,
-        ' ',
-        indent,
-        ' '
-    );
-
-    fprintf(c_fp, "%*cinitMainFunction();\n", indent, ' ');
-
-    fprintf(c_fp, "%*cphase = PREPARSE;\n", indent, ' ');
-    compiler_register_functions(ast_node, module, c_fp, indent);
-    fprintf(c_fp, "%*cphase = PROGRAM;\n", indent, ' ');
-    transpile_node(ast_node, module, c_fp, indent);
-
-    fprintf(
-        c_fp,
-        "%*cfree(argv0);\n"
-        "%*cfreeEverything();\n"
-        "%*creturn 0;\n",
-        indent,
-        ' ',
-        indent,
-        ' ',
-        indent,
-        ' '
-    );
-
-    fprintf(c_fp, "}\n");
-    fprintf(h_fp, "\n#endif\n");
-
-    fclose(c_fp);
-    fclose(h_fp);
-
-    printf("Compiling the C code into machine code...\n");
-
-    char bin_file_path[PATH_MAX];
-    if (bin_file != NULL) {
-#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
-        sprintf(bin_file_path, "%s%s%s.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
-#else
-        sprintf(bin_file_path, "%s%s%s", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__, bin_file);
-#endif
-    } else {
-#if defined(__clang__) && (defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__))
-        sprintf(bin_file_path, "%s%smain.exe", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
-#else
-        sprintf(bin_file_path, "%s%smain", __KAOS_BUILD_DIRECTORY__, __KAOS_PATH_SEPARATOR__);
-#endif
+    default:
+        break;
     }
-
-    char c_compiler_path[PATH_MAX];
-#if defined(__clang__)
-    sprintf(c_compiler_path, "clang");
-#elif defined(__GNUC__) || defined(__GNUG__)
-    sprintf(c_compiler_path, "gcc");
-#endif
-
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    char include_path[PATH_MAX];
-    PWSTR szPath = NULL;
-#   if defined(__clang__)
-    SHGetKnownFolderPath(&FOLDERID_ProgramFiles, 0, NULL, &szPath);
-    sprintf(include_path, "%ls/LLVM/lib/clang/%d.%d.%d/include/chaos", szPath, __clang_major__, __clang_minor__, __clang_patchlevel__);
-#   elif defined(__GNUC__) || defined(__GNUG__)
-    SHGetKnownFolderPath(&FOLDERID_ProgramData, 0, NULL, &szPath);
-    sprintf(include_path, "%ls/Chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/%d.%d.%d/include/chaos", szPath, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-#   endif
-    CoTaskMemFree(szPath);
-
-    char include_path_helpers[PATH_MAX];
-    sprintf(include_path_helpers, "\"%s/utilities/helpers.c\"", include_path);
-    char include_path_language[PATH_MAX];
-    sprintf(include_path_language, "\"%s/utilities/language.c\"", include_path);
-    char include_path_cwalk[PATH_MAX];
-    sprintf(include_path_cwalk, "\"%s/utilities/cwalk.c\"", include_path);
-    char include_path_windows_getopt[PATH_MAX];
-    sprintf(include_path_windows_getopt, "\"%s/utilities/windows/getopt.c\"", include_path);
-    char include_path_ast[PATH_MAX];
-    sprintf(include_path_ast, "\"%s/ast/ast.c\"", include_path);
-    char include_path_interpreter[PATH_MAX];
-    sprintf(include_path_interpreter, "\"%s/interpreter/interpreter.c\"", include_path);
-    char include_path_errors[PATH_MAX];
-    sprintf(include_path_errors, "\"%s/interpreter/errors.c\"", include_path);
-    char include_path_extension[PATH_MAX];
-    sprintf(include_path_extension, "\"%s/interpreter/extension.c\"", include_path);
-    char include_path_function[PATH_MAX];
-    sprintf(include_path_function, "\"%s/interpreter/function.c\"", include_path);
-    char include_path_module[PATH_MAX];
-    sprintf(include_path_module, "\"%s/interpreter/module.c\"", include_path);
-    char include_path_symbol[PATH_MAX];
-    sprintf(include_path_symbol, "\"%s/interpreter/symbol.c\"", include_path);
-    char include_path_alternative[PATH_MAX];
-    sprintf(include_path_alternative, "\"%s/compiler/lib/alternative.c\"", include_path);
-    char include_path_parser[PATH_MAX];
-    sprintf(include_path_parser, "\"%s/parser/parser.c\"", include_path);
-    char include_path_parser_tab[PATH_MAX];
-    sprintf(include_path_parser_tab, "\"%s/parser.tab.c\"", include_path);
-    char include_path_lex_yy[PATH_MAX];
-    sprintf(include_path_lex_yy, "\"%s/lex.yy.c\"", include_path);
-    char include_path_chaos[PATH_MAX];
-    sprintf(include_path_chaos, "\"%s/Chaos.c\"", include_path);
-    char include_path_include[PATH_MAX];
-    sprintf(include_path_include, "\"-I%s\"", include_path);
-
-    STARTUPINFO info={sizeof(info)};
-    PROCESS_INFORMATION processInfo;
-    DWORD status;
-
-    char cmd[4096];
-    sprintf(
-        cmd,
-#   if !defined(__clang__)
-        "/c %s %s %s %s %s %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
-#   else
-        "/c %s %s %s %s -o %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
-#   endif
-        c_compiler_path,
-        "-fcommon",
-#   if !defined(__clang__)
-        "-Wl,--stack,4294967296",
-        "-Werror",
-        "-Wall",
-        "-pedantic",
-        "-fcompare-debug-second",
-        "-D__USE_MINGW_ANSI_STDIO",
-#   else
-        "-Wno-everything",
-#   endif
-        "-DCHAOS_COMPILER",
-        bin_file_path,
-        c_file_path,
-        include_path_helpers,
-        include_path_language,
-        include_path_cwalk,
-        include_path_windows_getopt,
-        include_path_ast,
-        include_path_interpreter,
-        include_path_errors,
-        include_path_extension,
-        include_path_function,
-        include_path_module,
-        include_path_symbol,
-        include_path_alternative,
-        include_path_parser,
-        include_path_parser_tab,
-        include_path_lex_yy,
-        include_path_chaos,
-        include_path_include
-    );
-
-    if (extra_flags != NULL)
-        sprintf(cmd, "%s %s", cmd, extra_flags);
-
-    if (CreateProcess("C:\\WINDOWS\\system32\\cmd.exe", cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
-
-        WaitForSingleObject(processInfo.hProcess, INFINITE);
-
-        GetExitCodeProcess(processInfo.hProcess, &status);
-
-        CloseHandle(processInfo.hThread);
-        CloseHandle(processInfo.hProcess);
-
-        if (status != 0) {
-            printf("Compilation of %s is failed!\n", c_file_path);
-            exit(status);
-        }
-    } else {
-        printf("CreateProcess() failed!");
-    }
-#else
-    pid_t pid;
-
-    string_array extra_flags_arr;
-    extra_flags_arr.size = 0;
-    if (extra_flags != NULL)
-        extra_flags_arr = str_split(extra_flags, ' ');
-    unsigned extra_flags_count = extra_flags_arr.size;
-    if (extra_flags_count > 0)
-        extra_flags_count--;
-
-    unsigned arg_count = 29 + extra_flags_count;
-#   if !defined(__clang__)
-    arg_count++;
-#   endif
-
-#   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    arg_count++;
-#   endif
-
-    char *c_compiler_args[arg_count];
-    int arg_i = 0;
-    c_compiler_args[arg_i++] = c_compiler_path;
-    c_compiler_args[arg_i++] = "-Werror";
-    c_compiler_args[arg_i++] = "-Wall";
-    c_compiler_args[arg_i++] = "-pedantic";
-    c_compiler_args[arg_i++] = "-fcommon";
-    c_compiler_args[arg_i++] = "-DCHAOS_COMPILER";
-    c_compiler_args[arg_i++] = "-o";
-    c_compiler_args[arg_i++] = bin_file_path;
-    c_compiler_args[arg_i++] = c_file_path;
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/utilities/helpers.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/utilities/language.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/utilities/cwalk.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/ast/ast.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/interpreter.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/errors.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/extension.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/function.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/module.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/interpreter/symbol.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/compiler/lib/alternative.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/parser/parser.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/parser.tab.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/lex.yy.c";
-    c_compiler_args[arg_i++] = "/usr/local/include/chaos/Chaos.c";
-    c_compiler_args[arg_i++] = "-lreadline";
-    c_compiler_args[arg_i++] = "-L/usr/local/opt/readline/lib";
-    c_compiler_args[arg_i++] = "-ldl";
-    c_compiler_args[arg_i++] = "-I/usr/local/include/chaos/";
-
-    for (unsigned i = 0; i < (extra_flags_count); i++) {
-        c_compiler_args[arg_i + i] = extra_flags_arr.arr[i];
-        arg_i++;
-    }
-
-#   if !defined(__clang__)
-    c_compiler_args[arg_i + extra_flags_count] = "-fcompare-debug-second",
-#   endif
-
-#   if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    c_compiler_args[arg_i + extra_flags_count] = "-Wl,-stack_size,0x100000000",
-    arg_i++;
-#   endif
-
-    c_compiler_args[arg_count - 1] = NULL;
-
-    if ((pid = fork()) == -1)
-        perror("fork error");
-    else if (pid == 0)
-        execvp(c_compiler_path, c_compiler_args);
-
-    int status;
-    pid_t wait_result;
-
-    while ((wait_result = wait(&status)) != -1)
-    {
-        // printf("Process %lu returned result: %d\n", (unsigned long) wait_result, status);
-        if (status != 0) {
-            fprintf(stderr, "Compilation of %s is failed!\n", c_file_path);
-            exit(1);
-        }
-    }
-#endif
-
-    if (!keep) {
-        printf("Cleaning up the temporary files...\n\n");
-        remove(c_file_path);
-        remove(h_file_path);
-    } else {
-        printf("\n");
-    }
-
-    printf("Finished compiling.\n\n");
-
-    char bin_file_path_final[PATH_MAX + 4];
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-    if (!string_ends_with(bin_file_path, __KAOS_WINDOWS_EXE_EXT__)) {
-        sprintf(bin_file_path_final, "%s%s", bin_file_path, __KAOS_WINDOWS_EXE_EXT__);
-    } else {
-        sprintf(bin_file_path_final, "%s", bin_file_path);
-    }
-#else
-    sprintf(bin_file_path_final, "%s", bin_file_path);
-#endif
-
-    printf("Binary is ready on: %s\n", bin_file_path_final);
 }
 
-char* last_function_name;
+unsigned short compileExpr(i64_array* program, Expr* expr)
+{
+    ast_ref = (i64)(void *)expr->ast;
 
-ASTNode* transpile_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent, FILE *h_fp) {
-transpile_functions_label:
-    if (ast_node == NULL) {
-        return ast_node;
-    }
-    char *ast_node_module = malloc(1 + strlen(ast_node->module));
-    strcpy(ast_node_module, ast_node->module);
-    compiler_escape_module(ast_node_module);
+    switch (expr->kind) {
+    case BasicLit_kind:
+        switch (expr->v.basic_lit->value_type) {
+        case V_BOOL:
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
 
-    if (strcmp(ast_node_module, module) != 0) {
-        free(ast_node_module);
-        ast_node = ast_node->next;
-        goto transpile_functions_label;
-    }
-    free(ast_node_module);
-
-    if (is_node_function_related(ast_node)) {
-        if (ast_node->depend != NULL) {
-            transpile_functions(ast_node->depend, module, c_fp, indent, h_fp);
-        }
-
-        if (ast_node->right != NULL) {
-            transpile_functions(ast_node->right, module, c_fp, indent, h_fp);
-        }
-
-        if (ast_node->left != NULL) {
-            transpile_functions(ast_node->left, module, c_fp, indent, h_fp);
-        }
-    }
-
-    kaos_lineno = ast_node->lineno;
-
-    if (debug_enabled)
-        printf(
-            "(TranspileF)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
-            ast_node->id,
-            getAstNodeTypeName(ast_node->node_type),
-            ast_node->module,
-            ast_node->strings_size
-        );
-
-    if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
-        char *function_name = NULL;
-        function_name = snprintf_concat_string(function_name, "kaos_function_%s", module);
-        function_name = snprintf_concat_string(function_name, "_%s", ast_node->strings[0]);
-        if (!ast_node->dont_transpile && !is_in_array(&transpiled_functions, function_name)) {
-            append_to_array(&transpiled_functions, function_name);
-            append_to_array(&transpiled_modules, ast_node->module);
-            fprintf(h_fp, "void %s();\n", function_name);
-            fprintf(c_fp, "void %s() {\n", function_name);
-            transpile_node(ast_node->child, module, c_fp, indent);
-            fprintf(c_fp, "}\n\n");
-        }
-        free(function_name);
-        last_function_name = ast_node->strings[0];
-    }
-
-    char *decision_name;
-    switch (ast_node->node_type)
-    {
-        case AST_ADD_FUNCTION_NAME:
-            addFunctionNameToFunctionNamesBuffer(ast_node->strings[0]);
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, expr->v.basic_lit->value.b ? 1 : 0);
             break;
-        case AST_APPEND_MODULE:
-            appendModuleToModuleBuffer(ast_node->strings[0]);
+        case V_INT:
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_INT);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, expr->v.basic_lit->value.i);
             break;
-        case AST_PREPEND_MODULE:
-            prependModuleToModuleBuffer(ast_node->strings[0]);
+        case V_FLOAT:
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_FLOAT);
+
+            i64 f;
+            f64 _f = expr->v.basic_lit->value.f;
+            memcpy(&f, &_f, sizeof f);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, f);
             break;
-        case AST_MODULE_IMPORT:
-            compiler_handleModuleImport(NULL, false, c_fp, indent, h_fp);
-            break;
-        case AST_MODULE_IMPORT_AS:
-            compiler_handleModuleImport(ast_node->strings[0], false, c_fp, indent, h_fp);
-            break;
-        case AST_MODULE_IMPORT_PARTIAL:
-            compiler_handleModuleImport(NULL, true, c_fp, indent, h_fp);
-            break;
-        case AST_DECISION_DEFINE:
-            decision_name = NULL;
-            decision_name = snprintf_concat_string(decision_name, "kaos_decision_%s", module);
-            decision_name = snprintf_concat_string(decision_name, "_%s", last_function_name);
-            if (!ast_node->dont_transpile && !is_in_array(&transpiled_decisions, decision_name)) {
-                append_to_array(&transpiled_decisions, decision_name);
-                fprintf(h_fp, "void %s();\n", decision_name);
-                fprintf(c_fp, "void %s() {\n", decision_name);
-                transpile_decisions(ast_node->right, module, c_fp, indent);
-                fprintf(c_fp, "}\n\n");
+        case V_STRING: {
+            size_t len = strlen(expr->v.basic_lit->value.s);
+            for (size_t i = len; i > 0; i--) {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, expr->v.basic_lit->value.s[i - 1] - '0');
+
+                push_instr(program, PUSH);
+                push_instr(program, R0A);
             }
-            free(decision_name);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_STRING);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, len);
+            break;
+        }
+        default:
+            break;
+        }
+        return expr->v.basic_lit->value_type + 1;
+        break;
+    case Ident_kind: {
+        Symbol* symbol = getSymbol(expr->v.ident->name);
+        switch (symbol->value_type) {
+        case V_BOOL:
+            load_bool(program, symbol);
+            break;
+        case V_INT:
+            load_int(program, symbol);
+            break;
+        case V_FLOAT:
+            load_float(program, symbol);
+            break;
+        case V_STRING:
+            load_string(program, symbol);
+            break;
+        case V_LIST:
+            load_list(program, symbol);
+            break;
+        case V_DICT:
+            load_dict(program, symbol);
+            break;
+        default:
+            load_any(program, symbol);
+            break;
+        }
+        return symbol->value_type + 1;
+        break;
+    }
+    case BinaryExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
+        shift_registers(program, 8);
+        i64 addr = program->heap;
+        if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1B);
+        }
+        compileExpr(program, expr->v.binary_expr->x);
+        if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
+            push_instr(program, LDI);
+            push_instr(program, R1B);
+            push_instr(program, addr);
+        }
+        switch (expr->v.binary_expr->op) {
+        case ADD_tok:
+            push_instr(program, ADD);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case SUB_tok:
+            push_instr(program, SUB);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case MUL_tok:
+            push_instr(program, MUL);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case QUO_tok:
+            push_instr(program, DIV);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case REM_tok:
+            push_instr(program, MOD);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case AND_tok:
+            push_instr(program, BAND);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case OR_tok:
+            push_instr(program, BOR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case XOR_tok:
+            push_instr(program, BXOR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case SHL_tok:
+            push_instr(program, SHL);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case SHR_tok:
+            push_instr(program, SHR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case EQL_tok:
+            push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+            break;
+        case NEQ_tok:
+            push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JNZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+            break;
+        case GTR_tok:
+            push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JGZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+            break;
+        case LSS_tok:
+            push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JLZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+            break;
+        case GEQ_tok:
+            push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 5);
+            push_instr(program, JGZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+            break;
+        case LEQ_tok:
+            push_instr(program, CMP);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+
+            push_instr(program, JEZ);
+            push_instr(program, program->size + 5);
+            push_instr(program, JLZ);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 0);
+            break;
+        case LAND_tok:
+            push_instr(program, LAND);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case LOR_tok:
+            push_instr(program, LOR);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
             break;
         default:
             break;
-    }
-
-    ast_node = ast_node->next;
-    goto transpile_functions_label;
-}
-
-ASTNode* transpile_decisions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
-transpile_decisions_label:
-    if (ast_node == NULL) {
-        return ast_node;
-    }
-    char *ast_node_module = malloc(1 + strlen(ast_node->module));
-    strcpy(ast_node_module, ast_node->module);
-    compiler_escape_module(ast_node_module);
-
-    if (strcmp(ast_node_module, module) != 0) {
-        free(ast_node_module);
-        ast_node = ast_node->next;
-        goto transpile_decisions_label;
-    }
-    free(ast_node_module);
-
-    if (is_node_function_related(ast_node)) {
-        if (ast_node->depend != NULL) {
-            transpile_decisions(ast_node->depend, module, c_fp, indent);
         }
+        return type;
+        break;
+    }
+    case UnaryExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.unary_expr->x);
+        switch (expr->v.unary_expr->op) {
+        case ADD_tok:
+            push_instr(program, LII);
+            push_instr(program, R0B);
+            push_instr(program, V_INT);
 
-        if (ast_node->right != NULL) {
-            transpile_decisions(ast_node->right, module, c_fp, indent);
+            push_instr(program, LII);
+            push_instr(program, R1B);
+            push_instr(program, 1);
+
+            push_instr(program, MUL);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case SUB_tok:
+            push_instr(program, LII);
+            push_instr(program, R0B);
+            push_instr(program, V_INT);
+
+            push_instr(program, LII);
+            push_instr(program, R1B);
+            push_instr(program, -1);
+
+            push_instr(program, MUL);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+            break;
+        case NOT_tok:
+            push_instr(program, LNOT);
+            push_instr(program, R1A);
+            break;
+        case TILDE_tok:
+            push_instr(program, BNOT);
+            push_instr(program, R1A);
+            break;
+        default:
+            break;
         }
+        return type;
+        break;
+    }
+    case ParenExpr_kind:
+        return compileExpr(program, expr->v.paren_expr->x);
+        break;
+    case IndexExpr_kind: {
+        enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
+        shift_registers(program, 8);
 
-        if (ast_node->left != NULL) {
-            transpile_decisions(ast_node->left, module, c_fp, indent);
+        push_instr(program, MOV);
+        push_instr(program, R7B);
+        push_instr(program, R1B);
+
+        enum ValueType type2 = compileExpr(program, expr->v.index_expr->index) - 1;
+        if (type1 == V_STRING) {
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_STRING);
+
+            push_instr(program, MOV);
+            push_instr(program, R2A);
+            push_instr(program, R1A);
+
+            push_instr(program, LII);
+            push_instr(program, R3A);
+            push_instr(program, -1);
+
+            push_instr(program, CMP);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, JGZ);
+            push_instr(program, program->size + 9);
+
+            // Handle negative index and turn it to possitive
+            push_instr(program, MOV);
+            push_instr(program, R5A);
+            push_instr(program, R7B);
+
+            push_instr(program, ADD);
+            push_instr(program, R5A);
+            push_instr(program, R2A);
+
+            push_instr(program, MOV);
+            push_instr(program, R2A);
+            push_instr(program, R5A);
+
+            // Check if index out of range and throw error
+            push_instr(program, CLF);
+
+            push_instr(program, LII);
+            push_instr(program, R4A);
+            push_instr(program, 0);
+
+            // Check for negative index
+            push_instr(program, CMP);
+            push_instr(program, R4A);
+            push_instr(program, R2A);
+
+            push_instr(program, THRW);
+            push_instr(program, E_INDEX_OUT_OF_RANGE_STRING);
+            push_instr(program, R2A);
+
+            push_instr(program, CLF);
+
+            // Check for index bigger than string length
+            push_instr(program, MOV);
+            push_instr(program, R5A);
+            push_instr(program, R2A);
+
+            push_instr(program, INC);
+            push_instr(program, R5A);
+
+            push_instr(program, CMP);
+            push_instr(program, R5A);
+            push_instr(program, R7B);
+
+            push_instr(program, THRW);
+            push_instr(program, E_INDEX_OUT_OF_RANGE_STRING);
+            push_instr(program, R2A);
+
+            push_instr(program, MOV);
+            push_instr(program, R4A);
+            push_instr(program, R2A);
+
+            push_instr(program, POP);
+            push_instr(program, R1A);
+
+            push_instr(program, ADD);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, CLF);
+
+            push_instr(program, CMP);
+            push_instr(program, R2A);
+            push_instr(program, R3A);
+
+            push_instr(program, JNZ);
+            push_instr(program, program->size - 11);
+
+            push_instr(program, PUSH);
+            push_instr(program, R1A);
+
+            push_instr(program, LII);
+            push_instr(program, R1A);
+            push_instr(program, 1);
+        } else if ((type2 == V_ANY && type1 == V_LIST) || type2 == V_INT) {
+            push_instr(program, LIND);
+            push_instr(program, R7B);
+            push_instr(program, R1A);
+        } else if ((type2 == V_ANY && type1 == V_DICT) || type2 == V_STRING) {
+            push_instr(program, KSRCH);
+            push_instr(program, R7B);
+            push_instr(program, R1A);
         }
+        return type1 + 1;
+        break;
     }
+    case IncDecExpr_kind: {
+        enum ValueType type = compileExpr(program, expr->v.incdec_expr->x);
+        switch (expr->v.incdec_expr->op) {
+        case INC_tok:
+            push_instr(program, LII);
+            push_instr(program, R1B);
+            push_instr(program, 1);
+            break;
+        case DEC_tok:
+            push_instr(program, LII);
+            push_instr(program, R1B);
+            push_instr(program, -1);
+            break;
+        default:
+            break;
+        }
+        push_instr(program, ADD);
+        push_instr(program, R1A);
+        push_instr(program, R1B);
+        if (expr->v.incdec_expr->x->kind == Ident_kind) {
+            Symbol* symbol = getSymbol(expr->v.incdec_expr->x->v.ident->name);
+            i64 addr = symbol->addr;
+            if (symbol->value_type == V_REF) {
+                push_instr(program, LII);
+                push_instr(program, R7A);
+                push_instr(program, program->heap);
 
-    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_RETURN) {
-        transpile_node(ast_node->right, module, c_fp, indent);
-        transpile_node(ast_node->left, module, c_fp, indent);
-    }
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R7A);
 
-    kaos_lineno = ast_node->lineno;
-    if (ast_node->node_type != AST_FUNCTION_STEP) {
-        fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
-    }
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
 
-    if (debug_enabled)
-        printf(
-            "(TranspileD)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
-            ast_node->id,
-            getAstNodeTypeName(ast_node->node_type),
-            ast_node->module,
-            ast_node->strings_size
-        );
-
-    char *module_context = NULL;
-
-    switch (ast_node->node_type)
-    {
-        case AST_DECISION_MAKE_BOOLEAN:
-            if (ast_node->right->is_transpiled) {
-                fprintf(
-                    c_fp,
-                    "%*cif (%s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->transpiled,
-                    indent,
-                    ' '
-                );
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
             } else {
-                fprintf(
-                    c_fp,
-                    "%*cif (%s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->value.b ? "true" : "false",
-                    indent,
-                    ' '
-                );
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, addr++);
+                push_instr(program, R1A);
             }
-            fprintf(
-                c_fp,
-                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n",
-                indent + indent_length,
-                ' '
+        }
+        if (!expr->v.incdec_expr->first) {
+            switch (expr->v.incdec_expr->op) {
+            case INC_tok:
+                push_instr(program, LII);
+                push_instr(program, R1B);
+                push_instr(program, -1);
+                break;
+            case DEC_tok:
+                push_instr(program, LII);
+                push_instr(program, R1B);
+                push_instr(program, 1);
+                break;
+            default:
+                break;
+            }
+            push_instr(program, ADD);
+            push_instr(program, R1A);
+            push_instr(program, R1B);
+        }
+        return type;
+        break;
+    }
+    case CompositeLit_kind: {
+        ExprList* expr_list = expr->v.composite_lit->elts;
+        enum ValueType value_type = V_LIST;
+        for (size_t i = 0; i < expr_list->expr_count; i++) {
+            compileExpr(program, expr_list->exprs[i]);
+            if (expr_list->exprs[i]->kind != KeyValueExpr_kind) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, PUSH);
+                push_instr(program, R0A);
+            } else {
+                value_type = V_DICT;
+            }
+        }
+        compileSpec(program, expr->v.composite_lit->type);
+        push_instr(program, LII);
+        push_instr(program, R1A);
+        push_instr(program, expr_list->expr_count);
+        return value_type + 1;
+        break;
+    }
+    case KeyValueExpr_kind: {
+        compileExpr(program, expr->v.key_value_expr->value);
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, PUSH);
+        push_instr(program, R0A);
+        compileExpr(program, expr->v.key_value_expr->key);
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, PUSH);
+        push_instr(program, R0A);
+        break;
+    }
+    case CallExpr_kind: {
+        _Function* function = NULL;
+        switch (expr->v.call_expr->fun->kind) {
+        case Ident_kind:
+            function = getFunction(expr->v.call_expr->fun->v.ident->name, NULL);
+            break;
+        case SelectorExpr_kind:
+            function = getFunction(
+                expr->v.call_expr->fun->v.selector_expr->sel->v.ident->name,
+                expr->v.call_expr->fun->v.selector_expr->x->v.ident->name
             );
-            switch (ast_node->strings_size)
-            {
-                case 1:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
-                        indent + indent_length,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[0]
-                    );
-                    module_context = compiler_getFunctionModuleContext(ast_node->strings[0], ast_node->module);
-                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[0], indent + indent_length);
-                    free(module_context);
-                    module_context = NULL;
+            break;
+        default:
+            break;
+        }
+
+        ExprList* expr_list = expr->v.call_expr->args;
+
+        if (!function->is_dynamic) {
+            push_instr(program, SJMPB);
+            push_instr(program, program->size + 2);
+
+            push_instr(program, JMP);
+            push_instr(program, (i64)(void *)function);
+            push_instr(call_optional_jumps, program->size - 1);
+        }
+
+        for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+            Expr* expr = expr_list->exprs[expr_list->expr_count - i];
+            enum ValueType value_type = compileExpr(program, expr) - 1;
+            Symbol* parameter = function->parameters[i - 1];
+
+            strongly_type(parameter, NULL, function, expr, value_type);
+
+            enum Type type = parameter->type;
+            i64 addr = parameter->addr;
+
+            if (function->is_dynamic) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, PUSH);
+                push_instr(program, R0A);
+                continue;
+            }
+
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, program->heap);
+
+            push_instr(program, STI);
+            push_instr(program, addr++);
+            push_instr(program, R7A);
+
+            switch (type) {
+            case K_BOOL:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_BOOL);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            case K_NUMBER:
+                if (value_type == V_FLOAT) {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_FLOAT);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_INT);
+                }
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            case K_STRING: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case BasicLit_kind:
+                    len = strlen(expr->v.basic_lit->value.s);
                     break;
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
-                        indent + indent_length,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[1],
-                        ast_node->strings[0]
-                    );
-                    module_context = compiler_getFunctionModuleContext(ast_node->strings[1], ast_node->strings[0]);
-                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[1], indent + indent_length);
-                    free(module_context);
-                    module_context = NULL;
+                case BinaryExpr_kind:
+                    is_dynamic = true;
+                    break;
+                case IndexExpr_kind:
+                    len = 1;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
                     break;
                 default:
                     break;
-            }
-            fprintf(
-                c_fp,
-                "%*cfreeFunctionReturn(function_call_%llu);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n"
-                "%*creturn;\n"
-                "%*c} else {\n"
-                "%*cresetFunctionParametersMode();\n"
-                "%*c}\n",
-                indent + indent_length,
-                ' ',
-                compiler_function_counter,
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_function_counter,
-                indent + indent_length,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_BREAK:
-            if (ast_node->right->is_transpiled) {
-                fprintf(
-                    c_fp,
-                    "%*cif (nested_loop_counter > 0 && %s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->transpiled,
-                    indent,
-                    ' '
-                );
-            } else {
-                fprintf(
-                    c_fp,
-                    "%*cif (nested_loop_counter > 0 && %s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->value.b ? "true" : "false",
-                    indent,
-                    ' '
-                );
-            }
-            fprintf(
-                c_fp,
-                "%*cdecisionBreakLoop();\n"
-                "%*c}\n",
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_CONTINUE:
-            if (ast_node->right->is_transpiled) {
-                fprintf(
-                    c_fp,
-                    "%*cif (nested_loop_counter > 0 && %s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->transpiled,
-                    indent,
-                    ' '
-                );
-            } else {
-                fprintf(
-                    c_fp,
-                    "%*cif (nested_loop_counter > 0 && %s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->value.b ? "true" : "false",
-                    indent,
-                    ' '
-                );
-            }
-            fprintf(
-                c_fp,
-                "%*cdecisionContinueLoop();\n"
-                "%*c}\n",
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_BOOLEAN_RETURN:
-            if (ast_node->right->is_transpiled) {
-                fprintf(
-                    c_fp,
-                    "%*cif (%s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->transpiled,
-                    indent,
-                    ' '
-                );
-            } else {
-                fprintf(
-                    c_fp,
-                    "%*cif (%s)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->value.b ? "true" : "false",
-                    indent,
-                    ' '
-                );
-            }
-            fprintf(
-                c_fp,
-                "%*creturnSymbol(\"%s\");\n"
-                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
-                "%*creturn;\n"
-                "%*c}\n",
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT:
-            fprintf(
-                c_fp,
-                "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
-                "%*c{\n"
-                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' '
-            );
-            switch (ast_node->strings_size)
-            {
-                case 1:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", function_call_stack.arr[function_call_stack.size - 1]->function->module);\n",
-                        indent + indent_length,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[0]
-                    );
-                    module_context = compiler_getFunctionModuleContext(ast_node->strings[0], ast_node->module);
-                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[0], indent + indent_length);
-                    free(module_context);
-                    module_context = NULL;
-                    break;
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
-                        indent + indent_length,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[1],
-                        ast_node->strings[0]
-                    );
-                    module_context = compiler_getFunctionModuleContext(ast_node->strings[1], ast_node->strings[0]);
-                    transpile_function_call_decision(c_fp, ast_node->module, module_context, ast_node->strings[1], indent + indent_length);
-                    free(module_context);
-                    module_context = NULL;
-                    break;
-                default:
-                    break;
-            }
-            fprintf(
-                c_fp,
-                "%*cfreeFunctionReturn(function_call_%llu);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n"
-                "%*c} else {\n"
-                "%*cresetFunctionParametersMode();\n"
-                "%*c}\n",
-                indent + indent_length,
-                ' ',
-                compiler_function_counter,
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_function_counter,
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT_BREAK:
-            fprintf(
-                c_fp,
-                "%*cif (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
-                "%*c{\n"
-                "%*cdecisionBreakLoop();\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT_CONTINUE:
-            fprintf(
-                c_fp,
-                "%*cif (nested_loop_counter > 0 && function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
-                "%*c{\n"
-                "%*cdecisionContinueLoop();\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DECISION_MAKE_DEFAULT_RETURN:
-            fprintf(
-                c_fp,
-                "%*cif (function_call_stack.arr[function_call_stack.size - 1] != NULL)\n"
-                "%*c{\n"
-                "%*creturnSymbol(\"%s\");\n"
-                "%*ccallFunctionCleanUpSymbols(function_call_stack.arr[function_call_stack.size - 1]);\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        default:
-            break;
-    }
-
-    ast_node = ast_node->next;
-    goto transpile_decisions_label;
-}
-
-ASTNode* compiler_register_functions(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
-compiler_register_functions_label:
-    if (ast_node == NULL) {
-        return ast_node;
-    }
-    char *ast_node_module = malloc(1 + strlen(ast_node->module));
-    strcpy(ast_node_module, ast_node->module);
-    compiler_escape_module(ast_node_module);
-
-    if (strcmp(ast_node_module, module) != 0) {
-        free(ast_node_module);
-        ast_node = ast_node->next;
-        goto compiler_register_functions_label;
-    }
-    free(ast_node_module);
-
-    if (is_node_function_related(ast_node)) {
-        if (ast_node->depend != NULL) {
-            transpile_node(ast_node->depend, module, c_fp, indent);
-            compiler_register_functions(ast_node->depend, module, c_fp, indent);
-        }
-
-        if (ast_node->right != NULL) {
-            transpile_node(ast_node->right, module, c_fp, indent);
-            compiler_register_functions(ast_node->right, module, c_fp, indent);
-        }
-
-        if (ast_node->left != NULL) {
-            transpile_node(ast_node->left, module, c_fp, indent);
-            compiler_register_functions(ast_node->left, module, c_fp, indent);
-        }
-    }
-
-    kaos_lineno = ast_node->lineno;
-    if (
-        (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID)
-        ||
-        (ast_node->node_type == AST_FUNCTION_PARAMETERS_START)
-        ||
-        (ast_node->node_type >= AST_FUNCTION_PARAMETER_BOOL && ast_node->node_type <= AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT)
-    ) {
-        fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
-    }
-
-    if (debug_enabled)
-        printf(
-            "(TranspileR)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
-            ast_node->id,
-            getAstNodeTypeName(ast_node->node_type),
-            ast_node->module,
-            ast_node->strings_size
-        );
-
-    char* compiler_current_context = NULL;
-    char* compiler_current_module_context = NULL;
-    char* compiler_current_module = NULL;
-    if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
-        compiler_current_context = compiler_getCurrentContext();
-        compiler_current_module_context = compiler_getCurrentModuleContext();
-        compiler_current_module = compiler_getCurrentModule();
-    }
-
-    switch (ast_node->node_type)
-    {
-        case AST_DEFINE_FUNCTION_BOOL:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_BOOL, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_NUMBER:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_NUMBER, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_STRING:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_STRING, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_ANY:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_ANY, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_LIST:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_LIST, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_DICT:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_DICT, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_BOOL_LIST:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_LIST, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_BOOL_DICT:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_DICT, K_BOOL, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_NUMBER_LIST:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_LIST, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_NUMBER_DICT:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_DICT, K_NUMBER, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_STRING_LIST:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_LIST, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_STRING_DICT:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_DICT, K_STRING, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_DEFINE_FUNCTION_VOID:
-            fprintf(
-                c_fp,
-                "%*cstartFunction(\"%s\", K_VOID, K_ANY, \"%s\", \"%s\", \"%s\", false);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_current_context,
-                compiler_current_module_context,
-                compiler_current_module
-            );
-            break;
-        case AST_FUNCTION_PARAMETERS_START:
-            fprintf(
-                c_fp,
-                "%*cif (function_parameters_mode == NULL)\n"
-                "%*cstartFunctionParameters();\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' '
-            );
-            break;
-        case AST_FUNCTION_PARAMETER_BOOL:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_BOOL, K_ANY);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_NUMBER:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_NUMBER, K_ANY);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_STRING:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_STRING, K_ANY);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_ANY);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_BOOL_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_BOOL);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_NUMBER_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_NUMBER);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_STRING_LIST:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_LIST, K_STRING);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_ANY);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_BOOL_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_BOOL);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_NUMBER_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_NUMBER);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_PARAMETER_STRING_DICT:
-            fprintf(c_fp, "%*caddFunctionParameter(\"%s\", K_DICT, K_STRING);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*caddFunctionOptionalParameterBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "%*caddFunctionOptionalParameterBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
-            }
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER:
-            if (ast_node->right->is_transpiled) {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
                 }
-            } else {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
+
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_STRING);
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr - 1);
+                    push_instr(program, R7A);
                 } else {
-                    fprintf(c_fp, "%*caddFunctionOptionalParameterFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
-                }
-            }
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_STRING:
-            fprintf(c_fp, "%*caddFunctionOptionalParameterString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], ast_node->value.s);
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_ANY);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_BOOL);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_NUMBER);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_STRING_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_STRING);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_ANY);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_BOOL_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_BOOL);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_NUMBER_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_NUMBER);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_OPTIONAL_FUNCTION_PARAMETER_STRING_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionOptionalParameterComplex(\"%s\", K_STRING);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_ADD_FUNCTION_NAME:
-            addFunctionNameToFunctionNamesBuffer(ast_node->strings[0]);
-            break;
-        case AST_APPEND_MODULE:
-            appendModuleToModuleBuffer(ast_node->strings[0]);
-            break;
-        case AST_PREPEND_MODULE:
-            prependModuleToModuleBuffer(ast_node->strings[0]);
-            break;
-        case AST_MODULE_IMPORT:
-            compiler_handleModuleImportRegister(NULL, false, c_fp, indent);
-            break;
-        case AST_MODULE_IMPORT_AS:
-            compiler_handleModuleImportRegister(ast_node->strings[0], false, c_fp, indent);
-            break;
-        case AST_MODULE_IMPORT_PARTIAL:
-            compiler_handleModuleImportRegister(NULL, true, c_fp, indent);
-            break;
-        default:
-            break;
-    }
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
 
-    if (ast_node->node_type >= AST_DEFINE_FUNCTION_BOOL && ast_node->node_type <= AST_DEFINE_FUNCTION_VOID) {
-        free(compiler_current_context);
-        free(compiler_current_module_context);
-        free(compiler_current_module);
-    }
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
 
-    ast_node = ast_node->next;
-    goto compiler_register_functions_label;
-}
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
 
-ASTNode* transpile_node(ASTNode* ast_node, char *module, FILE *c_fp, unsigned short indent) {
-transpile_node_label:
-    if (ast_node == NULL) {
-        return ast_node;
-    }
-    char *ast_node_module = malloc(1 + strlen(ast_node->module));
-    strcpy(ast_node_module, ast_node->module);
-    compiler_escape_module(ast_node_module);
-
-    if (strcmp(ast_node_module, module) != 0) {
-        free(ast_node_module);
-        ast_node = ast_node->next;
-        goto transpile_node_label;
-    }
-    free(ast_node_module);
-
-    if (ast_node->node_type != AST_FUNCTION_STEP)
-        if (is_node_function_related(ast_node)) {
-            ast_node = ast_node->next;
-            goto transpile_node_label;
-        }
-
-    if (ast_node->node_type >= AST_DECISION_MAKE_BOOLEAN && ast_node->node_type <= AST_DECISION_MAKE_DEFAULT_RETURN) {
-        ast_node = ast_node->next;
-        goto transpile_node_label;
-    }
-
-    if (ast_node->depend != NULL) {
-        transpile_node(ast_node->depend, module, c_fp, indent);
-    }
-
-    if (ast_node->right != NULL) {
-        transpile_node(ast_node->right, module, c_fp, indent);
-    }
-
-    if (ast_node->left != NULL) {
-        transpile_node(ast_node->left, module, c_fp, indent);
-    }
-
-    if (ast_node->node_type == AST_END) {
-        return ast_node;
-    }
-
-    kaos_lineno = ast_node->lineno;
-    if (
-        (ast_node->node_type >= AST_START_TIMES_DO && ast_node->node_type <= AST_START_FOREACH_DICT)
-        ||
-        (ast_node->node_type >= AST_VAR_CREATE_BOOL && ast_node->node_type <= AST_PRETTY_ECHO_VAR_EL)
-        ||
-        (ast_node->node_type >= AST_DELETE_VAR && ast_node->node_type <= AST_EXIT_VAR)
-        ||
-        (ast_node->node_type == AST_PRINT_FUNCTION_TABLE)
-        ||
-        (ast_node->node_type >= AST_FUNCTION_CALL_PARAMETER_BOOL && ast_node->node_type <= AST_FUNCTION_CALL_PARAMETER_DICT)
-        ||
-        (ast_node->node_type >= AST_PRINT_FUNCTION_RETURN && ast_node->node_type <= AST_FUNCTION_RETURN)
-        ||
-        (ast_node->node_type == AST_NESTED_COMPLEX_TRANSITION)
-        ||
-        (ast_node->node_type == AST_JSON_PARSER)
-    ) {
-        fprintf(c_fp, "%*ckaos_lineno = %d;\n", indent, ' ', ast_node->lineno);
-    }
-
-    if (debug_enabled)
-        printf(
-            "(Transpile)\tASTNode: {id: %llu, node_type: %s, module: %s, string_size: %zu}\n",
-            ast_node->id,
-            getAstNodeTypeName(ast_node->node_type),
-            ast_node->module,
-            ast_node->strings_size
-        );
-
-    unsigned long long current_loop_counter = 0;
-    switch (ast_node->node_type)
-    {
-        case AST_START_TIMES_DO:
-            compiler_loop_counter++;
-            fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
-            if (ast_node->right->is_transpiled) {
-                fprintf(
-                    c_fp,
-                    "%*cfor (int i = 0; i < %s; i++)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->transpiled,
-                    indent,
-                    ' '
-                );
-            } else {
-                fprintf(
-                    c_fp,
-                    "%*cfor (int i = 0; i < %lld; i++)\n"
-                    "%*c{\n",
-                    indent,
-                    ' ',
-                    ast_node->right->value.i,
-                    indent,
-                    ' '
-                );
-            }
-            indent += indent_length;
-            fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
-            fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
-            indent -= indent_length;
-            fprintf(c_fp, "%*c}\n", indent, ' ');
-            fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
-            break;
-        case AST_START_TIMES_DO_INFINITE:
-            compiler_loop_counter++;
-            fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
-            fprintf(
-                c_fp,
-                "%*cwhile (true)\n"
-                "%*c{\n",
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            indent += indent_length;
-            fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
-            fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
-            indent -= indent_length;
-            fprintf(c_fp, "%*c}\n", indent, ' ');
-            fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
-            break;
-        case AST_START_TIMES_DO_VAR:
-            compiler_loop_counter++;
-            fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
-            fprintf(
-                c_fp,
-                "%*cfor (int i = 0; i < getSymbolValueInt(\"%s\"); i++)\n"
-                "%*c{\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                indent,
-                ' '
-            );
-            indent += indent_length;
-            fprintf(c_fp, "%*cif (setjmp(LoopBreak)) break;\n", indent, ' ');
-            fprintf(c_fp, "%*cif (setjmp(LoopContinue)) continue;\n", indent, ' ');
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
-            indent -= indent_length;
-            fprintf(c_fp, "%*c}\n", indent, ' ');
-            fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
-            break;
-        case AST_START_FOREACH:
-            compiler_loop_counter++;
-            current_loop_counter = compiler_loop_counter;
-            fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
-            fprintf(
-                c_fp,
-                "%*cSymbol* loop_%llu_list = getSymbol(\"%s\");\n"
-                "%*cif (loop_%llu_list->type != K_LIST) throw_error(E_NOT_A_LIST, \"%s\");\n"
-                "%*cfor (unsigned long i = 0; i < loop_%llu_list->children_count; i++)\n"
-                "%*c{\n"
-                "%*cSymbol* loop_%llu_child = loop_%llu_list->children[i];\n"
-                "%*cSymbol* loop_%llu_clone_symbol = createCloneFromSymbol(\"%s\", loop_%llu_child->type, loop_%llu_child, loop_%llu_child->secondary_type);\n",
-                indent,
-                ' ',
-                compiler_loop_counter,
-                ast_node->strings[0],
-                indent,
-                ' ',
-                compiler_loop_counter,
-                ast_node->strings[0],
-                indent,
-                ' ',
-                compiler_loop_counter,
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                ast_node->strings[1],
-                compiler_loop_counter,
-                compiler_loop_counter,
-                compiler_loop_counter
-            );
-            indent += indent_length;
-            fprintf(
-                c_fp,
-                "%*cif (setjmp(LoopBreak))\n"
-                "%*c{\n"
-                "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
-                "%*cbreak;\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            fprintf(
-                c_fp,
-                "%*cif (setjmp(LoopContinue))\n"
-                "%*c{\n"
-                "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
-                "%*ccontinue;\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            ast_node = transpile_node(ast_node->next, module, c_fp, indent);
-            indent -= indent_length;
-            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent + indent_length, ' ', current_loop_counter);
-            fprintf(c_fp, "%*c}\n", indent, ' ');
-            fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
-            break;
-        case AST_START_FOREACH_DICT:
-            compiler_loop_counter++;
-            current_loop_counter = compiler_loop_counter;
-            fprintf(c_fp, "%*cnested_loop_counter++;\n", indent, ' ');
-            fprintf(
-                c_fp,
-                "%*cSymbol* loop_%llu_dict = getSymbol(\"%s\");\n"
-                "%*cif (loop_%llu_dict->type != K_DICT) throw_error(E_NOT_A_DICT, \"%s\");\n"
-                "%*cfor (unsigned long i = 0; i < loop_%llu_dict->children_count; i++)\n"
-                "%*c{\n"
-                "%*cSymbol* loop_%llu_child = loop_%llu_dict->children[i];\n"
-                "%*caddSymbolString(\"%s\", loop_%llu_child->key);\n"
-                "%*cSymbol* loop_%llu_clone_symbol = createCloneFromSymbol(\"%s\", loop_%llu_child->type, loop_%llu_child, loop_%llu_child->secondary_type);\n",
-                indent,
-                ' ',
-                compiler_loop_counter,
-                ast_node->strings[0],
-                indent,
-                ' ',
-                compiler_loop_counter,
-                ast_node->strings[0],
-                indent,
-                ' ',
-                compiler_loop_counter,
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                ast_node->strings[1],
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                ast_node->strings[2],
-                compiler_loop_counter,
-                compiler_loop_counter,
-                compiler_loop_counter
-            );
-            indent += indent_length;
-            fprintf(
-                c_fp,
-                "%*cif (setjmp(LoopBreak))\n"
-                "%*c{\n"
-                "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
-                "%*cremoveSymbolByName(\"%s\");\n"
-                "%*cbreak;\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                ast_node->strings[1],
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            fprintf(
-                c_fp,
-                "%*cif (setjmp(LoopContinue))\n"
-                "%*c{\n"
-                "%*cremoveSymbol(loop_%llu_clone_symbol);\n"
-                "%*cremoveSymbolByName(\"%s\");\n"
-                "%*ccontinue;\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                compiler_loop_counter,
-                indent + indent_length,
-                ' ',
-                ast_node->strings[1],
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            ASTNode* next_node = transpile_node(ast_node->next, module, c_fp, indent);
-            indent -= indent_length;
-            fprintf(c_fp, "%*cremoveSymbol(loop_%llu_clone_symbol);\n", indent + indent_length, ' ', current_loop_counter);
-            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent + indent_length, ' ', ast_node->strings[1]);
-            fprintf(c_fp, "%*c}\n", indent, ' ');
-            fprintf(c_fp, "%*cnested_loop_counter--;\n", indent, ' ');
-            ast_node = next_node;
-            break;
-        default:
-            break;
-    }
-
-    long double l_value;
-    long double r_value;
-    char *_module = NULL;
-    char *value_s = NULL;
-    switch (ast_node->node_type)
-    {
-        case AST_VAR_CREATE_BOOL:
-            if (ast_node->strings[0] == NULL) {
-                if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*caddSymbolBool(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*caddSymbolBool(NULL, %s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
-                }
-            } else {
-                if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*caddSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*caddSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
-                }
-            }
-            break;
-        case AST_VAR_CREATE_BOOL_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_BOOL, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_BOOL_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_BOOL, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_BOOL_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_BOOL, K_ANY, indent);
-            break;
-        case AST_VAR_CREATE_NUMBER:
-            if (ast_node->right->is_transpiled) {
-                if (ast_node->right->value_type == V_INT) {
-                    if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolInt(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
-                    } else {
-                        fprintf(c_fp, "%*caddSymbolInt(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-                    }
-                } else {
-                    if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %s);\n", indent, ' ', ast_node->right->transpiled);
-                    } else {
-                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R0A);
                     }
                 }
-            } else {
-                if (ast_node->right->value_type == V_INT) {
-                    if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolInt(NULL, %lld);\n", indent, ' ', ast_node->right->value.i);
-                    } else {
-                        fprintf(c_fp, "%*caddSymbolInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
-                    }
-                } else {
-                    if (ast_node->strings[0] == NULL) {
-                        fprintf(c_fp, "%*caddSymbolFloat(NULL, %Lf);\n", indent, ' ', ast_node->right->value.f);
-                    } else {
-                        fprintf(c_fp, "%*caddSymbolFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
-                    }
-                }
+                break;
             }
-            break;
-        case AST_VAR_CREATE_NUMBER_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_NUMBER, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_NUMBER_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_NUMBER, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_NUMBER_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_NUMBER, K_ANY, indent);
-            break;
-        case AST_VAR_CREATE_STRING:
-            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "%*caddSymbolString(NULL, \"%s\");\n", indent, ' ', value_s);
-            } else {
-                fprintf(c_fp, "%*caddSymbolString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], value_s);
-            }
-            free(value_s);
-            break;
-        case AST_VAR_CREATE_STRING_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_STRING, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_STRING_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_STRING, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_STRING_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_STRING, K_ANY, indent);
-            break;
-        case AST_VAR_CREATE_ANY_BOOL:
-            if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "%*caddSymbolAnyBool(NULL, %s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
-            } else {
-                fprintf(c_fp, "%*caddSymbolAnyBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
-            }
-            break;
-        case AST_VAR_CREATE_ANY_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                if (ast_node->strings[0] == NULL) {
-                    fprintf(c_fp, "%*caddSymbolAnyInt(NULL, %lld);\n", indent, ' ', ast_node->right->value.i);
-                } else {
-                    fprintf(c_fp, "%*caddSymbolAnyInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
-                }
-            } else {
-                if (ast_node->strings[0] == NULL) {
-                    fprintf(c_fp, "%*caddSymbolAnyFloat(NULL, %Lf);\n", indent, ' ', ast_node->right->value.f);
-                } else {
-                    fprintf(c_fp, "%*caddSymbolAnyFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
-                }
-            }
-            break;
-        case AST_VAR_CREATE_ANY_STRING:
-            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            if (ast_node->strings[0] == NULL) {
-                fprintf(c_fp, "%*caddSymbolAnyString(NULL, \"%s\");\n", indent, ' ', value_s);
-            } else {
-                fprintf(c_fp, "%*caddSymbolAnyString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], value_s);
-            }
-            free(value_s);
-            break;
-        case AST_VAR_CREATE_ANY_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_ANY_VAR_EL:
-            fprintf(c_fp, "%*ccreateCloneFromComplexElement(\"%s\", K_ANY, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_ANY_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_ANY, K_ANY, indent);
-            break;
-        case AST_VAR_CREATE_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_ANY);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_ANY, indent);
-            break;
-        case AST_VAR_CREATE_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_ANY);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_ANY);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_ANY, indent);
-            break;
-        case AST_VAR_CREATE_BOOL_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_BOOL);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_BOOL_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_BOOL);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_BOOL_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_BOOL, indent);
-            break;
-        case AST_VAR_CREATE_BOOL_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_BOOL);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_BOOL_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_BOOL);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_BOOL_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_BOOL, indent);
-            break;
-        case AST_VAR_CREATE_NUMBER_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_NUMBER);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_NUMBER_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_NUMBER);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_NUMBER_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_NUMBER, indent);
-            break;
-        case AST_VAR_CREATE_NUMBER_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_NUMBER);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_NUMBER_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_NUMBER);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_NUMBER_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_NUMBER, indent);
-            break;
-        case AST_VAR_CREATE_STRING_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_STRING);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_STRING_LIST_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_LIST, \"%s\", K_STRING);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_STRING_LIST_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_LIST, K_STRING, indent);
-            break;
-        case AST_VAR_CREATE_STRING_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(\"%s\", K_STRING);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_CREATE_STRING_DICT_VAR:
-            fprintf(c_fp, "%*ccreateCloneFromSymbolByName(\"%s\", K_DICT, \"%s\", K_STRING);\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_CREATE_STRING_DICT_FUNC_RETURN:
-            transpile_function_call_create_var(c_fp, ast_node, module, K_DICT, K_STRING, indent);
-            break;
-        case AST_VAR_UPDATE_BOOL:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cupdateSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "%*cupdateSymbolBool(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.b ? "true" : "false");
-            }
-            break;
-        case AST_VAR_UPDATE_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateSymbolInt(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*cupdateSymbolInt(\"%s\", %lld);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.i);
-                }
-            } else {
-                if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %s);\n", indent, ' ', ast_node->strings[0], ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*cupdateSymbolFloat(\"%s\", %Lf);\n", indent, ' ', ast_node->strings[0], ast_node->right->value.f);
-                }
-            }
-            break;
-        case AST_VAR_UPDATE_STRING:
-            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cupdateSymbolString(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], value_s);
-            free(value_s);
-            break;
-        case AST_VAR_UPDATE_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexModeWithUpdate(\"%s\");\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_UPDATE_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexModeWithUpdate(\"%s\");\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                ast_node->strings[0]
-            );
-            break;
-        case AST_VAR_UPDATE_VAR:
-            fprintf(c_fp, "%*cupdateSymbolByClonningName(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_UPDATE_VAR_EL:
-            fprintf(c_fp, "%*cupdateSymbolByClonningComplexElement(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[0], ast_node->strings[1]);
-            break;
-        case AST_VAR_UPDATE_FUNC_RETURN:
-            compiler_function_counter++;
-            switch (ast_node->strings_size)
-            {
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n",
-                        indent,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
-                    break;
-                case 3:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
-                        indent,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[2],
-                        ast_node->strings[1]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
-                    break;
-                default:
-                    break;
-            }
-            fprintf(
-                c_fp,
-                "%*cupdateSymbolByClonningFunctionReturn(\"%s\", function_call_%llu);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                compiler_function_counter,
-                indent,
-                ' ',
-                indent,
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_RETURN_VAR:
-            fprintf(c_fp, "%*creturnSymbol(\"%s\");\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_PRINT_COMPLEX_EL:
-            fprintf(
-                c_fp,
-                "%*cprintSymbolValueEndWithNewLine(\n"
-                "%*cgetComplexElementBySymbolId(variable_complex_element, variable_complex_element_symbol_id),\n"
-                "%*cfalse,\n"
-                "%*cfalse\n"
-                "%*c);\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_COMPLEX_EL_UPDATE_BOOL:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cupdateComplexElementBool(%s);\n", indent, ' ', ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "%*cupdateComplexElementBool(%s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
-            }
-            break;
-        case AST_COMPLEX_EL_UPDATE_NUMBER:
-            if (ast_node->right->value_type == V_INT) {
-                if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateComplexElementInt(%s);\n", indent, ' ', ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*cupdateComplexElementInt(%lld);\n", indent, ' ', ast_node->right->value.i);
-                }
-            } else {
-                if (ast_node->right->is_transpiled) {
-                    fprintf(c_fp, "%*cupdateComplexElementFloat(%s);\n", indent, ' ', ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*cupdateComplexElementFloat(%Lf);\n", indent, ' ', ast_node->right->value.f);
-                }
-            }
-            break;
-        case AST_COMPLEX_EL_UPDATE_STRING:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cupdateComplexElementString(%s);\n", indent, ' ', ast_node->right->transpiled);
-            } else {
-                value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-                fprintf(c_fp, "%*cupdateComplexElementString(\"%s\");\n", indent, ' ', value_s);
-                free(value_s);
-            }
-            break;
-        case AST_COMPLEX_EL_UPDATE_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cupdateComplexElementComplex();\n",
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_COMPLEX_EL_UPDATE_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cupdateComplexElementComplex();\n",
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_COMPLEX_EL_UPDATE_VAR:
-            fprintf(c_fp, "%*cupdateComplexElementSymbol(getSymbol(\"%s\"));\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_COMPLEX_EL_UPDATE_VAR_EL:
-            fprintf(
-                c_fp,
-                "%*cupdateComplexElementSymbol(\n"
-                "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0)\n"
-                "%*c);\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent,
-                ' '
-            );
-            break;
-        case AST_COMPLEX_EL_UPDATE_FUNC_RETURN:
-            compiler_function_counter++;
-            switch (ast_node->strings_size)
-            {
-                case 1:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n",
-                        indent,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[0]
-                    );
-                    transpile_function_call(c_fp, NULL, ast_node->strings[0], indent);
-                    break;
-                case 2:
-                    fprintf(
-                        c_fp,
-                        "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
-                        indent,
-                        ' ',
-                        compiler_function_counter,
-                        ast_node->strings[1],
-                        ast_node->strings[0]
-                    );
-                    transpile_function_call(c_fp, ast_node->strings[0], ast_node->strings[1], indent);
-                    break;
-                default:
-                    break;
-            }
-            fprintf(
-                c_fp,
-                "%*cupdateComplexSymbolByClonningFunctionReturn(function_call_%llu);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                indent,
-                ' ',
-                indent,
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_PRINT_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), false, true);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_PRINT_VAR_EL:
-            fprintf(
-                c_fp,
-                "%*cprintSymbolValueEndWithNewLine(\n"
-                "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0),\n"
-                "%*cfalse,\n"
-                "%*ctrue\n"
-                "%*c);\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_PRINT_EXPRESSION:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "%*cprintf(\"%lld\\n\");\n", indent, ' ', ast_node->right->value.i);
-            }
-            break;
-        case AST_PRINT_MIXED_EXPRESSION:
-            if (ast_node->right->is_transpiled) {
-                fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', ast_node->right->transpiled);
-            } else {
-                fprintf(c_fp, "%*cprintf(\"%Lg\\n\");\n", indent, ' ', ast_node->right->value.f);
-            }
-            break;
-        case AST_PRINT_STRING:
-            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cprintf(\"%%s\\n\", \"%s\");\n", indent, ' ', value_s);
-            free(value_s);
-            break;
-        case AST_PRINT_INTERACTIVE_EXPRESSION:
-            if (ast_node->right->node_type >= AST_VAR_EXPRESSION_INCREMENT && ast_node->right->node_type <= AST_VAR_EXPRESSION_ASSIGN_INCREMENT)
-                fprintf(c_fp, "%*c%s;\n", indent, ' ', ast_node->right->transpiled);
-            break;
-        case AST_ECHO_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", false, true);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_ECHO_VAR_EL:
-            fprintf(
-                c_fp,
-                "%*cprintSymbolValueEndWith(\n"
-                "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0),\n"
-                "%*c\"\",\n"
-                "%*cfalse,\n"
-                "%*ctrue\n"
-                "%*c);\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_ECHO_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%lld\");\n", indent, ' ', ast_node->right->value.i);
-            break;
-        case AST_ECHO_MIXED_EXPRESSION:
-            fprintf(c_fp, "%*cprintf(\"%Lf\");\n", indent, ' ', ast_node->right->value.f);
-            break;
-        case AST_ECHO_STRING:
-            value_s = escape_string_literal_for_transpiler(ast_node->value.s);
-            fprintf(c_fp, "%*cprintf(\"%%s\", \"%s\");\n", indent, ' ', value_s);
-            free(value_s);
-            break;
-        case AST_PRETTY_PRINT_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWithNewLine(getSymbol(\"%s\"), true, true);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_PRETTY_PRINT_VAR_EL:
-            fprintf(
-                c_fp,
-                "%*cprintSymbolValueEndWithNewLine(\n"
-                "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0),\n"
-                "%*ctrue,\n"
-                "%*ctrue\n"
-                "%*c);\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_PRETTY_ECHO_VAR:
-            fprintf(c_fp, "%*cprintSymbolValueEndWith(getSymbol(\"%s\"), \"\", true, true);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_PRETTY_ECHO_VAR_EL:
-            fprintf(
-                c_fp,
-                "%*cprintSymbolValueEndWith(\n"
-                "%*cgetComplexElementThroughLeftRightBracketStack(\"%s\", 0),\n"
-                "%*c\"\",\n"
-                "%*ctrue,\n"
-                "%*ctrue\n"
-                "%*c);\n",
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                ast_node->strings[0],
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_PARENTHESIS:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(%s)", ast_node->right->transpiled));
-            } else {
-                ast_node->value = ast_node->right->value;
-                ast_node->value_type = ast_node->right->value_type;
-            }
-            break;
-        case AST_EXPRESSION_PLUS:
-            if (!transpile_common_operator(ast_node, "+", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i + ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_MINUS:
-            if (!transpile_common_operator(ast_node, "-", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i - ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_MULTIPLY:
-            if (!transpile_common_operator(ast_node, "*", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i * ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_AND:
-            if (!transpile_common_operator(ast_node, "&", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i & ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_OR:
-            if (!transpile_common_operator(ast_node, "|", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i | ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_XOR:
-            if (!transpile_common_operator(ast_node, "^", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i ^ ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_NOT:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "~ %s", ast_node->right->transpiled));
-            } else {
-                ast_node->value.i = ~ ast_node->right->value.i;
-            }
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_LEFT_SHIFT:
-            if (!transpile_common_operator(ast_node, "<<", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i << ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_EXPRESSION_BITWISE_RIGHT_SHIFT:
-            if (!transpile_common_operator(ast_node, ">>", V_INT, V_INT))
-                ast_node->value.i = ast_node->left->value.i >> ast_node->right->value.i;
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_VALUE:
-            setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "getSymbolValueInt(\"%s\")", ast_node->strings[0]));
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_INCREMENT:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s + 1", ast_node->right->transpiled));
-            } else {
-                ast_node->value.i = ast_node->right->value.i + 1;
-            }
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_DECREMENT:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s - 1", ast_node->right->transpiled));
-            } else {
-                ast_node->value.i = ast_node->right->value.i - 1;
-            }
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_INCREMENT_ASSIGN:
-            setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "incrementThenAssign(\"%s\"", ast_node->strings[0]));
-            setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->right->value.i));
-            ast_node->value_type = V_INT;
-            break;
-        case AST_VAR_EXPRESSION_ASSIGN_INCREMENT:
-            setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "assignThenIncrement(\"%s\"", ast_node->strings[0]));
-            setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, ", %lld)", ast_node->right->value.i));
-            ast_node->value_type = V_INT;
-            break;
-        case AST_MIXED_EXPRESSION_PLUS:
-            if (!transpile_common_mixed_operator(ast_node, "+")) {
-                if (ast_node->left->value_type == V_INT) {
-                    l_value = (long double) ast_node->left->value.i;
-                } else {
-                    l_value = ast_node->left->value.f;
-                }
-                if (ast_node->right->value_type == V_INT) {
-                    r_value = (long double) ast_node->right->value.i;
-                } else {
-                    r_value = ast_node->right->value.f;
-                }
-                ast_node->value.f = l_value + r_value;
-            }
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_MIXED_EXPRESSION_MINUS:
-            if (!transpile_common_mixed_operator(ast_node, "-")) {
-                if (ast_node->left->value_type == V_INT) {
-                    l_value = (long double) ast_node->left->value.i;
-                } else {
-                    l_value = ast_node->left->value.f;
-                }
-                if (ast_node->right->value_type == V_INT) {
-                    r_value = (long double) ast_node->right->value.i;
-                } else {
-                    r_value = ast_node->right->value.f;
-                }
-                ast_node->value.f = l_value - r_value;
-            }
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_MIXED_EXPRESSION_MULTIPLY:
-            if (!transpile_common_mixed_operator(ast_node, "*")) {
-                if (ast_node->left->value_type == V_INT) {
-                    l_value = (long double) ast_node->left->value.i;
-                } else {
-                    l_value = ast_node->left->value.f;
-                }
-                if (ast_node->right->value_type == V_INT) {
-                    r_value = (long double) ast_node->right->value.i;
-                } else {
-                    r_value = ast_node->right->value.f;
-                }
-                ast_node->value.f = l_value * r_value;
-            }
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_MIXED_EXPRESSION_DIVIDE:
-            if (!transpile_common_mixed_operator(ast_node, "/")) {
-                if (ast_node->left->value_type == V_INT) {
-                    l_value = (long double) ast_node->left->value.i;
-                } else {
-                    l_value = ast_node->left->value.f;
-                }
-                if (ast_node->right->value_type == V_INT) {
-                    r_value = (long double) ast_node->right->value.i;
-                } else {
-                    r_value = ast_node->right->value.f;
-                }
-                if (r_value == 0.0) {
-                    setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", "INFINITY"));
-                    break;
-                }
-                ast_node->value.f = l_value / r_value;
-            }
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_VAR_MIXED_EXPRESSION_VALUE:
-            setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "getSymbolValueFloat(\"%s\")", ast_node->strings[0]));
-            ast_node->value_type = V_FLOAT;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL:
-            if (!transpile_common_operator(ast_node, "==", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b == ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL:
-            if (!transpile_common_operator(ast_node, "!=", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b != ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT:
-            if (!transpile_common_operator(ast_node, ">", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b > ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL:
-            if (!transpile_common_operator(ast_node, "<", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b < ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL:
-            if (!transpile_common_operator(ast_node, ">=", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL:
-            if (!transpile_common_operator(ast_node, "<=", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND:
-            if (!transpile_common_operator(ast_node, "&&", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR:
-            if (!transpile_common_operator(ast_node, "||", V_BOOL, V_BOOL))
-                ast_node->value.b = ast_node->left->value.b || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "! %s", ast_node->right->transpiled));
-            } else {
-                ast_node->value.b = ! ast_node->right->value.b;
-            }
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED:
-            if (!transpile_common_operator(ast_node, "==", V_FLOAT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.f == ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED:
-            if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.f != ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED:
-            if (!transpile_common_operator(ast_node, ">", V_FLOAT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.f > ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED:
-            if (!transpile_common_operator(ast_node, "<", V_FLOAT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.f < ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED:
-            if (!transpile_common_operator(ast_node, ">=", V_FLOAT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED:
-            if (!transpile_common_operator(ast_node, "<=", V_FLOAT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED:
-            if (!transpile_common_operator(ast_node, "&&", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED:
-            if (!transpile_common_operator(ast_node, "||", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_MIXED:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "! %s", ast_node->right->transpiled));
-            } else {
-                ast_node->value.b = ! ast_node->right->value.f;
-            }
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f != ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, ">", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f > ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "<", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f < ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, ">=", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "<=", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "&&", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "||", V_FLOAT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.f || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, "==", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b == ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, "!=", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b != ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, ">", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b > ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, "<", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b < ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, ">=", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, "<=", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, "&&", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b && ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_MIXED:
-            if (!transpile_common_operator(ast_node, "||", V_BOOL, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.b || ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP:
-            if (!transpile_common_operator(ast_node, "==", V_INT, V_INT))
-                ast_node->value.b = ast_node->left->value.i == ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP:
-            if (!transpile_common_operator(ast_node, "!=", V_INT, V_INT))
-                ast_node->value.b = ast_node->left->value.i != ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP:
-            if (!transpile_common_operator(ast_node, ">", V_INT, V_INT))
-                ast_node->value.b = ast_node->left->value.i > ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP:
-            if (!transpile_common_operator(ast_node, "<", V_INT, V_INT))
-                ast_node->value.b = ast_node->left->value.i < ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP:
-            if (!transpile_common_operator(ast_node, ">=", V_INT, V_INT))
-                ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP:
-            if (!transpile_common_operator(ast_node, "<=", V_INT, V_INT))
-                ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP:
-            if (!transpile_common_operator(ast_node, "&&", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP:
-            if (!transpile_common_operator(ast_node, "||", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_NOT_EXP:
-            if (ast_node->right->is_transpiled) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "! %s", ast_node->right->transpiled));
-            } else {
-                ast_node->value.b = ! ast_node->right->value.i;
-            }
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "==", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i == ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "!=", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i != ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, ">", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i > ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "<", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i < ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, ">=", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "<=", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "&&", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i && ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_BOOLEAN:
-            if (!transpile_common_operator(ast_node, "||", V_INT, V_BOOL))
-                ast_node->value.b = ast_node->left->value.i || ast_node->right->value.b;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, "==", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b == ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, "!=", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b != ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, ">", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b > ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, "<", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b < ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, ">=", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b >= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, "<=", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b <= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, "&&", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b && ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_BOOLEAN_EXP:
-            if (!transpile_common_operator(ast_node, "||", V_BOOL, V_INT))
-                ast_node->value.b = ast_node->left->value.b || ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, "==", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f == ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, "!=", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f != ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, ">", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f > ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, "<", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f < ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, ">=", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f >= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, "<=", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f <= ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, "&&", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f && ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_MIXED_EXP:
-            if (!transpile_common_operator(ast_node, "||", V_FLOAT, V_INT))
-                ast_node->value.b = ast_node->left->value.f || ast_node->right->value.i;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, "==", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i == ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, "!=", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i != ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, ">", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i > ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, "<", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i < ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, ">=", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i >= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, "<=", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i <= ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_AND_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, "&&", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i && ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_LOGIC_OR_EXP_MIXED:
-            if (!transpile_common_operator(ast_node, "||", V_INT, V_FLOAT))
-                ast_node->value.b = ast_node->left->value.i || ast_node->right->value.f;
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_EQUAL_UNKNOWN:
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "resolveRelEqualUnknown(\"%s\",",
-                    ast_node->strings[0]
-                )
-            );
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "\"%s\")",
-                    ast_node->strings[1]
-                )
-            );
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_NOT_EQUAL_UNKNOWN:
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "resolveRelNotEqualUnknown(\"%s\",",
-                    ast_node->strings[0]
-                )
-            );
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "\"%s\")",
-                    ast_node->strings[1]
-                )
-            );
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_UNKNOWN:
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "resolveRelGreatUnknown(\"%s\",",
-                    ast_node->strings[0]
-                )
-            );
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "\"%s\")",
-                    ast_node->strings[1]
-                )
-            );
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_UNKNOWN:
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "resolveRelSmallUnknown(\"%s\",",
-                    ast_node->strings[0]
-                )
-            );
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "\"%s\")",
-                    ast_node->strings[1]
-                )
-            );
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_GREAT_EQUAL_UNKNOWN:
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "resolveRelGreatEqualUnknown(\"%s\",",
-                    ast_node->strings[0]
-                )
-            );
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "\"%s\")",
-                    ast_node->strings[1]
-                )
-            );
-            break;
-        case AST_BOOLEAN_EXPRESSION_REL_SMALL_EQUAL_UNKNOWN:
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "resolveRelSmallEqualUnknown(\"%s\",",
-                    ast_node->strings[0]
-                )
-            );
-            setASTNodeTranspiled(
-                ast_node,
-                snprintf_concat_string(
-                    ast_node->transpiled,
-                    "\"%s\")",
-                    ast_node->strings[1]
-                )
-            );
-            break;
-        case AST_VAR_BOOLEAN_EXPRESSION_VALUE:
-            setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "getSymbolValueBool(\"%s\")", ast_node->strings[0]));
-            break;
-        case AST_DELETE_VAR:
-            fprintf(c_fp, "%*cremoveSymbolByName(\"%s\");\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_DELETE_VAR_EL:
-            fprintf(c_fp, "%*cremoveComplexElementByLeftRightBracketStack(\"%s\");\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_PRINT_SYMBOL_TABLE:
-            fprintf(c_fp, "%*cprintSymbolTable();\n", indent, ' ');
-            break;
-        case AST_LIST_START:
-            fprintf(c_fp, "%*caddSymbolList(NULL);\n", indent, ' ');
-            break;
-        case AST_LIST_ADD_VAR:
-            fprintf(c_fp, "%*ccloneSymbolToComplex(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_LIST_ADD_VAR_EL:
-            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_LIST_NESTED_FINISH:
-            fprintf(
-                c_fp,
-                "%*cif (isNestedComplexMode())\n"
-                "%*c{\n"
-                "%*cpushNestedComplexModeStack(getComplexMode());\n"
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(NULL, K_ANY);\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_DICT_START:
-            fprintf(c_fp, "%*caddSymbolDict(NULL);\n", indent, ' ');
-            break;
-        case AST_DICT_ADD_VAR:
-            fprintf(c_fp, "%*ccloneSymbolToComplex(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[1], ast_node->strings[0]);
-            break;
-        case AST_DICT_ADD_VAR_EL:
-            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", \"%s\");\n", indent, ' ', ast_node->strings[1], ast_node->strings[0]);
-            break;
-        case AST_DICT_NESTED_FINISH:
-            fprintf(
-                c_fp,
-                "%*cif (isNestedComplexMode())\n"
-                "%*c{\n"
-                "%*cpushNestedComplexModeStack(getComplexMode());\n"
-                "%*creverseComplexMode();\n"
-                "%*cfinishComplexMode(NULL, K_ANY);\n"
-                "%*c}\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent + indent_length,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_POP_NESTED_COMPLEX_STACK:
-            fprintf(c_fp, "%*cpopNestedComplexModeStack(\"%s\");\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_LEFT_RIGHT_BRACKET_EXPRESSION:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            compiler_symbol_counter++;
-            if (ast_node->right->is_transpiled) {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, %s);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->transpiled
-                    );
-                } else {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, %s);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->transpiled
-                    );
-                }
-            } else {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, %lld);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->value.i
-                    );
-                } else {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, %Lf);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->value.f
-                    );
-                }
-            }
-            fprintf(
-                c_fp,
-                "%*csymbol_%llu->sign = 1;\n",
-                indent,
-                ' ',
-                compiler_symbol_counter
-            );
-            fprintf(
-                c_fp,
-                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n",
-                indent,
-                ' ',
-                compiler_symbol_counter
-            );
-            fprintf(c_fp, "%*cdisable_complex_mode = false;\n", indent, ' ');
-            break;
-        case AST_LEFT_RIGHT_BRACKET_MINUS_EXPRESSION:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            compiler_symbol_counter++;
-            if (ast_node->right->is_transpiled) {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, - %s);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->transpiled
-                    );
-                } else {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, - %s);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->transpiled
-                    );
-                }
-            } else {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolInt(NULL, - %lld);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->value.i
-                    );
-                } else {
-                    fprintf(
-                        c_fp,
-                        "%*cSymbol* symbol_%llu = addSymbolFloat(NULL, - %Lf);\n",
-                        indent,
-                        ' ',
-                        compiler_symbol_counter,
-                        ast_node->right->value.f
-                    );
-                }
-            }
-            fprintf(
-                c_fp,
-                "%*csymbol_%llu->sign = 1;\n"
-                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
-                "%*cdisable_complex_mode = false;\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' '
-            );
-            break;
-        case AST_LEFT_RIGHT_BRACKET_STRING:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            compiler_symbol_counter++;
-            fprintf(
-                c_fp,
-                "%*cSymbol* symbol_%llu = addSymbolString(NULL, \"%s\");\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                ast_node->value.s
-            );
-            fprintf(
-                c_fp,
-                "%*csymbol_%llu->sign = 1;\n"
-                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
-                "%*cdisable_complex_mode = false;\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' '
-            );
-            break;
-        case AST_LEFT_RIGHT_BRACKET_VAR:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            compiler_symbol_counter++;
-            fprintf(
-                c_fp,
-                "%*cSymbol* symbol_%llu = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                ast_node->strings[0]
-            );
-            fprintf(
-                c_fp,
-                "%*csymbol_%llu->sign = 1;\n"
-                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
-                "%*cdisable_complex_mode = false;\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' '
-            );
-            break;
-        case AST_LEFT_RIGHT_BRACKET_VAR_MINUS:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            compiler_symbol_counter++;
-            fprintf(
-                c_fp,
-                "%*cSymbol* symbol_%llu = createCloneFromSymbolByName(NULL, K_ANY, \"%s\", K_ANY);\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                ast_node->strings[0]
-            );
-            fprintf(
-                c_fp,
-                "%*csymbol_%llu->sign = -1;\n"
-                "%*cpushLeftRightBracketStack(symbol_%llu->id);\n"
-                "%*cdisable_complex_mode = false;\n",
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' '
-            );
-            break;
-        case AST_BUILD_COMPLEX_VARIABLE:
-            fprintf(c_fp, "%*cdisable_complex_mode = true;\n", indent, ' ');
-            fprintf(c_fp, "%*cbuildVariableComplexElement(\"%s\", NULL);\n", indent, ' ', ast_node->strings[0]);
-            fprintf(c_fp, "%*cdisable_complex_mode = false;\n", indent, ' ');
-            break;
-        case AST_EXIT_SUCCESS:
-            fprintf(
-                c_fp,
-                "%*cfreeEverything();\n"
-                "%*cexit(E_SUCCESS);\n",
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_EXIT_EXPRESSION:
-            if (ast_node->right->is_transpiled) {
-                fprintf(
-                    c_fp,
-                    "%*clong long exit_code = %s;\n"
-                    "%*cfreeEverything();\n"
-                    "%*cexit(exit_code);\n",
-                    indent,
-                    ' ',
-                    ast_node->right->transpiled,
-                    indent,
-                    ' ',
-                    indent,
-                    ' '
-                );
-            } else {
-                fprintf(
-                    c_fp,
-                    "%*clong long exit_code = %lld;\n"
-                    "%*cfreeEverything();\n"
-                    "%*cexit(exit_code);\n",
-                    indent,
-                    ' ',
-                    ast_node->right->value.i,
-                    indent,
-                    ' ',
-                    indent,
-                    ' '
-                );
-            }
-            break;
-        case AST_EXIT_VAR:
-            fprintf(
-                c_fp,
-                "%*clong long exit_code = getSymbolValueInt(\"%s\");\n"
-                "%*cfreeEverything();\n"
-                "%*cexit(exit_code);\n",
-                indent,
-                ' ',
-                ast_node->strings[0],
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_PRINT_FUNCTION_TABLE:
-            fprintf(c_fp, "%*cprintFunctionTable();\n", indent, ' ');
-            break;
-        case AST_FUNCTION_CALL_PARAMETERS_START:
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_BOOL:
-            fprintf(c_fp, "%*caddFunctionCallParameterBool(%s);\n", indent, ' ', ast_node->right->value.b ? "true" : "false");
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_NUMBER:
-            if (ast_node->right->is_transpiled) {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionCallParameterInt(%s);\n", indent, ' ', ast_node->right->transpiled);
-                } else {
-                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%s);\n", indent, ' ', ast_node->right->transpiled);
-                }
-            } else {
-                if (ast_node->right->value_type == V_INT) {
-                    fprintf(c_fp, "%*caddFunctionCallParameterInt(%lld);\n", indent, ' ', ast_node->right->value.i);
-                } else {
-                    fprintf(c_fp, "%*caddFunctionCallParameterFloat(%Lf);\n", indent, ' ', ast_node->right->value.f);
-                }
-            }
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_STRING:
-            fprintf(c_fp, "%*caddFunctionCallParameterString(\"%s\");\n", indent, ' ', ast_node->value.s);
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_VAR:
-            fprintf(c_fp, "%*caddFunctionCallParameterSymbol(\"%s\");\n", indent, ' ', ast_node->strings[0]);
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_LIST:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionCallParameterList(K_ANY);\n",
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_FUNCTION_CALL_PARAMETER_DICT:
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*caddFunctionCallParameterList(K_ANY);\n",
-                indent,
-                ' ',
-                indent,
-                ' '
-            );
-            break;
-        case AST_PRINT_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
-                _module = ast_node->strings[1];
-            }
-            compiler_function_counter++;
-            if (_module == NULL) {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-            } else {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-            }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-            fprintf(
-                c_fp,
-                "%*cprintFunctionReturn(function_call_%llu, \"\\n\", false, true);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                indent,
-                ' ',
-                indent,
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_ECHO_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
-                _module = ast_node->strings[1];
-            }
-            compiler_function_counter++;
-            if (_module == NULL) {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-            } else {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-            }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-            fprintf(
-                c_fp,
-                "%*cprintFunctionReturn(function_call_%llu, \"\", false, true);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                indent,
-                ' ',
-                indent,
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_PRETTY_PRINT_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
-                _module = ast_node->strings[1];
-            }
-            compiler_function_counter++;
-            if (_module == NULL) {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-            } else {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-            }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-            fprintf(
-                c_fp,
-                "%*cprintFunctionReturn(function_call_%llu, \"\\n\", true, true);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                indent,
-                indent,
-                ' ',
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_PRETTY_ECHO_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
-                _module = ast_node->strings[1];
-            }
-            compiler_function_counter++;
-            if (_module == NULL) {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-            } else {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-            }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-            fprintf(
-                c_fp,
-                "%*cprintFunctionReturn(function_call_%llu, \"\", true, true);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                indent,
-                indent,
-                ' ',
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_FUNCTION_RETURN:
-            if (ast_node->strings_size > 1) {
-                _module = ast_node->strings[1];
-            }
-            compiler_function_counter++;
-            if (_module == NULL) {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n", indent, ' ', compiler_function_counter, ast_node->strings[0]);
-            } else {
-                fprintf(c_fp, "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n", indent, ' ', compiler_function_counter, ast_node->strings[0], _module);
-            }
-            transpile_function_call(c_fp, _module, ast_node->strings[0], indent);
-            fprintf(
-                c_fp,
-                "%*cfreeFunctionReturn(function_call_%llu);\n"
-                "%*cupdateDecisionSymbolChainScope();\n"
-                "%*cfree(function_call_%llu);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                indent,
-                ' ',
-                indent,
-                ' ',
-                compiler_function_counter
-            );
-            break;
-        case AST_NESTED_COMPLEX_TRANSITION:
-            fprintf(c_fp, "%*creverseComplexMode();\n", indent, ' ');
-            break;
-        case AST_JSON_PARSER:
-            compiler_symbol_counter++;
-            fprintf(
-                c_fp,
-                "%*creverseComplexMode();\n"
-                "%*cSymbol* symbol_%llu = finishComplexMode(NULL, K_ANY);\n"
-                "%*creturnVariable(symbol);\n",
-                indent,
-                ' ',
-                indent,
-                ' ',
-                compiler_symbol_counter,
-                indent,
-                ' '
-            );
-            break;
-        default:
-            break;
-    }
-
-    ast_node = ast_node->next;
-    goto transpile_node_label;
-}
-
-bool transpile_common_operator(ASTNode* ast_node, char *operator, enum ValueType left_value_type, enum ValueType right_value_type) {
-    if ((ast_node->left != NULL && ast_node->left->is_transpiled) || (ast_node->right != NULL && ast_node->right->is_transpiled)) {
-        if (ast_node->left != NULL && ast_node->left->is_transpiled) {
-            if (in(operator, relational_operators, relational_operators_size)) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->left->transpiled));
-            } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled));
-            }
-        } else {
-            switch (left_value_type)
-            {
+            case K_ANY: {
+                switch (value_type) {
                 case V_BOOL:
-                    if (in(operator, relational_operators, relational_operators_size)) {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.b ? 1 : 0));
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_BOOL);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+                    break;
+                case V_INT: {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_INT);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+                    break;
+                }
+                case V_FLOAT: {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_FLOAT);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+                    break;
+                }
+                case V_STRING: {
+                    size_t len = 0;
+                    bool is_dynamic = false;
+
+                    switch (expr->kind) {
+                    case BasicLit_kind:
+                        len = strlen(expr->v.basic_lit->value.s);
+                        break;
+                    case BinaryExpr_kind:
+                        len =
+                            strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
+                            +
+                            strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
+                        break;
+                    case IndexExpr_kind:
+                        len = 1;
+                        break;
+                    case Ident_kind:
+                        is_dynamic = true;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_STRING);
+
+                    if (is_dynamic) {
+                        push_instr(program, PUSH);
+                        push_instr(program, R1A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, addr - 1);
+                        push_instr(program, R7A);
                     } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.b ? "true" : "false"));
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R0A);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R1A);
+
+                        for (size_t i = len; i > 0; i--) {
+                            push_instr(program, POP);
+                            push_instr(program, R0A);
+
+                            push_instr(program, STI);
+                            push_instr(program, program->heap++);
+                            push_instr(program, R0A);
+                        }
                     }
                     break;
-                case V_INT:
-                    if (in(operator, logical_operators, logical_operators_size)) {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.i > 0 ? "true" : "false"));
+                }
+                case V_LIST: {
+                    size_t len = 0;
+                    bool is_dynamic = false;
+
+                    switch (expr->kind) {
+                    case CompositeLit_kind:
+                        len = expr->v.composite_lit->elts->expr_count;
+                        break;
+                    case Ident_kind:
+                        is_dynamic = true;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (is_dynamic) {
+                        push_instr(program, PUSH);
+                        push_instr(program, R1A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, addr - 1);
+                        push_instr(program, R7A);
                     } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->left->value.i));
+                        push_instr(program, LII);
+                        push_instr(program, R0A);
+                        push_instr(program, V_LIST);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R0A);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R1A);
+
+                        program->heap += len;
+                        for (size_t i = len; i > 0; i--) {
+                            push_instr(program, POP);
+                            push_instr(program, R0A);
+
+                            push_instr(program, DSTR);
+                            push_instr(program, R7A);
+
+                            push_instr(program, STI);
+                            push_instr(program, --program->heap);
+                            push_instr(program, R7A);
+                        }
+                        program->heap += len;
                     }
                     break;
-                case V_FLOAT:
-                    if (in(operator, logical_operators, logical_operators_size)) {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->value.f > 0.0 ? "true" : "false"));
-                    } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->left->value.f));
+                }
+                case V_DICT: {
+                    size_t len = 0;
+                    bool is_dynamic = false;
+
+                    switch (expr->kind) {
+                    case CompositeLit_kind:
+                        len = expr->v.composite_lit->elts->expr_count;
+                        break;
+                    case Ident_kind:
+                        is_dynamic = true;
+                        break;
+                    default:
+                        break;
                     }
+
+                    if (is_dynamic) {
+                        push_instr(program, PUSH);
+                        push_instr(program, R1A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, addr - 1);
+                        push_instr(program, R7A);
+                    } else {
+                        push_instr(program, LII);
+                        push_instr(program, R0A);
+                        push_instr(program, V_DICT);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R0A);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R1A);
+
+                        program->heap += len * 2;
+                        for (size_t i = len; i > 0; i--) {
+                            push_instr(program, POP);
+                            push_instr(program, R0A);
+
+                            push_instr(program, DSTR);
+                            push_instr(program, R7A);
+
+                            push_instr(program, STI);
+                            push_instr(program, --program->heap);
+                            push_instr(program, R7A);
+
+                            push_instr(program, POP);
+                            push_instr(program, R0A);
+
+                            push_instr(program, DSTR);
+                            push_instr(program, R7A);
+
+                            push_instr(program, STI);
+                            push_instr(program, --program->heap);
+                            push_instr(program, R7A);
+                        }
+                        program->heap += len * 2;
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
+            }
+            case K_LIST: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
                     break;
                 default:
                     break;
+                }
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr - 1);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_LIST);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    program->heap += len;
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+                    }
+                    program->heap += len;
+                }
+                break;
+            }
+            case K_DICT: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr - 1);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_DICT);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    program->heap += len * 2;
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+                    }
+                    program->heap += len * 2;
+                }
+                break;
+            }
+            default:
+                break;
             }
         }
-        setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, " "));
-        setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, operator));
-        setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, " "));
-        if (ast_node->right != NULL && ast_node->right->is_transpiled) {
-            if (in(operator, relational_operators, relational_operators_size)) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->right->transpiled));
-            } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled));
-            }
+
+        if (function->is_dynamic) {
+            push_instr(program, LII);
+            push_instr(program, R5A);
+            push_instr(program, expr_list->expr_count);
+
+            push_instr(program, CALLEXT);
+            push_instr(program, (i64)(void *)function);
         } else {
-            switch (right_value_type)
-            {
-                case V_BOOL:
-                    if (in(operator, relational_operators, relational_operators_size)) {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.b ? 1 : 0));
-                    } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.b ? "true" : "false"));
-                    }
+            push_instr(program, SJMPB);
+            push_instr(program, program->size + 3);
+
+            push_instr(program, CALL);
+
+            push_instr(program, JMP);
+            push_instr(program, (i64)(void *)function);
+            push_instr(call_body_jumps, program->size - 1);
+        }
+        return function->value_type + 1;
+        break;
+    }
+    case DecisionExpr_kind: {
+        compileExpr(program, expr->v.decision_expr->bool_expr);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 0);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, JEZ);
+        i64 jump_point = program->size;
+        push_instr(program, 0);
+
+        // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
+        if (expr->v.decision_expr->outcome->kind == ReturnStmt_kind)
+            expr->v.decision_expr->outcome->v.return_stmt->dont_push_callx = true;
+
+        compileStmt(program, expr->v.decision_expr->outcome);
+
+        push_instr(program, JMPB);
+
+        program->arr[jump_point] = program->size - 1;
+        break;
+    }
+    case DefaultExpr_kind: {
+        // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
+        if (expr->v.default_expr->outcome->kind == ReturnStmt_kind)
+            expr->v.default_expr->outcome->v.return_stmt->dont_push_callx = true;
+
+        compileStmt(program, expr->v.default_expr->outcome);
+
+        push_instr(program, JMPB);
+        break;
+    }
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+void compileDecl(i64_array* program, Decl* decl)
+{
+    ast_ref = (i64)(void *)decl->ast;
+
+    switch (decl->kind) {
+    case VarDecl_kind: {
+        enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
+        enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
+        enum Type secondary_type = K_ANY;
+        if (decl->v.var_decl->type_spec->v.type_spec->sub_type_spec != NULL)
+            secondary_type = decl->v.var_decl->type_spec->v.type_spec->type;
+        Symbol* symbol = NULL;
+
+        switch (type) {
+        case K_BOOL:
+            symbol = store_bool(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                false
+            );
+            break;
+        case K_NUMBER:
+            if (value_type == V_FLOAT) {
+                symbol = store_float(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    false
+                );
+            } else {
+                symbol = store_int(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    false
+                );
+            }
+            break;
+        case K_STRING: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (decl->v.var_decl->expr->kind) {
+            case BasicLit_kind:
+                len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
+                break;
+            case BinaryExpr_kind:
+                is_dynamic = true;
+                break;
+            case IndexExpr_kind:
+                len = 1;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            symbol = store_string(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                len,
+                false,
+                is_dynamic
+            );
+            break;
+        }
+        case K_ANY: {
+            switch (value_type) {
+            case V_BOOL:
+                symbol = store_bool(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    true
+                );
+                break;
+            case V_INT: {
+                symbol = store_int(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    true
+                );
+                break;
+            }
+            case V_FLOAT: {
+                symbol = store_float(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    true
+                );
+                break;
+            }
+            case V_STRING: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (decl->v.var_decl->expr->kind) {
+                case BasicLit_kind:
+                    len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
                     break;
-                case V_INT:
-                    if (in(operator, logical_operators, logical_operators_size)) {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.i ? "true" : "false"));
-                    } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", ast_node->right->value.i));
-                    }
+                case BinaryExpr_kind:
+                    len =
+                        strlen(decl->v.var_decl->expr->v.binary_expr->x->v.basic_lit->value.s)
+                        +
+                        strlen(decl->v.var_decl->expr->v.binary_expr->y->v.basic_lit->value.s);
                     break;
-                case V_FLOAT:
-                    if (in(operator, logical_operators, logical_operators_size)) {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->value.f ? "true" : "false"));
-                    } else {
-                        setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
-                    }
+                case IndexExpr_kind:
+                    len = 1;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
                     break;
                 default:
                     break;
+                }
+
+                symbol = store_string(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    len,
+                    true,
+                    is_dynamic
+                );
+                break;
             }
+            case V_LIST:
+                symbol = store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
+                break;
+            case V_DICT:
+                symbol = store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
+                break;
+            case V_REF:
+                symbol = store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
+                break;
+            default:
+                break;
+            }
+            break;
         }
+        case K_LIST: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (decl->v.var_decl->expr->kind) {
+            case CompositeLit_kind:
+                len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            symbol = store_list(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                len,
+                is_dynamic
+            );
+            break;
+        }
+        case K_DICT: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (decl->v.var_decl->expr->kind) {
+            case CompositeLit_kind:
+                len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            symbol = store_dict(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                len,
+                is_dynamic
+            );
+            break;
+        }
+        default:
+            break;
+        }
+
+        symbol->secondary_type = secondary_type;
+        break;
+    }
+    case TimesDo_kind: {
+        compileExpr(program, decl->v.times_do->x);
+
+        i64 addr = program->heap;
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, SBRK);
+        i64 break_point = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, JLZ);
+        i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, SCONT);
+        i64 continue_point = program->size;
+        push_instr(program, 0);
+
+        compileStmt(program, decl->v.times_do->body);
+
+        program->arr[loop_start] = program->size;
+
+        push_instr(program, CONT);
+        program->arr[continue_point] = program->size - 1;
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, LII);
+        push_instr(program, R3A);
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr);
+
+        push_instr(program, SUB);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, STI);
+        push_instr(program, addr);
+        push_instr(program, R1A);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R3A);
+
+        push_instr(program, JGZ);
+        push_instr(program, loop_start);
+
+        push_instr(program, BRK);
+        program->arr[break_point] = program->size - 1;
+        break;
+    }
+    case ForeachAsList_kind: {
+        compileExpr(program, decl->v.foreach_as_list->x);
+
+        i64 addr = program->heap;
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+
+        size_t len = 0;
+        bool is_dynamic = false;
+
+        switch (decl->v.foreach_as_list->x->kind) {
+        case CompositeLit_kind:
+            len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
+            break;
+        case Ident_kind: {
+            Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
+            if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
+                throw_error(E_NOT_A_LIST, symbol_x->name);
+            is_dynamic = true;
+            break;
+        }
+        default:
+            break;
+        }
+
+        Symbol* _symbol = store_list(
+            program,
+            NULL,
+            len,
+            is_dynamic
+        );
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr + 1);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_INT);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, SBRK);
+        i64 break_point = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, JLZ);
+        i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, SCONT);
+        i64 continue_point = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R4A);
+        push_instr(program, addr + 2);
+
+        push_instr(program, MOV);
+        push_instr(program, R3A);
+        push_instr(program, R4A);
+
+        push_instr(program, SUB);
+        push_instr(program, R3A);
+        push_instr(program, R1A);
+
+        load_list(program, _symbol);
+
+        push_instr(program, LIND);
+        push_instr(program, R4A);
+        push_instr(program, R3A);
+
+        Symbol* el_symbol = store_any(
+            program,
+            decl->v.foreach_as_list->el->v.ident->name
+        );
+
+        compileStmt(program, decl->v.foreach_as_list->body);
+
+        push_instr(program, CONT);
+        program->arr[continue_point] = program->size - 1;
+
+        removeSymbol(el_symbol);
+
+        push_instr(program, LII);
+        push_instr(program, R3A);
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr);
+
+        push_instr(program, DEC);
+        push_instr(program, R1A);
+
+        push_instr(program, STI);
+        push_instr(program, addr);
+        push_instr(program, R1A);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R3A);
+
+        push_instr(program, JGZ);
+        push_instr(program, loop_start);
+
+        program->arr[loop_start] = program->size - 1;
+
+        push_instr(program, BRK);
+        program->arr[break_point] = program->size - 1;
+        break;
+    }
+    case ForeachAsDict_kind: {
+        compileExpr(program, decl->v.foreach_as_dict->x);
+
+        i64 addr = program->heap;
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+
+        size_t len = 0;
+        bool is_dynamic = false;
+
+        switch (decl->v.foreach_as_dict->x->kind) {
+        case CompositeLit_kind:
+            len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
+            break;
+        case Ident_kind: {
+            Symbol* symbol_x = getSymbol(decl->v.foreach_as_dict->x->v.ident->name);
+            if (symbol_x->type != K_DICT && symbol_x->type != K_ANY)
+                throw_error(E_NOT_A_DICT, symbol_x->name);
+            is_dynamic = true;
+            break;
+        }
+        default:
+            break;
+        }
+
+        Symbol* _symbol = store_dict(
+            program,
+            NULL,
+            len,
+            is_dynamic
+        );
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr + 1);
+
+        push_instr(program, LII);
+        push_instr(program, R2A);
+        push_instr(program, 1);
+
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_INT);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R2A);
+
+        push_instr(program, SBRK);
+        i64 break_point = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, JLZ);
+        i64 loop_start = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, SCONT);
+        i64 continue_point = program->size;
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R4A);
+        push_instr(program, addr + 2);
+
+        push_instr(program, MOV);
+        push_instr(program, R3A);
+        push_instr(program, R4A);
+
+        push_instr(program, SUB);
+        push_instr(program, R3A);
+        push_instr(program, R1A);
+
+        load_list(program, _symbol);
+
+        push_instr(program, DEC);
+        push_instr(program, R3A);
+
+        push_instr(program, LII);
+        push_instr(program, R4A);
+        push_instr(program, 0);
+
+        push_instr(program, CMP);
+        push_instr(program, R3A);
+        push_instr(program, R4A);
+
+        push_instr(program, JLZ);
+        push_instr(program, program->size + 10);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, DPOP);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, DPOP);
+
+        push_instr(program, DEC);
+        push_instr(program, R3A);
+
+        push_instr(program, JMP);
+        push_instr(program, program->size - 18);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+
+        Symbol* key_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->key->v.ident->name
+        );
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+
+        Symbol* value_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->value->v.ident->name
+        );
+
+        compileStmt(program, decl->v.foreach_as_dict->body);
+
+        push_instr(program, CONT);
+        program->arr[continue_point] = program->size - 1;
+
+        removeSymbol(key_symbol);
+        removeSymbol(value_symbol);
+
+        push_instr(program, LII);
+        push_instr(program, R3A);
+        push_instr(program, 0);
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr);
+
+        push_instr(program, DEC);
+        push_instr(program, R1A);
+
+        push_instr(program, STI);
+        push_instr(program, addr);
+        push_instr(program, R1A);
+
+        push_instr(program, CMP);
+        push_instr(program, R1A);
+        push_instr(program, R3A);
+
+        push_instr(program, JGZ);
+        push_instr(program, loop_start);
+
+        program->arr[loop_start] = program->size - 1;
+
+        push_instr(program, BRK);
+        program->arr[break_point] = program->size - 1;
+        break;
+    }
+    case FuncDecl_kind: {
+        _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+        if (function->is_compiled)
+            break;
+
+        function->body_addr = program->size - 1;
+        compileStmt(program, decl->v.func_decl->body);
+        if (decl->v.func_decl->decision != NULL)
+            compileSpec(program, decl->v.func_decl->decision);
+
+        push_instr(program, CALLX);
+
+        push_instr(program, JMPB);
+
+        function_mode->is_compiled = true;
+        endFunction();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void compileSpecList(i64_array* program, SpecList* spec_list)
+{
+    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
+        compileSpec(program, spec_list->specs[i - 1]);
+    }
+}
+
+unsigned short compileSpec(i64_array* program, Spec* spec)
+{
+    ast_ref = (i64)(void *)spec->ast;
+
+    switch (spec->kind) {
+    case ListType_kind:
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_LIST);
+        break;
+    case DictType_kind:
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_DICT);
+        break;
+    case TypeSpec_kind:
+        if (spec->v.type_spec->sub_type_spec != NULL)
+            return compileSpec(program, spec->v.type_spec->sub_type_spec);
+        else
+            return spec->v.type_spec->type;
+        break;
+    case FuncType_kind:
+        compileSpec(program, spec->v.func_type->params);
+        compileSpec(program, spec->v.func_type->result);
+        break;
+    case FieldListSpec_kind:
+        compileSpecList(program, spec->v.field_list_spec->list);
+        break;
+    case FieldSpec_kind: {
+        enum Type type = compileSpec(program, spec->v.field_spec->type_spec);
+        enum Type secondary_type = K_ANY;
+        if (spec->v.field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
+            secondary_type = spec->v.field_spec->type_spec->v.type_spec->type;
+
+        Symbol* parameter = NULL;
+        union Value value;
+        value.i = 0;
+
+        switch (type) {
+        case K_BOOL:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
+            break;
+        case K_NUMBER:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
+            break;
+        case K_STRING:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
+            break;
+        case K_LIST:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
+            break;
+        case K_DICT:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
+            break;
+        case K_ANY:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_ANY, value, V_REF);
+            break;
+        default:
+            break;
+        }
+        parameter->secondary_type = secondary_type;
+
+        parameter->addr = program->heap;
+        program->heap += 2;
+        addFunctionParameterNew(function_mode, parameter);
+        break;
+    }
+    case OptionalFieldSpec_kind: {
+        enum Type type = compileSpec(program, spec->v.optional_field_spec->type_spec);
+        enum Type secondary_type = K_ANY;
+        if (spec->v.optional_field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
+            secondary_type = spec->v.optional_field_spec->type_spec->v.type_spec->type;
+
+        Symbol* parameter = NULL;
+        union Value value;
+        value.i = 0;
+
+        switch (type) {
+        case K_BOOL:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
+            break;
+        case K_NUMBER:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
+            break;
+        case K_STRING:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
+            break;
+        case K_LIST:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
+            break;
+        case K_DICT:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
+            break;
+        case K_ANY:
+            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_ANY, value, V_REF);
+            break;
+        default:
+            break;
+        }
+        parameter->secondary_type = secondary_type;
+
+        parameter->addr = program->heap;
+        program->heap += 2;
+
+        addFunctionParameterNew(function_mode, parameter);
+
+        // Load the default value
+        Expr* expr = spec->v.optional_field_spec->expr;
+        enum ValueType value_type = compileExpr(program, expr) - 1;
+        i64 addr = parameter->addr;
+
+        push_instr(program, LII);
+        push_instr(program, R7A);
+        push_instr(program, program->heap);
+
+        push_instr(program, STI);
+        push_instr(program, addr++);
+        push_instr(program, R7A);
+
+        switch (type) {
+        case K_BOOL:
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_BOOL);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1A);
+            break;
+        case K_NUMBER:
+            if (value_type == V_FLOAT) {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_FLOAT);
+            } else {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_INT);
+            }
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R1A);
+            break;
+        case K_STRING: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (expr->kind) {
+            case BasicLit_kind:
+                len = strlen(expr->v.basic_lit->value.s);
+                break;
+            case BinaryExpr_kind:
+                is_dynamic = true;
+                break;
+            case IndexExpr_kind:
+                len = 1;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            push_instr(program, LII);
+            push_instr(program, R0A);
+            push_instr(program, V_STRING);
+
+            if (is_dynamic) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr - 1);
+                push_instr(program, R7A);
+            } else {
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+
+                for (size_t i = len; i > 0; i--) {
+                    push_instr(program, POP);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+                }
+            }
+            break;
+        }
+        case K_ANY: {
+            switch (value_type) {
+            case V_BOOL:
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_BOOL);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            case V_INT: {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_INT);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            }
+            case V_FLOAT: {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_FLOAT);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+                break;
+            }
+            case V_STRING: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case BasicLit_kind:
+                    len = strlen(expr->v.basic_lit->value.s);
+                    break;
+                case BinaryExpr_kind:
+                    len =
+                        strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
+                        +
+                        strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
+                    break;
+                case IndexExpr_kind:
+                    len = 1;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_STRING);
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr - 1);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, STI);
+                        push_instr(program, program->heap++);
+                        push_instr(program, R0A);
+                    }
+                }
+                break;
+            }
+            case V_LIST: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr - 1);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_LIST);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    program->heap += len;
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+                    }
+                    program->heap += len;
+                }
+                break;
+            }
+            case V_DICT: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                    push_instr(program, PUSH);
+                    push_instr(program, R1A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, addr - 1);
+                    push_instr(program, R7A);
+                } else {
+                    push_instr(program, LII);
+                    push_instr(program, R0A);
+                    push_instr(program, V_DICT);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R0A);
+
+                    push_instr(program, STI);
+                    push_instr(program, program->heap++);
+                    push_instr(program, R1A);
+
+                    program->heap += len * 2;
+                    for (size_t i = len; i > 0; i--) {
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+
+                        push_instr(program, POP);
+                        push_instr(program, R0A);
+
+                        push_instr(program, DSTR);
+                        push_instr(program, R7A);
+
+                        push_instr(program, STI);
+                        push_instr(program, --program->heap);
+                        push_instr(program, R7A);
+                    }
+                    program->heap += len * 2;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        case K_LIST: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (expr->kind) {
+            case CompositeLit_kind:
+                len = expr->v.composite_lit->elts->expr_count;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            if (is_dynamic) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr - 1);
+                push_instr(program, R7A);
+            } else {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_LIST);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+
+                program->heap += len;
+                for (size_t i = len; i > 0; i--) {
+                    push_instr(program, POP);
+                    push_instr(program, R0A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, --program->heap);
+                    push_instr(program, R7A);
+                }
+                program->heap += len;
+            }
+            break;
+        }
+        case K_DICT: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (expr->kind) {
+            case CompositeLit_kind:
+                len = expr->v.composite_lit->elts->expr_count;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            if (is_dynamic) {
+                push_instr(program, PUSH);
+                push_instr(program, R1A);
+
+                push_instr(program, DSTR);
+                push_instr(program, R7A);
+
+                push_instr(program, STI);
+                push_instr(program, addr - 1);
+                push_instr(program, R7A);
+            } else {
+                push_instr(program, LII);
+                push_instr(program, R0A);
+                push_instr(program, V_DICT);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R0A);
+
+                push_instr(program, STI);
+                push_instr(program, program->heap++);
+                push_instr(program, R1A);
+
+                program->heap += len * 2;
+                for (size_t i = len; i > 0; i--) {
+                    push_instr(program, POP);
+                    push_instr(program, R0A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, --program->heap);
+                    push_instr(program, R7A);
+
+                    push_instr(program, POP);
+                    push_instr(program, R0A);
+
+                    push_instr(program, DSTR);
+                    push_instr(program, R7A);
+
+                    push_instr(program, STI);
+                    push_instr(program, --program->heap);
+                    push_instr(program, R7A);
+                }
+                program->heap += len * 2;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    case ImportSpec_kind: {
+        if (spec->v.import_spec->handled)
+            break;
+
+        char* name = compile_module_selector(spec->v.import_spec->module_selector);
+        File* file = NULL;
+        interactively_importing = true;
+        if (spec->v.import_spec->ident != NULL) {
+            file = handleModuleImport(spec->v.import_spec->ident->v.ident->name, false, import_parent_context->module_path);
+        } else {
+            if (spec->v.import_spec->asterisk != NULL || spec->v.import_spec->names->expr_count > 0)
+                file = handleModuleImport(name, true, import_parent_context->module_path);
+            else
+                file = handleModuleImport(name, false, import_parent_context->module_path);
+        }
+        interactively_importing = false;
+
+        for (unsigned long i = 0; i < spec->v.import_spec->names->expr_count; i++) {
+            addExpr(file->aliases, spec->v.import_spec->names->exprs[i]);
+        }
+
+        spec->v.import_spec->handled = true;
+        break;
+    }
+    case DecisionBlock_kind: {
+        push_instr(program, SJMPB);
+        i64 jump_back_point = program->size;
+        push_instr(program, 0);
+
+        ExprList* expr_list = spec->v.decision_block->decisions;
+        for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+            compileExpr(program, expr_list->exprs[i - 1]);
+        }
+
+        push_instr(program, JMPB);
+
+        program->arr[jump_back_point] = program->size - 1;
+        break;
+    }
+    default:
+        break;
+    }
+    return 0;
+}
+
+void push_instr(i64_array* program, i64 el)
+{
+    pushProgram(program, el);
+    pushProgram(program->ast_ref, ast_ref);
+}
+
+void pushProgram(i64_array* program, i64 el)
+{
+    if (program->capacity == 0) {
+        program->arr = (i64*)malloc((++program->capacity) * sizeof(i64));
+    } else {
+        program->arr = (i64*)realloc(program->arr, (++program->capacity) * sizeof(i64));
+    }
+    program->arr[program->size++] = el;
+}
+
+i64 popProgram(i64_array* program)
+{
+    return program->arr[program->size--];
+}
+
+void freeProgram(i64_array* program)
+{
+    free(program->arr);
+    initProgram(program);
+}
+
+i64_array* initProgram()
+{
+    i64_array* program = malloc(sizeof *program);
+    program->capacity = 0;
+    program->arr = NULL;
+    program->size = 0;
+    program->heap = 0;
+    program->hlt_count = 0;
+
+    program->ast_ref = malloc(sizeof *program->ast_ref);
+    program->ast_ref->capacity = 0;
+    program->ast_ref->arr = NULL;
+    program->ast_ref->size = 0;
+    program->ast_ref->heap = 0;
+    program->ast_ref->hlt_count = 0;
+
+    return program;
+}
+
+void shift_registers(i64_array* program, size_t shift)
+{
+    size_t len = NUM_REGISTERS / 2;
+    for (size_t i = 0; i < shift; i++) {
+        push_instr(program, MOV);
+        push_instr(program, i + len);
+        push_instr(program, i);
+    }
+}
+
+Symbol* store_bool(i64_array* program, char *name, bool is_any)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol;
+    if (is_any)
+        symbol = addSymbol(name, K_ANY, value, V_BOOL);
+    else {
+        symbol = addSymbol(name, K_BOOL, value, V_BOOL);
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_BOOL);
+    }
+    symbol->addr = program->heap;
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+
+    return symbol;
+}
+
+Symbol* store_int(i64_array* program, char *name, bool is_any)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol;
+    if (is_any)
+        symbol = addSymbol(name, K_ANY, value, V_INT);
+    else {
+        symbol = addSymbol(name, K_NUMBER, value, V_INT);
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_INT);
+    }
+    symbol->addr = program->heap;
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+
+    return symbol;
+}
+
+Symbol* store_float(i64_array* program, char *name, bool is_any)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol;
+    if (is_any)
+        symbol = addSymbol(name, K_ANY, value, V_FLOAT);
+    else {
+        symbol = addSymbol(name, K_NUMBER, value, V_FLOAT);
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_FLOAT);
+    }
+    symbol->addr = program->heap;
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R0A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R1A);
+
+    return symbol;
+}
+
+Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol;
+    if (is_any)
+        symbol = addSymbol(name, K_ANY, value, V_STRING);
+    else {
+        symbol = addSymbol(name, K_STRING, value, V_STRING);
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_STRING);
+    }
+    symbol->addr = program->heap;
+    symbol->len = len;
+    symbol->is_dynamic = is_dynamic;
+
+    if (is_dynamic) {
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, DSTR);
+        push_instr(program, R7A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R7A);
+    } else {
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R0A);
+        }
+    }
+
+    return symbol;
+}
+
+Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
+
+    symbol->addr = program->heap;
+    symbol->len = len;
+    symbol->is_dynamic = is_dynamic;
+
+    if (is_dynamic) {
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, DSTR);
+        push_instr(program, R7A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R7A);
+    } else {
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_LIST);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, DSTR);
+            push_instr(program, R7A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R7A);
+        }
+    }
+
+    return symbol;
+}
+
+Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol = addSymbol(name, K_DICT, value, V_DICT);
+
+    symbol->addr = program->heap;
+    symbol->len = len;
+    symbol->is_dynamic = is_dynamic;
+
+    if (is_dynamic) {
+        push_instr(program, PUSH);
+        push_instr(program, R1A);
+
+        push_instr(program, DSTR);
+        push_instr(program, R7A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R7A);
+    } else {
+        push_instr(program, LII);
+        push_instr(program, R0A);
+        push_instr(program, V_DICT);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R0A);
+
+        push_instr(program, STI);
+        push_instr(program, program->heap++);
+        push_instr(program, R1A);
+
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, DSTR);
+            push_instr(program, R7A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R7A);
+
+            push_instr(program, POP);
+            push_instr(program, R0A);
+
+            push_instr(program, DSTR);
+            push_instr(program, R7A);
+
+            push_instr(program, STI);
+            push_instr(program, program->heap++);
+            push_instr(program, R7A);
+        }
+    }
+
+    return symbol;
+}
+
+Symbol* store_any(i64_array* program, char *name)
+{
+    union Value value;
+    value.i = 0;
+    Symbol* symbol = addSymbol(name, K_ANY, value, V_ANY);
+    symbol->addr = program->heap;
+    symbol->is_dynamic = true;
+
+    push_instr(program, PUSH);
+    push_instr(program, R1A);
+
+    push_instr(program, DSTR);
+    push_instr(program, R7A);
+
+    push_instr(program, STI);
+    push_instr(program, program->heap++);
+    push_instr(program, R7A);
+
+    return symbol;
+}
+
+void load_bool(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+}
+
+void load_int(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+}
+
+void load_float(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    push_instr(program, LDI);
+    push_instr(program, R0A);
+    push_instr(program, addr++);
+
+    push_instr(program, LDI);
+    push_instr(program, R1A);
+    push_instr(program, addr++);
+}
+
+void load_string(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    if (symbol->is_dynamic) {
+        push_instr(program, LII);
+        push_instr(program, R7A);
+        push_instr(program, addr++);
+
+        push_instr(program, DLDR);
+        push_instr(program, R7A);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+    } else {
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr++);
+
+        size_t len = symbol->len;
+        addr += len - 1;
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, LDI);
+            push_instr(program, R2A);
+            push_instr(program, addr--);
+
+            push_instr(program, PUSH);
+            push_instr(program, R2A);
+        }
+    }
+}
+
+void load_list(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    if (symbol->is_dynamic) {
+        push_instr(program, LII);
+        push_instr(program, R7A);
+        push_instr(program, addr++);
+
+        push_instr(program, DLDR);
+        push_instr(program, R7A);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+    } else {
+        size_t len = symbol->len;
+        addr += len + 1;
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, addr--);
+
+            push_instr(program, DLDR);
+            push_instr(program, R7A);
+        }
+        addr--;
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr++);
+    }
+}
+
+void load_dict(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    if (symbol->is_dynamic) {
+        push_instr(program, LII);
+        push_instr(program, R7A);
+        push_instr(program, addr++);
+
+        push_instr(program, DLDR);
+        push_instr(program, R7A);
+
+        push_instr(program, POP);
+        push_instr(program, R0A);
+
+        push_instr(program, POP);
+        push_instr(program, R1A);
+    } else {
+        size_t len = symbol->len;
+        addr += len * 2 - 1 + 2;
+        for (size_t i = len; i > 0; i--) {
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, addr--);
+
+            push_instr(program, DLDR);
+            push_instr(program, R7A);
+
+            push_instr(program, LII);
+            push_instr(program, R7A);
+            push_instr(program, addr--);
+
+            push_instr(program, DLDR);
+            push_instr(program, R7A);
+        }
+        addr--;
+
+        push_instr(program, LDI);
+        push_instr(program, R0A);
+        push_instr(program, addr++);
+
+        push_instr(program, LDI);
+        push_instr(program, R1A);
+        push_instr(program, addr++);
+    }
+}
+
+void load_any(i64_array* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+
+    push_instr(program, LII);
+    push_instr(program, R7A);
+    push_instr(program, addr);
+
+    push_instr(program, DLDR);
+    push_instr(program, R7A);
+
+    push_instr(program, POP);
+    push_instr(program, R0A);
+
+    push_instr(program, POP);
+    push_instr(program, R1A);
+}
+
+char* compile_module_selector(Expr* module_selector)
+{
+    char* name = NULL;
+    if (module_selector->v.module_selector->parent_dir_spec != NULL) {
+        name = malloc(1 + strlen(".."));
+        strcpy(name, "..");
+    } else {
+        name = module_selector->v.module_selector->x->v.ident->name;
+    }
+    appendModuleToModuleBuffer(name);
+
+    if (
+        module_selector->v.module_selector->sel != NULL
+        &&
+        module_selector->v.module_selector->sel->kind == ModuleSelector_kind
+    ) {
+        return compile_module_selector(module_selector->v.module_selector->sel);
+    } else {
+        return name;
+    }
+}
+
+bool declare_function(Stmt* stmt, File* file, i64_array* program)
+{
+    if (stmt->kind != DeclStmt_kind || stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
+        return false;
+
+    Decl* decl = stmt->v.decl_stmt->decl;
+
+    if (file->aliases->expr_count != 0) {
+        bool _return = true;
+        for (unsigned long i = 0; i < file->aliases->expr_count; i++) {
+            if (strcmp(decl->v.func_decl->name->v.ident->name, file->aliases->exprs[i]->v.alias_expr->name->v.ident->name) == 0)
+                _return = false;
+        }
+
+        if (_return) {
+            function_mode = declareFunction(
+                decl->v.func_decl->name->v.ident->name,
+                "",
+                file->module_path,
+                file->module_path,
+                K_VOID,
+                K_VOID
+            );
+
+            startFunctionScope(function_mode);
+            function_mode->optional_parameters_addr = program->size - 1;
+            compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+            push_instr(program, JMPB);
+            endFunction();
+
+            return true;
+        }
+    }
+
+    _Function* duplicate_function = (checkDuplicateFunction(
+        decl->v.func_decl->name->v.ident->name,
+        file->module_path
+    ));
+
+    function_mode = declareFunction(
+        decl->v.func_decl->name->v.ident->name,
+        file->module,
+        file->module_path,
+        file->context,
+        K_VOID,
+        K_VOID
+    );
+
+    if (duplicate_function != NULL) {
+        function_mode->ref = duplicate_function;
+        function_mode->parameter_count = duplicate_function->parameter_count;
+        function_mode->optional_parameter_count = duplicate_function->optional_parameter_count;
+        function_mode->parameters = duplicate_function->parameters;
         return true;
     }
-    return false;
-}
 
-bool transpile_common_mixed_operator(ASTNode* ast_node, char *operator) {
-    if ((ast_node->left != NULL && ast_node->left->is_transpiled) || (ast_node->right != NULL && ast_node->right->is_transpiled)) {
-        if (ast_node->left != NULL && ast_node->left->is_transpiled) {
-            if (ast_node->left->value_type == V_INT) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->left->transpiled));
-            } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->left->transpiled));
-            }
-        } else {
-            if (ast_node->left->value_type == V_INT) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", (long double) ast_node->left->value.i));
-            } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->left->value.f));
-            }
-        }
-        setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, " "));
-        setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, operator));
-        setASTNodeTranspiled(ast_node, strcat_ext(ast_node->transpiled, " "));
-        if (ast_node->right != NULL && ast_node->right->is_transpiled) {
-            if (ast_node->right->value_type == V_INT) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "(long double) %s", ast_node->right->transpiled));
-            } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_string(ast_node->transpiled, "%s", ast_node->right->transpiled));
-            }
-        } else {
-            if (ast_node->right->value_type == V_INT) {
-                setASTNodeTranspiled(ast_node, snprintf_concat_int(ast_node->transpiled, "%lld", (long double) ast_node->right->value.i));
-            } else {
-                setASTNodeTranspiled(ast_node, snprintf_concat_float(ast_node->transpiled, "%Lf", ast_node->right->value.f));
-            }
-        }
-        return true;
-    }
-    return false;
-}
+    startFunctionScope(function_mode);
+    function_mode->optional_parameters_addr = program->size - 1;
+    compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+    push_instr(program, JMPB);
 
-void transpile_function_call(FILE *c_fp, char *module, char *name, unsigned short indent) {
-    fprintf(
-        c_fp,
-        "%*cfunction_call_%llu->lineno = kaos_lineno;\n",
-        indent,
-        ' ',
-        compiler_function_counter
-    );
-    char *module_context = compiler_getFunctionModuleContext(name, module);
-    if (!isFunctionFromDynamicLibrary(name, module))
-        fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module_context, name);
-
-    _Function* function = NULL;
-    if (
-        module == NULL
-        &&
-        transpiled_modules.size > 0
-        &&
-        strcmp(transpiled_modules.arr[transpiled_modules.size - 1], "") != 0
-    ) {
-        function = getFunctionByModuleContext(name, transpiled_modules.arr[transpiled_modules.size - 1]);
-    } else {
-        function = getFunction(name, module);
-    }
-    if (function->decision_node != NULL) {
-        fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module_context, name);
-    }
-    free(module_context);
-    fprintf(
-        c_fp,
-        "%*ccallFunctionCleanUp(function_call_%llu, %s);\n",
-        indent,
-        ' ',
-        compiler_function_counter,
-        function->decision_node != NULL ? "true" : "false"
-    );
-}
-
-void transpile_function_call_decision(FILE *c_fp, char *module_context, char* module, char *name, unsigned short indent) {
-    fprintf(
-        c_fp,
-        "%*cfunction_call_%llu->lineno = kaos_lineno;\n",
-        indent,
-        ' ',
-        compiler_function_counter
-    );
-    if (!isFunctionFromDynamicLibraryByModuleContext(name, module_context))
-        fprintf(c_fp, "%*ckaos_function_%s_%s();\n", indent, ' ', module, name);
-    _Function* function = getFunctionByModuleContext(name, module_context);
-    if (function->decision_node != NULL) {
-        fprintf(c_fp, "%*ckaos_decision_%s_%s();\n", indent, ' ', module, name);
-    }
-    fprintf(
-        c_fp,
-        "%*ccallFunctionCleanUp(function_call_%llu, %s);\n",
-        indent,
-        ' ',
-        compiler_function_counter,
-        function->decision_node != NULL ? "true" : "false"
-    );
-}
-
-void transpile_function_call_create_var(FILE *c_fp, ASTNode* ast_node, char *module, enum Type type1, enum Type type2, unsigned short indent) {
-    compiler_function_counter++;
-    switch (ast_node->strings_size)
-    {
-        case 2:
-            fprintf(
-                c_fp,
-                "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", NULL);\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                ast_node->strings[1]
-            );
-            transpile_function_call(c_fp, NULL, ast_node->strings[1], indent);
-            break;
-        case 3:
-            fprintf(
-                c_fp,
-                "%*cFunctionCall* function_call_%llu = callFunction(\"%s\", \"%s\");\n",
-                indent,
-                ' ',
-                compiler_function_counter,
-                ast_node->strings[2],
-                ast_node->strings[1]
-            );
-            transpile_function_call(c_fp, ast_node->strings[1], ast_node->strings[2], indent);
-            break;
-        default:
-            break;
-    }
-    fprintf(
-        c_fp,
-        "%*ccreateCloneFromFunctionReturn(\"%s\", %s, function_call_%llu, %s);\n"
-        "%*cupdateDecisionSymbolChainScope();\n"
-        "%*cfree(function_call_%llu);\n",
-        indent,
-        ' ',
-        ast_node->strings[0],
-        type_strings[type1],
-        compiler_function_counter,
-        type_strings[type2],
-        indent,
-        ' ',
-        indent,
-        ' ',
-        compiler_function_counter
-    );
-}
-
-void compiler_handleModuleImport(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent, FILE *h_fp) {
-    char *module_path = resolveModulePath(module_name, directly_import);
-
-    char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-    strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
-    compiler_escape_module(compiled_module);
-    ASTNode* ast_node = ast_root_node;
-    transpile_functions(ast_node, compiled_module, c_fp, indent, h_fp);
-    free(compiled_module);
-
-    moduleImportCleanUp(module_path);
-}
-
-void compiler_handleModuleImportRegister(char *module_name, bool directly_import, FILE *c_fp, unsigned short indent) {
-    char *module_path = resolveModulePath(module_name, directly_import);
-    if (
-        strcmp(
-            get_filename_ext(module_path),
-            __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-        ) == 0
-    ) {
-        char *extension_name = module_stack.arr[module_stack.size - 1];
-
-        char *spells_dir_path = NULL;
-        spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_BUILD_DIRECTORY__);
-        spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_PATH_SEPARATOR__);
-        spells_dir_path = snprintf_concat_string(spells_dir_path, "%s", __KAOS_SPELLS__);
-        if (stat(spells_dir_path, &dir_stat) == -1) {
-            printf("Creating %s directory...\n", spells_dir_path);
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-            _mkdir(spells_dir_path);
-#else
-            mkdir(spells_dir_path, 0700);
-#endif
-        }
-
-        char *extension_dir_path = spells_dir_path;
-        extension_dir_path = snprintf_concat_string(extension_dir_path, "%s", __KAOS_PATH_SEPARATOR__);
-        extension_dir_path = snprintf_concat_string(extension_dir_path, "%s", extension_name);
-        if (stat(extension_dir_path, &dir_stat) == -1) {
-            printf("Creating %s directory...\n", extension_dir_path);
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-            _mkdir(extension_dir_path);
-#else
-            mkdir(extension_dir_path, 0700);
-#endif
-        }
-
-        char *new_module_path = extension_dir_path;
-        new_module_path = snprintf_concat_string(new_module_path, "%s", __KAOS_PATH_SEPARATOR__);
-        new_module_path = snprintf_concat_string(new_module_path, "%s", extension_name);
-        new_module_path = snprintf_concat_string(new_module_path, "%s", ".");
-        new_module_path = snprintf_concat_string(new_module_path, "%s", (char*) get_filename_ext(module_path));
-        printf("Copying %s to %s\n", module_path, new_module_path);
-        copy_binary_file(module_path, new_module_path);
-        free(new_module_path);
-
-        extension_counter++;
-        fprintf(
-            c_fp,
-            "%*cchar *extension_path_%llu = strcat_ext(getParentDir(argv0), \"%s%s%s%s%s%s.%s\");\n",
-            indent,
-            ' ',
-            extension_counter,
-            __KAOS_PATH_SEPARATOR_COMPILER__,
-            __KAOS_SPELLS__,
-            __KAOS_PATH_SEPARATOR_COMPILER__,
-            extension_name,
-            __KAOS_PATH_SEPARATOR_COMPILER__,
-            extension_name,
-            get_filename_ext(module_path)
+    if (strcmp(file->module_path, file->context) != 0) {
+        _Function* context_function = declareFunction(
+            decl->v.func_decl->name->v.ident->name,
+            "",
+            file->module_path,
+            file->module_path,
+            K_VOID,
+            K_VOID
         );
-        fprintf(
-            c_fp,
-            "%*cpushModuleStack(extension_path_%llu, \"%s\");\n",
-            indent,
-            ' ',
-            extension_counter,
-            extension_name
-        );
-        fprintf(c_fp, "%*ccallRegisterInDynamicLibrary(extension_path_%llu);\n", indent, ' ', extension_counter);
-        fprintf(c_fp, "%*cpopModuleStack();\n", indent, ' ');
-        fprintf(c_fp, "%*cfree(extension_path_%llu);\n", indent, ' ', extension_counter);
-    } else {
-        char *compiled_module = malloc(1 + strlen(module_path_stack.arr[module_path_stack.size - 1]));
-        strcpy(compiled_module, module_path_stack.arr[module_path_stack.size - 1]);
-        compiler_escape_module(compiled_module);
-        ASTNode* ast_node = ast_root_node;
-        compiler_register_functions(ast_node, compiled_module, c_fp, indent);
-        free(compiled_module);
+
+        context_function->ref = function_mode;
+        context_function->parameter_count = function_mode->parameter_count;
+        context_function->optional_parameter_count = function_mode->optional_parameter_count;
+        context_function->parameters = function_mode->parameters;
     }
 
-    moduleImportCleanUp(module_path);
+    endFunction();
+
+    return true;
 }
 
-char* compiler_getCurrentContext() {
-    unsigned short parent_context = 1;
-    if (module_path_stack.size > 1) parent_context = 2;
-    return fix_bs(module_path_stack.arr[module_path_stack.size - parent_context]);
+void declare_functions(ASTRoot* ast_root, i64_array* program)
+{
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
+
+        // Declare functions
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            declare_function(stmt, file, program);
+        }
+
+        popModuleStack();
+    }
 }
 
-char* compiler_getCurrentModuleContext() {
-    return fix_bs(module_path_stack.arr[module_path_stack.size - 1]);
+void compile_functions(ASTRoot* ast_root, i64_array* program)
+{
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
+
+        // Compile functions
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
+                compileStmt(program, stmt);
+            }
+        }
+
+        popModuleStack();
+    }
 }
 
-char* compiler_getCurrentModule() {
-    return fix_bs(module_stack.arr[module_stack.size - 1]);
-}
-
-char* compiler_getFunctionModuleContext(char *name, char *module) {
-    if (
-        module == NULL
-        &&
-        transpiled_modules.size > 0
-        &&
-        strcmp(transpiled_modules.arr[transpiled_modules.size - 1], "") != 0
-    ) {
-        char *module_context = malloc(strlen(transpiled_modules.arr[transpiled_modules.size - 1]) + 1);
-        strcpy(module_context, transpiled_modules.arr[transpiled_modules.size - 1]);
-        compiler_escape_module(module_context);
-        return module_context;
+void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type)
+{
+    if (expr != NULL) {
+        if ((symbol_x->type == K_LIST || symbol_x->type == K_DICT) && symbol_x->secondary_type != K_ANY) {
+            switch (expr->kind) {
+            case CompositeLit_kind: {
+                CompositeLit* composite_lit = expr->v.composite_lit;
+                for (unsigned long i = composite_lit->elts->expr_count; 0 < i; i--) {
+                    Expr* elt = composite_lit->elts->exprs[i - 1];
+                    switch (elt->kind) {
+                    case CompositeLit_kind: {
+                        if (function != NULL)
+                            throw_error(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name);
+                        break;
+                    }
+                    case BasicLit_kind: {
+                        BasicLit* basic_lit = elt->v.basic_lit;
+                        strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->secondary_type, basic_lit->value_type);
+                        break;
+                    }
+                    case KeyValueExpr_kind: {
+                        KeyValueExpr* key_value_expr = elt->v.key_value_expr;
+                        if (key_value_expr->value->kind == BasicLit_kind) {
+                            BasicLit* basic_lit = key_value_expr->value->v.basic_lit;
+                            strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->secondary_type, basic_lit->value_type);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                }
+                break;
+            }
+            case BasicLit_kind: {
+                BasicLit* basic_lit = expr->v.basic_lit;
+                strongly_type_basic_check(E_ILLEGAL_ELEMENT_TYPE_FOR_TYPED_LIST, getValueTypeName(basic_lit->value_type), symbol_x->name, symbol_x->secondary_type, basic_lit->value_type);
+                break;
+            }
+            default:
+                break;
+            }
+        }
     }
 
-    _Function* function = getFunction(name, module);
-    if (function == NULL)
-        function = getFunctionByModuleContext(name, module);
-    char *module_context = malloc(strlen(function->module_context) + 1);
-    strcpy(module_context, function->module_context);
-    compiler_escape_module(module_context);
-    return module_context;
-}
-
-bool isFunctionFromDynamicLibrary(char *name, char *module) {
-    if (
-        module == NULL
-        &&
-        transpiled_modules.size > 0
-        &&
-        strcmp(transpiled_modules.arr[transpiled_modules.size - 1], "") != 0
-    ) {
-        return strcmp(
-        get_filename_ext(transpiled_modules.arr[transpiled_modules.size - 1]),
-        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-    ) == 0;
+    if (function != NULL && value_type != V_ANY && value_type != V_REF) {
+        strongly_type_basic_check(E_ILLEGAL_VARIABLE_TYPE_FOR_FUNCTION_PARAMETER, symbol_x->name, function->name, symbol_x->type, value_type);
     }
-    _Function* function = getFunction(name, module);
-    return strcmp(
-        get_filename_ext(function->module_context),
-        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-    ) == 0;
 }
 
-bool isFunctionFromDynamicLibraryByModuleContext(char *name, char *module) {
-    _Function* function = getFunctionByModuleContext(name, module);
-    return strcmp(
-        get_filename_ext(function->module_context),
-        __KAOS_DYNAMIC_LIBRARY_EXTENSION__
-    ) == 0;
-}
-
-char* fix_bs(char* str) {
-    char* new_str = str_replace(str, "\\", "\\\\");
-    return new_str;
-}
-
-void compiler_escape_module(char* module) {
-    module = replace_char(module, '.', '_');
-    module = replace_char(module, '/', '_');
-    module = replace_char(module, '\\', '_');
-    module = replace_char(module, '-', '_');
-    module = replace_char(module, ':', '_');
-    module = replace_char(module, ' ', '_');
-}
-
-void free_transpiled_functions() {
-    for (unsigned i = 0; i < transpiled_functions.size; i++) {
-        free(transpiled_functions.arr[i]);
+void strongly_type_basic_check(unsigned short code, char *str1, char *str2, enum Type type, enum ValueType value_type)
+{
+    switch (type) {
+    case K_BOOL:
+        if (value_type != V_BOOL)
+            throw_error(code, str1, str2);
+        break;
+    case K_NUMBER:
+        if (value_type != V_INT && value_type != V_FLOAT)
+            throw_error(code, str1, str2);
+        break;
+    case K_STRING:
+        if (value_type != V_STRING)
+            throw_error(code, str1, str2);
+        break;
+    case K_LIST:
+        if (value_type != V_LIST)
+            throw_error(code, str1, str2);
+        break;
+    case K_DICT:
+        if (value_type != V_DICT)
+            throw_error(code, str1, str2);
+        break;
+    default:
+        break;
     }
-    if (transpiled_functions.size > 0) free(transpiled_functions.arr);
-    transpiled_functions.capacity = 0;
-    transpiled_functions.size = 0;
-
-    for (unsigned i = 0; i < transpiled_modules.size; i++) {
-        free(transpiled_modules.arr[i]);
-    }
-    if (transpiled_modules.size > 0) free(transpiled_modules.arr);
-    transpiled_modules.capacity = 0;
-    transpiled_modules.size = 0;
-}
-
-void free_transpiled_decisions() {
-    for (unsigned i = 0; i < transpiled_decisions.size; i++) {
-        free(transpiled_decisions.arr[i]);
-    }
-    if (transpiled_decisions.size > 0) free(transpiled_decisions.arr);
-    transpiled_decisions.capacity = 0;
-    transpiled_decisions.size = 0;
 }

@@ -1,0 +1,2484 @@
+{
+    "_type": "Program",
+    "files": [
+        {
+            "_type": "File",
+            "imports": [],
+            "stmt_list": [
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "1"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "2"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "3"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "b"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "256"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "c"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "deepest loop"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "a"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "TimesDo",
+                                        "x": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "4"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "b"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "DeclStmt",
+                                                    "decl": {
+                                                        "_type": "TimesDo",
+                                                        "x": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "2"
+                                                        },
+                                                        "body": {
+                                                            "_type": "BlockStmt",
+                                                            "stmt_list": [
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "BasicLit",
+                                                                        "value_type": "int",
+                                                                        "value": "1"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "c"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "hey"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsList",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "el": {
+                                            "_type": "Ident",
+                                            "name": "el"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "el"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "n"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "5"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "n"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "hoy"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "el"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "el"
+                                    }
+                                },
+                                {
+                                    "_type": "AssignStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "el"
+                                    },
+                                    "op": "=",
+                                    "y": {
+                                        "_type": "BasicLit",
+                                        "value_type": "int",
+                                        "value": "5"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "TimesDo",
+                                        "x": {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "2"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "el"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "n"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "n"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "a"
+                                    },
+                                    "value": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "foo"
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "b"
+                                    },
+                                    "value": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "bar"
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "c"
+                                    },
+                                    "value": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "baz"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsDict",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "n"
+                        },
+                        "key": {
+                            "_type": "Ident",
+                            "name": "key"
+                        },
+                        "value": {
+                            "_type": "Ident",
+                            "name": "val"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "key"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "val"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsList",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "el": {
+                                            "_type": "Ident",
+                                            "name": "el"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "el"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "DeclStmt",
+                                                    "decl": {
+                                                        "_type": "ForeachAsDict",
+                                                        "x": {
+                                                            "_type": "Ident",
+                                                            "name": "n"
+                                                        },
+                                                        "key": {
+                                                            "_type": "Ident",
+                                                            "name": "key"
+                                                        },
+                                                        "value": {
+                                                            "_type": "Ident",
+                                                            "name": "val"
+                                                        },
+                                                        "body": {
+                                                            "_type": "BlockStmt",
+                                                            "stmt_list": [
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "key"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "val"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "String",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "d"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "string",
+                            "value": "after all the loops"
+                        }
+                    }
+                },
+                {
+                    "_type": "PrintStmt",
+                    "mod": null,
+                    "x": {
+                        "_type": "Ident",
+                        "name": "d"
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "ListType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "2"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "ListType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "4"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "ListType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "_type": "BasicLit",
+                                            "value_type": "int",
+                                            "value": "6"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "i"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "i"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsList",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        },
+                                        "el": {
+                                            "_type": "Ident",
+                                            "name": "j"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "j"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "DictType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "a"
+                                            },
+                                            "value": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            }
+                                        },
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "b"
+                                            },
+                                            "value": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "2"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "DictType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "c"
+                                            },
+                                            "value": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "3"
+                                            }
+                                        },
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "d"
+                                            },
+                                            "value": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "4"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "DictType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "e"
+                                            },
+                                            "value": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "5"
+                                            }
+                                        },
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "f"
+                                            },
+                                            "value": {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "6"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "i"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "i"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsDict",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        },
+                                        "key": {
+                                            "_type": "Ident",
+                                            "name": "key"
+                                        },
+                                        "value": {
+                                            "_type": "Ident",
+                                            "name": "val"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "key"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "val"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "DictType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "a"
+                                            },
+                                            "value": {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "ListType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "1"
+                                                    },
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "2"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "b"
+                                            },
+                                            "value": {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "ListType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "3"
+                                                    },
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "4"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "DictType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "c"
+                                            },
+                                            "value": {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "ListType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "5"
+                                                    },
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "6"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "d"
+                                            },
+                                            "value": {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "ListType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "7"
+                                                    },
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "8"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "_type": "CompositeLit",
+                                    "type": {
+                                        "_type": "DictType"
+                                    },
+                                    "elts": [
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "e"
+                                            },
+                                            "value": {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "ListType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "9"
+                                                    },
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "10"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "_type": "KeyValueExpr",
+                                            "key": {
+                                                "_type": "BasicLit",
+                                                "value_type": "string",
+                                                "value": "f"
+                                            },
+                                            "value": {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "ListType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "11"
+                                                    },
+                                                    {
+                                                        "_type": "BasicLit",
+                                                        "value_type": "int",
+                                                        "value": "12"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "i"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "i"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsDict",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        },
+                                        "key": {
+                                            "_type": "Ident",
+                                            "name": "key"
+                                        },
+                                        "value": {
+                                            "_type": "Ident",
+                                            "name": "val"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "key"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "val"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "DeclStmt",
+                                                    "decl": {
+                                                        "_type": "ForeachAsList",
+                                                        "x": {
+                                                            "_type": "Ident",
+                                                            "name": "val"
+                                                        },
+                                                        "el": {
+                                                            "_type": "Ident",
+                                                            "name": "j"
+                                                        },
+                                                        "body": {
+                                                            "_type": "BlockStmt",
+                                                            "stmt_list": [
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "j"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "a"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "DictType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "a"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "1"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "b"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "2"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "b"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "DictType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "c"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "3"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "d"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "4"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "c"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "DictType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "e"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "5"
+                                                }
+                                            },
+                                            {
+                                                "_type": "KeyValueExpr",
+                                                "key": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "string",
+                                                    "value": "f"
+                                                },
+                                                "value": {
+                                                    "_type": "BasicLit",
+                                                    "value_type": "int",
+                                                    "value": "6"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsDict",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "key": {
+                            "_type": "Ident",
+                            "name": "key1"
+                        },
+                        "value": {
+                            "_type": "Ident",
+                            "name": "val1"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "key1"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "val1"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsDict",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "val1"
+                                        },
+                                        "key": {
+                                            "_type": "Ident",
+                                            "name": "key2"
+                                        },
+                                        "value": {
+                                            "_type": "Ident",
+                                            "name": "val2"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "key2"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "val2"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "a"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "2"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "b"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "3"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "4"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "c"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "5"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "6"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsDict",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "key": {
+                            "_type": "Ident",
+                            "name": "key"
+                        },
+                        "value": {
+                            "_type": "Ident",
+                            "name": "val"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "key"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "val"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsList",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "val"
+                                        },
+                                        "el": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "i"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "a"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "a"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "1"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "b"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "2"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "c"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "3"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "d"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "4"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "b"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "e"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "5"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "f"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "6"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "g"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "7"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "h"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "8"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "c"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "x"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "9"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "y"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "10"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "t"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "11"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "v"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "int",
+                                                            "value": "12"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsDict",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "key": {
+                            "_type": "Ident",
+                            "name": "key1"
+                        },
+                        "value": {
+                            "_type": "Ident",
+                            "name": "val1"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "key1"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "val1"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsList",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "val1"
+                                        },
+                                        "el": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "PrintStmt",
+                                                    "mod": null,
+                                                    "x": {
+                                                        "_type": "Ident",
+                                                        "name": "i"
+                                                    }
+                                                },
+                                                {
+                                                    "_type": "DeclStmt",
+                                                    "decl": {
+                                                        "_type": "ForeachAsDict",
+                                                        "x": {
+                                                            "_type": "Ident",
+                                                            "name": "i"
+                                                        },
+                                                        "key": {
+                                                            "_type": "Ident",
+                                                            "name": "key2"
+                                                        },
+                                                        "value": {
+                                                            "_type": "Ident",
+                                                            "name": "val2"
+                                                        },
+                                                        "body": {
+                                                            "_type": "BlockStmt",
+                                                            "stmt_list": [
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "key2"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "val2"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Dictionary",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "DictType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "C"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "h"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "a"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "o"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "s"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": " "
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "L"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "a"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "n"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "KeyValueExpr",
+                                    "key": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "g"
+                                    },
+                                    "value": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "CompositeLit",
+                                                "type": {
+                                                    "_type": "DictType"
+                                                },
+                                                "elts": [
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "u"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "a"
+                                                        }
+                                                    },
+                                                    {
+                                                        "_type": "KeyValueExpr",
+                                                        "key": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "g"
+                                                        },
+                                                        "value": {
+                                                            "_type": "BasicLit",
+                                                            "value_type": "string",
+                                                            "value": "e"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsDict",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "key": {
+                            "_type": "Ident",
+                            "name": "key1"
+                        },
+                        "value": {
+                            "_type": "Ident",
+                            "name": "val1"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "key1"
+                                    }
+                                },
+                                {
+                                    "_type": "DeclStmt",
+                                    "decl": {
+                                        "_type": "ForeachAsList",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "val1"
+                                        },
+                                        "el": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        },
+                                        "body": {
+                                            "_type": "BlockStmt",
+                                            "stmt_list": [
+                                                {
+                                                    "_type": "DeclStmt",
+                                                    "decl": {
+                                                        "_type": "ForeachAsDict",
+                                                        "x": {
+                                                            "_type": "Ident",
+                                                            "name": "i"
+                                                        },
+                                                        "key": {
+                                                            "_type": "Ident",
+                                                            "name": "key2"
+                                                        },
+                                                        "value": {
+                                                            "_type": "Ident",
+                                                            "name": "val2"
+                                                        },
+                                                        "body": {
+                                                            "_type": "BlockStmt",
+                                                            "stmt_list": [
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "key2"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "_type": "PrintStmt",
+                                                                    "mod": null,
+                                                                    "x": {
+                                                                        "_type": "Ident",
+                                                                        "name": "val2"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "List",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": []
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "AssignStmt",
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "a"
+                                    },
+                                    "op": "=",
+                                    "y": {
+                                        "_type": "CompositeLit",
+                                        "type": {
+                                            "_type": "ListType"
+                                        },
+                                        "elts": [
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "_type": "BasicLit",
+                                                "value_type": "int",
+                                                "value": "3"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "a"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BinaryExpr",
+                            "x": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "3"
+                            },
+                            "op": "+",
+                            "y": {
+                                "_type": "BasicLit",
+                                "value_type": "int",
+                                "value": "5"
+                            }
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "BasicLit",
+                                        "value_type": "string",
+                                        "value": "eight times"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DelStmt",
+                    "ident": {
+                        "_type": "Ident",
+                        "name": "a"
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "VarDecl",
+                        "type_spec": {
+                            "_type": "TypeSpec",
+                            "type": "Number",
+                            "sub_type_spec": null
+                        },
+                        "ident": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "expr": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "0"
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "10"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "ExprStmt",
+                                    "x": {
+                                        "_type": "IncDecExpr",
+                                        "op": "++",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "first": false
+                                    }
+                                },
+                                {
+                                    "_type": "ExprStmt",
+                                    "x": {
+                                        "_type": "IncDecExpr",
+                                        "op": "++",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "first": true
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "a"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "10"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "ExprStmt",
+                                    "x": {
+                                        "_type": "IncDecExpr",
+                                        "op": "--",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "first": false
+                                    }
+                                },
+                                {
+                                    "_type": "ExprStmt",
+                                    "x": {
+                                        "_type": "IncDecExpr",
+                                        "op": "--",
+                                        "x": {
+                                            "_type": "Ident",
+                                            "name": "a"
+                                        },
+                                        "first": true
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "a"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

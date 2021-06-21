@@ -1,7 +1,7 @@
 /*
  * Description: Language module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -29,13 +29,14 @@
 #define __KAOS_VERSION_PATCHLEVEL__ 0
 #define __KAOS_LANGUAGE_FILE_EXTENSION__ "kaos"
 #define __KAOS_LANGUAGE_MOTTO__ "Turn chaos into magic!"
-#define __KAOS_LANGUAGE_KEYWORD_COUNT__ 33
+#define __KAOS_LANGUAGE_KEYWORD_COUNT__ 32
 #define __KAOS_INTERACTIVE_MODULE_NAME__ "__interactive__."__KAOS_LANGUAGE_FILE_EXTENSION__
 #define __KAOS_MSG_LINE_LENGTH__ 1000
 #define __KAOS_BYE_BYE__ "Bye bye!"
 #define __KAOS_SPELLS__ "spells"
 #define __KAOS_SYNTAX_ERROR__ "Syntax error"
 #define __KAOS_INDENT_LENGTH__ 4
+#define __KAOS_INDENT_CHAR__ ' '
 
 #if defined(__APPLE__) || defined(__MACH__)
 #   define __KAOS_DYNAMIC_LIBRARY_EXTENSION__ "dylib"

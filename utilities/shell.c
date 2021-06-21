@@ -1,7 +1,7 @@
 /*
  * Description: Shell module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,7 @@
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__CYGWIN__)
 #   include "shell.h"
 
-extern unsigned long long loops_inside_function_counter;
-extern bool is_complex_parsing;
+extern unsigned long long shell_indicator_block_counter;
 
 unsigned long long suggestions_length = __KAOS_LANGUAGE_KEYWORD_COUNT__;
 char *suggestions[1000] = {
@@ -33,7 +32,6 @@ char *suggestions[1000] = {
     "print",
     "true",
     "false",
-    "symbol_table",
     "del",
     "return",
     "times do",
@@ -118,7 +116,7 @@ int shell_readline(char *buf) {
 
     char *line;
 
-    if (is_interactive && (loops_inside_function_counter > 0 || is_complex_parsing)) {
+    if (is_interactive && shell_indicator_block_counter > 0) {
         line = readline(__KAOS_SHELL_INDICATOR_BLOCK__);
     } else {
         line = readline(__KAOS_SHELL_INDICATOR__);

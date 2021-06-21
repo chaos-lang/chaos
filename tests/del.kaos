@@ -3,4 +3,3 @@ num var2 = 5
 str var3 = 'string1'
 num var4 = 45.6
 del var2
-symbol_table

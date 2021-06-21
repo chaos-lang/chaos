@@ -27,9 +27,7 @@ print arr2
 str list arr3 = ['A', "asdasdaqs", 'asdasd123123', "."]
 print arr3
 
-symbol_table
 del f
-symbol_table
 
 print a[2]
 print a[1]
@@ -249,11 +247,6 @@ print a
 // Update list element or list's itself with a cross-complex assignment
 del a
 list a = [1, 2, 3]
-a = {'c': 3, 'd': 4}
-print a
-
-del a
-list a = [1, 2, 3]
 a[0] = {'c': 3, 'd': 4}
 print a
 
@@ -345,3 +338,29 @@ list a = [
     }
 ]
 print a
+
+
+// Nested list eat
+del a
+list a = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+print a[0]
+print a[1]
+print a[2]
+
+
+// Assigning list element to any
+del a
+list a = [
+    'x',
+    'y',
+    'z'
+]
+any el = a[1]
+el = 'g'
+print el
+

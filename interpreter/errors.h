@@ -1,7 +1,7 @@
 /*
  * Description: Errors module of the Chaos Programming Language's source
  *
- * Copyright (c) 2019-2020 Chaos Language Development Authority <info@chaos-lang.org>
+ * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
  * License: GNU General Public License v3.0
  * This program is free software: you can redistribute it and/or modify
@@ -69,6 +69,7 @@ enum ExitCode {
     E_CONTINUE_CALL_OUTSIDE_LOOP,
     E_BREAK_CALL_MULTILINE_LOOP,
     E_CONTINUE_CALL_MULTILINE_LOOP,
+    E_STACK_OVERFLOW,
     E_PREEMPTIVE
 };
 
@@ -90,7 +91,6 @@ void throw_error_base(
     char *str2,
     long long lld1,
     unsigned long long llu1,
-    bool is_preemptive,
     _Function* function
 );
 
@@ -100,7 +100,6 @@ typedef struct {
     char *str2;
     long long lld1;
     unsigned long long llu1;
-    bool is_preemptive;
     _Function* function;
 } throw_error_args;
 
