@@ -551,17 +551,14 @@ void execute(cpu *c)
         }
         break;
     case DEBUG:
-        printf("\n");
-        print_registers(c, pc_start);
-        print_stack(c);
-        printf("\n");
+        debug(c, pc_start);
         break;
     default:
         break;
     }
 
     if (c->debug_level > 2)
-        print_registers(c, pc_start);
+        debug(c, pc_start);
 }
 
 void print_registers(cpu *c, i64 pc_start)
@@ -1085,13 +1082,30 @@ void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
     free(key);
 }
 
+void debug(cpu *c, i64 pc_start)
+{
+    printf(" ----------------------------------------------------------\n");
+    print_registers(c, pc_start);
+    print_stack(c);
+    print_heap(c);
+}
+
 void print_stack(cpu *c)
 {
-    i64 _sp = c->sp;
-    printf("PRINT STACK:\n");
-    while (_sp < c->max_mem) {
-        printf("%lld\n", c->mem[_sp++]);
+    for (i64 i = c->sp; i < USHRT_MAX * 2 - 1; i++) {
+        printf("[SP: %lld] %lld\n", i, c->stack[i]);
     }
+}
+
+void print_heap(cpu *c)
+{
+    i64 heap_start = 0;
+    if (is_interactive)
+        heap_start = USHRT_MAX * 32;
+    for (i64 i = heap_start; i < c->heap_size; i++) {
+        printf("[HP: %lld: %lld] ", i, c->mem[i]);
+    }
+    printf("\n");
 }
 
 void cpu_store(cpu *c, i64 heap, i64 value)
