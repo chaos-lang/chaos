@@ -323,7 +323,7 @@ Stmt* exitStmt(Expr* x, int lineno)
 {
     ExitStmt* exit_stmt = (struct ExitStmt*)calloc(1, sizeof(ExitStmt));
     exit_stmt->x = x;
-    Stmt* stmt = buildStmt(ExitStmt_kind, lineno);
+    Stmt* stmt = buildStmt(ExitStmt_kind, lineno - 1);  // TODO: Why do we need `lineno - 1` here?
     stmt->v.exit_stmt = exit_stmt;
     return stmt;
 }
