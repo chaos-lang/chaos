@@ -28,6 +28,16 @@ if [[ "$OSTYPE" == "linux"* ]]; then
         echo "Error: Automatic detection of default package manager is failed!"
         exit 1;
     fi
+
+    # Install GNU Lightning
+    curl http://ftp.gnu.org/gnu/lightning/lightning-2.1.3.tar.gz -o /tmp/lightning-2.1.3.tar.gz && \
+    tar -xvf /tmp/lightning-2.1.3.tar.gz -C /tmp && \
+    cd /tmp/lightning-2.1.3 && \
+    ./configure && \
+    make && \
+    make check && \
+    make install && \
+    cd -
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     brew update
     brew install make flex bison readline
