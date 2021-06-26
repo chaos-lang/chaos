@@ -42,9 +42,9 @@ cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned shor
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void eat_until_hlt(cpu *c);
-void fetch(cpu *c);
+// static inline void fetch(cpu *c);
 void fetch_without_ast_stack(cpu *c);
-void execute(cpu *c);
+// void execute(cpu *c);
 
 void print_registers(cpu *c, i64 pc_start);
 char *getRegName(i64 i);

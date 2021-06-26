@@ -41,7 +41,7 @@ void print_cpu(cpu *c, i64 hlt_count)
     );
     for (i64 i = 0; i < hlt_count; i++) {
         do {
-            fetch(c);
+            // fetch(c);
             emitBytecode(c);
         } while (c->inst != HLT);
     }
