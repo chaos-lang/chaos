@@ -99,11 +99,13 @@ parser.tab.c parser.tab.h:
 lex.yy.c:
 	flex lexer/lexer.l
 
-chaos: lex.yy.c parser.tab.c parser.tab.h
-ifeq ($(UNAME_S), Darwin)
-	export CHAOS_STACK_SIZE=-Wl,-stack_size,0x100000000
-endif
-	${CHAOS_COMPILER} -Werror -Wall -fcommon ${CHAOS_STACK_SIZE} -DCHAOS_INTERPRETER -o chaos parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c -lreadline -lm -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl -llightning ${CHAOS_EXTRA_FLAGS}
+myjit:
+	cd myjit
+	make jitlib-core.o
+
+chaos: lex.yy.c parser.tab.c parser.tab.h myjit
+	${CHAOS_COMPILER} -c -g -Werror -Wall -fcommon -DCHAOS_INTERPRETER parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c ${CHAOS_EXTRA_FLAGS}
+	${CHAOS_COMPILER} -o chaos -g -Wall -std=c99 -pedantic *.o myjit/jitlib-core.o -lreadline -lm -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl
 
 clean:
 	rm -rf chaos parser.tab.c lex.yy.c parser.tab.h

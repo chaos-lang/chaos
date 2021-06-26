@@ -20,11 +20,12 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
+#include "../myjit/myjit/jitlib.h"
+
+typedef long (*plfl)(long);
+struct jit *_jit;
+
 #include "cpu.h"
-
-static jit_state_t *_jit;
-
-typedef int (*pifi)(int);
 
 char *reg_names[] = {
     "R0A", "R1A", "R2A", "R3A", "R4A", "R5A", "R6A", "R7A",
@@ -73,22 +74,23 @@ void free_cpu(cpu *c)
 
 void run_cpu(cpu *c)
 {
-    // jit_node_t  *in;
-    pifi         incr;
+    _jit = jit_init();
 
-    init_jit(0);
-    _jit = jit_new_state();
-    jit_prolog();
+	plfl foo;
+
+    jit_prolog(_jit, &foo);
+    jit_declare_arg(_jit, JIT_SIGNED_NUM, sizeof(long));
+    jit_getarg(_jit, R(0), 0);
 
     do {
         fetch(c);
         execute(c);
     } while (c->inst != HLT);
 
-    jit_retr(JIT_R0);
-    incr = jit_emit();
-    jit_clear_state();
-    printf("%d\n", incr(0));
+    jit_retr(_jit, R(0));
+    jit_generate_code(_jit);
+
+    printf("%li\n", foo(0));
 }
 
 void eat_until_hlt(cpu *c)
@@ -145,7 +147,7 @@ void execute(cpu *c)
         c->pc += 2;
         break;
     case LII:
-        jit_movi(JIT_R0, c->src);
+        jit_movi(_jit, R(0), c->src);
         c->pc += 2;
         break;
     case PUSH:
