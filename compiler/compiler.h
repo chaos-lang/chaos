@@ -23,43 +23,9 @@
 #ifndef KAOS_COMPILER_H
 #define KAOS_COMPILER_H
 
-#include "../ast/ast.h"
 #include "../vm/cpu.h"
+#include "../ast/ast.h"
 #include "../interpreter/module_new.h"
-
-typedef struct KaosIR KaosIR;
-typedef struct KaosInst KaosInst;
-typedef struct KaosOp KaosOp;
-
-typedef struct KaosIR {
-    KaosInst* arr;
-    i64 capacity;
-    i64 size;
-    i64 hlt_count;
-} KaosIR;
-
-typedef struct KaosInst {
-    i64 op_code;
-    KaosOp* op1;
-    KaosOp* op2;
-    KaosOp* op3;
-    void* ast_ref;
-} KaosInst;
-
-
-enum IRType { IR_REG, IR_VAL };
-enum IRValueType { IR_INT, IR_FLOAT, IR_STRING };
-
-typedef struct KaosOp {
-    enum IRType type;
-    i64 reg;
-    enum IRValueType value_type;
-    union IRValue {
-        i64 i;
-        f64 f;
-        byte *s;
-    } value;
-} KaosOp;
 
 KaosIR* compile(ASTRoot* ast_root);
 void initCallJumps();
@@ -72,9 +38,11 @@ void compileDecl(KaosIR* program, Decl* decl);
 void compileSpecList(KaosIR* program, SpecList* spec_list);
 unsigned short compileSpec(KaosIR* program, Spec* spec);
 
-void push_instr(KaosIR* program, i64 el);
-void pushProgram(KaosIR* program, i64 el);
-KaosInst popProgram(KaosIR* program);
+void push_inst_(KaosIR* program, enum IROpCode op_code);
+void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i);
+
+void pushProgram(KaosIR* program, KaosInst* el);
+KaosInst* popProgram(KaosIR* program);
 void freeProgram(KaosIR* program);
 KaosIR* initProgram();
 void shift_registers(KaosIR* program, size_t shift);

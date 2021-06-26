@@ -28,8 +28,8 @@ struct jit *_jit;
 #include "cpu.h"
 
 char *reg_names[] = {
-    "R0A", "R1A", "R2A", "R3A", "R4A", "R5A", "R6A", "R7A",
-    "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
+    "R0", "R1", "R2",  "R3",  "R4",  "R5",  "R6",  "R7",
+    "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"
 };
 
 i64* ast_stack = NULL;
@@ -39,6 +39,7 @@ cpu *new_cpu(KaosIR* program, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
     c->program = program;
+    c->ic = 0;
 
     ast_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     return c;
@@ -65,7 +66,7 @@ void run_cpu(cpu *c)
     do {
         fetch(c);
         execute(c);
-    } while (c->inst != HLT);
+    } while (c->inst->op_code != HLT);
 
     jit_retr(_jit, R(0));
     jit_generate_code(_jit);
@@ -76,24 +77,23 @@ void run_cpu(cpu *c)
 void eat_until_hlt(cpu *c)
 {
     do {
-    } while (c->inst != HLT);
+    } while (c->inst->op_code != HLT);
 }
 
 void fetch(cpu *c)
 {
-    c->ic++;
+    c->inst = c->program->arr[c->ic++];
 }
 
 void execute(cpu *c)
 {
     // i64 ic_start = c->ic;
 
-    // switch (c->inst) {
-    // case LII:
-    //     jit_movi(_jit, R(0), c->src);
-    //     c->ic += 2;
-    //     break;
-    // default:
-    //     break;
-    // }
+    switch (c->inst->op_code) {
+    case MOVI:
+        jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
+        break;
+    default:
+        break;
+    }
 }

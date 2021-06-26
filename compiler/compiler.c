@@ -61,6 +61,7 @@ KaosIR* compile(ASTRoot* ast_root)
             compileStmt(program, stmt);
     }
 
+    push_inst_(program, HLT);
     program->hlt_count++;
     fillCallJumps(program);
     return program;
@@ -353,6 +354,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case V_BOOL:
             break;
         case V_INT:
+            push_inst_r_i(program, MOVI, R0, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
             break;
@@ -1414,23 +1416,45 @@ unsigned short compileSpec(KaosIR* program, Spec* spec)
     return 0;
 }
 
-void push_instr(KaosIR* program, i64 el)
+void push_inst_(KaosIR* program, enum IROpCode op_code)
 {
-    pushProgram(program, el);
-    // pushProgram(program->ast_ref, ast_ref);
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+
+    pushProgram(program, inst);
 }
 
-void pushProgram(KaosIR* program, i64 el)
+void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_VAL;
+    union IRValue value2;
+    value2.i = i;
+    op2->value = value2;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+
+    pushProgram(program, inst);
+}
+
+void pushProgram(KaosIR* program, KaosInst* inst)
 {
     if (program->capacity == 0) {
-        program->arr = (KaosInst*)malloc((++program->capacity) * sizeof(KaosInst));
+        program->arr = (KaosInst**)malloc((++program->capacity) * sizeof(KaosInst*));
     } else {
-        program->arr = (KaosInst*)realloc(program->arr, (++program->capacity) * sizeof(KaosInst));
+        program->arr = (KaosInst**)realloc(program->arr, (++program->capacity) * sizeof(KaosInst*));
     }
-    // program->arr[program->size++] = el;
+    program->arr[program->size++] = inst;
 }
 
-KaosInst popProgram(KaosIR* program)
+KaosInst* popProgram(KaosIR* program)
 {
     return program->arr[program->size--];
 }

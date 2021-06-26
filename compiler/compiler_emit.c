@@ -43,7 +43,7 @@ void print_cpu(cpu *c, i64 hlt_count)
         do {
             fetch(c);
             emitBytecode(c);
-        } while (c->inst != HLT);
+        } while (c->inst->op_code != HLT);
     }
     printf("\n");
 }

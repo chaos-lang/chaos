@@ -28,13 +28,10 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "types.h"
-#include "instructions.h"
+#include "ir.h"
 
 #include "../enums.h"
 #include "../utilities/helpers.h"
-
-typedef struct KaosIR KaosIR;
 
 i64* ast_stack;
 i64 ast_stack_p;

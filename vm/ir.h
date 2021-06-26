@@ -1,5 +1,5 @@
 /*
- * Description: CPU types module of the Chaos Programming Language's source
+ * Description: Intermediate Representation module of the Chaos Programming Language's source
  *
  * Copyright (c) 2019-2021 Chaos Language Development Authority <info@chaos-lang.org>
  *
@@ -20,28 +20,53 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef IR_H
+#define IR_H
 
-#define byte unsigned char
-#define u64 unsigned long long
-#define i64 long long
-#define f64 long double
+#include "types.h"
+
+enum IROpCode {
+    MOVI,
+    HLT,
+    NUM_INSTRUCTIONS
+};
 
 typedef struct KaosIR KaosIR;
 typedef struct KaosInst KaosInst;
+typedef struct KaosOp KaosOp;
 
+typedef struct KaosIR {
+    KaosInst** arr;
+    i64 capacity;
+    i64 size;
+    i64 hlt_count;
+} KaosIR;
 
-typedef struct {
-    KaosIR* program;
+typedef struct KaosInst {
+    i64 op_code;
+    KaosOp* op1;
+    KaosOp* op2;
+    KaosOp* op3;
+    void* ast_ref;
+} KaosInst;
 
-    // instruction counter
-    i64 ic;
+enum IRType { IR_REG, IR_VAL };
+enum IRValueType { IR_INT, IR_FLOAT, IR_STRING };
+enum IRRegister {
+    R0,  R1,  R2,  R3,  R4,  R5,  R6,  R7,
+    R8,  R9,  R10, R11, R12, R13, R14, R15,
+    IR_NUM_REGISTERS
+};
 
-    // current instruction
-    KaosInst* inst;
-
-    unsigned short debug_level;
-} cpu;
+typedef struct KaosOp {
+    enum IRType type;
+    enum IRRegister reg;
+    enum IRValueType value_type;
+    union IRValue {
+        i64 i;
+        f64 f;
+        byte *s;
+    } value;
+} KaosOp;
 
 #endif

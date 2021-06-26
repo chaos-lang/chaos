@@ -268,7 +268,7 @@ void compile_interactive()
         compiling_a_function = false;
         current_file_index = 0;
 
-        push_instr(interactive_program, HLT);
+        push_inst_(interactive_program, HLT);
         interactive_program->hlt_count++;
         interactive_c->ic = interactive_program->size - 1;
         if (interactive_c->debug_level > 1) {
@@ -288,7 +288,7 @@ void compile_interactive()
             compiling_a_function = true;
         compileStmt(interactive_program, stmt);
         compiling_a_function = false;
-        push_instr(interactive_program, HLT);
+        push_inst_(interactive_program, HLT);
         interactive_program->hlt_count++;
         if (!is_function)
             fillCallJumps(interactive_program);
