@@ -22,9 +22,9 @@
 
 #include "compiler_emit.h"
 
-void emit(i64_array* program)
+void emit(KaosIR* program)
 {
-    cpu *c = new_cpu(program->arr, program->heap, 0, program->ast_ref->arr, 0);
+    cpu *c = new_cpu(program, 0);
     print_cpu(c, program->hlt_count);
     free_cpu(c);
 }
@@ -53,9 +53,9 @@ void emitBytecode(cpu *c)
     char str_pc[40];
     char str_inst[40];
 
-    sprintf(str_pc, "%lld", c->pc);
+    sprintf(str_pc, "%lld", c->ic);
 
-	switch (c->inst) {
+	switch (c->inst->op_code) {
     case HLT:
         sprintf(str_inst, "%s", "HLT");
 	}

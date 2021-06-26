@@ -30,62 +30,20 @@
 
 #include "types.h"
 #include "instructions.h"
-#include "flags.h"
 
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
+typedef struct KaosIR KaosIR;
+
 i64* ast_stack;
 i64 ast_stack_p;
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level);
+cpu *new_cpu(KaosIR* program, unsigned short debug_level);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void eat_until_hlt(cpu *c);
 void fetch(cpu *c);
-void fetch_without_ast_stack(cpu *c);
 void execute(cpu *c);
-
-void print_registers(cpu *c, i64 pc_start);
-char *getRegName(i64 i);
-char *build_string(cpu *c, i64 len);
-char *build_string_from_addr(cpu *c, i64 addr);
-
-void print_bool(cpu *c);
-void print_int(cpu *c);
-void print_float(cpu *c);
-void print_string(cpu *c, bool quoted);
-void print_list(cpu *c, bool pretty, unsigned long iter);
-void print_dict(cpu *c, bool pretty, unsigned long iter);
-
-void cpu_store_dynamic(cpu *c);
-void cpu_store_common(cpu *c);
-void cpu_store_string(cpu *c);
-void cpu_store_list(cpu *c);
-void cpu_store_dict(cpu *c);
-
-void cpu_load_dynamic(cpu *c, i64 addr);
-i64 cpu_load_common(cpu *c, i64 addr);
-i64 cpu_load_string(cpu *c, i64 addr);
-i64 cpu_load_list(cpu *c, i64 addr);
-i64 cpu_load_dict(cpu *c, i64 addr);
-
-void cpu_eat_string(cpu *c);
-void cpu_eat_dynamic(cpu *c);
-
-void cpu_pop_dynamic(cpu *c);
-void cpu_pop_common(cpu *c);
-void cpu_pop_string(cpu *c);
-void cpu_pop_list(cpu *c);
-void cpu_pop_dict(cpu *c);
-
-void cpu_list_index_access(cpu *c, i64 list_len, i64 index);
-void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len);
-
-void debug(cpu *c, i64 pc_start);
-void print_stack(cpu *c);
-void print_heap(cpu *c);
-
-void cpu_store(cpu *c, i64 heap, i64 value);
 
 #endif

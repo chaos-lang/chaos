@@ -26,46 +26,19 @@
 #define byte unsigned char
 #define u64 unsigned long long
 #define i64 long long
-#define f64 double
+#define f64 long double
 
-enum registers {
-    R0A, R1A, R2A, R3A, R4A, R5A, R6A, R7A,
-    R0B, R1B, R2B, R3B, R4B, R5B, R6B, R7B,
-    NUM_REGISTERS
-};
+typedef struct KaosIR KaosIR;
+typedef struct KaosInst KaosInst;
 
 typedef struct {
-    i64 *program;
-    i64 *mem;
-    i64 **mems;
-    i64 *stack;
-    i64 memp;
-    i64 max_mem;
-    i64 stack_size;
-    i64 heap_size;
-    i64 heap;
-    i64 *ast_ref;
+    KaosIR* program;
 
-    // registers
-    i64 pc;
-    i64 sp;
-    i64 *jmpb;
-    i64 jmpbp;
-    i64 *brk;
-    i64 brkp;
-    i64 *cont;
-    i64 contp;
-    i64 r[NUM_REGISTERS];
+    // instruction counter
+    i64 ic;
 
-    // instruction parts
-    i64 inst;
-    i64 dest;
-    i64 src;
-
-    // flags
-    i64 zero;
-    i64 ltz;
-    i64 gtz;
+    // current instruction
+    KaosInst* inst;
 
     unsigned short debug_level;
 } cpu;

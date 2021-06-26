@@ -172,7 +172,7 @@ int initParser(int argc, char** argv) {
         greet();
         phase = INIT_PROGRAM;
         interactive_program = initProgram();
-        interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, interactive_program->ast_ref->arr, debug_level);
+        interactive_c = new_cpu(interactive_program, debug_level);
         initCallJumps();
     } else {
         program_code = fileGetContents(program_file_path);
@@ -214,7 +214,7 @@ int initParser(int argc, char** argv) {
                 exit(0);
         }
 
-        i64_array* program = compile(_ast_root);
+        KaosIR* program = compile(_ast_root);
 
         if (debug_level > 1) {
             printf("\nDebug Bytecode:\n");
@@ -226,7 +226,7 @@ int initParser(int argc, char** argv) {
         if (debug_level > 2)
             printf("\nProgram Output:\n");
 
-        cpu *c = new_cpu(program->arr, program->heap, program->start, program->ast_ref->arr, debug_level);
+        cpu *c = new_cpu(program, debug_level);
         run_cpu(c);
         free_cpu(c);
         // if (!is_interactive) {
@@ -270,7 +270,7 @@ void compile_interactive()
 
         push_instr(interactive_program, HLT);
         interactive_program->hlt_count++;
-        interactive_c->pc = interactive_program->size - 1;
+        interactive_c->ic = interactive_program->size - 1;
         if (interactive_c->debug_level > 1) {
             printf("\nDebug Bytecode:\n");
             emit(interactive_program);
@@ -302,10 +302,9 @@ void compile_interactive()
     if (!any_stmts)
         return;
 
-    interactive_c->program = interactive_program->arr;
-    interactive_c->ast_ref = interactive_program->ast_ref->arr;
+    interactive_c->program = interactive_program;
     if (is_function)
-        interactive_c->pc = interactive_program->size - 1;
+        interactive_c->ic = interactive_program->size - 1;
     else
         run_cpu(interactive_c);
 }

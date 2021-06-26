@@ -22,9 +22,9 @@
 
 #include "compiler.h"
 
-i64_array* call_body_jumps;
+KaosIR* call_body_jumps;
 unsigned long call_body_jumps_index = 0;
-i64_array* call_optional_jumps;
+KaosIR* call_optional_jumps;
 unsigned long call_optional_jumps_index = 0;
 
 extern bool interactively_importing;
@@ -33,9 +33,9 @@ File* import_parent_context = NULL;
 
 i64 ast_ref = 0;
 
-i64_array* compile(ASTRoot* ast_root)
+KaosIR* compile(ASTRoot* ast_root)
 {
-    i64_array* program = initProgram();
+    KaosIR* program = initProgram();
     initCallJumps();
 
     // Compile imports
@@ -49,8 +49,6 @@ i64_array* compile(ASTRoot* ast_root)
 
     StmtList* stmt_list = ast_root->files[0]->stmt_list;
     current_file_index = 0;
-
-    program->start = program->size;
 
     // Compile other statements in the first parsed file
     for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
@@ -74,27 +72,27 @@ void initCallJumps()
     call_optional_jumps = initProgram();
 }
 
-void fillCallJumps(i64_array* program)
+void fillCallJumps(KaosIR* program)
 {
-    for (unsigned long i = call_optional_jumps_index; i < call_optional_jumps->size; i++) {
-        call_optional_jumps_index++;
-        i64 addr = call_optional_jumps->arr[i];
-        _Function* function = (void *)program->arr[addr];
-        program->arr[addr] = function->optional_parameters_addr;
-    }
+    // for (unsigned long i = call_optional_jumps_index; i < call_optional_jumps->size; i++) {
+    //     call_optional_jumps_index++;
+    //     i64 addr = call_optional_jumps->arr[i];
+    //     _Function* function = (void *)program->arr[addr];
+    //     program->arr[addr] = function->optional_parameters_addr;
+    // }
 
-    for (unsigned long i = call_body_jumps_index; i < call_body_jumps->size; i++) {
-        call_body_jumps_index++;
-        i64 addr = call_body_jumps->arr[i];
-        _Function* function = (void *)program->arr[addr];
-        if (function->ref != NULL)
-            program->arr[addr] = function->ref->body_addr;
-        else
-            program->arr[addr] = function->body_addr;
-    }
+    // for (unsigned long i = call_body_jumps_index; i < call_body_jumps->size; i++) {
+    //     call_body_jumps_index++;
+    //     i64 addr = call_body_jumps->arr[i];
+    //     _Function* function = (void *)program->arr[addr];
+    //     if (function->ref != NULL)
+    //         program->arr[addr] = function->ref->body_addr;
+    //     else
+    //         program->arr[addr] = function->body_addr;
+    // }
 }
 
-void compileImports(ASTRoot* ast_root, i64_array* program)
+void compileImports(ASTRoot* ast_root, KaosIR* program)
 {
     while (true) {
         bool all_imports_handled = true;
@@ -118,14 +116,14 @@ void compileImports(ASTRoot* ast_root, i64_array* program)
     }
 }
 
-void compileStmtList(i64_array* program, StmtList* stmt_list)
+void compileStmtList(KaosIR* program, StmtList* stmt_list)
 {
     for (unsigned long i = stmt_list->stmt_count; 0 < i; i--) {
         compileStmt(program, stmt_list->stmts[i - 1]);
     }
 }
 
-void compileStmt(i64_array* program, Stmt* stmt)
+void compileStmt(KaosIR* program, Stmt* stmt)
 {
     ast_ref = (i64)(void *)stmt->ast;
 
@@ -345,7 +343,7 @@ void compileStmt(i64_array* program, Stmt* stmt)
     }
 }
 
-unsigned short compileExpr(i64_array* program, Expr* expr)
+unsigned short compileExpr(KaosIR* program, Expr* expr)
 {
     ast_ref = (i64)(void *)expr->ast;
 
@@ -656,10 +654,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
                     if (is_dynamic) {
                     } else {
-                        program->heap += len;
+                        // program->heap += len;
                         for (size_t i = len; i > 0; i--) {
                         }
-                        program->heap += len;
+                        // program->heap += len;
                     }
                     break;
                 }
@@ -680,10 +678,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
                     if (is_dynamic) {
                     } else {
-                        program->heap += len * 2;
+                        // program->heap += len * 2;
                         for (size_t i = len; i > 0; i--) {
                         }
-                        program->heap += len * 2;
+                        // program->heap += len * 2;
                     }
                     break;
                 }
@@ -709,10 +707,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
                 if (is_dynamic) {
                 } else {
-                    program->heap += len;
+                    // program->heap += len;
                     for (size_t i = len; i > 0; i--) {
                     }
-                    program->heap += len;
+                    // program->heap += len;
                 }
                 break;
             }
@@ -733,10 +731,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
 
                 if (is_dynamic) {
                 } else {
-                    program->heap += len * 2;
+                    // program->heap += len * 2;
                     for (size_t i = len; i > 0; i--) {
                     }
-                    program->heap += len * 2;
+                    // program->heap += len * 2;
                 }
                 break;
             }
@@ -776,7 +774,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     return 0;
 }
 
-void compileDecl(i64_array* program, Decl* decl)
+void compileDecl(KaosIR* program, Decl* decl)
 {
     ast_ref = (i64)(void *)decl->ast;
 
@@ -1080,14 +1078,14 @@ void compileDecl(i64_array* program, Decl* decl)
     }
 }
 
-void compileSpecList(i64_array* program, SpecList* spec_list)
+void compileSpecList(KaosIR* program, SpecList* spec_list)
 {
     for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
         compileSpec(program, spec_list->specs[i - 1]);
     }
 }
 
-unsigned short compileSpec(i64_array* program, Spec* spec)
+unsigned short compileSpec(KaosIR* program, Spec* spec)
 {
     ast_ref = (i64)(void *)spec->ast;
 
@@ -1143,8 +1141,8 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         }
         parameter->secondary_type = secondary_type;
 
-        parameter->addr = program->heap;
-        program->heap += 2;
+        // parameter->addr = program->heap;
+        // program->heap += 2;
         addFunctionParameterNew(function_mode, parameter);
         break;
     }
@@ -1182,8 +1180,8 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         }
         parameter->secondary_type = secondary_type;
 
-        parameter->addr = program->heap;
-        program->heap += 2;
+        // parameter->addr = program->heap;
+        // program->heap += 2;
 
         addFunctionParameterNew(function_mode, parameter);
 
@@ -1286,10 +1284,10 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
                 if (is_dynamic) {
                 } else {
-                    program->heap += len;
+                    // program->heap += len;
                     for (size_t i = len; i > 0; i--) {
                     }
-                    program->heap += len;
+                    // program->heap += len;
                 }
                 break;
             }
@@ -1310,10 +1308,10 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
                 if (is_dynamic) {
                 } else {
-                    program->heap += len * 2;
+                    // program->heap += len * 2;
                     for (size_t i = len; i > 0; i--) {
                     }
-                    program->heap += len * 2;
+                    // program->heap += len * 2;
                 }
                 break;
             }
@@ -1339,10 +1337,10 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
             if (is_dynamic) {
             } else {
-                program->heap += len;
+                // program->heap += len;
                 for (size_t i = len; i > 0; i--) {
                 }
-                program->heap += len;
+                // program->heap += len;
             }
             break;
         }
@@ -1363,10 +1361,10 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
             if (is_dynamic) {
             } else {
-                program->heap += len * 2;
+                // program->heap += len * 2;
                 for (size_t i = len; i > 0; i--) {
                 }
-                program->heap += len * 2;
+                // program->heap += len * 2;
             }
             break;
         }
@@ -1400,14 +1398,14 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         break;
     }
     case DecisionBlock_kind: {
-        i64 jump_back_point = program->size;
+        // i64 jump_back_point = program->size;
 
         ExprList* expr_list = spec->v.decision_block->decisions;
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
             compileExpr(program, expr_list->exprs[i - 1]);
         }
 
-        program->arr[jump_back_point] = program->size - 1;
+        // program->arr[jump_back_point] = program->size - 1;
         break;
     }
     default:
@@ -1416,60 +1414,52 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
     return 0;
 }
 
-void push_instr(i64_array* program, i64 el)
+void push_instr(KaosIR* program, i64 el)
 {
     pushProgram(program, el);
-    pushProgram(program->ast_ref, ast_ref);
+    // pushProgram(program->ast_ref, ast_ref);
 }
 
-void pushProgram(i64_array* program, i64 el)
+void pushProgram(KaosIR* program, i64 el)
 {
     if (program->capacity == 0) {
-        program->arr = (i64*)malloc((++program->capacity) * sizeof(i64));
+        program->arr = (KaosInst*)malloc((++program->capacity) * sizeof(KaosInst));
     } else {
-        program->arr = (i64*)realloc(program->arr, (++program->capacity) * sizeof(i64));
+        program->arr = (KaosInst*)realloc(program->arr, (++program->capacity) * sizeof(KaosInst));
     }
-    program->arr[program->size++] = el;
+    // program->arr[program->size++] = el;
 }
 
-i64 popProgram(i64_array* program)
+KaosInst popProgram(KaosIR* program)
 {
     return program->arr[program->size--];
 }
 
-void freeProgram(i64_array* program)
+void freeProgram(KaosIR* program)
 {
     free(program->arr);
     initProgram(program);
 }
 
-i64_array* initProgram()
+KaosIR* initProgram()
 {
-    i64_array* program = malloc(sizeof *program);
+    KaosIR* program = malloc(sizeof *program);
     program->capacity = 0;
     program->arr = NULL;
     program->size = 0;
-    program->heap = 0;
     program->hlt_count = 0;
-
-    program->ast_ref = malloc(sizeof *program->ast_ref);
-    program->ast_ref->capacity = 0;
-    program->ast_ref->arr = NULL;
-    program->ast_ref->size = 0;
-    program->ast_ref->heap = 0;
-    program->ast_ref->hlt_count = 0;
 
     return program;
 }
 
-void shift_registers(i64_array* program, size_t shift)
+void shift_registers(KaosIR* program, size_t shift)
 {
     // size_t len = NUM_REGISTERS / 2;
     for (size_t i = 0; i < shift; i++) {
     }
 }
 
-Symbol* store_bool(i64_array* program, char *name, bool is_any)
+Symbol* store_bool(KaosIR* program, char *name, bool is_any)
 {
     union Value value;
     value.i = 0;
@@ -1479,12 +1469,12 @@ Symbol* store_bool(i64_array* program, char *name, bool is_any)
     else {
         symbol = addSymbol(name, K_BOOL, value, V_BOOL);
     }
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
 
     return symbol;
 }
 
-Symbol* store_int(i64_array* program, char *name, bool is_any)
+Symbol* store_int(KaosIR* program, char *name, bool is_any)
 {
     union Value value;
     value.i = 0;
@@ -1494,12 +1484,12 @@ Symbol* store_int(i64_array* program, char *name, bool is_any)
     else {
         symbol = addSymbol(name, K_NUMBER, value, V_INT);
     }
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
 
     return symbol;
 }
 
-Symbol* store_float(i64_array* program, char *name, bool is_any)
+Symbol* store_float(KaosIR* program, char *name, bool is_any)
 {
     union Value value;
     value.i = 0;
@@ -1509,12 +1499,12 @@ Symbol* store_float(i64_array* program, char *name, bool is_any)
     else {
         symbol = addSymbol(name, K_NUMBER, value, V_FLOAT);
     }
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
 
     return symbol;
 }
 
-Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic)
+Symbol* store_string(KaosIR* program, char *name, size_t len, bool is_any, bool is_dynamic)
 {
     union Value value;
     value.i = 0;
@@ -1524,7 +1514,7 @@ Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bo
     else {
         symbol = addSymbol(name, K_STRING, value, V_STRING);
     }
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
     symbol->len = len;
     symbol->is_dynamic = is_dynamic;
 
@@ -1537,13 +1527,13 @@ Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bo
     return symbol;
 }
 
-Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic)
+Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic)
 {
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
 
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
     symbol->len = len;
     symbol->is_dynamic = is_dynamic;
 
@@ -1556,13 +1546,13 @@ Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic)
     return symbol;
 }
 
-Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic)
+Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
 {
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_DICT, value, V_DICT);
 
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
     symbol->len = len;
     symbol->is_dynamic = is_dynamic;
 
@@ -1575,33 +1565,33 @@ Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic)
     return symbol;
 }
 
-Symbol* store_any(i64_array* program, char *name)
+Symbol* store_any(KaosIR* program, char *name)
 {
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_ANY, value, V_ANY);
-    symbol->addr = program->heap;
+    // symbol->addr = program->heap;
     symbol->is_dynamic = true;
 
     return symbol;
 }
 
-void load_bool(i64_array* program, Symbol* symbol)
+void load_bool(KaosIR* program, Symbol* symbol)
 {
     // i64 addr = symbol->addr;
 }
 
-void load_int(i64_array* program, Symbol* symbol)
+void load_int(KaosIR* program, Symbol* symbol)
 {
     // i64 addr = symbol->addr;
 }
 
-void load_float(i64_array* program, Symbol* symbol)
+void load_float(KaosIR* program, Symbol* symbol)
 {
     // i64 addr = symbol->addr;
 }
 
-void load_string(i64_array* program, Symbol* symbol)
+void load_string(KaosIR* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
 
@@ -1614,7 +1604,7 @@ void load_string(i64_array* program, Symbol* symbol)
     }
 }
 
-void load_list(i64_array* program, Symbol* symbol)
+void load_list(KaosIR* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
 
@@ -1628,7 +1618,7 @@ void load_list(i64_array* program, Symbol* symbol)
     }
 }
 
-void load_dict(i64_array* program, Symbol* symbol)
+void load_dict(KaosIR* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
 
@@ -1642,7 +1632,7 @@ void load_dict(i64_array* program, Symbol* symbol)
     }
 }
 
-void load_any(i64_array* program, Symbol* symbol)
+void load_any(KaosIR* program, Symbol* symbol)
 {
     // i64 addr = symbol->addr;
 }
@@ -1669,7 +1659,7 @@ char* compile_module_selector(Expr* module_selector)
     }
 }
 
-bool declare_function(Stmt* stmt, File* file, i64_array* program)
+bool declare_function(Stmt* stmt, File* file, KaosIR* program)
 {
     if (stmt->kind != DeclStmt_kind || stmt->v.decl_stmt->decl->kind != FuncDecl_kind)
         return false;
@@ -1749,7 +1739,7 @@ bool declare_function(Stmt* stmt, File* file, i64_array* program)
     return true;
 }
 
-void declare_functions(ASTRoot* ast_root, i64_array* program)
+void declare_functions(ASTRoot* ast_root, KaosIR* program)
 {
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
         File* file = ast_root->files[i];
@@ -1767,7 +1757,7 @@ void declare_functions(ASTRoot* ast_root, i64_array* program)
     }
 }
 
-void compile_functions(ASTRoot* ast_root, i64_array* program)
+void compile_functions(ASTRoot* ast_root, KaosIR* program)
 {
     for (unsigned long i = 0; i < ast_root->file_count; i++) {
         File* file = ast_root->files[i];

@@ -60,7 +60,7 @@ jmp_buf InteractiveShellErrorAbsorber;
 
 i64 prev_stmt_count;
 i64 prev_import_count;
-i64_array* interactive_program;
+KaosIR* interactive_program;
 bool interactively_importing;
 bool compiling_a_function;
 
