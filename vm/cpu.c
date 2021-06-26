@@ -84,10 +84,12 @@ void eat_until_hlt(cpu *c)
 
 void fetch(cpu *c)
 {
-    c->pc++;
-    c->inst = c->program[c->pc];
-    c->dest = c->program[c->pc + 1];
-    c->src = c->program[c->pc + 2];
+    // c->pc++;
+    // c->inst = c->program[c->pc];
+    // c->dest = c->program[c->pc + 1];
+    // c->src = c->program[c->pc + 2];
+
+    memcpy(&c->inst, &c->program[++c->pc], 3 * sizeof(i64));
 
     ast_stack[ast_stack_p] = c->ast_ref[c->pc];
 }
@@ -102,13 +104,36 @@ void fetch_without_ast_stack(cpu *c)
 
 void execute(cpu *c)
 {
-    i64 pc_start = c->pc;
+    // i64 pc_start = c->pc;
+    static const void *dispatch[] = {
+        &&vm_clf,
+        &&vm_cmp, &&vm_cmpi,
+        &&vm_mov,
+        &&vm_sti, &&vm_ldi, &&vm_str, &&vm_ldr,
+        &&vm_lii,
+        &&vm_push, &&vm_pop,
+        &&vm_inc, &&vm_dec,
+        &&vm_add, &&vm_sub, &&vm_mul, &&vm_div, &&vm_mod,
+        &&vm_jlz, &&vm_jgz, &&vm_jez, &&vm_jnz, &&vm_jmp,
+        &&vm_shl, &&vm_shr,
+        &&vm_band, &&vm_bor, &&vm_bnot, &&vm_bxor,
+        &&vm_land, &&vm_lor, &&vm_lnot,
+        &&vm_dldr, &&vm_dstr, &&vm_dpop, &&vm_ddel,
+        &&vm_prnt, &&vm_pprnt,
+        &&vm_lind, &&vm_ksrch,
+        &&vm_jmpb, &&vm_sjmpb,
+        &&vm_brk, &&vm_sbrk, &&vm_cont, &&vm_scont,
+        &&vm_call, &&vm_callx, &&vm_callext,
+        &&vm_debug,
+        &&vm_hlt, &&vm_exit, &&vm_thrw
+    };
 
-    switch (c->inst) {
-    case CLF:
+    goto *dispatch[c->inst];
+
+    vm_clf:
         clear_flags(c);
-        break;
-    case CMP:
+        return;
+    vm_cmp:
         if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
@@ -130,54 +155,54 @@ void execute(cpu *c)
             set_flags(c, c->r[c->dest], c->r[c->src]);
         }
         c->pc += 2;
-        break;
-    case CMPI:
+        return;
+    vm_cmpi:
         set_flags(c, c->r[c->dest], c->src);
         c->pc += 2;
-        break;
-    case MOV:
+        return;
+    vm_mov:
         c->r[c->dest] = c->r[c->src];
         c->pc += 2;
-        break;
-    case STI:
+        return;
+    vm_sti:
         cpu_store(c, c->dest, c->r[c->src]);
         c->pc += 2;
-        break;
-    case STR:
+        return;
+    vm_str:
         cpu_store(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
-        break;
-    case LDI:
+        return;
+    vm_ldi:
         c->r[c->dest] = c->mem[c->src];
         c->pc += 2;
-        break;
-    case LDR:
+        return;
+    vm_ldr:
         c->r[c->dest] = c->mem[c->r[c->src]];
         c->pc += 2;
-        break;
-    case LII:
+        return;
+    vm_lii:
         c->r[c->dest] = c->src;
         c->pc += 2;
-        break;
-    case PUSH:
+        return;
+    vm_push:
         c->stack[--c->sp] = c->r[c->program[++c->pc]];
-        break;
-    case POP:
+        return;
+    vm_pop:
         if (c->sp + 1 > USHRT_MAX * 2 - 1) {
             eat_until_hlt(c);
             throw_error(E_STACK_OVERFLOW);
         }
         c->r[c->program[++c->pc]] = c->stack[c->sp++];
-        break;
-    case INC:
+        return;
+    vm_inc:
         c->r[c->dest]++;
         c->pc++;
-        break;
-    case DEC:
+        return;
+    vm_dec:
         c->r[c->dest]--;
         c->pc++;
-        break;
-    case ADD:
+        return;
+    vm_add:
         if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
@@ -202,8 +227,8 @@ void execute(cpu *c)
             c->r[c->dest] += c->r[c->src];
         }
         c->pc += 2;
-        break;
-    case SUB:
+        return;
+    vm_sub:
         if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
@@ -228,8 +253,8 @@ void execute(cpu *c)
             c->r[c->dest] -= c->r[c->src];
         }
         c->pc += 2;
-        break;
-    case MUL:
+        return;
+    vm_mul:
         if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
@@ -254,8 +279,8 @@ void execute(cpu *c)
             c->r[c->dest] *= c->r[c->src];
         }
         c->pc += 2;
-        break;
-    case DIV:
+        return;
+    vm_div:
         if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
@@ -280,8 +305,8 @@ void execute(cpu *c)
             c->r[c->dest] /= c->r[c->src];
         }
         c->pc += 2;
-        break;
-    case MOD:
+        return;
+    vm_mod:
         if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
             f64 f1;
             f64 f2;
@@ -306,61 +331,61 @@ void execute(cpu *c)
             c->r[c->dest] %= c->r[c->src];
         }
         c->pc += 2;
-        break;
-    case JLZ:
+        return;
+    vm_jlz:
         if (c->ltz) {
             ++(c->pc);
             c->pc = c->program[c->pc];
         }
         else c->pc++;
-        break;
-    case JGZ:
+        return;
+    vm_jgz:
         if (c->gtz) {
             ++(c->pc);
             c->pc = c->program[c->pc];
         }
         else c->pc++;
-        break;
-    case JEZ:
+        return;
+    vm_jez:
         if (c->zero) {
             ++(c->pc);
             c->pc = c->program[c->pc];
         }
         else c->pc++;
-        break;
-    case JNZ:
+        return;
+    vm_jnz:
         if (!c->zero) {
             ++(c->pc);
             c->pc = c->program[c->pc];
         }
         else c->pc++;
-        break;
-    case JMP:
+        return;
+    vm_jmp:
         ++(c->pc);
         c->pc = c->program[c->pc];
-        break;
-    case JMPB:
+        return;
+    vm_jmpb:
         c->pc = c->jmpb[--c->jmpbp];
-        break;
-    case SJMPB:
+        return;
+    vm_sjmpb:
         c->jmpb[c->jmpbp++] = c->dest;
         c->pc++;
-        break;
-    case BRK:
+        return;
+    vm_brk:
         c->pc = c->brk[--c->brkp];
-        break;
-    case SBRK:
+        return;
+    vm_sbrk:
         c->brk[c->brkp++] = c->dest;
         c->pc++;
-        break;
-    case CONT:
+        return;
+    vm_cont:
         c->pc = c->cont[--c->contp];
-        break;
-    case SCONT:
+        return;
+    vm_scont:
         c->cont[c->contp++] = c->dest;
         c->pc++;
-        break;
-    case CALL: {
+        return;
+    vm_call: {
         i64 *new_mem = (i64*)malloc(c->heap_size * sizeof(i64));
         c->mems[c->memp++] = c->mem;
         memcpy(new_mem, c->mem, c->heap_size * sizeof(i64));
@@ -368,74 +393,74 @@ void execute(cpu *c)
         c->mems[c->memp++] = c->mem;
 
         ast_stack_p++;
-        break;
+        return;
     }
-    case CALLX: {
+    vm_callx: {
         --c->memp;
         c->mem = c->mems[--c->memp];
         free(c->mems[c->memp + 1]);
 
         ast_stack_p--;
-        break;
+        return;
     }
-    case CALLEXT: {
+    vm_callext: {
         _Function* function = (void *)c->dest;
         callFunctionFromDynamicLibrary(function, c);
         c->pc++;
-        break;
+        return;
     }
-    case SHL:
+    vm_shl:
         c->r[c->dest] <<= c->r[c->src];
         c->pc += 2;
-        break;
-    case SHR:
+        return;
+    vm_shr:
         c->r[c->dest] >>= c->r[c->src];
         c->pc += 2;
-        break;
-    case BAND:
+        return;
+    vm_band:
         c->r[c->dest] &= c->r[c->src];
         c->pc += 2;
-        break;
-    case BOR:
+        return;
+    vm_bor:
         c->r[c->dest] |= c->r[c->src];
         c->pc += 2;
-        break;
-    case BNOT:
+        return;
+    vm_bnot:
         c->r[c->dest] = ~c->r[c->dest];
         c->pc++;
-        break;
-    case BXOR:
+        return;
+    vm_bxor:
         c->r[c->dest] ^= c->r[c->src];
         c->pc += 2;
-        break;
-    case LAND:
+        return;
+    vm_land:
         c->r[c->dest] = c->r[c->dest] && c->r[c->src];
         c->pc += 2;
-        break;
-    case LOR:
+        return;
+    vm_lor:
         c->r[c->dest] = c->r[c->dest] || c->r[c->src];
         c->pc += 2;
-        break;
-    case LNOT:
+        return;
+    vm_lnot:
         c->r[c->dest] = !c->r[c->dest];
         c->pc++;
-        break;
-    case DLDR: {
+        return;
+    vm_dldr: {
         i64 addr = c->mem[c->r[c->dest]];
         c->r[R0A] = c->mem[addr++];
         cpu_load_dynamic(c, addr);
         c->pc++;
-        break;
+        return;
     }
-    case DSTR:
+    vm_dstr:
         c->r[c->dest] = c->heap;
         cpu_store_dynamic(c);
         c->pc++;
-        break;
-    case DPOP:
+        return;
+    vm_dpop:
         cpu_pop_dynamic(c);
-        break;
-    case DDEL: {
+        return;
+    vm_ddel: {
         i64 addr = c->r[c->dest];
         enum ValueType value_type = c->mem[addr];
         addr++;
@@ -476,9 +501,9 @@ void execute(cpu *c)
             }
         }
         c->pc += 2;
-        break;
+        return;
     }
-    case PRNT:
+    vm_prnt:
         switch (c->r[R0A]) {
         case V_BOOL:
             print_bool(c);
@@ -501,8 +526,8 @@ void execute(cpu *c)
         default:
             break;
         }
-        break;
-    case PPRNT:
+        return;
+    vm_pprnt:
         switch (c->r[R0A]) {
         case V_BOOL:
             print_bool(c);
@@ -525,21 +550,21 @@ void execute(cpu *c)
         default:
             break;
         }
-        break;
-    case LIND:
+        return;
+    vm_lind:
         cpu_list_index_access(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
-        break;
-    case KSRCH:
+        return;
+    vm_ksrch:
         cpu_dict_key_search(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
-        break;
-    case EXIT:
+        return;
+    vm_exit:
         if (is_interactive)
             print_bye_bye();
         exit(c->r[R1A]);
-        break;
-    case THRW:
+        return;
+    vm_thrw:
         c->pc += 2;
         if (c->gtz) {
             i64 err_code = c->dest;
@@ -549,16 +574,15 @@ void execute(cpu *c)
             }
             throw_error(err_code, NULL, NULL, i);
         }
-        break;
-    case DEBUG:
-        debug(c, pc_start);
-        break;
-    default:
-        break;
-    }
+        return;
+    vm_debug:
+        // debug(c, pc_start);
+        return;
+    vm_hlt:
+        return;
 
-    if (c->debug_level > 2)
-        debug(c, pc_start);
+    // if (c->debug_level > 2)
+    //     debug(c, pc_start);
 }
 
 void print_registers(cpu *c, i64 pc_start)
