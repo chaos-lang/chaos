@@ -63,7 +63,6 @@ i64_array* compile(ASTRoot* ast_root)
             compileStmt(program, stmt);
     }
 
-    push_instr(program, HLT);
     program->hlt_count++;
     fillCallJumps(program);
     return program;
@@ -133,34 +132,15 @@ void compileStmt(i64_array* program, Stmt* stmt)
     switch (stmt->kind) {
     case EchoStmt_kind:
         compileExpr(program, stmt->v.echo_stmt->x);
-        if (stmt->v.echo_stmt->mod != NULL && stmt->v.echo_stmt->mod->kind == PrettySpec_kind)
-            push_instr(program, PPRNT);
-        else
-            push_instr(program, PRNT);
+        if (stmt->v.echo_stmt->mod != NULL && stmt->v.echo_stmt->mod->kind == PrettySpec_kind) {
+        } else {
+        }
         break;
     case PrintStmt_kind:
         compileExpr(program, stmt->v.print_stmt->x);
-        if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind)
-            push_instr(program, PPRNT);
-        else
-            push_instr(program, PRNT);
-
-        // push_instr(program, LII);
-        // push_instr(program, R0A);
-        // push_instr(program, '\n' - '0');
-
-        // push_instr(program, PUSH);
-        // push_instr(program, R0A);
-
-        // push_instr(program, LII);
-        // push_instr(program, R0A);
-        // push_instr(program, V_STRING);
-
-        // push_instr(program, LII);
-        // push_instr(program, R1A);
-        // push_instr(program, 1);
-
-        // push_instr(program, PRNT);
+        if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind) {
+        } else {
+        }
         break;
     case ExprStmt_kind:
         compileExpr(program, stmt->v.expr_stmt->x);
@@ -178,7 +158,7 @@ void compileStmt(i64_array* program, Stmt* stmt)
             Symbol* symbol_y = NULL;
             if (stmt->v.assign_stmt->y->kind == Ident_kind)
                 symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
-            i64 addr = symbol_x->addr;
+            // i64 addr = symbol_x->addr;
             if (symbol_x->type == K_ANY)
                 symbol_x->value_type = V_ANY;
             else if (symbol_x->type == K_NUMBER && symbol_y != NULL && (
@@ -190,91 +170,22 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
             switch (symbol_x->value_type) {
             case V_BOOL:
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_BOOL);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R1A);
                 break;
             case V_INT:
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_INT);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R1A);
                 break;
             case V_FLOAT:
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_FLOAT);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R1A);
                 break;
             case V_STRING: {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_STRING);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R1A);
-
                 size_t len = symbol_x->len;
                 for (size_t i = 0; i < len; i++) {
-                    push_instr(program, POP);
-                    push_instr(program, R2A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr++);
-                    push_instr(program, R2A);
                 }
                 break;
             }
             case V_ANY: {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R7A);
                 break;
             }
             case V_LIST: {
                 if (symbol_x->type == K_ANY) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr++);
-                    push_instr(program, R7A);
                 } else {
                     Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
                     removeSymbol(symbol);
@@ -289,15 +200,6 @@ void compileStmt(i64_array* program, Stmt* stmt)
             }
             case V_DICT: {
                 if (symbol_x->type == K_ANY) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr++);
-                    push_instr(program, R7A);
                 } else {
                     Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
                     removeSymbol(symbol);
@@ -311,19 +213,6 @@ void compileStmt(i64_array* program, Stmt* stmt)
                 break;
             }
             case V_REF: {
-                push_instr(program, LII);
-                push_instr(program, R7A);
-                push_instr(program, program->heap);
-
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R7A);
                 break;
             }
             default:
@@ -333,7 +222,7 @@ void compileStmt(i64_array* program, Stmt* stmt)
         }
         case IndexExpr_kind: {
             Symbol* symbol = getSymbol(stmt->v.assign_stmt->x->v.index_expr->x->v.ident->name);
-            i64 addr = symbol->addr;
+            // i64 addr = symbol->addr;
 
             switch (symbol->type) {
             case K_STRING: {
@@ -384,106 +273,18 @@ void compileStmt(i64_array* program, Stmt* stmt)
             switch (symbol->type) {
             case K_STRING:
                 if (symbol->value_type == V_REF) {
-                    push_instr(program, LDI);
                 } else {
-                    push_instr(program, LII);
                 }
-                push_instr(program, R3B);
-                push_instr(program, addr);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, ADD);
-                push_instr(program, R3B);
-                push_instr(program, R4B);
-
-                push_instr(program, POP);
-                push_instr(program, R1A);
-
-                push_instr(program, STR);
-                push_instr(program, R3B);
-                push_instr(program, R1A);
                 break;
             case K_LIST:
                 if (symbol->value_type == V_REF) {
-                    push_instr(program, LDI);
                 } else {
-                    push_instr(program, LII);
                 }
-                push_instr(program, R3B);
-                push_instr(program, addr);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, LII);
-                push_instr(program, R0B);
-                push_instr(program, V_INT);
-
-                push_instr(program, ADD);
-                push_instr(program, R3B);
-                push_instr(program, R4B);
-
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STR);
-                push_instr(program, R3B);
-                push_instr(program, R7A);
                 break;
             case K_DICT:
                 if (symbol->value_type == V_REF) {
-                    push_instr(program, LDI);
                 } else {
-                    push_instr(program, LII);
                 }
-                push_instr(program, R3B);
-                push_instr(program, addr);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, INC);
-                push_instr(program, R3B);
-
-                push_instr(program, LII);
-                push_instr(program, R0B);
-                push_instr(program, V_INT);
-
-                push_instr(program, LII);
-                push_instr(program, R5B);
-                push_instr(program, 2);
-
-                push_instr(program, MUL);
-                push_instr(program, R4B);
-                push_instr(program, R5B);
-
-                push_instr(program, ADD);
-                push_instr(program, R3B);
-                push_instr(program, R4B);
-
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STR);
-                push_instr(program, R3B);
-                push_instr(program, R7A);
                 break;
             default:
                 break;
@@ -508,16 +309,6 @@ void compileStmt(i64_array* program, Stmt* stmt)
 
             if (symbol->type != K_LIST && symbol->type != K_DICT && symbol->type != K_STRING)
                 throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), symbol->name);
-
-            i64 addr = symbol->addr;
-
-            push_instr(program, LII);
-            push_instr(program, R7A);
-            push_instr(program, addr++);
-
-            push_instr(program, DDEL);
-            push_instr(program, R7A);
-            push_instr(program, R1A);
             break;
         }
         default:
@@ -533,30 +324,20 @@ void compileStmt(i64_array* program, Stmt* stmt)
         enum ValueType value_type = compileExpr(program, return_stmt->x) - 1;
         function_mode->value_type = value_type;
 
-        if (!return_stmt->dont_push_callx)
-            push_instr(program, CALLX);
-
-        push_instr(program, JMPB);
+        if (!return_stmt->dont_push_callx) {
+        }
         break;
     }
     case ExitStmt_kind: {
         if (stmt->v.exit_stmt->x == NULL) {
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
         } else {
-            compileExpr(program, stmt->v.exit_stmt->x);
         }
-
-        push_instr(program, EXIT);
         break;
     }
     case BreakStmt_kind: {
-        push_instr(program, BRK);
         break;
     }
     case ContinueStmt_kind: {
-        push_instr(program, CONT);
         break;
     }
     default:
@@ -572,54 +353,12 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_INT);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_FLOAT);
-
-            i64 f;
-            f64 _f = expr->v.basic_lit->value.f;
-            memcpy(&f, &_f, sizeof f);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, f);
             break;
         case V_STRING: {
-            size_t len = strlen(expr->v.basic_lit->value.s);
-            for (size_t i = len; i > 0; i--) {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, expr->v.basic_lit->value.s[i - 1] - '0');
-
-                push_instr(program, PUSH);
-                push_instr(program, R0A);
-            }
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_STRING);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, len);
             break;
         }
         default:
@@ -658,202 +397,48 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     case BinaryExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
         shift_registers(program, 8);
-        i64 addr = program->heap;
+        // i64 addr = program->heap;
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1B);
         }
         compileExpr(program, expr->v.binary_expr->x);
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
-            push_instr(program, LDI);
-            push_instr(program, R1B);
-            push_instr(program, addr);
         }
         switch (expr->v.binary_expr->op) {
         case ADD_tok:
-            push_instr(program, ADD);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case SUB_tok:
-            push_instr(program, SUB);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case MUL_tok:
-            push_instr(program, MUL);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case QUO_tok:
-            push_instr(program, DIV);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case REM_tok:
-            push_instr(program, MOD);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case AND_tok:
-            push_instr(program, BAND);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case OR_tok:
-            push_instr(program, BOR);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case XOR_tok:
-            push_instr(program, BXOR);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case SHL_tok:
-            push_instr(program, SHL);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case SHR_tok:
-            push_instr(program, SHR);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case EQL_tok:
-            push_instr(program, CMP);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
-
-            push_instr(program, JEZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
             break;
         case NEQ_tok:
-            push_instr(program, CMP);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
-
-            push_instr(program, JNZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
             break;
         case GTR_tok:
-            push_instr(program, CMP);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
-
-            push_instr(program, JGZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
             break;
         case LSS_tok:
-            push_instr(program, CMP);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
-
-            push_instr(program, JLZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
             break;
         case GEQ_tok:
-            push_instr(program, CMP);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
-
-            push_instr(program, JEZ);
-            push_instr(program, program->size + 5);
-            push_instr(program, JGZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
             break;
         case LEQ_tok:
-            push_instr(program, CMP);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
-
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
-
-            push_instr(program, JEZ);
-            push_instr(program, program->size + 5);
-            push_instr(program, JLZ);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 0);
             break;
         case LAND_tok:
-            push_instr(program, LAND);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case LOR_tok:
-            push_instr(program, LOR);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         default:
             break;
@@ -865,38 +450,12 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         enum ValueType type = compileExpr(program, expr->v.unary_expr->x);
         switch (expr->v.unary_expr->op) {
         case ADD_tok:
-            push_instr(program, LII);
-            push_instr(program, R0B);
-            push_instr(program, V_INT);
-
-            push_instr(program, LII);
-            push_instr(program, R1B);
-            push_instr(program, 1);
-
-            push_instr(program, MUL);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case SUB_tok:
-            push_instr(program, LII);
-            push_instr(program, R0B);
-            push_instr(program, V_INT);
-
-            push_instr(program, LII);
-            push_instr(program, R1B);
-            push_instr(program, -1);
-
-            push_instr(program, MUL);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
             break;
         case NOT_tok:
-            push_instr(program, LNOT);
-            push_instr(program, R1A);
             break;
         case TILDE_tok:
-            push_instr(program, BNOT);
-            push_instr(program, R1A);
             break;
         default:
             break;
@@ -911,112 +470,10 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
         shift_registers(program, 8);
 
-        push_instr(program, MOV);
-        push_instr(program, R7B);
-        push_instr(program, R1B);
-
         enum ValueType type2 = compileExpr(program, expr->v.index_expr->index) - 1;
         if (type1 == V_STRING) {
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_STRING);
-
-            push_instr(program, MOV);
-            push_instr(program, R2A);
-            push_instr(program, R1A);
-
-            push_instr(program, LII);
-            push_instr(program, R3A);
-            push_instr(program, -1);
-
-            push_instr(program, CMP);
-            push_instr(program, R2A);
-            push_instr(program, R3A);
-
-            push_instr(program, JGZ);
-            push_instr(program, program->size + 9);
-
-            // Handle negative index and turn it to possitive
-            push_instr(program, MOV);
-            push_instr(program, R5A);
-            push_instr(program, R7B);
-
-            push_instr(program, ADD);
-            push_instr(program, R5A);
-            push_instr(program, R2A);
-
-            push_instr(program, MOV);
-            push_instr(program, R2A);
-            push_instr(program, R5A);
-
-            // Check if index out of range and throw error
-            push_instr(program, CLF);
-
-            push_instr(program, LII);
-            push_instr(program, R4A);
-            push_instr(program, 0);
-
-            // Check for negative index
-            push_instr(program, CMP);
-            push_instr(program, R4A);
-            push_instr(program, R2A);
-
-            push_instr(program, THRW);
-            push_instr(program, E_INDEX_OUT_OF_RANGE_STRING);
-            push_instr(program, R2A);
-
-            push_instr(program, CLF);
-
-            // Check for index bigger than string length
-            push_instr(program, MOV);
-            push_instr(program, R5A);
-            push_instr(program, R2A);
-
-            push_instr(program, INC);
-            push_instr(program, R5A);
-
-            push_instr(program, CMP);
-            push_instr(program, R5A);
-            push_instr(program, R7B);
-
-            push_instr(program, THRW);
-            push_instr(program, E_INDEX_OUT_OF_RANGE_STRING);
-            push_instr(program, R2A);
-
-            push_instr(program, MOV);
-            push_instr(program, R4A);
-            push_instr(program, R2A);
-
-            push_instr(program, POP);
-            push_instr(program, R1A);
-
-            push_instr(program, ADD);
-            push_instr(program, R2A);
-            push_instr(program, R3A);
-
-            push_instr(program, CLF);
-
-            push_instr(program, CMP);
-            push_instr(program, R2A);
-            push_instr(program, R3A);
-
-            push_instr(program, JNZ);
-            push_instr(program, program->size - 11);
-
-            push_instr(program, PUSH);
-            push_instr(program, R1A);
-
-            push_instr(program, LII);
-            push_instr(program, R1A);
-            push_instr(program, 1);
         } else if ((type2 == V_ANY && type1 == V_LIST) || type2 == V_INT) {
-            push_instr(program, LIND);
-            push_instr(program, R7B);
-            push_instr(program, R1A);
         } else if ((type2 == V_ANY && type1 == V_DICT) || type2 == V_STRING) {
-            push_instr(program, KSRCH);
-            push_instr(program, R7B);
-            push_instr(program, R1A);
         }
         return type1 + 1;
         break;
@@ -1025,68 +482,28 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         enum ValueType type = compileExpr(program, expr->v.incdec_expr->x);
         switch (expr->v.incdec_expr->op) {
         case INC_tok:
-            push_instr(program, LII);
-            push_instr(program, R1B);
-            push_instr(program, 1);
             break;
         case DEC_tok:
-            push_instr(program, LII);
-            push_instr(program, R1B);
-            push_instr(program, -1);
             break;
         default:
             break;
         }
-        push_instr(program, ADD);
-        push_instr(program, R1A);
-        push_instr(program, R1B);
         if (expr->v.incdec_expr->x->kind == Ident_kind) {
             Symbol* symbol = getSymbol(expr->v.incdec_expr->x->v.ident->name);
-            i64 addr = symbol->addr;
+            // i64 addr = symbol->addr;
             if (symbol->value_type == V_REF) {
-                push_instr(program, LII);
-                push_instr(program, R7A);
-                push_instr(program, program->heap);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
             } else {
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, addr++);
-                push_instr(program, R1A);
             }
         }
         if (!expr->v.incdec_expr->first) {
             switch (expr->v.incdec_expr->op) {
             case INC_tok:
-                push_instr(program, LII);
-                push_instr(program, R1B);
-                push_instr(program, -1);
                 break;
             case DEC_tok:
-                push_instr(program, LII);
-                push_instr(program, R1B);
-                push_instr(program, 1);
                 break;
             default:
                 break;
             }
-            push_instr(program, ADD);
-            push_instr(program, R1A);
-            push_instr(program, R1B);
         }
         return type;
         break;
@@ -1097,35 +514,17 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         for (size_t i = 0; i < expr_list->expr_count; i++) {
             compileExpr(program, expr_list->exprs[i]);
             if (expr_list->exprs[i]->kind != KeyValueExpr_kind) {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, PUSH);
-                push_instr(program, R0A);
             } else {
                 value_type = V_DICT;
             }
         }
         compileSpec(program, expr->v.composite_lit->type);
-        push_instr(program, LII);
-        push_instr(program, R1A);
-        push_instr(program, expr_list->expr_count);
         return value_type + 1;
         break;
     }
     case KeyValueExpr_kind: {
         compileExpr(program, expr->v.key_value_expr->value);
-        push_instr(program, PUSH);
-        push_instr(program, R1A);
-
-        push_instr(program, PUSH);
-        push_instr(program, R0A);
         compileExpr(program, expr->v.key_value_expr->key);
-        push_instr(program, PUSH);
-        push_instr(program, R1A);
-
-        push_instr(program, PUSH);
-        push_instr(program, R0A);
         break;
     }
     case CallExpr_kind: {
@@ -1147,12 +546,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         ExprList* expr_list = expr->v.call_expr->args;
 
         if (!function->is_dynamic) {
-            push_instr(program, SJMPB);
-            push_instr(program, program->size + 2);
-
-            push_instr(program, JMP);
-            push_instr(program, (i64)(void *)function);
-            push_instr(call_optional_jumps, program->size - 1);
         }
 
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
@@ -1163,57 +556,19 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             strongly_type(parameter, NULL, function, expr, value_type);
 
             enum Type type = parameter->type;
-            i64 addr = parameter->addr;
+            // i64 addr = parameter->addr;
 
             if (function->is_dynamic) {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, PUSH);
-                push_instr(program, R0A);
                 continue;
             }
 
-            push_instr(program, LII);
-            push_instr(program, R7A);
-            push_instr(program, program->heap);
-
-            push_instr(program, STI);
-            push_instr(program, addr++);
-            push_instr(program, R7A);
-
             switch (type) {
             case K_BOOL:
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_BOOL);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
                 break;
             case K_NUMBER:
                 if (value_type == V_FLOAT) {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_FLOAT);
                 } else {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_INT);
                 }
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
                 break;
             case K_STRING: {
                 size_t len = 0;
@@ -1236,36 +591,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     break;
                 }
 
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_STRING);
-
                 if (is_dynamic) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr - 1);
-                    push_instr(program, R7A);
                 } else {
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
-
                     for (size_t i = len; i > 0; i--) {
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R0A);
                     }
                 }
                 break;
@@ -1273,44 +601,11 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             case K_ANY: {
                 switch (value_type) {
                 case V_BOOL:
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_BOOL);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
                     break;
                 case V_INT: {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_INT);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
                     break;
                 }
                 case V_FLOAT: {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_FLOAT);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
                     break;
                 }
                 case V_STRING: {
@@ -1337,36 +632,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                         break;
                     }
 
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_STRING);
-
                     if (is_dynamic) {
-                        push_instr(program, PUSH);
-                        push_instr(program, R1A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, addr - 1);
-                        push_instr(program, R7A);
                     } else {
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R0A);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R1A);
-
                         for (size_t i = len; i > 0; i--) {
-                            push_instr(program, POP);
-                            push_instr(program, R0A);
-
-                            push_instr(program, STI);
-                            push_instr(program, program->heap++);
-                            push_instr(program, R0A);
                         }
                     }
                     break;
@@ -1387,39 +655,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     }
 
                     if (is_dynamic) {
-                        push_instr(program, PUSH);
-                        push_instr(program, R1A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, addr - 1);
-                        push_instr(program, R7A);
                     } else {
-                        push_instr(program, LII);
-                        push_instr(program, R0A);
-                        push_instr(program, V_LIST);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R0A);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R1A);
-
                         program->heap += len;
                         for (size_t i = len; i > 0; i--) {
-                            push_instr(program, POP);
-                            push_instr(program, R0A);
-
-                            push_instr(program, DSTR);
-                            push_instr(program, R7A);
-
-                            push_instr(program, STI);
-                            push_instr(program, --program->heap);
-                            push_instr(program, R7A);
                         }
                         program->heap += len;
                     }
@@ -1441,49 +679,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                     }
 
                     if (is_dynamic) {
-                        push_instr(program, PUSH);
-                        push_instr(program, R1A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, addr - 1);
-                        push_instr(program, R7A);
                     } else {
-                        push_instr(program, LII);
-                        push_instr(program, R0A);
-                        push_instr(program, V_DICT);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R0A);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R1A);
-
                         program->heap += len * 2;
                         for (size_t i = len; i > 0; i--) {
-                            push_instr(program, POP);
-                            push_instr(program, R0A);
-
-                            push_instr(program, DSTR);
-                            push_instr(program, R7A);
-
-                            push_instr(program, STI);
-                            push_instr(program, --program->heap);
-                            push_instr(program, R7A);
-
-                            push_instr(program, POP);
-                            push_instr(program, R0A);
-
-                            push_instr(program, DSTR);
-                            push_instr(program, R7A);
-
-                            push_instr(program, STI);
-                            push_instr(program, --program->heap);
-                            push_instr(program, R7A);
                         }
                         program->heap += len * 2;
                     }
@@ -1510,39 +708,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                 }
 
                 if (is_dynamic) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr - 1);
-                    push_instr(program, R7A);
                 } else {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_LIST);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
-
                     program->heap += len;
                     for (size_t i = len; i > 0; i--) {
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, --program->heap);
-                        push_instr(program, R7A);
                     }
                     program->heap += len;
                 }
@@ -1564,49 +732,9 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
                 }
 
                 if (is_dynamic) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr - 1);
-                    push_instr(program, R7A);
                 } else {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_DICT);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
-
                     program->heap += len * 2;
                     for (size_t i = len; i > 0; i--) {
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, --program->heap);
-                        push_instr(program, R7A);
-
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, --program->heap);
-                        push_instr(program, R7A);
                     }
                     program->heap += len * 2;
                 }
@@ -1618,21 +746,7 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
         }
 
         if (function->is_dynamic) {
-            push_instr(program, LII);
-            push_instr(program, R5A);
-            push_instr(program, expr_list->expr_count);
-
-            push_instr(program, CALLEXT);
-            push_instr(program, (i64)(void *)function);
         } else {
-            push_instr(program, SJMPB);
-            push_instr(program, program->size + 3);
-
-            push_instr(program, CALL);
-
-            push_instr(program, JMP);
-            push_instr(program, (i64)(void *)function);
-            push_instr(call_body_jumps, program->size - 1);
         }
         return function->value_type + 1;
         break;
@@ -1640,27 +754,11 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
     case DecisionExpr_kind: {
         compileExpr(program, expr->v.decision_expr->bool_expr);
 
-        push_instr(program, LII);
-        push_instr(program, R2A);
-        push_instr(program, 0);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R2A);
-
-        push_instr(program, JEZ);
-        i64 jump_point = program->size;
-        push_instr(program, 0);
-
         // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
         if (expr->v.decision_expr->outcome->kind == ReturnStmt_kind)
             expr->v.decision_expr->outcome->v.return_stmt->dont_push_callx = true;
 
         compileStmt(program, expr->v.decision_expr->outcome);
-
-        push_instr(program, JMPB);
-
-        program->arr[jump_point] = program->size - 1;
         break;
     }
     case DefaultExpr_kind: {
@@ -1669,8 +767,6 @@ unsigned short compileExpr(i64_array* program, Expr* expr)
             expr->v.default_expr->outcome->v.return_stmt->dont_push_callx = true;
 
         compileStmt(program, expr->v.default_expr->outcome);
-
-        push_instr(program, JMPB);
         break;
     }
     default:
@@ -1883,383 +979,86 @@ void compileDecl(i64_array* program, Decl* decl)
     case TimesDo_kind: {
         compileExpr(program, decl->v.times_do->x);
 
-        i64 addr = program->heap;
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R0A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
-        push_instr(program, LII);
-        push_instr(program, R2A);
-        push_instr(program, 1);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R2A);
-
-        push_instr(program, SBRK);
-        i64 break_point = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, JLZ);
-        i64 loop_start = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, SCONT);
-        i64 continue_point = program->size;
-        push_instr(program, 0);
-
-        compileStmt(program, decl->v.times_do->body);
-
-        program->arr[loop_start] = program->size;
-
-        push_instr(program, CONT);
-        program->arr[continue_point] = program->size - 1;
-
-        push_instr(program, LII);
-        push_instr(program, R2A);
-        push_instr(program, 1);
-
-        push_instr(program, LII);
-        push_instr(program, R3A);
-        push_instr(program, 0);
-
-        push_instr(program, LDI);
-        push_instr(program, R0A);
-        push_instr(program, addr++);
-
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr);
-
-        push_instr(program, SUB);
-        push_instr(program, R1A);
-        push_instr(program, R2A);
-
-        push_instr(program, STI);
-        push_instr(program, addr);
-        push_instr(program, R1A);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R3A);
-
-        push_instr(program, JGZ);
-        push_instr(program, loop_start);
-
-        push_instr(program, BRK);
-        program->arr[break_point] = program->size - 1;
         break;
     }
     case ForeachAsList_kind: {
         compileExpr(program, decl->v.foreach_as_list->x);
 
-        i64 addr = program->heap;
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R0A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
-
-        size_t len = 0;
-        bool is_dynamic = false;
+        // size_t len = 0;
+        // bool is_dynamic = false;
 
         switch (decl->v.foreach_as_list->x->kind) {
         case CompositeLit_kind:
-            len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
+            // len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
             break;
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
             if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_LIST, symbol_x->name);
-            is_dynamic = true;
+            // is_dynamic = true;
             break;
         }
         default:
             break;
         }
 
-        Symbol* _symbol = store_list(
-            program,
-            NULL,
-            len,
-            is_dynamic
-        );
+        // Symbol* _symbol = store_list(
+        //     program,
+        //     NULL,
+        //     len,
+        //     is_dynamic
+        // );
 
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr + 1);
-
-        push_instr(program, LII);
-        push_instr(program, R2A);
-        push_instr(program, 1);
-
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_INT);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R2A);
-
-        push_instr(program, SBRK);
-        i64 break_point = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, JLZ);
-        i64 loop_start = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, SCONT);
-        i64 continue_point = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, LDI);
-        push_instr(program, R4A);
-        push_instr(program, addr + 2);
-
-        push_instr(program, MOV);
-        push_instr(program, R3A);
-        push_instr(program, R4A);
-
-        push_instr(program, SUB);
-        push_instr(program, R3A);
-        push_instr(program, R1A);
-
-        load_list(program, _symbol);
-
-        push_instr(program, LIND);
-        push_instr(program, R4A);
-        push_instr(program, R3A);
-
-        Symbol* el_symbol = store_any(
-            program,
-            decl->v.foreach_as_list->el->v.ident->name
-        );
+        // Symbol* el_symbol = store_any(
+        //     program,
+        //     decl->v.foreach_as_list->el->v.ident->name
+        // );
 
         compileStmt(program, decl->v.foreach_as_list->body);
-
-        push_instr(program, CONT);
-        program->arr[continue_point] = program->size - 1;
-
-        removeSymbol(el_symbol);
-
-        push_instr(program, LII);
-        push_instr(program, R3A);
-        push_instr(program, 0);
-
-        push_instr(program, LDI);
-        push_instr(program, R0A);
-        push_instr(program, addr++);
-
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr);
-
-        push_instr(program, DEC);
-        push_instr(program, R1A);
-
-        push_instr(program, STI);
-        push_instr(program, addr);
-        push_instr(program, R1A);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R3A);
-
-        push_instr(program, JGZ);
-        push_instr(program, loop_start);
-
-        program->arr[loop_start] = program->size - 1;
-
-        push_instr(program, BRK);
-        program->arr[break_point] = program->size - 1;
+        // removeSymbol(el_symbol);
         break;
     }
     case ForeachAsDict_kind: {
         compileExpr(program, decl->v.foreach_as_dict->x);
-
-        i64 addr = program->heap;
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R0A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
-
-        size_t len = 0;
-        bool is_dynamic = false;
+        // size_t len = 0;
+        // bool is_dynamic = false;
 
         switch (decl->v.foreach_as_dict->x->kind) {
         case CompositeLit_kind:
-            len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
+            // len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
             break;
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(decl->v.foreach_as_dict->x->v.ident->name);
             if (symbol_x->type != K_DICT && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_DICT, symbol_x->name);
-            is_dynamic = true;
+            // is_dynamic = true;
             break;
         }
         default:
             break;
         }
 
-        Symbol* _symbol = store_dict(
-            program,
-            NULL,
-            len,
-            is_dynamic
-        );
+        // Symbol* _symbol = store_dict(
+        //     program,
+        //     NULL,
+        //     len,
+        //     is_dynamic
+        // );
 
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr + 1);
+        // Symbol* key_symbol = store_any(
+        //     program,
+        //     decl->v.foreach_as_dict->key->v.ident->name
+        // );
 
-        push_instr(program, LII);
-        push_instr(program, R2A);
-        push_instr(program, 1);
-
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_INT);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R2A);
-
-        push_instr(program, SBRK);
-        i64 break_point = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, JLZ);
-        i64 loop_start = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, SCONT);
-        i64 continue_point = program->size;
-        push_instr(program, 0);
-
-        push_instr(program, LDI);
-        push_instr(program, R4A);
-        push_instr(program, addr + 2);
-
-        push_instr(program, MOV);
-        push_instr(program, R3A);
-        push_instr(program, R4A);
-
-        push_instr(program, SUB);
-        push_instr(program, R3A);
-        push_instr(program, R1A);
-
-        load_list(program, _symbol);
-
-        push_instr(program, DEC);
-        push_instr(program, R3A);
-
-        push_instr(program, LII);
-        push_instr(program, R4A);
-        push_instr(program, 0);
-
-        push_instr(program, CMP);
-        push_instr(program, R3A);
-        push_instr(program, R4A);
-
-        push_instr(program, JLZ);
-        push_instr(program, program->size + 10);
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, DPOP);
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, DPOP);
-
-        push_instr(program, DEC);
-        push_instr(program, R3A);
-
-        push_instr(program, JMP);
-        push_instr(program, program->size - 18);
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, POP);
-        push_instr(program, R1A);
-
-        Symbol* key_symbol = store_any(
-            program,
-            decl->v.foreach_as_dict->key->v.ident->name
-        );
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, POP);
-        push_instr(program, R1A);
-
-        Symbol* value_symbol = store_any(
-            program,
-            decl->v.foreach_as_dict->value->v.ident->name
-        );
+        // Symbol* value_symbol = store_any(
+        //     program,
+        //     decl->v.foreach_as_dict->value->v.ident->name
+        // );
 
         compileStmt(program, decl->v.foreach_as_dict->body);
 
-        push_instr(program, CONT);
-        program->arr[continue_point] = program->size - 1;
-
-        removeSymbol(key_symbol);
-        removeSymbol(value_symbol);
-
-        push_instr(program, LII);
-        push_instr(program, R3A);
-        push_instr(program, 0);
-
-        push_instr(program, LDI);
-        push_instr(program, R0A);
-        push_instr(program, addr++);
-
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr);
-
-        push_instr(program, DEC);
-        push_instr(program, R1A);
-
-        push_instr(program, STI);
-        push_instr(program, addr);
-        push_instr(program, R1A);
-
-        push_instr(program, CMP);
-        push_instr(program, R1A);
-        push_instr(program, R3A);
-
-        push_instr(program, JGZ);
-        push_instr(program, loop_start);
-
-        program->arr[loop_start] = program->size - 1;
-
-        push_instr(program, BRK);
-        program->arr[break_point] = program->size - 1;
+        // removeSymbol(key_symbol);
+        // removeSymbol(value_symbol);
         break;
     }
     case FuncDecl_kind: {
@@ -2271,10 +1070,6 @@ void compileDecl(i64_array* program, Decl* decl)
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
             compileSpec(program, decl->v.func_decl->decision);
-
-        push_instr(program, CALLX);
-
-        push_instr(program, JMPB);
 
         function_mode->is_compiled = true;
         endFunction();
@@ -2298,14 +1093,8 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
 
     switch (spec->kind) {
     case ListType_kind:
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_LIST);
         break;
     case DictType_kind:
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_DICT);
         break;
     case TypeSpec_kind:
         if (spec->v.type_spec->sub_type_spec != NULL)
@@ -2401,48 +1190,15 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         // Load the default value
         Expr* expr = spec->v.optional_field_spec->expr;
         enum ValueType value_type = compileExpr(program, expr) - 1;
-        i64 addr = parameter->addr;
-
-        push_instr(program, LII);
-        push_instr(program, R7A);
-        push_instr(program, program->heap);
-
-        push_instr(program, STI);
-        push_instr(program, addr++);
-        push_instr(program, R7A);
+        // i64 addr = parameter->addr;
 
         switch (type) {
         case K_BOOL:
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_BOOL);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1A);
             break;
         case K_NUMBER:
             if (value_type == V_FLOAT) {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_FLOAT);
             } else {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_INT);
             }
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R1A);
             break;
         case K_STRING: {
             size_t len = 0;
@@ -2465,36 +1221,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
                 break;
             }
 
-            push_instr(program, LII);
-            push_instr(program, R0A);
-            push_instr(program, V_STRING);
-
             if (is_dynamic) {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, addr - 1);
-                push_instr(program, R7A);
             } else {
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
-
                 for (size_t i = len; i > 0; i--) {
-                    push_instr(program, POP);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
                 }
             }
             break;
@@ -2502,44 +1231,11 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         case K_ANY: {
             switch (value_type) {
             case V_BOOL:
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_BOOL);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
                 break;
             case V_INT: {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_INT);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
                 break;
             }
             case V_FLOAT: {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_FLOAT);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
                 break;
             }
             case V_STRING: {
@@ -2566,36 +1262,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
                     break;
                 }
 
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_STRING);
-
                 if (is_dynamic) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr - 1);
-                    push_instr(program, R7A);
                 } else {
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
-
                     for (size_t i = len; i > 0; i--) {
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, STI);
-                        push_instr(program, program->heap++);
-                        push_instr(program, R0A);
                     }
                 }
                 break;
@@ -2616,39 +1285,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
                 }
 
                 if (is_dynamic) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr - 1);
-                    push_instr(program, R7A);
                 } else {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_LIST);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
-
                     program->heap += len;
                     for (size_t i = len; i > 0; i--) {
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, --program->heap);
-                        push_instr(program, R7A);
                     }
                     program->heap += len;
                 }
@@ -2670,49 +1309,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
                 }
 
                 if (is_dynamic) {
-                    push_instr(program, PUSH);
-                    push_instr(program, R1A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, addr - 1);
-                    push_instr(program, R7A);
                 } else {
-                    push_instr(program, LII);
-                    push_instr(program, R0A);
-                    push_instr(program, V_DICT);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R0A);
-
-                    push_instr(program, STI);
-                    push_instr(program, program->heap++);
-                    push_instr(program, R1A);
-
                     program->heap += len * 2;
                     for (size_t i = len; i > 0; i--) {
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, --program->heap);
-                        push_instr(program, R7A);
-
-                        push_instr(program, POP);
-                        push_instr(program, R0A);
-
-                        push_instr(program, DSTR);
-                        push_instr(program, R7A);
-
-                        push_instr(program, STI);
-                        push_instr(program, --program->heap);
-                        push_instr(program, R7A);
                     }
                     program->heap += len * 2;
                 }
@@ -2739,39 +1338,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
             }
 
             if (is_dynamic) {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, addr - 1);
-                push_instr(program, R7A);
             } else {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_LIST);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
-
                 program->heap += len;
                 for (size_t i = len; i > 0; i--) {
-                    push_instr(program, POP);
-                    push_instr(program, R0A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, --program->heap);
-                    push_instr(program, R7A);
                 }
                 program->heap += len;
             }
@@ -2793,49 +1362,9 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
             }
 
             if (is_dynamic) {
-                push_instr(program, PUSH);
-                push_instr(program, R1A);
-
-                push_instr(program, DSTR);
-                push_instr(program, R7A);
-
-                push_instr(program, STI);
-                push_instr(program, addr - 1);
-                push_instr(program, R7A);
             } else {
-                push_instr(program, LII);
-                push_instr(program, R0A);
-                push_instr(program, V_DICT);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R0A);
-
-                push_instr(program, STI);
-                push_instr(program, program->heap++);
-                push_instr(program, R1A);
-
                 program->heap += len * 2;
                 for (size_t i = len; i > 0; i--) {
-                    push_instr(program, POP);
-                    push_instr(program, R0A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, --program->heap);
-                    push_instr(program, R7A);
-
-                    push_instr(program, POP);
-                    push_instr(program, R0A);
-
-                    push_instr(program, DSTR);
-                    push_instr(program, R7A);
-
-                    push_instr(program, STI);
-                    push_instr(program, --program->heap);
-                    push_instr(program, R7A);
                 }
                 program->heap += len * 2;
             }
@@ -2871,16 +1400,12 @@ unsigned short compileSpec(i64_array* program, Spec* spec)
         break;
     }
     case DecisionBlock_kind: {
-        push_instr(program, SJMPB);
         i64 jump_back_point = program->size;
-        push_instr(program, 0);
 
         ExprList* expr_list = spec->v.decision_block->decisions;
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
             compileExpr(program, expr_list->exprs[i - 1]);
         }
-
-        push_instr(program, JMPB);
 
         program->arr[jump_back_point] = program->size - 1;
         break;
@@ -2939,11 +1464,8 @@ i64_array* initProgram()
 
 void shift_registers(i64_array* program, size_t shift)
 {
-    size_t len = NUM_REGISTERS / 2;
+    // size_t len = NUM_REGISTERS / 2;
     for (size_t i = 0; i < shift; i++) {
-        push_instr(program, MOV);
-        push_instr(program, i + len);
-        push_instr(program, i);
     }
 }
 
@@ -2956,19 +1478,8 @@ Symbol* store_bool(i64_array* program, char *name, bool is_any)
         symbol = addSymbol(name, K_ANY, value, V_BOOL);
     else {
         symbol = addSymbol(name, K_BOOL, value, V_BOOL);
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_BOOL);
     }
     symbol->addr = program->heap;
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R0A);
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R1A);
 
     return symbol;
 }
@@ -2982,19 +1493,8 @@ Symbol* store_int(i64_array* program, char *name, bool is_any)
         symbol = addSymbol(name, K_ANY, value, V_INT);
     else {
         symbol = addSymbol(name, K_NUMBER, value, V_INT);
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_INT);
     }
     symbol->addr = program->heap;
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R0A);
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R1A);
 
     return symbol;
 }
@@ -3008,19 +1508,8 @@ Symbol* store_float(i64_array* program, char *name, bool is_any)
         symbol = addSymbol(name, K_ANY, value, V_FLOAT);
     else {
         symbol = addSymbol(name, K_NUMBER, value, V_FLOAT);
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_FLOAT);
     }
     symbol->addr = program->heap;
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R0A);
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R1A);
 
     return symbol;
 }
@@ -3034,40 +1523,14 @@ Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bo
         symbol = addSymbol(name, K_ANY, value, V_STRING);
     else {
         symbol = addSymbol(name, K_STRING, value, V_STRING);
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_STRING);
     }
     symbol->addr = program->heap;
     symbol->len = len;
     symbol->is_dynamic = is_dynamic;
 
     if (is_dynamic) {
-        push_instr(program, PUSH);
-        push_instr(program, R1A);
-
-        push_instr(program, DSTR);
-        push_instr(program, R7A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R7A);
     } else {
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R0A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
         for (size_t i = len; i > 0; i--) {
-            push_instr(program, POP);
-            push_instr(program, R0A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R0A);
         }
     }
 
@@ -3085,38 +1548,8 @@ Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic)
     symbol->is_dynamic = is_dynamic;
 
     if (is_dynamic) {
-        push_instr(program, PUSH);
-        push_instr(program, R1A);
-
-        push_instr(program, DSTR);
-        push_instr(program, R7A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R7A);
     } else {
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_LIST);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R0A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
         for (size_t i = len; i > 0; i--) {
-            push_instr(program, POP);
-            push_instr(program, R0A);
-
-            push_instr(program, DSTR);
-            push_instr(program, R7A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R7A);
         }
     }
 
@@ -3134,48 +1567,8 @@ Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic)
     symbol->is_dynamic = is_dynamic;
 
     if (is_dynamic) {
-        push_instr(program, PUSH);
-        push_instr(program, R1A);
-
-        push_instr(program, DSTR);
-        push_instr(program, R7A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R7A);
     } else {
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_DICT);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R0A);
-
-        push_instr(program, STI);
-        push_instr(program, program->heap++);
-        push_instr(program, R1A);
-
         for (size_t i = len; i > 0; i--) {
-            push_instr(program, POP);
-            push_instr(program, R0A);
-
-            push_instr(program, DSTR);
-            push_instr(program, R7A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R7A);
-
-            push_instr(program, POP);
-            push_instr(program, R0A);
-
-            push_instr(program, DSTR);
-            push_instr(program, R7A);
-
-            push_instr(program, STI);
-            push_instr(program, program->heap++);
-            push_instr(program, R7A);
         }
     }
 
@@ -3190,56 +1583,22 @@ Symbol* store_any(i64_array* program, char *name)
     symbol->addr = program->heap;
     symbol->is_dynamic = true;
 
-    push_instr(program, PUSH);
-    push_instr(program, R1A);
-
-    push_instr(program, DSTR);
-    push_instr(program, R7A);
-
-    push_instr(program, STI);
-    push_instr(program, program->heap++);
-    push_instr(program, R7A);
-
     return symbol;
 }
 
 void load_bool(i64_array* program, Symbol* symbol)
 {
-    i64 addr = symbol->addr;
-
-    push_instr(program, LDI);
-    push_instr(program, R0A);
-    push_instr(program, addr++);
-
-    push_instr(program, LDI);
-    push_instr(program, R1A);
-    push_instr(program, addr++);
+    // i64 addr = symbol->addr;
 }
 
 void load_int(i64_array* program, Symbol* symbol)
 {
-    i64 addr = symbol->addr;
-
-    push_instr(program, LDI);
-    push_instr(program, R0A);
-    push_instr(program, addr++);
-
-    push_instr(program, LDI);
-    push_instr(program, R1A);
-    push_instr(program, addr++);
+    // i64 addr = symbol->addr;
 }
 
 void load_float(i64_array* program, Symbol* symbol)
 {
-    i64 addr = symbol->addr;
-
-    push_instr(program, LDI);
-    push_instr(program, R0A);
-    push_instr(program, addr++);
-
-    push_instr(program, LDI);
-    push_instr(program, R1A);
-    push_instr(program, addr++);
+    // i64 addr = symbol->addr;
 }
 
 void load_string(i64_array* program, Symbol* symbol)
@@ -3247,36 +1606,10 @@ void load_string(i64_array* program, Symbol* symbol)
     i64 addr = symbol->addr;
 
     if (symbol->is_dynamic) {
-        push_instr(program, LII);
-        push_instr(program, R7A);
-        push_instr(program, addr++);
-
-        push_instr(program, DLDR);
-        push_instr(program, R7A);
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, POP);
-        push_instr(program, R1A);
     } else {
-        push_instr(program, LDI);
-        push_instr(program, R0A);
-        push_instr(program, addr++);
-
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr++);
-
         size_t len = symbol->len;
         addr += len - 1;
         for (size_t i = len; i > 0; i--) {
-            push_instr(program, LDI);
-            push_instr(program, R2A);
-            push_instr(program, addr--);
-
-            push_instr(program, PUSH);
-            push_instr(program, R2A);
         }
     }
 }
@@ -3286,38 +1619,12 @@ void load_list(i64_array* program, Symbol* symbol)
     i64 addr = symbol->addr;
 
     if (symbol->is_dynamic) {
-        push_instr(program, LII);
-        push_instr(program, R7A);
-        push_instr(program, addr++);
-
-        push_instr(program, DLDR);
-        push_instr(program, R7A);
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, POP);
-        push_instr(program, R1A);
     } else {
         size_t len = symbol->len;
         addr += len + 1;
         for (size_t i = len; i > 0; i--) {
-            push_instr(program, LII);
-            push_instr(program, R7A);
-            push_instr(program, addr--);
-
-            push_instr(program, DLDR);
-            push_instr(program, R7A);
         }
         addr--;
-
-        push_instr(program, LDI);
-        push_instr(program, R0A);
-        push_instr(program, addr++);
-
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr++);
     }
 }
 
@@ -3326,64 +1633,18 @@ void load_dict(i64_array* program, Symbol* symbol)
     i64 addr = symbol->addr;
 
     if (symbol->is_dynamic) {
-        push_instr(program, LII);
-        push_instr(program, R7A);
-        push_instr(program, addr++);
-
-        push_instr(program, DLDR);
-        push_instr(program, R7A);
-
-        push_instr(program, POP);
-        push_instr(program, R0A);
-
-        push_instr(program, POP);
-        push_instr(program, R1A);
     } else {
         size_t len = symbol->len;
         addr += len * 2 - 1 + 2;
         for (size_t i = len; i > 0; i--) {
-            push_instr(program, LII);
-            push_instr(program, R7A);
-            push_instr(program, addr--);
-
-            push_instr(program, DLDR);
-            push_instr(program, R7A);
-
-            push_instr(program, LII);
-            push_instr(program, R7A);
-            push_instr(program, addr--);
-
-            push_instr(program, DLDR);
-            push_instr(program, R7A);
         }
         addr--;
-
-        push_instr(program, LDI);
-        push_instr(program, R0A);
-        push_instr(program, addr++);
-
-        push_instr(program, LDI);
-        push_instr(program, R1A);
-        push_instr(program, addr++);
     }
 }
 
 void load_any(i64_array* program, Symbol* symbol)
 {
-    i64 addr = symbol->addr;
-
-    push_instr(program, LII);
-    push_instr(program, R7A);
-    push_instr(program, addr);
-
-    push_instr(program, DLDR);
-    push_instr(program, R7A);
-
-    push_instr(program, POP);
-    push_instr(program, R0A);
-
-    push_instr(program, POP);
-    push_instr(program, R1A);
+    // i64 addr = symbol->addr;
 }
 
 char* compile_module_selector(Expr* module_selector)
@@ -3435,7 +1696,6 @@ bool declare_function(Stmt* stmt, File* file, i64_array* program)
             startFunctionScope(function_mode);
             function_mode->optional_parameters_addr = program->size - 1;
             compileSpec(program, decl->v.func_decl->type->v.func_type->params);
-            push_instr(program, JMPB);
             endFunction();
 
             return true;
@@ -3467,7 +1727,6 @@ bool declare_function(Stmt* stmt, File* file, i64_array* program)
     startFunctionScope(function_mode);
     function_mode->optional_parameters_addr = program->size - 1;
     compileSpec(program, decl->v.func_decl->type->v.func_type->params);
-    push_instr(program, JMPB);
 
     if (strcmp(file->module_path, file->context) != 0) {
         _Function* context_function = declareFunction(

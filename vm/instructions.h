@@ -24,26 +24,7 @@
 #define INSTRUCTIONS_H
 
 enum instr {
-    CLF,
-    CMP, CMPI,
-    MOV,
-    STI, LDI, STR, LDR,
-    LII,
-    PUSH, POP,
-    INC, DEC,
-    ADD, SUB, MUL, DIV, MOD,
-    JLZ, JGZ, JEZ, JNZ, JMP,
-    SHL, SHR,
-    BAND, BOR, BNOT, BXOR,
-    LAND, LOR, LNOT,
-    DLDR, DSTR, DPOP, DDEL,
-    PRNT, PPRNT,
-    LIND, KSRCH,
-    JMPB, SJMPB,
-    BRK, SBRK, CONT, SCONT,
-    CALL, CALLX, CALLEXT,
-    DEBUG,
-    HLT, EXIT, THRW,
+    HLT,
     NUM_INSTRUCTIONS
 };
 
