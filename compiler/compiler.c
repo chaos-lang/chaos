@@ -145,22 +145,22 @@ void compileStmt(i64_array* program, Stmt* stmt)
         else
             push_instr(program, PRNT);
 
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, '\n' - '0');
+        // push_instr(program, LII);
+        // push_instr(program, R0A);
+        // push_instr(program, '\n' - '0');
 
-        push_instr(program, PUSH);
-        push_instr(program, R0A);
+        // push_instr(program, PUSH);
+        // push_instr(program, R0A);
 
-        push_instr(program, LII);
-        push_instr(program, R0A);
-        push_instr(program, V_STRING);
+        // push_instr(program, LII);
+        // push_instr(program, R0A);
+        // push_instr(program, V_STRING);
 
-        push_instr(program, LII);
-        push_instr(program, R1A);
-        push_instr(program, 1);
+        // push_instr(program, LII);
+        // push_instr(program, R1A);
+        // push_instr(program, 1);
 
-        push_instr(program, PRNT);
+        // push_instr(program, PRNT);
         break;
     case ExprStmt_kind:
         compileExpr(program, stmt->v.expr_stmt->x);

@@ -22,6 +22,10 @@
 
 #include "cpu.h"
 
+static jit_state_t *_jit;
+
+typedef int (*pifi)(int);
+
 char *reg_names[] = {
     "R0A", "R1A", "R2A", "R3A", "R4A", "R5A", "R6A", "R7A",
     "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
@@ -69,10 +73,22 @@ void free_cpu(cpu *c)
 
 void run_cpu(cpu *c)
 {
+    // jit_node_t  *in;
+    pifi         incr;
+
+    init_jit(0);
+    _jit = jit_new_state();
+    jit_prolog();
+
     do {
         fetch(c);
         execute(c);
     } while (c->inst != HLT);
+
+    jit_retr(JIT_R0);
+    incr = jit_emit();
+    jit_clear_state();
+    printf("%d\n", incr(0));
 }
 
 void eat_until_hlt(cpu *c)
@@ -106,452 +122,143 @@ void execute(cpu *c)
 
     switch (c->inst) {
     case CLF:
-        clear_flags(c);
         break;
     case CMP:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            fset_flags(c, f1, f2);
-        } else {
-            set_flags(c, c->r[c->dest], c->r[c->src]);
-        }
         c->pc += 2;
         break;
     case CMPI:
-        set_flags(c, c->r[c->dest], c->src);
         c->pc += 2;
         break;
     case MOV:
-        c->r[c->dest] = c->r[c->src];
         c->pc += 2;
         break;
     case STI:
-        cpu_store(c, c->dest, c->r[c->src]);
         c->pc += 2;
         break;
     case STR:
-        cpu_store(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
         break;
     case LDI:
-        c->r[c->dest] = c->mem[c->src];
         c->pc += 2;
         break;
     case LDR:
-        c->r[c->dest] = c->mem[c->r[c->src]];
         c->pc += 2;
         break;
     case LII:
-        c->r[c->dest] = c->src;
+        jit_movi(JIT_R0, c->src);
         c->pc += 2;
         break;
     case PUSH:
-        c->stack[--c->sp] = c->r[c->program[++c->pc]];
         break;
     case POP:
-        if (c->sp + 1 > USHRT_MAX * 2 - 1) {
-            eat_until_hlt(c);
-            throw_error(E_STACK_OVERFLOW);
-        }
-        c->r[c->program[++c->pc]] = c->stack[c->sp++];
         break;
     case INC:
-        c->r[c->dest]++;
         c->pc++;
         break;
     case DEC:
-        c->r[c->dest]--;
         c->pc++;
         break;
     case ADD:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 + f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] += c->r[c->src];
-        }
         c->pc += 2;
         break;
     case SUB:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 - f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] -= c->r[c->src];
-        }
         c->pc += 2;
         break;
     case MUL:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 * f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] *= c->r[c->src];
-        }
         c->pc += 2;
         break;
     case DIV:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 / f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] /= c->r[c->src];
-        }
         c->pc += 2;
         break;
     case MOD:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = fmodl(f1, f2);
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] %= c->r[c->src];
-        }
         c->pc += 2;
         break;
     case JLZ:
-        if (c->ltz) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
         break;
     case JGZ:
-        if (c->gtz) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
         break;
     case JEZ:
-        if (c->zero) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
         break;
     case JNZ:
-        if (!c->zero) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
         break;
     case JMP:
-        ++(c->pc);
-        c->pc = c->program[c->pc];
         break;
     case JMPB:
-        c->pc = c->jmpb[--c->jmpbp];
         break;
     case SJMPB:
-        c->jmpb[c->jmpbp++] = c->dest;
         c->pc++;
         break;
     case BRK:
-        c->pc = c->brk[--c->brkp];
         break;
     case SBRK:
-        c->brk[c->brkp++] = c->dest;
         c->pc++;
         break;
     case CONT:
-        c->pc = c->cont[--c->contp];
         break;
     case SCONT:
-        c->cont[c->contp++] = c->dest;
         c->pc++;
         break;
-    case CALL: {
-        i64 *new_mem = (i64*)malloc(c->heap_size * sizeof(i64));
-        c->mems[c->memp++] = c->mem;
-        memcpy(new_mem, c->mem, c->heap_size * sizeof(i64));
-        c->mem = new_mem;
-        c->mems[c->memp++] = c->mem;
-
-        ast_stack_p++;
+    case CALL:
         break;
-    }
-    case CALLX: {
-        --c->memp;
-        c->mem = c->mems[--c->memp];
-        free(c->mems[c->memp + 1]);
-
-        ast_stack_p--;
+    case CALLX:
         break;
-    }
-    case CALLEXT: {
-        _Function* function = (void *)c->dest;
-        callFunctionFromDynamicLibrary(function, c);
+    case CALLEXT:
         c->pc++;
         break;
-    }
     case SHL:
-        c->r[c->dest] <<= c->r[c->src];
         c->pc += 2;
         break;
     case SHR:
-        c->r[c->dest] >>= c->r[c->src];
         c->pc += 2;
         break;
     case BAND:
-        c->r[c->dest] &= c->r[c->src];
         c->pc += 2;
         break;
     case BOR:
-        c->r[c->dest] |= c->r[c->src];
         c->pc += 2;
         break;
     case BNOT:
-        c->r[c->dest] = ~c->r[c->dest];
         c->pc++;
         break;
     case BXOR:
-        c->r[c->dest] ^= c->r[c->src];
         c->pc += 2;
         break;
     case LAND:
-        c->r[c->dest] = c->r[c->dest] && c->r[c->src];
         c->pc += 2;
         break;
     case LOR:
-        c->r[c->dest] = c->r[c->dest] || c->r[c->src];
         c->pc += 2;
         break;
     case LNOT:
-        c->r[c->dest] = !c->r[c->dest];
         c->pc++;
         break;
-    case DLDR: {
-        i64 addr = c->mem[c->r[c->dest]];
-        c->r[R0A] = c->mem[addr++];
-        cpu_load_dynamic(c, addr);
+    case DLDR:
         c->pc++;
         break;
-    }
     case DSTR:
-        c->r[c->dest] = c->heap;
-        cpu_store_dynamic(c);
         c->pc++;
         break;
     case DPOP:
-        cpu_pop_dynamic(c);
         break;
-    case DDEL: {
-        i64 addr = c->r[c->dest];
-        enum ValueType value_type = c->mem[addr];
-        addr++;
-        i64 index = c->r[c->src];
-        i64 len = c->mem[addr++];
-        cpu_store(c, addr - 1, len - 1);
-        if (index < 0)
-            index = len + index;
-
-        if (value_type == V_STRING || value_type == V_LIST) {
-            for (i64 i = 0; i < len; i++) {
-                if (i < index) {
-                    addr++;
-                    continue;
-                }
-                cpu_store(c, addr, c->mem[addr + 1]);
-                addr++;
-            }
-        } else if (value_type == V_DICT) {
-            char *key = build_string(c, c->r[R1A]);
-            i64 shift_index = 0;
-            i64 _addr = addr;
-            for (size_t i = 0; i < len; i++) {
-                addr = c->mem[_addr + 2 * i + 1];
-                char *dict_key = build_string_from_addr(c, addr);
-
-                if (strcmp(dict_key, key) == 0) {
-                    shift_index = i;
-                    break;
-                }
-                free(dict_key);
-            }
-            free(key);
-
-            for (i64 i = shift_index; i < (len - 1); i++) {
-                cpu_store(c, _addr + 2 * i + 1, c->mem[_addr + 2 * (i + 1) + 1]);
-                cpu_store(c, _addr + 2 * i, c->mem[_addr + 2 * (i + 1)]);
-            }
-        }
+    case DDEL:
         c->pc += 2;
         break;
-    }
     case PRNT:
-        switch (c->r[R0A]) {
-        case V_BOOL:
-            print_bool(c);
-            break;
-        case V_INT:
-            print_int(c);
-            break;
-        case V_FLOAT:
-            print_float(c);
-            break;
-        case V_STRING:
-            print_string(c, false);
-            break;
-        case V_LIST:
-            print_list(c, false, 0);
-            break;
-        case V_DICT:
-            print_dict(c, false, 0);
-            break;
-        default:
-            break;
-        }
         break;
     case PPRNT:
-        switch (c->r[R0A]) {
-        case V_BOOL:
-            print_bool(c);
-            break;
-        case V_INT:
-            print_int(c);
-            break;
-        case V_FLOAT:
-            print_float(c);
-            break;
-        case V_STRING:
-            print_string(c, false);
-            break;
-        case V_LIST:
-            print_list(c, true, 0);
-            break;
-        case V_DICT:
-            print_dict(c, true, 0);
-            break;
-        default:
-            break;
-        }
         break;
     case LIND:
-        cpu_list_index_access(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
         break;
     case KSRCH:
-        cpu_dict_key_search(c, c->r[c->dest], c->r[c->src]);
         c->pc += 2;
         break;
     case EXIT:
-        if (is_interactive)
-            print_bye_bye();
-        exit(c->r[R1A]);
         break;
     case THRW:
-        c->pc += 2;
-        if (c->gtz) {
-            i64 err_code = c->dest;
-            i64 i = c->r[c->src];
-            if (is_interactive) {
-                eat_until_hlt(c);
-            }
-            throw_error(err_code, NULL, NULL, i);
-        }
+        c->pc++;
         break;
     case DEBUG:
-        debug(c, pc_start);
         break;
     default:
         break;

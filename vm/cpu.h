@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <lightning.h>
 
 #include "types.h"
 #include "instructions.h"
