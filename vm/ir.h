@@ -25,8 +25,12 @@
 
 #include "types.h"
 
+typedef struct AST AST;
+
 enum IROpCode {
+    PROLOG,
     MOVI,
+    PRINT_I,
     HLT,
     NUM_INSTRUCTIONS
 };
@@ -47,7 +51,7 @@ typedef struct KaosInst {
     KaosOp* op1;
     KaosOp* op2;
     KaosOp* op3;
-    void* ast_ref;
+    AST* ast;
 } KaosInst;
 
 enum IRType { IR_REG, IR_VAL };

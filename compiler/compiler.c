@@ -31,7 +31,7 @@ extern bool interactively_importing;
 
 File* import_parent_context = NULL;
 
-i64 ast_ref = 0;
+AST* ast_ref = 0;
 
 KaosIR* compile(ASTRoot* ast_root)
 {
@@ -51,6 +51,7 @@ KaosIR* compile(ASTRoot* ast_root)
     current_file_index = 0;
 
     // Compile other statements in the first parsed file
+    push_inst_(program, PROLOG);
     for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
         Stmt* stmt = stmt_list->stmts[j - 1];
         if (
@@ -126,7 +127,7 @@ void compileStmtList(KaosIR* program, StmtList* stmt_list)
 
 void compileStmt(KaosIR* program, Stmt* stmt)
 {
-    ast_ref = (i64)(void *)stmt->ast;
+    ast_ref = stmt->ast;
 
     switch (stmt->kind) {
     case EchoStmt_kind:
@@ -140,6 +141,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind) {
         } else {
         }
+        push_inst_(program, PRINT_I);
         break;
     case ExprStmt_kind:
         compileExpr(program, stmt->v.expr_stmt->x);
@@ -346,7 +348,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
 
 unsigned short compileExpr(KaosIR* program, Expr* expr)
 {
-    ast_ref = (i64)(void *)expr->ast;
+    ast_ref = expr->ast;
 
     switch (expr->kind) {
     case BasicLit_kind:
@@ -354,7 +356,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case V_BOOL:
             break;
         case V_INT:
-            push_inst_r_i(program, MOVI, R0, expr->v.basic_lit->value.i);
+            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
             break;
@@ -778,7 +780,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
 
 void compileDecl(KaosIR* program, Decl* decl)
 {
-    ast_ref = (i64)(void *)decl->ast;
+    ast_ref = decl->ast;
 
     switch (decl->kind) {
     case VarDecl_kind: {
@@ -1089,7 +1091,7 @@ void compileSpecList(KaosIR* program, SpecList* spec_list)
 
 unsigned short compileSpec(KaosIR* program, Spec* spec)
 {
-    ast_ref = (i64)(void *)spec->ast;
+    ast_ref = spec->ast;
 
     switch (spec->kind) {
     case ListType_kind:
@@ -1420,6 +1422,7 @@ void push_inst_(KaosIR* program, enum IROpCode op_code)
 {
     KaosInst* inst = malloc(sizeof *inst);
     inst->op_code = op_code;
+    inst->ast = ast_ref;
 
     pushProgram(program, inst);
 }
@@ -1440,6 +1443,7 @@ void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
     inst->op_code = op_code;
     inst->op1 = op1;
     inst->op2 = op2;
+    inst->ast = ast_ref;
 
     pushProgram(program, inst);
 }

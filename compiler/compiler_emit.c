@@ -56,27 +56,47 @@ void emitBytecode(cpu *c)
     sprintf(str_pc, "%lld", c->ic);
 
 	switch (c->inst->op_code) {
+    case PROLOG:
+        sprintf(str_inst, "%s", "PROLOG");
+        break;
+    case MOVI:
+        sprintf(str_inst, "%s R(%d) %lld", "MOVI", c->inst->op1->reg, c->inst->op2->value.i);
+        break;
+    case PRINT_I:
+        sprintf(str_inst, "%s", "PRINT_I");
+        break;
     case HLT:
         sprintf(str_inst, "%s", "HLT");
+        break;
+    default:
+        break;
 	}
 
     FILE* fp_module = NULL;
-    AST* current_ast = (void *)ast_stack[ast_stack_p];
-    if (current_ast->file->is_interactive) {
-        fseek(tmp_stdin, 0, SEEK_SET);
-        fp_module = tmp_stdin;
-    } else {
-        fp_module = fopen(current_ast->file->module_path, "r");
+    AST* current_ast = c->inst->ast;
+    char* line = NULL;
+    char* module_path = NULL;
+    int lineno = 0;
+    if (current_ast != NULL) {
+        if (current_ast->file->is_interactive) {
+            fseek(tmp_stdin, 0, SEEK_SET);
+            fp_module = tmp_stdin;
+        } else {
+            fp_module = fopen(current_ast->file->module_path, "r");
+        }
+        line = get_nth_line(fp_module, current_ast->lineno);
+        line[strlen(line) - 1] = '\0';
+        module_path = current_ast->file->module_path;
+        lineno = current_ast->lineno;
     }
-    char* line = get_nth_line(fp_module, current_ast->lineno);
-    line[strlen(line) - 1] = '\0';
+
     printf(
         "%-40s %-40s %-40s %-80s %-40d\n",
         str_pc,
         str_inst,
         line,
-        current_ast->file->module_path,
-        current_ast->lineno
+        module_path,
+        lineno
     );
     if (fp_module != tmp_stdin)
         fclose(fp_module);

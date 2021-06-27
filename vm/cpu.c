@@ -22,8 +22,9 @@
 
 #include "../myjit/myjit/jitlib.h"
 
-typedef long (*plfl)(long);
+typedef long (*plfv)();
 struct jit *_jit;
+plfv _main;
 
 #include "cpu.h"
 
@@ -48,20 +49,14 @@ cpu *new_cpu(KaosIR* program, unsigned short debug_level)
 void free_cpu(cpu *c)
 {
     free(c);
-    // free(ast_stack);
-    // ast_stack = NULL;
-    // ast_stack_p = 0;
 }
 
 void run_cpu(cpu *c)
 {
     _jit = jit_init();
 
-	plfl foo;
-
-    jit_prolog(_jit, &foo);
-    jit_declare_arg(_jit, JIT_SIGNED_NUM, sizeof(long));
-    jit_getarg(_jit, R(0), 0);
+    // jit_declare_arg(_jit, JIT_SIGNED_NUM, sizeof(long));
+    // jit_getarg(_jit, R(0), 0);
 
     do {
         fetch(c);
@@ -70,8 +65,7 @@ void run_cpu(cpu *c)
 
     jit_retr(_jit, R(0));
     jit_generate_code(_jit);
-
-    printf("%li\n", foo(0));
+    _main();
 }
 
 void eat_until_hlt(cpu *c)
@@ -90,9 +84,22 @@ void execute(cpu *c)
     // i64 ic_start = c->ic;
 
     switch (c->inst->op_code) {
+    case PROLOG:
+        jit_prolog(_jit, &_main);
+        break;
     case MOVI:
         jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
         break;
+    case PRINT_I: {
+        static char *str = "%i\n";
+        jit_movi(_jit, R(0), str);
+        jit_movi(_jit, R(2), printf);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(0));
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        break;
+    }
     default:
         break;
     }
