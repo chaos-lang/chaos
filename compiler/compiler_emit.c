@@ -62,6 +62,18 @@ void emitBytecode(cpu *c)
     case MOVI:
         sprintf(str_inst, "%s R(%d) %lld", "MOVI", c->inst->op1->reg, c->inst->op2->value.i);
         break;
+    case ALLOCAI:
+        sprintf(str_inst, "%s stack: %lld space: %lld", "ALLOCAI", c->inst->op1->value.i, c->inst->op2->value.i);
+        break;
+    case REF_ALLOCAI:
+        sprintf(str_inst, "%s R(%d) stack: %lld", "REF_ALLOCAI", c->inst->op1->reg, c->inst->op2->value.i);
+        break;
+    case STR:
+        sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "STR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    case LDR:
+        sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "LDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
     case PRINT_I:
         sprintf(str_inst, "%s", "PRINT_I");
         break;
@@ -85,9 +97,11 @@ void emitBytecode(cpu *c)
             fp_module = fopen(current_ast->file->module_path, "r");
         }
         line = get_nth_line(fp_module, current_ast->lineno);
-        line[strlen(line) - 1] = '\0';
-        module_path = current_ast->file->module_path;
-        lineno = current_ast->lineno;
+        if (line != NULL) {
+            line[strlen(line) - 1] = '\0';
+            module_path = current_ast->file->module_path;
+            lineno = current_ast->lineno;
+        }
     }
 
     printf(

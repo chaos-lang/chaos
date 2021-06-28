@@ -32,6 +32,8 @@ extern bool interactively_importing;
 File* import_parent_context = NULL;
 
 AST* ast_ref = 0;
+i64 label_counter = 0;
+int stack_counter = 0;
 
 KaosIR* compile(ASTRoot* ast_root)
 {
@@ -784,199 +786,21 @@ void compileDecl(KaosIR* program, Decl* decl)
 
     switch (decl->kind) {
     case VarDecl_kind: {
-        enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
-        enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
-        enum Type secondary_type = K_ANY;
-        if (decl->v.var_decl->type_spec->v.type_spec->sub_type_spec != NULL)
-            secondary_type = decl->v.var_decl->type_spec->v.type_spec->type;
+        compileExpr(program, decl->v.var_decl->expr);
+        // enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
+        // enum Type secondary_type = K_ANY;
+        // if (decl->v.var_decl->type_spec->v.type_spec->sub_type_spec != NULL)
+        //     secondary_type = decl->v.var_decl->type_spec->v.type_spec->type;
         Symbol* symbol = NULL;
 
-        switch (type) {
-        case K_BOOL:
-            symbol = store_bool(
+        if (decl->v.var_decl->expr->kind == BasicLit_kind) {
+            symbol = store_int(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
                 false
             );
-            break;
-        case K_NUMBER:
-            if (value_type == V_FLOAT) {
-                symbol = store_float(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name,
-                    false
-                );
-            } else {
-                symbol = store_int(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name,
-                    false
-                );
-            }
-            break;
-        case K_STRING: {
-            size_t len = 0;
-            bool is_dynamic = false;
-
-            switch (decl->v.var_decl->expr->kind) {
-            case BasicLit_kind:
-                len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
-                break;
-            case BinaryExpr_kind:
-                is_dynamic = true;
-                break;
-            case IndexExpr_kind:
-                len = 1;
-                break;
-            case Ident_kind:
-                is_dynamic = true;
-                break;
-            default:
-                break;
-            }
-
-            symbol = store_string(
-                program,
-                decl->v.var_decl->ident->v.ident->name,
-                len,
-                false,
-                is_dynamic
-            );
-            break;
         }
-        case K_ANY: {
-            switch (value_type) {
-            case V_BOOL:
-                symbol = store_bool(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name,
-                    true
-                );
-                break;
-            case V_INT: {
-                symbol = store_int(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name,
-                    true
-                );
-                break;
-            }
-            case V_FLOAT: {
-                symbol = store_float(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name,
-                    true
-                );
-                break;
-            }
-            case V_STRING: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (decl->v.var_decl->expr->kind) {
-                case BasicLit_kind:
-                    len = strlen(decl->v.var_decl->expr->v.basic_lit->value.s);
-                    break;
-                case BinaryExpr_kind:
-                    len =
-                        strlen(decl->v.var_decl->expr->v.binary_expr->x->v.basic_lit->value.s)
-                        +
-                        strlen(decl->v.var_decl->expr->v.binary_expr->y->v.basic_lit->value.s);
-                    break;
-                case IndexExpr_kind:
-                    len = 1;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                symbol = store_string(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name,
-                    len,
-                    true,
-                    is_dynamic
-                );
-                break;
-            }
-            case V_LIST:
-                symbol = store_any(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name
-                );
-                break;
-            case V_DICT:
-                symbol = store_any(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name
-                );
-                break;
-            case V_REF:
-                symbol = store_any(
-                    program,
-                    decl->v.var_decl->ident->v.ident->name
-                );
-                break;
-            default:
-                break;
-            }
-            break;
-        }
-        case K_LIST: {
-            size_t len = 0;
-            bool is_dynamic = false;
-
-            switch (decl->v.var_decl->expr->kind) {
-            case CompositeLit_kind:
-                len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
-                break;
-            case Ident_kind:
-                is_dynamic = true;
-                break;
-            default:
-                break;
-            }
-
-            symbol = store_list(
-                program,
-                decl->v.var_decl->ident->v.ident->name,
-                len,
-                is_dynamic
-            );
-            break;
-        }
-        case K_DICT: {
-            size_t len = 0;
-            bool is_dynamic = false;
-
-            switch (decl->v.var_decl->expr->kind) {
-            case CompositeLit_kind:
-                len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
-                break;
-            case Ident_kind:
-                is_dynamic = true;
-                break;
-            default:
-                break;
-            }
-
-            symbol = store_dict(
-                program,
-                decl->v.var_decl->ident->v.ident->name,
-                len,
-                is_dynamic
-            );
-            break;
-        }
-        default:
-            break;
-        }
-
-        symbol->secondary_type = secondary_type;
-        break;
+        symbol->addr = label_counter++;
     }
     case TimesDo_kind: {
         compileExpr(program, decl->v.times_do->x);
@@ -1427,6 +1251,45 @@ void push_inst_(KaosIR* program, enum IROpCode op_code)
     pushProgram(program, inst);
 }
 
+void push_inst_i(KaosIR* program, enum IROpCode op_code, i64 i)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_VAL;
+    union IRValue value1;
+    value1.i = i;
+    op1->value = value1;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_i_i(KaosIR* program, enum IROpCode op_code, i64 i1, i64 i2)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_VAL;
+    union IRValue value1;
+    value1.i = i1;
+    op1->value = value1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_VAL;
+    union IRValue value2;
+    value2.i = i2;
+    op2->value = value2;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
 void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i)
 {
     KaosOp* op1 = malloc(sizeof *op1);
@@ -1443,6 +1306,32 @@ void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
     inst->op_code = op_code;
     inst->op1 = op1;
     inst->op2 = op2;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_REG;
+    op2->reg = reg2;
+
+    KaosOp* op3 = malloc(sizeof *op3);
+    op3->type = IR_VAL;
+    union IRValue value3;
+    value3.i = i;
+    op3->value = value3;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->op3 = op3;
     inst->ast = ast_ref;
 
     pushProgram(program, inst);
@@ -1512,7 +1401,10 @@ Symbol* store_int(KaosIR* program, char *name, bool is_any)
     else {
         symbol = addSymbol(name, K_NUMBER, value, V_INT);
     }
-    // symbol->addr = program->heap;
+    symbol->addr = stack_counter++;
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 1);
+    push_inst_r_i(program, REF_ALLOCAI, 0, symbol->addr);
+    push_inst_r_r_i(program, STR, 0, 1, 1);
 
     return symbol;
 }
@@ -1611,7 +1503,9 @@ void load_bool(KaosIR* program, Symbol* symbol)
 
 void load_int(KaosIR* program, Symbol* symbol)
 {
-    // i64 addr = symbol->addr;
+    i64 addr = symbol->addr;
+    push_inst_r_i(program, REF_ALLOCAI, 0, addr);
+    push_inst_r_r_i(program, LDR, 1, 0, 1);
 }
 
 void load_float(KaosIR* program, Symbol* symbol)

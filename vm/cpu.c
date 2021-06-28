@@ -20,13 +20,14 @@
  * Authors: M. Mert Yildiran <me@mertyildiran.com>
  */
 
-#include "../myjit/myjit/jitlib.h"
+#include "cpu.h"
 
 typedef long (*plfv)();
 struct jit *_jit;
 plfv _main;
+jit_op *skip_data;
 
-#include "cpu.h"
+jit_label_array* label_array = NULL;
 
 char *reg_names[] = {
     "R0", "R1", "R2",  "R3",  "R4",  "R5",  "R6",  "R7",
@@ -42,7 +43,9 @@ cpu *new_cpu(KaosIR* program, unsigned short debug_level)
     c->program = program;
     c->ic = 0;
 
-    ast_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
+    c->stack = (int*)malloc(USHRT_MAX * 256 * sizeof(int));
+
+    // ast_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     return c;
 }
 
@@ -53,6 +56,7 @@ void free_cpu(cpu *c)
 
 void run_cpu(cpu *c)
 {
+    label_array = init_label_array();
     _jit = jit_init();
 
     // jit_declare_arg(_jit, JIT_SIGNED_NUM, sizeof(long));
@@ -90,7 +94,22 @@ void execute(cpu *c)
     case MOVI:
         jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
         break;
+    case ALLOCAI: {
+        int i = jit_allocai(_jit, c->inst->op2->value.i);
+        c->stack[c->inst->op1->value.i] = i;
+        break;
+    }
+    case REF_ALLOCAI:
+        jit_addi(_jit, R(c->inst->op1->reg), R_FP, c->stack[c->inst->op2->value.i]);
+        break;
+    case STR:
+        jit_str(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case LDR:
+        jit_ldr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
     case PRINT_I: {
+        // Prints the value in R(1)
         static char *str = "%i\n";
         jit_movi(_jit, R(0), str);
         jit_movi(_jit, R(2), printf);
@@ -103,4 +122,28 @@ void execute(cpu *c)
     default:
         break;
     }
+}
+
+jit_label_array* init_label_array()
+{
+    jit_label_array* label_array = malloc(sizeof *label_array);
+    label_array->capacity = 0;
+    label_array->arr = NULL;
+    label_array->size = 0;
+    return label_array;
+}
+
+void push_label(jit_label_array* label_array, jit_label* label)
+{
+    if (label_array->capacity == 0) {
+        label_array->arr = (jit_label**)malloc((++label_array->capacity) * sizeof(jit_label*));
+    } else {
+        label_array->arr = (jit_label**)realloc(label_array->arr, (++label_array->capacity) * sizeof(jit_label*));
+    }
+    label_array->arr[label_array->size++] = label;
+}
+
+jit_label* get_label(jit_label_array* label_array, i64 i)
+{
+    return label_array->arr[i];
 }

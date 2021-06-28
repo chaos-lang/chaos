@@ -38,6 +38,9 @@ typedef struct {
     // instruction counter
     i64 ic;
 
+    // stack
+    int* stack;
+
     // current instruction
     KaosInst* inst;
 

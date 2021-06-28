@@ -33,8 +33,17 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
+#include "../myjit/myjit/jitlib.h"
+
 i64* ast_stack;
 i64 ast_stack_p;
+
+typedef struct jit_label_array {
+    jit_label** arr;
+    i64 capacity;
+    i64 size;
+    i64 hlt_count;
+} jit_label_array;
 
 cpu *new_cpu(KaosIR* program, unsigned short debug_level);
 void free_cpu(cpu *c);
@@ -42,5 +51,9 @@ void run_cpu(cpu *c);
 void eat_until_hlt(cpu *c);
 void fetch(cpu *c);
 void execute(cpu *c);
+
+jit_label_array* init_label_array();
+void push_label(jit_label_array* label_array, jit_label* label);
+jit_label* get_label(jit_label_array* label_array, i64 i);
 
 #endif

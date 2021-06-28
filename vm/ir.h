@@ -30,6 +30,10 @@ typedef struct AST AST;
 enum IROpCode {
     PROLOG,
     MOVI,
+    ALLOCAI,
+    REF_ALLOCAI,
+    LDR,
+    STR,
     PRINT_I,
     HLT,
     NUM_INSTRUCTIONS
