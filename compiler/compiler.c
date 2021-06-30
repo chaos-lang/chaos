@@ -173,6 +173,8 @@ void compileStmt(KaosIR* program, Stmt* stmt)
 
             switch (symbol_x->value_type) {
             case V_BOOL:
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
                 break;
             case V_INT:
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
@@ -360,6 +362,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
+            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
             push_inst_r_i(program, MOVI, R0, V_INT);
@@ -804,6 +808,11 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         switch (type) {
         case K_BOOL:
+            store_bool(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                false
+            );
             break;
         case K_NUMBER:
             if (value_type == V_FLOAT) {
@@ -1569,7 +1578,12 @@ Symbol* store_bool(KaosIR* program, char *name, bool is_any)
     else {
         symbol = addSymbol(name, K_BOOL, value, V_BOOL);
     }
-    // symbol->addr = program->heap;
+    symbol->addr = stack_counter++;
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
+    push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
     return symbol;
 }
@@ -1688,7 +1702,11 @@ Symbol* store_any(KaosIR* program, char *name)
 
 void load_bool(KaosIR* program, Symbol* symbol)
 {
-    // i64 addr = symbol->addr;
+    i64 addr = symbol->addr;
+    push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+    push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
 }
 
 void load_int(KaosIR* program, Symbol* symbol)

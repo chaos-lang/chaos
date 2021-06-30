@@ -189,12 +189,13 @@ void cpu_print(i64 r0, i64 r1, f64 fr1)
 {
     switch (r0) {
     case V_BOOL:
+        cpu_print_bool(r1);
         break;
     case V_INT:
-        printf("%lld\n", r1);
+        cpu_print_int(r1);
         break;
     case V_FLOAT:
-        printf("%lg\n", fr1);
+        cpu_print_float(fr1);
         break;
     case V_STRING:
         break;
@@ -205,6 +206,21 @@ void cpu_print(i64 r0, i64 r1, f64 fr1)
     default:
         break;
     }
+}
+
+void cpu_print_bool(i64 i)
+{
+    printf("%s\n", i ? "true" : "false");
+}
+
+void cpu_print_int(i64 i)
+{
+    printf("%lld\n", i);
+}
+
+void cpu_print_float(f64 f)
+{
+    printf("%lg\n", f);
 }
 
 void debug(struct jit *jit)
