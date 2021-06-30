@@ -153,7 +153,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         break;
     case AssignStmt_kind: {
         compileExpr(program, stmt->v.assign_stmt->x);
-        shift_registers(program, 8);
+        shift_registers(program, 4);
         compileExpr(program, stmt->v.assign_stmt->y);
         switch (stmt->v.assign_stmt->x->kind) {
         case Ident_kind: {
@@ -175,9 +175,12 @@ void compileStmt(KaosIR* program, Stmt* stmt)
             case V_BOOL:
                 break;
             case V_INT:
-                // push_inst_r_r_i(program, STR, 0, 1, 1);
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
                 break;
             case V_FLOAT:
+                push_inst_r_i(program, MOVI, R3, sizeof(double));
+                push_inst_r_r_r_i(program, FSTXR, R2, R3, R1, sizeof(double));
                 break;
             case V_STRING: {
                 size_t len = symbol_x->len;
@@ -404,7 +407,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     }
     case BinaryExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
-        shift_registers(program, 8);
+        shift_registers(program, 4);
         // i64 addr = program->heap;
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
         }
@@ -415,6 +418,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case ADD_tok:
             break;
         case SUB_tok:
+            push_inst_r_r_r(program, SUBR, R1, R1, R4);
             break;
         case MUL_tok:
             break;
@@ -460,6 +464,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case ADD_tok:
             break;
         case SUB_tok:
+            push_inst_r_r_i(program, MULI, R1, R1, -1);
             break;
         case NOT_tok:
             break;
@@ -476,7 +481,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         break;
     case IndexExpr_kind: {
         enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
-        shift_registers(program, 8);
+        shift_registers(program, 4);
 
         enum ValueType type2 = compileExpr(program, expr->v.index_expr->index) - 1;
         if (type1 == V_STRING) {
@@ -1358,6 +1363,25 @@ void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
     pushProgram(program, inst);
 }
 
+void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_REG;
+    op2->reg = reg2;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
 void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i)
 {
     KaosOp* op1 = malloc(sizeof *op1);
@@ -1399,6 +1423,30 @@ void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
     union IRValue value3;
     value3.f = f;
     op3->value = value3;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->op3 = op3;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_REG;
+    op2->reg = reg2;
+
+    KaosOp* op3 = malloc(sizeof *op3);
+    op3->type = IR_REG;
+    op3->reg = reg3;
 
     KaosInst* inst = malloc(sizeof *inst);
     inst->op_code = op_code;
@@ -1506,8 +1554,8 @@ KaosIR* initProgram()
 
 void shift_registers(KaosIR* program, size_t shift)
 {
-    // size_t len = NUM_REGISTERS / 2;
     for (size_t i = 0; i < shift; i++) {
+        push_inst_r_r(program, MOVR, shift + i, i);
     }
 }
 

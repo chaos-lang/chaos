@@ -62,6 +62,9 @@ void emitBytecode(cpu *c)
     case MOVI:
         sprintf(str_inst, "%s R(%d) %lld", "MOVI", c->inst->op1->reg, c->inst->op2->value.i);
         break;
+    case MOVR:
+        sprintf(str_inst, "%s R(%d) R(%d)", "MOVR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
     case FMOV:
         sprintf(str_inst, "%s FR(%d) %lf", "FMOV", c->inst->op1->reg, c->inst->op2->value.f);
         break;
@@ -94,6 +97,12 @@ void emitBytecode(cpu *c)
         break;
     case FLDXR:
         sprintf(str_inst, "%s FR(%d) R(%d) R(%d) size: %lld", "FLDXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
+    case SUBR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "SUBR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case MULI:
+        sprintf(str_inst, "%s R(%d) R(%d) imm: %lld", "MULI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
     case PRNT:
         sprintf(str_inst, "%s", "PRNT");

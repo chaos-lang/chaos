@@ -97,6 +97,9 @@ void execute(cpu *c)
     case MOVI:
         jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
         break;
+    case MOVR:
+        jit_movr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
     case FMOV:
         jit_fmovi(_jit, FR(c->inst->op1->reg), c->inst->op2->value.f);
         break;
@@ -131,6 +134,12 @@ void execute(cpu *c)
         break;
     case FLDXR:
         jit_fldxr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    case SUBR:
+        jit_subr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case MULI:
+        jit_muli(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
     case PRNT: {
         jit_movi(_jit, R(2), cpu_print);

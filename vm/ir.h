@@ -29,11 +29,12 @@ typedef struct AST AST;
 
 enum IROpCode {
     PROLOG,
-    MOVI, FMOV,
+    MOVI, MOVR, FMOV,
     ALLOCAI,
     REF_ALLOCAI,
     LDR, LDXR, FLDR, FLDXR,
     STR, STXR, FSTR, FSTXR,
+    SUBR, MULI,
     PRNT,
     DEBUG,
     HLT,
