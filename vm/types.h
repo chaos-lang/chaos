@@ -26,7 +26,7 @@
 #define byte unsigned char
 #define u64 unsigned long long
 #define i64 long long
-#define f64 long double
+#define f64 double
 
 typedef struct KaosIR KaosIR;
 typedef struct KaosInst KaosInst;

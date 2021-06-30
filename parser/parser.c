@@ -217,14 +217,14 @@ int initParser(int argc, char** argv) {
         KaosIR* program = compile(_ast_root);
 
         if (debug_level > 1) {
-            printf("\nDebug Bytecode:\n");
+            printf("\nJIT Abstraction Layer:\n");
             emit(program);
             if (debug_level == 2)
                 exit(0);
         }
 
         if (debug_level > 2)
-            printf("\nProgram Output:\n");
+            printf("\nJIT Runtime:\n");
 
         cpu *c = new_cpu(program, debug_level);
         run_cpu(c);
@@ -272,7 +272,7 @@ void compile_interactive()
         interactive_program->hlt_count++;
         interactive_c->ic = interactive_program->size - 1;
         if (interactive_c->debug_level > 1) {
-            printf("\nDebug Bytecode:\n");
+            printf("\nJIT Abstraction Layer:\n");
             emit(interactive_program);
         }
 
@@ -295,7 +295,7 @@ void compile_interactive()
     }
 
     if (interactive_c->debug_level > 1) {
-        printf("\nDebug Bytecode:\n");
+        printf("\nJIT Abstraction Layer:\n");
         emit(interactive_program);
     }
 

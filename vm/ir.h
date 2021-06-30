@@ -29,12 +29,13 @@ typedef struct AST AST;
 
 enum IROpCode {
     PROLOG,
-    MOVI,
+    MOVI, FMOV,
     ALLOCAI,
     REF_ALLOCAI,
-    LDR,
-    STR,
-    PRINT_I,
+    LDR, LDXR, FLDR, FLDXR,
+    STR, STXR, FSTR, FSTXR,
+    PRNT,
+    DEBUG,
     HLT,
     NUM_INSTRUCTIONS
 };
@@ -55,6 +56,7 @@ typedef struct KaosInst {
     KaosOp* op1;
     KaosOp* op2;
     KaosOp* op3;
+    KaosOp* op4;
     AST* ast;
 } KaosInst;
 

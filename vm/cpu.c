@@ -42,6 +42,7 @@ cpu *new_cpu(KaosIR* program, unsigned short debug_level)
     cpu *c = malloc(sizeof(cpu));
     c->program = program;
     c->ic = 0;
+    c->debug_level = debug_level;
 
     c->stack = (int*)malloc(USHRT_MAX * 256 * sizeof(int));
 
@@ -67,7 +68,9 @@ void run_cpu(cpu *c)
         execute(c);
     } while (c->inst->op_code != HLT);
 
-    jit_retr(_jit, R(0));
+    jit_reti(_jit, 0);
+    if (c->debug_level > 2)
+        jit_check_code(_jit, JIT_WARN_ALL);
     jit_generate_code(_jit);
     _main();
 }
@@ -94,6 +97,9 @@ void execute(cpu *c)
     case MOVI:
         jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
         break;
+    case FMOV:
+        jit_fmovi(_jit, FR(c->inst->op1->reg), c->inst->op2->value.f);
+        break;
     case ALLOCAI: {
         int i = jit_allocai(_jit, c->inst->op2->value.i);
         c->stack[c->inst->op1->value.i] = i;
@@ -105,23 +111,45 @@ void execute(cpu *c)
     case STR:
         jit_str(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
+    case STXR:
+        jit_stxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    case FSTR:
+        jit_fstr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case FSTXR:
+        jit_fstxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), FR(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
     case LDR:
         jit_ldr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-    case PRINT_I: {
-        // Prints the value in R(1)
-        static char *str = "%i\n";
-        jit_movi(_jit, R(0), str);
-        jit_movi(_jit, R(2), printf);
+    case LDXR:
+        jit_ldxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    case FLDR:
+        jit_fldr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case FLDXR:
+        jit_fldxr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    case PRNT: {
+        jit_movi(_jit, R(2), cpu_print);
         jit_prepare(_jit);
         jit_putargr(_jit, R(0));
         jit_putargr(_jit, R(1));
+        jit_fputargr(_jit, FR(1), sizeof(double));
         jit_callr(_jit, R(2));
         break;
     }
+    case DEBUG:
+        debug(_jit);
+        break;
     default:
         break;
     }
+
+    if (c->debug_level > 2)
+        debug(_jit);
 }
 
 jit_label_array* init_label_array()
@@ -146,4 +174,39 @@ void push_label(jit_label_array* label_array, jit_label* label)
 jit_label* get_label(jit_label_array* label_array, i64 i)
 {
     return label_array->arr[i];
+}
+
+void cpu_print(i64 r0, i64 r1, f64 fr1)
+{
+    switch (r0) {
+    case V_BOOL:
+        break;
+    case V_INT:
+        printf("%lld\n", r1);
+        break;
+    case V_FLOAT:
+        printf("%lg\n", fr1);
+        break;
+    case V_STRING:
+        break;
+    case V_LIST:
+        break;
+    case V_DICT:
+        break;
+    default:
+        break;
+    }
+}
+
+void debug(struct jit *jit)
+{
+    jit_msg(jit, " ----------------------------------------------------------\n");
+    jit_msgr(jit, "[R0: %lld] ", R(0));
+    jit_msgr(jit, "[R1: %lld] ", R(1));
+    jit_msgr(jit, "[R2: %lld] ", R(2));
+    jit_msgr(jit, "[R3: %lld] | ", R(3));
+    jit_msgr(jit, "[FR0: %lf] ", FR(0));
+    jit_msgr(jit, "[FR1: %lf] ", FR(1));
+    jit_msgr(jit, "[FR2: %lf] ", FR(2));
+    jit_msgr(jit, "[FR3: %lf]\n", FR(3));
 }

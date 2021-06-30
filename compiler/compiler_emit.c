@@ -33,8 +33,8 @@ void print_cpu(cpu *c, i64 hlt_count)
 {
     printf(
         "%-40s %-40s %-40s %-80s %-40s\n",
-        "Program Counter",
-        "Bytecode",
+        "Counter",
+        "Instructions",
         "Line",
         "File",
         "Line Number"
@@ -51,7 +51,7 @@ void print_cpu(cpu *c, i64 hlt_count)
 void emitBytecode(cpu *c)
 {
     char str_pc[40];
-    char str_inst[40];
+    char str_inst[50];
 
     sprintf(str_pc, "%lld", c->ic);
 
@@ -62,20 +62,44 @@ void emitBytecode(cpu *c)
     case MOVI:
         sprintf(str_inst, "%s R(%d) %lld", "MOVI", c->inst->op1->reg, c->inst->op2->value.i);
         break;
+    case FMOV:
+        sprintf(str_inst, "%s FR(%d) %lf", "FMOV", c->inst->op1->reg, c->inst->op2->value.f);
+        break;
     case ALLOCAI:
-        sprintf(str_inst, "%s stack: %lld space: %lld", "ALLOCAI", c->inst->op1->value.i, c->inst->op2->value.i);
+        sprintf(str_inst, "%s addr: %lld space: %lld", "ALLOCAI", c->inst->op1->value.i, c->inst->op2->value.i);
         break;
     case REF_ALLOCAI:
-        sprintf(str_inst, "%s R(%d) stack: %lld", "REF_ALLOCAI", c->inst->op1->reg, c->inst->op2->value.i);
+        sprintf(str_inst, "%s R(%d) addr: %lld", "REF_ALLOCAI", c->inst->op1->reg, c->inst->op2->value.i);
         break;
     case STR:
         sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "STR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
+    case STXR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d) size: %lld", "STXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
+    case FSTR:
+        sprintf(str_inst, "%s R(%d) FR(%d) size: %lld", "FSTR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    case FSTXR:
+        sprintf(str_inst, "%s R(%d) R(%d) FR(%d) size: %lld", "FSTXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
     case LDR:
         sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "LDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-    case PRINT_I:
-        sprintf(str_inst, "%s", "PRINT_I");
+    case LDXR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d) size: %lld", "LDXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
+    case FLDR:
+        sprintf(str_inst, "%s FR(%d) R(%d) size: %lld", "FLDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    case FLDXR:
+        sprintf(str_inst, "%s FR(%d) R(%d) R(%d) size: %lld", "FLDXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
+    case PRNT:
+        sprintf(str_inst, "%s", "PRNT");
+        break;
+    case DEBUG:
+        sprintf(str_inst, "%s", "DEBUG");
         break;
     case HLT:
         sprintf(str_inst, "%s", "HLT");

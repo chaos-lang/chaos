@@ -143,7 +143,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind) {
         } else {
         }
-        push_inst_(program, PRINT_I);
+        push_inst_(program, PRNT);
         break;
     case ExprStmt_kind:
         compileExpr(program, stmt->v.expr_stmt->x);
@@ -175,6 +175,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
             case V_BOOL:
                 break;
             case V_INT:
+                // push_inst_r_r_i(program, STR, 0, 1, 1);
                 break;
             case V_FLOAT:
                 break;
@@ -358,9 +359,12 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case V_BOOL:
             break;
         case V_INT:
+            push_inst_r_i(program, MOVI, R0, V_INT);
             push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
+            push_inst_r_i(program, MOVI, R0, V_FLOAT);
+            push_inst_r_f(program, FMOV, R1, expr->v.basic_lit->value.f);
             break;
         case V_STRING: {
             break;
@@ -786,21 +790,43 @@ void compileDecl(KaosIR* program, Decl* decl)
 
     switch (decl->kind) {
     case VarDecl_kind: {
-        compileExpr(program, decl->v.var_decl->expr);
-        // enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
+        enum ValueType value_type = compileExpr(program, decl->v.var_decl->expr) - 1;
+        enum Type type = compileSpec(program, decl->v.var_decl->type_spec);
         // enum Type secondary_type = K_ANY;
         // if (decl->v.var_decl->type_spec->v.type_spec->sub_type_spec != NULL)
         //     secondary_type = decl->v.var_decl->type_spec->v.type_spec->type;
-        Symbol* symbol = NULL;
+        // Symbol* symbol = NULL;
 
-        if (decl->v.var_decl->expr->kind == BasicLit_kind) {
-            symbol = store_int(
-                program,
-                decl->v.var_decl->ident->v.ident->name,
-                false
-            );
+        switch (type) {
+        case K_BOOL:
+            break;
+        case K_NUMBER:
+            if (value_type == V_FLOAT) {
+                store_float(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    false
+                );
+            } else {
+                store_int(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    false
+                );
+            }
+            break;
+        case K_STRING:
+            break;
+        case K_VOID:
+            break;
+        case K_ANY:
+            break;
+        case K_LIST:
+            break;
+        case K_DICT:
+            break;
         }
-        symbol->addr = label_counter++;
+        break;
     }
     case TimesDo_kind: {
         compileExpr(program, decl->v.times_do->x);
@@ -1311,6 +1337,27 @@ void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
     pushProgram(program, inst);
 }
 
+void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, f64 f)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_VAL;
+    union IRValue value2;
+    value2.f = f;
+    op2->value = value2;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
 void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i)
 {
     KaosOp* op1 = malloc(sizeof *op1);
@@ -1332,6 +1379,94 @@ void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
     inst->op1 = op1;
     inst->op2 = op2;
     inst->op3 = op3;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, f64 f)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_REG;
+    op2->reg = reg2;
+
+    KaosOp* op3 = malloc(sizeof *op3);
+    op3->type = IR_VAL;
+    union IRValue value3;
+    value3.f = f;
+    op3->value = value3;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->op3 = op3;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, i64 i)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_REG;
+    op2->reg = reg2;
+
+    KaosOp* op3 = malloc(sizeof *op3);
+    op3->type = IR_REG;
+    op3->reg = reg3;
+
+    KaosOp* op4 = malloc(sizeof *op4);
+    op4->type = IR_VAL;
+    union IRValue value4;
+    value4.i = i;
+    op4->value = value4;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->op3 = op3;
+    inst->op4 = op4;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_r_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, f64 f)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_REG;
+    op2->reg = reg2;
+
+    KaosOp* op3 = malloc(sizeof *op3);
+    op3->type = IR_REG;
+    op3->reg = reg3;
+
+    KaosOp* op4 = malloc(sizeof *op4);
+    op4->type = IR_VAL;
+    union IRValue value4;
+    value4.f = f;
+    op4->value = value4;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->op3 = op3;
+    inst->op4 = op4;
     inst->ast = ast_ref;
 
     pushProgram(program, inst);
@@ -1402,9 +1537,11 @@ Symbol* store_int(KaosIR* program, char *name, bool is_any)
         symbol = addSymbol(name, K_NUMBER, value, V_INT);
     }
     symbol->addr = stack_counter++;
-    push_inst_i_i(program, ALLOCAI, symbol->addr, 1);
-    push_inst_r_i(program, REF_ALLOCAI, 0, symbol->addr);
-    push_inst_r_r_i(program, STR, 0, 1, 1);
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
+    push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
     return symbol;
 }
@@ -1419,7 +1556,12 @@ Symbol* store_float(KaosIR* program, char *name, bool is_any)
     else {
         symbol = addSymbol(name, K_NUMBER, value, V_FLOAT);
     }
-    // symbol->addr = program->heap;
+    symbol->addr = stack_counter++;
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(double));
+    push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    push_inst_r_r_i(program, STR, R2, R0, sizeof(double));
+    push_inst_r_i(program, MOVI, R3, sizeof(double));
+    push_inst_r_r_r_i(program, FSTXR, R2, R3, R1, sizeof(double));
 
     return symbol;
 }
@@ -1504,13 +1646,19 @@ void load_bool(KaosIR* program, Symbol* symbol)
 void load_int(KaosIR* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
-    push_inst_r_i(program, REF_ALLOCAI, 0, addr);
-    push_inst_r_r_i(program, LDR, 1, 0, 1);
+    push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+    push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
 }
 
 void load_float(KaosIR* program, Symbol* symbol)
 {
-    // i64 addr = symbol->addr;
+    i64 addr = symbol->addr;
+    push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+    push_inst_r_r_i(program, LDR, R0, R2, sizeof(double));
+    push_inst_r_i(program, MOVI, R3, sizeof(double));
+    push_inst_r_r_r_i(program, FLDXR, R1, R2, R3, sizeof(double));
 }
 
 void load_string(KaosIR* program, Symbol* symbol)
