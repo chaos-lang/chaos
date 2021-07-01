@@ -412,11 +412,17 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case BinaryExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
         shift_registers(program, 4);
-        // i64 addr = program->heap;
+        i64 addr = stack_counter++;
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
+            push_inst_i_i(program, ALLOCAI, addr, sizeof(long long));
+            push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+            push_inst_r_r_i(program, STR, R2, R1, sizeof(long long));
         }
         compileExpr(program, expr->v.binary_expr->x);
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
+            shift_registers(program, 4);
+            push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+            push_inst_r_r_i(program, LDR, R5, R2, sizeof(long long));
         }
         switch (expr->v.binary_expr->op) {
         case ADD_tok:

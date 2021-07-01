@@ -269,7 +269,11 @@ void debug(struct jit *jit)
     jit_msgr(jit, "[R0: %lld] ", R(0));
     jit_msgr(jit, "[R1: %lld] ", R(1));
     jit_msgr(jit, "[R2: %lld] ", R(2));
-    jit_msgr(jit, "[R3: %lld] | ", R(3));
+    jit_msgr(jit, "[R3: %lld] ", R(3));
+    jit_msgr(jit, "[R4: %lld] ", R(4));
+    jit_msgr(jit, "[R5: %lld] ", R(5));
+    jit_msgr(jit, "[R6: %lld] ", R(6));
+    jit_msgr(jit, "[R7: %lld] | ", R(7));
     jit_msgr(jit, "[FR0: %lf] ", FR(0));
     jit_msgr(jit, "[FR1: %lf] ", FR(1));
     jit_msgr(jit, "[FR2: %lf] ", FR(2));
