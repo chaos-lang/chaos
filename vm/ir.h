@@ -29,12 +29,20 @@ typedef struct AST AST;
 
 enum IROpCode {
     PROLOG,
-    MOVI, MOVR, FMOV,
-    ALLOCAI,
-    REF_ALLOCAI,
+    // >>> Transfer Operations <<<
+    MOVR, MOVI, FMOV,
+    ALLOCAI, REF_ALLOCAI,
+    // >>> Load Operations <<<
     LDR, LDXR, FLDR, FLDXR,
+    // >>> Store Operations <<<
     STR, STXR, FSTR, FSTXR,
-    SUBR, MULI,
+    // >>> Binary Arithmetic Operations <<<
+    ADDR, ADDI,
+    SUBR, SUBI,
+    MULR, MULI,
+    DIVR, DIVI,
+    MODR, MODI,
+    // >>> Non-Atomic Instructions <<<
     PRNT,
     DEBUG,
     HLT,

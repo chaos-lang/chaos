@@ -94,15 +94,19 @@ void execute(cpu *c)
     case PROLOG:
         jit_prolog(_jit, &_main);
         break;
-    case MOVI:
-        jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
-        break;
+    // >>> Transfer Operations <<<
+    // mov
     case MOVR:
         jit_movr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
         break;
+    case MOVI:
+        jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
+        break;
+    // fmov
     case FMOV:
         jit_fmovi(_jit, FR(c->inst->op1->reg), c->inst->op2->value.f);
         break;
+    // alloc
     case ALLOCAI: {
         int i = jit_allocai(_jit, c->inst->op2->value.i);
         c->stack[c->inst->op1->value.i] = i;
@@ -111,36 +115,72 @@ void execute(cpu *c)
     case REF_ALLOCAI:
         jit_addi(_jit, R(c->inst->op1->reg), R_FP, c->stack[c->inst->op2->value.i]);
         break;
-    case STR:
-        jit_str(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
-        break;
-    case STXR:
-        jit_stxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
-        break;
-    case FSTR:
-        jit_fstr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg), c->inst->op3->value.i);
-        break;
-    case FSTXR:
-        jit_fstxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), FR(c->inst->op3->reg), c->inst->op4->value.i);
-        break;
+    // >>> Load Operations <<<
+    // ldr
     case LDR:
         jit_ldr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
     case LDXR:
         jit_ldxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
         break;
+    // fldr
     case FLDR:
         jit_fldr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
     case FLDXR:
         jit_fldxr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
         break;
+    // >>> Store Operations <<<
+    case STR:
+        jit_str(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case STXR:
+        jit_stxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    // fstr
+    case FSTR:
+        jit_fstr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case FSTXR:
+        jit_fstxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), FR(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    // >>> Binary Arithmetic Operations <<<
+    // add
+    case ADDR:
+        jit_addr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case ADDI:
+        jit_addi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // sub
     case SUBR:
         jit_subr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case SUBI:
+        jit_subi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // mul
+    case MULR:
+        jit_mulr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case MULI:
         jit_muli(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
+    // div
+    case DIVR:
+        jit_divr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case DIVI:
+        jit_divi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // mod
+    case MODR:
+        jit_modr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case MODI:
+        jit_modi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // >>> Non-Atomic Instructions <<<
     case PRNT: {
         jit_movi(_jit, R(2), cpu_print);
         jit_prepare(_jit);

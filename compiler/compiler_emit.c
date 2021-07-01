@@ -59,51 +59,92 @@ void emitBytecode(cpu *c)
     case PROLOG:
         sprintf(str_inst, "%s", "PROLOG");
         break;
-    case MOVI:
-        sprintf(str_inst, "%s R(%d) %lld", "MOVI", c->inst->op1->reg, c->inst->op2->value.i);
-        break;
+    // >>> Transfer Operations <<<
+    // mov
     case MOVR:
         sprintf(str_inst, "%s R(%d) R(%d)", "MOVR", c->inst->op1->reg, c->inst->op2->reg);
         break;
+    case MOVI:
+        sprintf(str_inst, "%s R(%d) %lld", "MOVI", c->inst->op1->reg, c->inst->op2->value.i);
+        break;
+    // fmov
     case FMOV:
         sprintf(str_inst, "%s FR(%d) %lf", "FMOV", c->inst->op1->reg, c->inst->op2->value.f);
         break;
+    // alloc
     case ALLOCAI:
         sprintf(str_inst, "%s addr: %lld space: %lld", "ALLOCAI", c->inst->op1->value.i, c->inst->op2->value.i);
         break;
     case REF_ALLOCAI:
         sprintf(str_inst, "%s R(%d) addr: %lld", "REF_ALLOCAI", c->inst->op1->reg, c->inst->op2->value.i);
         break;
-    case STR:
-        sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "STR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
-        break;
-    case STXR:
-        sprintf(str_inst, "%s R(%d) R(%d) R(%d) size: %lld", "STXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
-        break;
-    case FSTR:
-        sprintf(str_inst, "%s R(%d) FR(%d) size: %lld", "FSTR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
-        break;
-    case FSTXR:
-        sprintf(str_inst, "%s R(%d) R(%d) FR(%d) size: %lld", "FSTXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
-        break;
+    // >>> Load Operations <<<
+    // ldr
     case LDR:
         sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "LDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
     case LDXR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d) size: %lld", "LDXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
         break;
+    // >>> Store Operations <<<
+    // str
+    case STR:
+        sprintf(str_inst, "%s R(%d) R(%d) size: %lld", "STR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    case STXR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d) size: %lld", "STXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
+    // fstr
+    case FSTR:
+        sprintf(str_inst, "%s R(%d) FR(%d) size: %lld", "FSTR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    case FSTXR:
+        sprintf(str_inst, "%s R(%d) R(%d) FR(%d) size: %lld", "FSTXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
+        break;
+    // fldr
     case FLDR:
         sprintf(str_inst, "%s FR(%d) R(%d) size: %lld", "FLDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
     case FLDXR:
         sprintf(str_inst, "%s FR(%d) R(%d) R(%d) size: %lld", "FLDXR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg, c->inst->op4->value.i);
         break;
+    // >>> Binary Arithmetic Operations <<<
+    // add
+    case ADDR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "ADDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case ADDI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "ADDI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    // sub
     case SUBR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "SUBR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case SUBI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "SUBI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    // mul
+    case MULR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "MULR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     case MULI:
         sprintf(str_inst, "%s R(%d) R(%d) imm: %lld", "MULI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
+    // div
+    case DIVR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "DIVR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case DIVI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "DIVI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    // mod
+    case MODR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "MODR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case MODI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "MODI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+    // >>> Non-Atomic Instructions <<<
     case PRNT:
         sprintf(str_inst, "%s", "PRNT");
         break;
