@@ -75,8 +75,11 @@ void run_cpu(cpu *c)
 
     jit_generate_code(_jit);
 
-	if (c->debug_level == 3 || c->debug_level > 4)
+	if (c->debug_level == 3 || c->debug_level == 5)
 		jit_dump_ops(_jit, JIT_DEBUG_CODE);
+
+	if (c->debug_level == 4)
+		jit_dump_ops(_jit, JIT_DEBUG_COMBINED);
 
     _main();
 }
@@ -274,7 +277,7 @@ void execute(cpu *c)
         break;
     }
 
-    if (c->debug_level > 3)
+    if (c->debug_level > 4)
         debug(_jit);
 }
 
