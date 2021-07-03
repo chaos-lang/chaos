@@ -426,19 +426,19 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
         switch (expr->v.binary_expr->op) {
         case ADD_tok:
-            push_inst_r_r_r(program, ADDR, R1, R1, R5);
+            push_inst_(program, DYN_ADD);
             break;
         case SUB_tok:
-            push_inst_r_r_r(program, SUBR, R1, R1, R5);
+            push_inst_(program, DYN_SUB);
             break;
         case MUL_tok:
-            push_inst_r_r_r(program, MULR, R1, R1, R5);
+            push_inst_(program, DYN_MUL);
             break;
         case QUO_tok:
-            push_inst_r_r_r(program, DIVR, R1, R1, R5);
+            push_inst_(program, DYN_DIV);
             break;
         case REM_tok:
-            push_inst_r_r_r(program, MODR, R1, R1, R5);
+            push_inst_(program, DYN_MOD);
             break;
         case AND_tok:
             break;

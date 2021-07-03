@@ -145,6 +145,21 @@ void emitBytecode(cpu *c)
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "MODI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
     // >>> Non-Atomic Instructions <<<
+	case DYN_ADD:
+        sprintf(str_inst, "%s", "DYN_ADD");
+        break;
+	case DYN_SUB:
+        sprintf(str_inst, "%s", "DYN_SUB");
+        break;
+	case DYN_MUL:
+        sprintf(str_inst, "%s", "DYN_MUL");
+        break;
+	case DYN_DIV:
+        sprintf(str_inst, "%s", "DYN_DIV");
+        break;
+	case DYN_MOD:
+        sprintf(str_inst, "%s", "DYN_MOD");
+        break;
     case PRNT:
         sprintf(str_inst, "%s", "PRNT");
         break;

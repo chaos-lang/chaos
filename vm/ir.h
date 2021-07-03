@@ -43,6 +43,11 @@ enum IROpCode {
     DIVR, DIVI,
     MODR, MODI,
     // >>> Non-Atomic Instructions <<<
+	DYN_ADD,
+	DYN_SUB,
+	DYN_MUL,
+	DYN_DIV,
+	DYN_MOD,
     PRNT,
     DEBUG,
     HLT,

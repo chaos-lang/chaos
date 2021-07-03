@@ -69,9 +69,15 @@ void run_cpu(cpu *c)
     } while (c->inst->op_code != HLT);
 
     jit_reti(_jit, 0);
+
     if (c->debug_level > 2)
         jit_check_code(_jit, JIT_WARN_ALL);
+
     jit_generate_code(_jit);
+
+	if (c->debug_level == 3 || c->debug_level > 4)
+		jit_dump_ops(_jit, JIT_DEBUG_CODE);
+
     _main();
 }
 
@@ -146,7 +152,7 @@ void execute(cpu *c)
         break;
     // >>> Binary Arithmetic Operations <<<
     // add
-    case ADDR:
+	case ADDR:
         jit_addr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case ADDI:
@@ -181,6 +187,26 @@ void execute(cpu *c)
         jit_modi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
     // >>> Non-Atomic Instructions <<<
+	case DYN_ADD: {
+        DYN_ARITH(jit_addr, jit_faddr);
+        break;
+    }
+	case DYN_SUB: {
+        DYN_ARITH(jit_subr, jit_fsubr);
+        break;
+    }
+	case DYN_MUL: {
+        DYN_ARITH(jit_mulr, jit_fmulr);
+        break;
+    }
+	case DYN_DIV: {
+        DYN_ARITH(jit_divr, jit_fdivr);
+        break;
+    }
+	case DYN_MOD: {
+		jit_modr(_jit, R(1), R(1), R(5));
+        break;
+    }
     case PRNT: {
         jit_movi(_jit, R(2), cpu_print);
         jit_prepare(_jit);
@@ -197,7 +223,7 @@ void execute(cpu *c)
         break;
     }
 
-    if (c->debug_level > 2)
+    if (c->debug_level > 3)
         debug(_jit);
 }
 
@@ -274,8 +300,10 @@ void debug(struct jit *jit)
     jit_msgr(jit, "[R5: %lld] ", R(5));
     jit_msgr(jit, "[R6: %lld] ", R(6));
     jit_msgr(jit, "[R7: %lld] | ", R(7));
-    jit_msgr(jit, "[FR0: %lf] ", FR(0));
-    jit_msgr(jit, "[FR1: %lf] ", FR(1));
-    jit_msgr(jit, "[FR2: %lf] ", FR(2));
-    jit_msgr(jit, "[FR3: %lf]\n", FR(3));
+    jit_fmsgr(jit, "[FR0: %lf] ", FR(0));
+    jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
+	// TODO: Debugging FR(2) and FR(3) together with FR(0) and FR(1) causes a segmentation fault on `printf` (myjit)
+    // jit_fmsgr(jit, "[FR2: %lf] ", FR(2));
+    // jit_fmsgr(jit, "[FR3: %lf]", FR(3));
+	jit_msg(jit, "\n");
 }
