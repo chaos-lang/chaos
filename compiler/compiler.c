@@ -441,14 +441,19 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_(program, DYN_MOD);
             break;
         case AND_tok:
+			push_inst_r_r_r(program, ANDR, R1, R1, R5);
             break;
         case OR_tok:
+			push_inst_r_r_r(program, ORR, R1, R1, R5);
             break;
         case XOR_tok:
+			push_inst_r_r_r(program, XORR, R1, R1, R5);
             break;
         case SHL_tok:
+			push_inst_r_r_r(program, LSHR, R1, R1, R5);
             break;
         case SHR_tok:
+			push_inst_r_r_r(program, RSHR, R1, R1, R5);
             break;
         case EQL_tok:
             break;

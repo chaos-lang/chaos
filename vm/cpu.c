@@ -186,6 +186,43 @@ void execute(cpu *c)
     case MODI:
         jit_modi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
+	// Binary Logic
+	// and
+	case ANDR:
+        jit_andr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case ANDI:
+        jit_andi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+	// or
+	case ORR:
+        jit_orr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case ORI:
+        jit_ori(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+	// xor
+	case XORR:
+        jit_xorr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case XORI:
+        jit_xori(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+	// Binary Shift
+	// lsh
+	case LSHR:
+        jit_lshr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case LSHI:
+        jit_lshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+	// rsh
+	case RSHR:
+        jit_rshr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case RSHI:
+        jit_rshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
     // >>> Non-Atomic Instructions <<<
 	case DYN_ADD: {
         DYN_ARITH(jit_addr, jit_faddr);

@@ -42,6 +42,11 @@ enum IROpCode {
     MULR, MULI,
     DIVR, DIVI,
     MODR, MODI,
+	ANDR, ANDI,
+	ORR, ORI,
+	XORR, XORI,
+	LSHR, LSHI,
+	RSHR, RSHI,
     // >>> Non-Atomic Instructions <<<
 	DYN_ADD,
 	DYN_SUB,

@@ -144,6 +144,43 @@ void emitBytecode(cpu *c)
     case MODI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "MODI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
+	// Binary Logic
+	// and
+    case ANDR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "ANDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case ANDI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "ANDI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+	// or
+    case ORR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "ORR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case ORI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "ORI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+	// xor
+    case XORR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "XORR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case XORI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "XORI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+	// Binary Shift
+	// lsh
+    case LSHR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "LSHR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case LSHI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "LSHI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
+	// rsh
+    case RSHR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "RSHR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    case RSHI:
+        sprintf(str_inst, "%s R(%d) R(%d) %lld", "RSHI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
+        break;
     // >>> Non-Atomic Instructions <<<
 	case DYN_ADD:
         sprintf(str_inst, "%s", "DYN_ADD");
