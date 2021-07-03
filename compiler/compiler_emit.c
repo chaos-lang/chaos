@@ -181,6 +181,19 @@ void emitBytecode(cpu *c)
     case RSHI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "RSHI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
+	// >>> Unary Arithmetic Operations <<<
+	// negr
+    case NEGR:
+        sprintf(str_inst, "%s R(%d) R(%d)", "NEGR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
+	// fnegr
+    case FNEGR:
+        sprintf(str_inst, "%s FR(%d) FR(%d)", "FNEGR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
+	// notr
+    case NOTR:
+        sprintf(str_inst, "%s R(%d) R(%d)", "NOTR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
     // >>> Non-Atomic Instructions <<<
 	case DYN_ADD:
         sprintf(str_inst, "%s", "DYN_ADD");
@@ -194,8 +207,8 @@ void emitBytecode(cpu *c)
 	case DYN_DIV:
         sprintf(str_inst, "%s", "DYN_DIV");
         break;
-	case DYN_MOD:
-        sprintf(str_inst, "%s", "DYN_MOD");
+	case DYN_NEG:
+        sprintf(str_inst, "%s", "DYN_NEG");
         break;
     case PRNT:
         sprintf(str_inst, "%s", "PRNT");

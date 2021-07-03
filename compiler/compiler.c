@@ -438,7 +438,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_(program, DYN_DIV);
             break;
         case REM_tok:
-            push_inst_(program, DYN_MOD);
+            push_inst_r_r_r(program, MODR, R1, R1, R5);
             break;
         case AND_tok:
 			push_inst_r_r_r(program, ANDR, R1, R1, R5);
@@ -483,11 +483,12 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case ADD_tok:
             break;
         case SUB_tok:
-            push_inst_r_r_i(program, MULI, R1, R1, -1);
+            push_inst_(program, DYN_NEG);
             break;
         case NOT_tok:
             break;
         case TILDE_tok:
+			push_inst_r_r(program, NOTR, R1, R1);
             break;
         default:
             break;

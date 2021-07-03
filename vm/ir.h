@@ -47,12 +47,15 @@ enum IROpCode {
 	XORR, XORI,
 	LSHR, LSHI,
 	RSHR, RSHI,
+	// >>> Unary Arithmetic Operations <<<
+	NEGR, FNEGR,
+	NOTR,
     // >>> Non-Atomic Instructions <<<
 	DYN_ADD,
 	DYN_SUB,
 	DYN_MUL,
 	DYN_DIV,
-	DYN_MOD,
+	DYN_NEG,
     PRNT,
     DEBUG,
     HLT,

@@ -223,27 +223,41 @@ void execute(cpu *c)
     case RSHI:
         jit_rshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
+	// >>> Unary Arithmetic Operations <<<
+	// negr
+    case NEGR:
+        jit_negr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+	// fnegr
+    case FNEGR:
+        jit_fnegr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+	// notr
+    case NOTR:
+        jit_notr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
     // >>> Non-Atomic Instructions <<<
+	// Dynamic Instructions (prefixed with `DYN_`)
 	case DYN_ADD: {
-        DYN_ARITH(jit_addr, jit_faddr);
+        DYN_BINARY_ARITH(jit_addr, jit_faddr);
         break;
     }
 	case DYN_SUB: {
-        DYN_ARITH(jit_subr, jit_fsubr);
+        DYN_BINARY_ARITH(jit_subr, jit_fsubr);
         break;
     }
 	case DYN_MUL: {
-        DYN_ARITH(jit_mulr, jit_fmulr);
+        DYN_BINARY_ARITH(jit_mulr, jit_fmulr);
         break;
     }
 	case DYN_DIV: {
-        DYN_ARITH(jit_divr, jit_fdivr);
+        DYN_BINARY_ARITH(jit_divr, jit_fdivr);
         break;
     }
-	case DYN_MOD: {
-		jit_modr(_jit, R(1), R(1), R(5));
-        break;
-    }
+	case DYN_NEG: {
+		DYN_UNARY_ARITH(jit_negr, jit_fnegr);
+		break;
+	}
     case PRNT: {
         jit_movi(_jit, R(2), cpu_print);
         jit_prepare(_jit);
