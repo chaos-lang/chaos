@@ -441,19 +441,19 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_r_r(program, MODR, R1, R1, R5);
             break;
         case AND_tok:
-			push_inst_r_r_r(program, ANDR, R1, R1, R5);
+            push_inst_r_r_r(program, ANDR, R1, R1, R5);
             break;
         case OR_tok:
-			push_inst_r_r_r(program, ORR, R1, R1, R5);
+            push_inst_r_r_r(program, ORR, R1, R1, R5);
             break;
         case XOR_tok:
-			push_inst_r_r_r(program, XORR, R1, R1, R5);
+            push_inst_r_r_r(program, XORR, R1, R1, R5);
             break;
         case SHL_tok:
-			push_inst_r_r_r(program, LSHR, R1, R1, R5);
+            push_inst_r_r_r(program, LSHR, R1, R1, R5);
             break;
         case SHR_tok:
-			push_inst_r_r_r(program, RSHR, R1, R1, R5);
+            push_inst_r_r_r(program, RSHR, R1, R1, R5);
             break;
         case EQL_tok:
             break;
@@ -488,7 +488,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case NOT_tok:
             break;
         case TILDE_tok:
-			push_inst_r_r(program, NOTR, R1, R1);
+            push_inst_r_r(program, NOTR, R1, R1);
             break;
         default:
             break;

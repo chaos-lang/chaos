@@ -75,16 +75,16 @@ void run_cpu(cpu *c)
 
     jit_generate_code(_jit);
 
-	if (c->debug_level == 3 || c->debug_level == 5) {
-		printf("\n>>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<");
-		jit_dump_ops(_jit, JIT_DEBUG_OPS);
-		printf(">>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<\n");
-		jit_dump_ops(_jit, JIT_DEBUG_CODE);
-	}
+    if (c->debug_level == 3 || c->debug_level == 5) {
+        printf("\n>>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<");
+        jit_dump_ops(_jit, JIT_DEBUG_OPS);
+        printf(">>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<\n");
+        jit_dump_ops(_jit, JIT_DEBUG_CODE);
+    }
 
-	if (c->debug_level == 4) {
-		jit_dump_ops(_jit, JIT_DEBUG_COMBINED);
-	}
+    if (c->debug_level == 4) {
+        jit_dump_ops(_jit, JIT_DEBUG_COMBINED);
+    }
 
     _main();
 }
@@ -107,24 +107,24 @@ void execute(cpu *c)
     switch (c->inst->op_code) {
     case PROLOG:
         jit_prolog(_jit, &_main);
-		if (c->debug_level > 4) {
-			// Fixes the "uninitialized register" warning that caused by the usage in the `debug` function
-			// TODO: Do it only if the prolog belongs to the main function
-			// Initialize the integers registers
-			jit_movi(_jit, R(0), 0);
-			jit_movi(_jit, R(1), 0);
-			jit_movi(_jit, R(2), 0);
-			jit_movi(_jit, R(3), 0);
-			jit_movi(_jit, R(4), 0);
-			jit_movi(_jit, R(5), 0);
-			jit_movi(_jit, R(6), 0);
-			jit_movi(_jit, R(7), 0);
-			// Initialize the floating-point registers
-			jit_fmovi(_jit, FR(0), 0.0);
-			jit_fmovi(_jit, FR(1), 0.0);
-			jit_fmovi(_jit, FR(2), 0.0);
-			jit_fmovi(_jit, FR(3), 0.0);
-		}
+        if (c->debug_level > 4) {
+            // Fixes the "uninitialized register" warning that caused by the usage in the `debug` function
+            // TODO: Do it only if the prolog belongs to the main function
+            // Initialize the integers registers
+            jit_movi(_jit, R(0), 0);
+            jit_movi(_jit, R(1), 0);
+            jit_movi(_jit, R(2), 0);
+            jit_movi(_jit, R(3), 0);
+            jit_movi(_jit, R(4), 0);
+            jit_movi(_jit, R(5), 0);
+            jit_movi(_jit, R(6), 0);
+            jit_movi(_jit, R(7), 0);
+            // Initialize the floating-point registers
+            jit_fmovi(_jit, FR(0), 0.0);
+            jit_fmovi(_jit, FR(1), 0.0);
+            jit_fmovi(_jit, FR(2), 0.0);
+            jit_fmovi(_jit, FR(3), 0.0);
+        }
         break;
     // >>> Transfer Operations <<<
     // mov
@@ -178,7 +178,7 @@ void execute(cpu *c)
         break;
     // >>> Binary Arithmetic Operations <<<
     // add
-	case ADDR:
+    case ADDR:
         jit_addr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case ADDI:
@@ -212,78 +212,78 @@ void execute(cpu *c)
     case MODI:
         jit_modi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-	// Binary Logic
-	// and
-	case ANDR:
+    // Binary Logic
+    // and
+    case ANDR:
         jit_andr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case ANDI:
         jit_andi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-	// or
-	case ORR:
+    // or
+    case ORR:
         jit_orr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case ORI:
         jit_ori(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-	// xor
-	case XORR:
+    // xor
+    case XORR:
         jit_xorr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case XORI:
         jit_xori(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-	// Binary Shift
-	// lsh
-	case LSHR:
+    // Binary Shift
+    // lsh
+    case LSHR:
         jit_lshr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case LSHI:
         jit_lshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-	// rsh
-	case RSHR:
+    // rsh
+    case RSHR:
         jit_rshr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
     case RSHI:
         jit_rshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;
-	// >>> Unary Arithmetic Operations <<<
-	// negr
+    // >>> Unary Arithmetic Operations <<<
+    // negr
     case NEGR:
         jit_negr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
         break;
-	// fnegr
+    // fnegr
     case FNEGR:
         jit_fnegr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
         break;
-	// notr
+    // notr
     case NOTR:
         jit_notr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
         break;
     // >>> Non-Atomic Instructions <<<
-	// Dynamic Instructions (prefixed with `DYN_`)
-	case DYN_ADD: {
+    // Dynamic Instructions (prefixed with `DYN_`)
+    case DYN_ADD: {
         DYN_BINARY_ARITH(jit_addr, jit_faddr);
         break;
     }
-	case DYN_SUB: {
+    case DYN_SUB: {
         DYN_BINARY_ARITH(jit_subr, jit_fsubr);
         break;
     }
-	case DYN_MUL: {
+    case DYN_MUL: {
         DYN_BINARY_ARITH(jit_mulr, jit_fmulr);
         break;
     }
-	case DYN_DIV: {
+    case DYN_DIV: {
         DYN_BINARY_ARITH(jit_divr, jit_fdivr);
         break;
     }
-	case DYN_NEG: {
-		DYN_UNARY_ARITH(jit_negr, jit_fnegr);
-		break;
-	}
+    case DYN_NEG: {
+        DYN_UNARY_ARITH(jit_negr, jit_fnegr);
+        break;
+    }
     case PRNT: {
         jit_movi(_jit, R(2), cpu_print);
         jit_prepare(_jit);
@@ -381,5 +381,5 @@ void debug(struct jit *jit)
     jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
     jit_fmsgr(jit, "[FR2: %lf] ", FR(2));
     jit_fmsgr(jit, "[FR3: %lf]", FR(3));
-	jit_msg(jit, "\n");
+    jit_msg(jit, "\n");
 }

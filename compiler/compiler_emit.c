@@ -55,7 +55,7 @@ void emitBytecode(cpu *c)
 
     sprintf(str_pc, "%lld", c->ic);
 
-	switch (c->inst->op_code) {
+    switch (c->inst->op_code) {
     case PROLOG:
         sprintf(str_inst, "%s", "PROLOG");
         break;
@@ -144,70 +144,70 @@ void emitBytecode(cpu *c)
     case MODI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "MODI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-	// Binary Logic
-	// and
+    // Binary Logic
+    // and
     case ANDR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "ANDR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     case ANDI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "ANDI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-	// or
+    // or
     case ORR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "ORR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     case ORI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "ORI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-	// xor
+    // xor
     case XORR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "XORR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     case XORI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "XORI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-	// Binary Shift
-	// lsh
+    // Binary Shift
+    // lsh
     case LSHR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "LSHR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     case LSHI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "LSHI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-	// rsh
+    // rsh
     case RSHR:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "RSHR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     case RSHI:
         sprintf(str_inst, "%s R(%d) R(%d) %lld", "RSHI", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->value.i);
         break;
-	// >>> Unary Arithmetic Operations <<<
-	// negr
+    // >>> Unary Arithmetic Operations <<<
+    // negr
     case NEGR:
         sprintf(str_inst, "%s R(%d) R(%d)", "NEGR", c->inst->op1->reg, c->inst->op2->reg);
         break;
-	// fnegr
+    // fnegr
     case FNEGR:
         sprintf(str_inst, "%s FR(%d) FR(%d)", "FNEGR", c->inst->op1->reg, c->inst->op2->reg);
         break;
-	// notr
+    // notr
     case NOTR:
         sprintf(str_inst, "%s R(%d) R(%d)", "NOTR", c->inst->op1->reg, c->inst->op2->reg);
         break;
     // >>> Non-Atomic Instructions <<<
-	case DYN_ADD:
+    case DYN_ADD:
         sprintf(str_inst, "%s", "DYN_ADD");
         break;
-	case DYN_SUB:
+    case DYN_SUB:
         sprintf(str_inst, "%s", "DYN_SUB");
         break;
-	case DYN_MUL:
+    case DYN_MUL:
         sprintf(str_inst, "%s", "DYN_MUL");
         break;
-	case DYN_DIV:
+    case DYN_DIV:
         sprintf(str_inst, "%s", "DYN_DIV");
         break;
-	case DYN_NEG:
+    case DYN_NEG:
         sprintf(str_inst, "%s", "DYN_NEG");
         break;
     case PRNT:
@@ -221,7 +221,7 @@ void emitBytecode(cpu *c)
         break;
     default:
         break;
-	}
+    }
 
     FILE* fp_module = NULL;
     AST* current_ast = c->inst->ast;
