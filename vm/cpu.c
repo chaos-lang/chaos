@@ -75,11 +75,16 @@ void run_cpu(cpu *c)
 
     jit_generate_code(_jit);
 
-	if (c->debug_level == 3 || c->debug_level == 5)
+	if (c->debug_level == 3 || c->debug_level == 5) {
+		printf("\n>>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<");
+		jit_dump_ops(_jit, JIT_DEBUG_OPS);
+		printf(">>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<\n");
 		jit_dump_ops(_jit, JIT_DEBUG_CODE);
+	}
 
-	if (c->debug_level == 4)
+	if (c->debug_level == 4) {
 		jit_dump_ops(_jit, JIT_DEBUG_COMBINED);
+	}
 
     _main();
 }
@@ -102,6 +107,24 @@ void execute(cpu *c)
     switch (c->inst->op_code) {
     case PROLOG:
         jit_prolog(_jit, &_main);
+		if (c->debug_level > 4) {
+			// Fixes the "uninitialized register" warning that caused by the usage in the `debug` function
+			// TODO: Do it only if the prolog belongs to the main function
+			// Initialize the integers registers
+			jit_movi(_jit, R(0), 0);
+			jit_movi(_jit, R(1), 0);
+			jit_movi(_jit, R(2), 0);
+			jit_movi(_jit, R(3), 0);
+			jit_movi(_jit, R(4), 0);
+			jit_movi(_jit, R(5), 0);
+			jit_movi(_jit, R(6), 0);
+			jit_movi(_jit, R(7), 0);
+			// Initialize the floating-point registers
+			jit_fmovi(_jit, FR(0), 0.0);
+			jit_fmovi(_jit, FR(1), 0.0);
+			jit_fmovi(_jit, FR(2), 0.0);
+			jit_fmovi(_jit, FR(3), 0.0);
+		}
         break;
     // >>> Transfer Operations <<<
     // mov
@@ -356,8 +379,7 @@ void debug(struct jit *jit)
     jit_msgr(jit, "[R7: %lld] | ", R(7));
     jit_fmsgr(jit, "[FR0: %lf] ", FR(0));
     jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
-	// TODO: Debugging FR(2) and FR(3) together with FR(0) and FR(1) causes a segmentation fault on `printf` (myjit)
-    // jit_fmsgr(jit, "[FR2: %lf] ", FR(2));
-    // jit_fmsgr(jit, "[FR3: %lf]", FR(3));
+    jit_fmsgr(jit, "[FR2: %lf] ", FR(2));
+    jit_fmsgr(jit, "[FR3: %lf]", FR(3));
 	jit_msg(jit, "\n");
 }
