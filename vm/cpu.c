@@ -326,12 +326,13 @@ void execute(cpu *c)
         break;
     }
     case DYN_PRNT: {
-        jit_movi(_jit, R(2), cpu_print);
+        jit_movi(_jit, R(3), cpu_print);
         jit_prepare(_jit);
         jit_putargr(_jit, R(0));
         jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(2));
         jit_fputargr(_jit, FR(1), sizeof(double));
-        jit_callr(_jit, R(2));
+        jit_callr(_jit, R(3));
         break;
     }
     case DEBUG:
@@ -369,7 +370,7 @@ jit_label* get_label(jit_label_array* label_array, i64 i)
     return label_array->arr[i];
 }
 
-void cpu_print(i64 r0, i64 r1, f64 fr1)
+void cpu_print(i64 r0, i64 r1, i64 r2, f64 fr1)
 {
     switch (r0) {
     case V_BOOL:
@@ -382,6 +383,7 @@ void cpu_print(i64 r0, i64 r1, f64 fr1)
         cpu_print_float(fr1);
         break;
     case V_STRING:
+        cpu_print_string(r2);
         break;
     case V_LIST:
         break;
@@ -405,6 +407,12 @@ void cpu_print_int(i64 i)
 void cpu_print_float(f64 f)
 {
     printf("%lg\n", f);
+}
+
+void cpu_print_string(i64 addr)
+{
+    char *s = (char*)addr;
+    printf("%s\n", s);
 }
 
 void debug(struct jit *jit)

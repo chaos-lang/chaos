@@ -374,6 +374,24 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_f(program, FMOV, R1, expr->v.basic_lit->value.f);
             break;
         case V_STRING: {
+            size_t len = strlen(expr->v.basic_lit->value.s);
+            i64 addr = stack_counter++;
+            push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char));
+            push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+            push_inst_r_i(program, MOVI, R3, 0);
+
+            for (size_t i = 0; i < len; i++) {
+                push_inst_r_i(program, MOVI, R3, i * sizeof(char));
+                push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.s[i]);
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(char));
+            }
+
+            push_inst_r_i(program, MOVI, R3, len);
+            push_inst_r_i(program, MOVI, R1, '\0');
+            push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(char));
+
+            push_inst_r_i(program, MOVI, R0, V_STRING);
+            push_inst_r_i(program, MOVI, R1, len);
             break;
         }
         default:

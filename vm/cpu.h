@@ -56,10 +56,11 @@ jit_label_array* init_label_array();
 void push_label(jit_label_array* label_array, jit_label* label);
 jit_label* get_label(jit_label_array* label_array, i64 i);
 
-void cpu_print(i64 r0, i64 r1, f64 fr1);
+void cpu_print(i64 r0, i64 r1, i64 r2, f64 fr1);
 void cpu_print_bool(i64 i);
 void cpu_print_int(i64 i);
 void cpu_print_float(f64 f);
+void cpu_print_string(i64 addr);
 
 void debug(struct jit *jit);
 
