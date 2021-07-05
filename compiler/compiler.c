@@ -143,7 +143,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         if (stmt->v.print_stmt->mod != NULL && stmt->v.print_stmt->mod->kind == PrettySpec_kind) {
         } else {
         }
-        push_inst_(program, PRNT);
+        push_inst_(program, DYN_PRNT);
         break;
     case ExprStmt_kind:
         compileExpr(program, stmt->v.expr_stmt->x);
@@ -456,20 +456,36 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_r_r(program, RSHR, R1, R1, R5);
             break;
         case EQL_tok:
+            push_inst_r_r_r(program, EQR, R1, R1, R5);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case NEQ_tok:
+            push_inst_r_r_r(program, NER, R1, R1, R5);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case GTR_tok:
+            push_inst_r_r_r(program, GTR, R1, R1, R5);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LSS_tok:
+            push_inst_r_r_r(program, LTR, R1, R1, R5);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case GEQ_tok:
+            push_inst_r_r_r(program, GER, R1, R1, R5);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LEQ_tok:
+            push_inst_r_r_r(program, LER, R1, R1, R5);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LAND_tok:
+            push_inst_(program, DYN_LAND);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LOR_tok:
+            push_inst_(program, DYN_LOR);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         default:
             break;

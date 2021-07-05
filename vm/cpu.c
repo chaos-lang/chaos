@@ -262,8 +262,34 @@ void execute(cpu *c)
     case NOTR:
         jit_notr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
         break;
+    // >>> Compare Instructions <<<
+    // eqr
+    case EQR:
+        jit_eqr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ner
+    case NER:
+        jit_ner(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // gtr
+    case GTR:
+        jit_gtr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ltr
+    case LTR:
+        jit_ltr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ger
+    case GER:
+        jit_ger(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ler
+    case LER:
+        jit_ler(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
     // >>> Non-Atomic Instructions <<<
     // Dynamic Instructions (prefixed with `DYN_`)
+    // Dynamic Arithmetic
     case DYN_ADD: {
         DYN_BINARY_ARITH(jit_addr, jit_faddr);
         break;
@@ -284,7 +310,22 @@ void execute(cpu *c)
         DYN_UNARY_ARITH(jit_negr, jit_fnegr);
         break;
     }
-    case PRNT: {
+    // Dynamic Logic
+    case DYN_LAND: {
+        jit_gti(_jit, R(1), R(1), 0);
+        jit_op* land_false_label = jit_beqi(_jit, JIT_FORWARD, R(1), 0);
+        jit_gti(_jit, R(1), R(5), 0);
+        jit_patch(_jit, land_false_label);
+        break;
+    }
+    case DYN_LOR: {
+        jit_gti(_jit, R(1), R(1), 0);
+        jit_op* lor_true_label = jit_bnei(_jit, JIT_FORWARD, R(1), 0);
+        jit_gti(_jit, R(1), R(5), 0);
+        jit_patch(_jit, lor_true_label);
+        break;
+    }
+    case DYN_PRNT: {
         jit_movi(_jit, R(2), cpu_print);
         jit_prepare(_jit);
         jit_putargr(_jit, R(0));

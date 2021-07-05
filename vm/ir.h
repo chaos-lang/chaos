@@ -50,13 +50,15 @@ enum IROpCode {
     // >>> Unary Arithmetic Operations <<<
     NEGR, FNEGR,
     NOTR,
+    //  >>> Compare Instructions <<<
+    EQR, NER, GTR, LTR, GER, LER,
     // >>> Non-Atomic Instructions <<<
-    DYN_ADD,
-    DYN_SUB,
-    DYN_MUL,
-    DYN_DIV,
-    DYN_NEG,
-    PRNT,
+    // Dynamic Arithmetic
+    DYN_ADD, DYN_SUB, DYN_MUL, DYN_DIV, DYN_NEG,
+    // Dynamic Logic
+    DYN_LAND, DYN_LOR,
+    // Dynamic Printing
+    DYN_PRNT,
     DEBUG,
     HLT,
     NUM_INSTRUCTIONS

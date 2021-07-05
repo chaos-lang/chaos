@@ -194,7 +194,34 @@ void emitBytecode(cpu *c)
     case NOTR:
         sprintf(str_inst, "%s R(%d) R(%d)", "NOTR", c->inst->op1->reg, c->inst->op2->reg);
         break;
+    // >>> Compare Instructions <<<
+    // eqr
+    case EQR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "EQR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    // ner
+    case NER:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "NER", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    // gtr
+    case GTR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "GTR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    // ltr
+    case LTR:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "LTR", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    // ger
+    case GER:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "GER", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
+    // ler
+    case LER:
+        sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "LER", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+        break;
     // >>> Non-Atomic Instructions <<<
+    // Dynamic Instructions (prefixed with `DYN_`)
+    // Dynamic Arithmetic
     case DYN_ADD:
         sprintf(str_inst, "%s", "DYN_ADD");
         break;
@@ -210,8 +237,16 @@ void emitBytecode(cpu *c)
     case DYN_NEG:
         sprintf(str_inst, "%s", "DYN_NEG");
         break;
-    case PRNT:
-        sprintf(str_inst, "%s", "PRNT");
+    // Dynamic Logic
+    case DYN_LAND:
+        sprintf(str_inst, "%s", "DYN_LAND");
+        break;
+    case DYN_LOR:
+        sprintf(str_inst, "%s", "DYN_LOR");
+        break;
+    // Dynamic Printing
+    case DYN_PRNT:
+        sprintf(str_inst, "%s", "DYN_PRNT");
         break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
