@@ -73,14 +73,14 @@ void debug(struct jit *jit);
     _fn(_jit, R(1), R(1), R(5)); \
     jit_op* float_op_label_5 = jit_jmpi(_jit, JIT_FORWARD); \
 \
-    /* It's a float operation. Set the jump point to dodge the integer operation */ \
+    /* It's a float operation. Set the jump point to dodge the integer operation TODO: reduce to one */ \
     jit_patch(_jit, float_op_label_1); \
     jit_patch(_jit, float_op_label_2); \
 \
     /* Check if left-hand operand is a float and cast it to float if it's not a float */ \
     jit_op* float_op_label_3 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
     jit_movi(_jit, R(0), V_FLOAT); \
-    jit_extr(_jit, FR(0), R(1)); \
+    jit_extr(_jit, FR(2), R(1)); \
     jit_patch(_jit, float_op_label_3); \
 \
     /* Check if right-hand operand is a float and cast it to float if it's not a float */ \
@@ -90,7 +90,7 @@ void debug(struct jit *jit);
     jit_patch(_jit, float_op_label_4); \
 \
     /* Do the float operation */ \
-    _ffn(_jit, FR(1), FR(0), FR(1)); \
+    _ffn(_jit, FR(1), FR(2), FR(1)); \
 \
     /* Set the jump point to dodge the float operation */ \
     jit_patch(_jit, float_op_label_5); \
@@ -112,5 +112,42 @@ void debug(struct jit *jit);
     /* Set the jump point to dodge the float operation */ \
     jit_patch(_jit, float_op_label_2); \
 
+#define DYN_BINARY_COMPARISON(_fn, _ffn) \
+    /* Check if any of the operands are float */ \
+    jit_op* float_op_label_1 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+    jit_op* float_op_label_2 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
+\
+    /* It's an integer operation, do the operation */ \
+    jit_movi(_jit, R(3), 1); \
+    jit_op* float_comp_label_true_int = _fn(_jit, JIT_FORWARD, R(1), R(5)); \
+    jit_movi(_jit, R(3), 0); \
+    jit_patch(_jit, float_comp_label_true_int); \
+    jit_op* float_op_label_5 = jit_jmpi(_jit, JIT_FORWARD); \
+\
+    /* It's a float operation. Set the jump point to dodge the integer operation TODO: reduce to one */ \
+    jit_patch(_jit, float_op_label_1); \
+    jit_patch(_jit, float_op_label_2); \
+\
+    /* Check if left-hand operand is a float and cast it to float if it's not a float */ \
+    jit_op* float_op_label_3 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+    jit_movi(_jit, R(0), V_FLOAT); \
+    jit_extr(_jit, FR(1), R(1)); \
+    jit_patch(_jit, float_op_label_3); \
+\
+    /* Check if right-hand operand is a float and cast it to float if it's not a float */ \
+    jit_op* float_op_label_4 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
+    jit_fmovr(_jit, FR(0), FR(1)); \
+    jit_extr(_jit, FR(2), R(5)); \
+    jit_patch(_jit, float_op_label_4); \
+\
+    /* Do the float operation */ \
+    jit_movi(_jit, R(3), 1); \
+    jit_op* float_comp_label_true_float = _ffn(_jit, JIT_FORWARD, FR(1), FR(2)); \
+    jit_movi(_jit, R(3), 0); \
+    jit_patch(_jit, float_comp_label_true_float); \
+\
+    /* Set the jump point to dodge the float operation */ \
+    jit_patch(_jit, float_op_label_5); \
+    jit_movr(_jit, R(1), R(3)); \
 
 #endif

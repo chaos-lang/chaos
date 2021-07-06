@@ -138,6 +138,9 @@ void execute(cpu *c)
     case FMOV:
         jit_fmovi(_jit, FR(c->inst->op1->reg), c->inst->op2->value.f);
         break;
+    case FMOVR:
+        jit_fmovr(_jit, FR(c->inst->op1->reg), FR(c->inst->op2->reg));
+        break;
     // alloc
     case ALLOCAI: {
         int i = jit_allocai(_jit, c->inst->op2->value.i);
@@ -310,6 +313,30 @@ void execute(cpu *c)
         DYN_UNARY_ARITH(jit_negr, jit_fnegr);
         break;
     }
+    case DYN_EQR: {
+        DYN_BINARY_COMPARISON(jit_beqr, jit_fbeqr);
+        break;
+    }
+    case DYN_NER: {
+        DYN_BINARY_COMPARISON(jit_bner, jit_fbner);
+        break;
+    }
+    case DYN_GTR: {
+        DYN_BINARY_COMPARISON(jit_bgtr, jit_fbgtr);
+        break;
+    }
+    case DYN_LTR: {
+        DYN_BINARY_COMPARISON(jit_bltr, jit_fbltr);
+        break;
+    }
+    case DYN_GER: {
+        DYN_BINARY_COMPARISON(jit_bger, jit_fbger);
+        break;
+    }
+    case DYN_LER: {
+        DYN_BINARY_COMPARISON(jit_bler, jit_fbler);
+        break;
+    }
     // Dynamic Logic
     case DYN_LAND: {
         jit_gti(_jit, R(1), R(1), 0);
@@ -323,6 +350,14 @@ void execute(cpu *c)
         jit_op* lor_true_label = jit_bnei(_jit, JIT_FORWARD, R(1), 0);
         jit_gti(_jit, R(1), R(5), 0);
         jit_patch(_jit, lor_true_label);
+        break;
+    }
+    case DYN_LNOT: {
+        jit_op* float_op_label = jit_bnei(_jit, JIT_FORWARD, R(0), V_FLOAT);
+        jit_truncr(_jit, R(1), FR(1));
+        jit_patch(_jit, float_op_label);
+        jit_gti(_jit, R(1), R(1), 0);
+        jit_xori(_jit, R(1), R(1), 0x00000001);
         break;
     }
     case DYN_PRNT: {

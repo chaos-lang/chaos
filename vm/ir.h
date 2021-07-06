@@ -30,7 +30,7 @@ typedef struct AST AST;
 enum IROpCode {
     PROLOG,
     // >>> Transfer Operations <<<
-    MOVR, MOVI, FMOV,
+    MOVR, MOVI, FMOV, FMOVR,
     ALLOCAI, REF_ALLOCAI,
     // >>> Load Operations <<<
     LDR, LDXR, FLDR, FLDXR,
@@ -55,8 +55,10 @@ enum IROpCode {
     // >>> Non-Atomic Instructions <<<
     // Dynamic Arithmetic
     DYN_ADD, DYN_SUB, DYN_MUL, DYN_DIV, DYN_NEG,
+    // Dynamic Comparison
+    DYN_EQR, DYN_NER, DYN_GTR, DYN_LTR, DYN_GER, DYN_LER,
     // Dynamic Logic
-    DYN_LAND, DYN_LOR,
+    DYN_LAND, DYN_LOR, DYN_LNOT,
     // Dynamic Printing
     DYN_PRNT,
     DEBUG,

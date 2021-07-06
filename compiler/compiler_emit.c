@@ -71,6 +71,9 @@ void emitBytecode(cpu *c)
     case FMOV:
         sprintf(str_inst, "%s FR(%d) %lf", "FMOV", c->inst->op1->reg, c->inst->op2->value.f);
         break;
+    case FMOVR:
+        sprintf(str_inst, "%s FR(%d) FR(%d)", "FMOVR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
     // alloc
     case ALLOCAI:
         sprintf(str_inst, "%s addr: %lld space: %lld", "ALLOCAI", c->inst->op1->value.i, c->inst->op2->value.i);
@@ -237,12 +240,31 @@ void emitBytecode(cpu *c)
     case DYN_NEG:
         sprintf(str_inst, "%s", "DYN_NEG");
         break;
+    // Dynamic Comparison
+    case DYN_EQR:
+        sprintf(str_inst, "%s", "DYN_EQR");
+        break;
+    case DYN_NER:
+        sprintf(str_inst, "%s", "DYN_NER");
+        break;
+    case DYN_GTR:
+        sprintf(str_inst, "%s", "DYN_GTR");
+        break;
+    case DYN_LTR:
+        sprintf(str_inst, "%s", "DYN_LTR");
+        break;
+    case DYN_GER:
+        sprintf(str_inst, "%s", "DYN_LTR");
+        break;
     // Dynamic Logic
     case DYN_LAND:
         sprintf(str_inst, "%s", "DYN_LAND");
         break;
     case DYN_LOR:
         sprintf(str_inst, "%s", "DYN_LOR");
+        break;
+    case DYN_LNOT:
+        sprintf(str_inst, "%s", "DYN_LNOT");
         break;
     // Dynamic Printing
     case DYN_PRNT:

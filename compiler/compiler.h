@@ -52,7 +52,7 @@ void pushProgram(KaosIR* program, KaosInst* el);
 KaosInst* popProgram(KaosIR* program);
 void freeProgram(KaosIR* program);
 KaosIR* initProgram();
-void shift_registers(KaosIR* program, size_t shift);
+void shift_registers(KaosIR* program);
 
 Symbol* store_bool(KaosIR* program, char *name, bool is_any);
 Symbol* store_int(KaosIR* program, char *name, bool is_any);

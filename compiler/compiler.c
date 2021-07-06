@@ -153,7 +153,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         break;
     case AssignStmt_kind: {
         compileExpr(program, stmt->v.assign_stmt->x);
-        shift_registers(program, 4);
+        shift_registers(program);
         compileExpr(program, stmt->v.assign_stmt->y);
         switch (stmt->v.assign_stmt->x->kind) {
         case Ident_kind: {
@@ -429,7 +429,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     }
     case BinaryExpr_kind: {
         enum ValueType type = compileExpr(program, expr->v.binary_expr->y);
-        shift_registers(program, 4);
+        shift_registers(program);
         i64 addr = stack_counter++;
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
             push_inst_i_i(program, ALLOCAI, addr, sizeof(long long));
@@ -438,7 +438,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
         compileExpr(program, expr->v.binary_expr->x);
         if (expr->v.binary_expr->x->kind == ParenExpr_kind || expr->v.binary_expr->x->kind == BinaryExpr_kind) {
-            shift_registers(program, 4);
+            shift_registers(program);
             push_inst_r_i(program, REF_ALLOCAI, R2, addr);
             push_inst_r_r_i(program, LDR, R5, R2, sizeof(long long));
         }
@@ -474,27 +474,27 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_r_r(program, RSHR, R1, R1, R5);
             break;
         case EQL_tok:
-            push_inst_r_r_r(program, EQR, R1, R1, R5);
+            push_inst_(program, DYN_EQR);
             push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case NEQ_tok:
-            push_inst_r_r_r(program, NER, R1, R1, R5);
+            push_inst_(program, DYN_NER);
             push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case GTR_tok:
-            push_inst_r_r_r(program, GTR, R1, R1, R5);
+            push_inst_(program, DYN_GTR);
             push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LSS_tok:
-            push_inst_r_r_r(program, LTR, R1, R1, R5);
+            push_inst_(program, DYN_LTR);
             push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case GEQ_tok:
-            push_inst_r_r_r(program, GER, R1, R1, R5);
+            push_inst_(program, DYN_GER);
             push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LEQ_tok:
-            push_inst_r_r_r(program, LER, R1, R1, R5);
+            push_inst_(program, DYN_LER);
             push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case LAND_tok:
@@ -520,6 +520,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_(program, DYN_NEG);
             break;
         case NOT_tok:
+            push_inst_(program, DYN_LNOT);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
             break;
         case TILDE_tok:
             push_inst_r_r(program, NOTR, R1, R1);
@@ -535,7 +537,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         break;
     case IndexExpr_kind: {
         enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
-        shift_registers(program, 4);
+        shift_registers(program);
 
         enum ValueType type2 = compileExpr(program, expr->v.index_expr->index) - 1;
         if (type1 == V_STRING) {
@@ -549,8 +551,10 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         enum ValueType type = compileExpr(program, expr->v.incdec_expr->x);
         switch (expr->v.incdec_expr->op) {
         case INC_tok:
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
             break;
         case DEC_tok:
+            push_inst_r_r_i(program, SUBI, R1, R1, 1);
             break;
         default:
             break;
@@ -560,13 +564,17 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             // i64 addr = symbol->addr;
             if (symbol->value_type == V_REF) {
             } else {
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
             }
         }
         if (!expr->v.incdec_expr->first) {
             switch (expr->v.incdec_expr->op) {
             case INC_tok:
+                push_inst_r_r_i(program, SUBI, R1, R1, 1);
                 break;
             case DEC_tok:
+                push_inst_r_r_i(program, ADDI, R1, R1, 1);
                 break;
             default:
                 break;
@@ -1611,11 +1619,14 @@ KaosIR* initProgram()
     return program;
 }
 
-void shift_registers(KaosIR* program, size_t shift)
+void shift_registers(KaosIR* program)
 {
+    i64 shift = 4;
     for (size_t i = 0; i < shift; i++) {
         push_inst_r_r(program, MOVR, shift + i, i);
     }
+
+    push_inst_r_r(program, FMOVR, R2, R1);
 }
 
 Symbol* store_bool(KaosIR* program, char *name, bool is_any)
