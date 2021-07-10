@@ -39,6 +39,8 @@ void compileSpecList(KaosIR* program, SpecList* spec_list);
 unsigned short compileSpec(KaosIR* program, Spec* spec);
 
 void push_inst_(KaosIR* program, enum IROpCode op_code);
+void push_inst_i(KaosIR* program, enum IROpCode op_code, i64 i);
+void push_inst_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg);
 void push_inst_i_i(KaosIR* program, enum IROpCode op_code, i64 i1, i64 i2);
 void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i);
 void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, f64 f);

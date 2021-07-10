@@ -56,8 +56,32 @@ void emitBytecode(cpu *c)
     sprintf(str_pc, "%lld", c->ic);
 
     switch (c->inst->op_code) {
+    // >>> Function Declaration <<<
+    // prolog
     case PROLOG:
-        sprintf(str_inst, "%s", "PROLOG");
+        sprintf(str_inst, "%s label: %lld", "PROLOG", c->inst->op1->value.i);
+        break;
+    case MAIN_PROLOG:
+        sprintf(str_inst, "%s", "MAIN_PROLOG");
+        break;
+    // ret
+    case RETR:
+        sprintf(str_inst, "%s R(%d)", "RETR", c->inst->op1->reg);
+        break;
+    case RETI:
+        sprintf(str_inst, "%s %lld", "RETI", c->inst->op1->value.i);
+        break;
+    // >>> Function Calls <<<
+    // prepare
+    case PREPARE:
+        sprintf(str_inst, "PREPARE");
+        break;
+    // call
+    case CALLR:
+        sprintf(str_inst, "%s R(%d)", "CALLR", c->inst->op1->reg);
+        break;
+    case CALL:
+        sprintf(str_inst, "%s label: %lld", "CALL", c->inst->op1->value.i);
         break;
     // >>> Transfer Operations <<<
     // mov

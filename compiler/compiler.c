@@ -31,7 +31,7 @@ extern bool interactively_importing;
 
 File* import_parent_context = NULL;
 
-AST* ast_ref = 0;
+AST* ast_ref = NULL;
 i64 label_counter = 0;
 int stack_counter = 0;
 
@@ -53,7 +53,9 @@ KaosIR* compile(ASTRoot* ast_root)
     current_file_index = 0;
 
     // Compile other statements in the first parsed file
-    push_inst_(program, PROLOG);
+    if (stmt_list->stmt_count > 0)
+        ast_ref = stmt_list->stmts[stmt_list->stmt_count - 1]->ast;
+    push_inst_(program, MAIN_PROLOG);
     for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
         Stmt* stmt = stmt_list->stmts[j - 1];
         if (
@@ -63,6 +65,7 @@ KaosIR* compile(ASTRoot* ast_root)
         )
             compileStmt(program, stmt);
     }
+    push_inst_i(program, RETI, 0);
 
     push_inst_(program, HLT);
     program->hlt_count++;
@@ -618,6 +621,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             break;
         }
 
+        push_inst_(program, PREPARE);
+        push_inst_i(program, CALL, function->addr);
+
         ExprList* expr_list = expr->v.call_expr->args;
 
         if (!function->is_dynamic) {
@@ -987,16 +993,21 @@ void compileDecl(KaosIR* program, Decl* decl)
     }
     case FuncDecl_kind: {
         _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+
         if (function->is_compiled)
             break;
 
-        function->body_addr = program->size - 1;
+        function->addr = label_counter++;
+        push_inst_i(program, PROLOG, function->addr);
+
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
             compileSpec(program, decl->v.func_decl->decision);
 
         function_mode->is_compiled = true;
         endFunction();
+
+        push_inst_i(program, RETI, 0);
         break;
     }
     default:
@@ -1356,6 +1367,20 @@ void push_inst_i(KaosIR* program, enum IROpCode op_code, i64 i)
     union IRValue value1;
     value1.i = i;
     op1->value = value1;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
+void push_inst_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg;
 
     KaosInst* inst = malloc(sizeof *inst);
     inst->op_code = op_code;

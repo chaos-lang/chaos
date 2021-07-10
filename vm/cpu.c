@@ -25,6 +25,7 @@
 typedef long (*plfv)();
 struct jit *_jit;
 plfv _main;
+plfv _f;
 jit_op *skip_data;
 
 jit_label_array* label_array = NULL;
@@ -105,11 +106,18 @@ void execute(cpu *c)
     // i64 ic_start = c->ic;
 
     switch (c->inst->op_code) {
-    case PROLOG:
+    // >>> Function Declaration <<<
+    // prolog
+    case PROLOG: {
+        jit_label* __f = jit_get_label(_jit);
+        jit_prolog(_jit, &_f);
+        push_label(label_array, __f);
+        break;
+    }
+    case MAIN_PROLOG:
         jit_prolog(_jit, &_main);
         if (c->debug_level > 4) {
             // Fixes the "uninitialized register" warning that caused by the usage in the `debug` function
-            // TODO: Do it only if the prolog belongs to the main function
             // Initialize the integers registers
             jit_movi(_jit, R(0), 0);
             jit_movi(_jit, R(1), 0);
@@ -125,6 +133,25 @@ void execute(cpu *c)
             jit_fmovi(_jit, FR(2), 0.0);
             jit_fmovi(_jit, FR(3), 0.0);
         }
+        break;
+    // ret
+    case RETR:
+        jit_retr(_jit, R(c->inst->op1->reg));
+        break;
+    case RETI:
+        jit_reti(_jit, c->inst->op1->value.i);
+        break;
+    // >>> Function Calls <<<
+    // prepare
+    case PREPARE:
+        jit_prepare(_jit);
+        break;
+    // call
+    case CALLR:
+        jit_callr(_jit, R(c->inst->op1->reg));
+        break;
+    case CALL:
+        jit_call(_jit, label_array->arr[c->inst->op1->value.i]);
         break;
     // >>> Transfer Operations <<<
     // mov
@@ -166,6 +193,7 @@ void execute(cpu *c)
         jit_fldxr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
         break;
     // >>> Store Operations <<<
+    // str
     case STR:
         jit_str(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
         break;

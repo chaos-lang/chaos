@@ -28,7 +28,11 @@
 typedef struct AST AST;
 
 enum IROpCode {
-    PROLOG,
+    // >>> Function Declaration <<<
+    PROLOG, MAIN_PROLOG,
+    RETR, RETI,
+    // >>> Function Calls <<<
+    PREPARE, CALLR, CALL,
     // >>> Transfer Operations <<<
     MOVR, MOVI, FMOV, FMOVR,
     ALLOCAI, REF_ALLOCAI,
