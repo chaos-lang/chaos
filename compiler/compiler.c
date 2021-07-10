@@ -34,6 +34,7 @@ File* import_parent_context = NULL;
 AST* ast_ref = NULL;
 i64 label_counter = 0;
 int stack_counter = 0;
+i64 register_offset = 0;
 
 KaosIR* compile(ASTRoot* ast_root)
 {
@@ -365,16 +366,16 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
-            push_inst_r_i(program, MOVI, R0, V_BOOL);
-            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.b ? 1 : 0);
+            push_inst_r_i(program, MOVI, R0 + register_offset, V_BOOL);
+            push_inst_r_i(program, MOVI, R1 + register_offset, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
-            push_inst_r_i(program, MOVI, R0, V_INT);
-            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.i);
+            push_inst_r_i(program, MOVI, R0 + register_offset, V_INT);
+            push_inst_r_i(program, MOVI, R1 + register_offset, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
-            push_inst_r_i(program, MOVI, R0, V_FLOAT);
-            push_inst_r_f(program, FMOV, R1, expr->v.basic_lit->value.f);
+            push_inst_r_i(program, MOVI, R0 + register_offset, V_FLOAT);
+            push_inst_r_f(program, FMOV, R1 + register_offset, expr->v.basic_lit->value.f);
             break;
         case V_STRING: {
             size_t len = strlen(expr->v.basic_lit->value.s);
@@ -393,8 +394,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_i(program, MOVI, R1, '\0');
             push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(char));
 
-            push_inst_r_i(program, MOVI, R0, V_STRING);
-            push_inst_r_i(program, MOVI, R1, len);
+            push_inst_r_i(program, MOVI, R0 + register_offset, V_STRING);
+            push_inst_r_i(program, MOVI, R1 + register_offset, len);
             break;
         }
         default:
@@ -632,7 +633,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         i64* putargr_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
         i64 putargr_stack_p = 0;
 
-        for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+        for (unsigned long i = 1; i < expr_list->expr_count + 1; i++) {
+            register_offset = (i - 1) * 2;
+
             Expr* expr = expr_list->exprs[expr_list->expr_count - i];
             enum ValueType value_type = compileExpr(program, expr) - 1;
             Symbol* parameter = function->parameters[i - 1];
@@ -648,15 +651,20 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
 
             switch (type) {
             case K_BOOL:
+                putargr_stack[putargr_stack_p++] = R0 + register_offset;
+                putargr_stack[putargr_stack_p++] = R1 + register_offset;
                 break;
             case K_NUMBER:
-                putargr_stack[putargr_stack_p++] = R0;
-                putargr_stack[putargr_stack_p++] = R1;
+                putargr_stack[putargr_stack_p++] = R0 + register_offset;
+                putargr_stack[putargr_stack_p++] = R1 + register_offset;
                 if (value_type == V_FLOAT) {
                 } else {
                 }
                 break;
             case K_STRING: {
+                putargr_stack[putargr_stack_p++] = R0 + register_offset;
+                putargr_stack[putargr_stack_p++] = R1 + register_offset;
+
                 size_t len = 0;
                 bool is_dynamic = false;
 
@@ -829,6 +837,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             default:
                 break;
             }
+
+            register_offset = 0;
         }
 
         if (function->is_dynamic) {
@@ -1349,11 +1359,13 @@ unsigned short compileSpec(KaosIR* program, Spec* spec)
 
         switch (type) {
         case K_BOOL:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_NUMBER:
             push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_STRING:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_LIST:
             break;
@@ -1922,6 +1934,16 @@ void load_ref(KaosIR* program, Symbol* symbol)
     i64 addr = symbol->addr;
     push_inst_r_i(program, GETARG, R0, addr);
     push_inst_r_i(program, GETARG, R1, addr + 1);
+
+    // TODO: This enables variable editing but find a better way
+    // // At first load, turn the argument into a variable in the stack
+    // symbol->addr = stack_counter++;
+    // push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
+    // push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    // push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+    // push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    // push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+    // symbol->value_type = V_INT;
 }
 
 char* compile_module_selector(Expr* module_selector)
