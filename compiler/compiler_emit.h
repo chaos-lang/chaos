@@ -29,5 +29,6 @@
 void emit(KaosIR* program);
 void print_cpu(cpu *c, i64 hlt_count);
 void emitBytecode(cpu *c);
+char* getArgTypeName(i64 i);
 
 #endif

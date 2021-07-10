@@ -22,6 +22,13 @@
 
 #include "compiler_emit.h"
 
+char *arg_type_names[] = {
+    "SIGNED_NUM",
+    "UNSIGNED_NUM",
+    "FLOAT_NUM",
+    "PTR"
+};
+
 void emit(KaosIR* program)
 {
     cpu *c = new_cpu(program, 0);
@@ -64,6 +71,14 @@ void emitBytecode(cpu *c)
     case MAIN_PROLOG:
         sprintf(str_inst, "%s", "MAIN_PROLOG");
         break;
+    // declare_arg
+    case DECLARE_ARG:
+        sprintf(str_inst, "%s type: %s size: %lld", "DECLARE_ARG", getArgTypeName(c->inst->op1->value.i), c->inst->op2->value.i);
+        break;
+    // getarg
+    case GETARG:
+        sprintf(str_inst, "%s R(%d) %lld", "GETARG", c->inst->op1->reg, c->inst->op2->value.i);
+        break;
     // ret
     case RETR:
         sprintf(str_inst, "%s R(%d)", "RETR", c->inst->op1->reg);
@@ -75,6 +90,13 @@ void emitBytecode(cpu *c)
     // prepare
     case PREPARE:
         sprintf(str_inst, "PREPARE");
+        break;
+    // putarg
+    case PUTARGR:
+        sprintf(str_inst, "%s R(%d)", "PUTARGR", c->inst->op1->reg);
+        break;
+    case PUTARGI:
+        sprintf(str_inst, "%s %lld", "PUTARGI", c->inst->op1->value.i);
         break;
     // call
     case CALLR:
@@ -334,4 +356,9 @@ void emitBytecode(cpu *c)
     );
     if (fp_module != tmp_stdin)
         fclose(fp_module);
+}
+
+char* getArgTypeName(i64 i)
+{
+    return arg_type_names[i];
 }

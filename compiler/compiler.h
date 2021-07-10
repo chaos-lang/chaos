@@ -35,7 +35,9 @@ void compileStmtList(KaosIR* program, StmtList* stmt_list);
 void compileStmt(KaosIR* program, Stmt* stmt);
 unsigned short compileExpr(KaosIR* program, Expr* expr);
 void compileDecl(KaosIR* program, Decl* decl);
+void declareSpecList(KaosIR* program, SpecList* spec_list);
 void compileSpecList(KaosIR* program, SpecList* spec_list);
+unsigned short declareSpec(KaosIR* program, Spec* spec);
 unsigned short compileSpec(KaosIR* program, Spec* spec);
 
 void push_inst_(KaosIR* program, enum IROpCode op_code);
@@ -71,6 +73,7 @@ void load_string(KaosIR* program, Symbol* symbol);
 void load_list(KaosIR* program, Symbol* symbol);
 void load_dict(KaosIR* program, Symbol* symbol);
 void load_any(KaosIR* program, Symbol* symbol);
+void load_ref(KaosIR* program, Symbol* symbol);
 
 char* compile_module_selector(Expr* module_selector);
 bool declare_function(Stmt* stmt, File* file, KaosIR* program);

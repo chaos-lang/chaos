@@ -134,6 +134,14 @@ void execute(cpu *c)
             jit_fmovi(_jit, FR(3), 0.0);
         }
         break;
+    // declare_arg
+    case DECLARE_ARG:
+        jit_declare_arg(_jit, c->inst->op1->value.i, c->inst->op2->value.i);
+        break;
+    // getarg
+    case GETARG:
+        jit_getarg(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
+        break;
     // ret
     case RETR:
         jit_retr(_jit, R(c->inst->op1->reg));
@@ -145,6 +153,13 @@ void execute(cpu *c)
     // prepare
     case PREPARE:
         jit_prepare(_jit);
+        break;
+    // putarg
+    case PUTARGR:
+        jit_putargr(_jit, R(c->inst->op1->reg));
+        break;
+    case PUTARGI:
+        jit_putargi(_jit, c->inst->op1->value.i);
         break;
     // call
     case CALLR:

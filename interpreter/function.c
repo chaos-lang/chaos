@@ -220,6 +220,7 @@ void addFunctionParameterNew(_Function* function, Symbol* parameter) {
     );
     function->parameters[function->parameter_count - 1] = parameter;
     parameter->param_of = function;
+    parameter->addr = (function->parameter_count - 1) * 2;
 }
 
 void endFunction() {

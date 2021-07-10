@@ -423,6 +423,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case V_DICT:
             load_dict(program, symbol);
             break;
+        case V_REF:
+            load_ref(program, symbol);
+            break;
         default:
             load_any(program, symbol);
             break;
@@ -621,13 +624,13 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             break;
         }
 
-        push_inst_(program, PREPARE);
-        push_inst_i(program, CALL, function->addr);
-
         ExprList* expr_list = expr->v.call_expr->args;
 
         if (!function->is_dynamic) {
         }
+
+        i64* putargr_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
+        i64 putargr_stack_p = 0;
 
         for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
             Expr* expr = expr_list->exprs[expr_list->expr_count - i];
@@ -647,6 +650,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             case K_BOOL:
                 break;
             case K_NUMBER:
+                putargr_stack[putargr_stack_p++] = R0;
+                putargr_stack[putargr_stack_p++] = R1;
                 if (value_type == V_FLOAT) {
                 } else {
                 }
@@ -829,6 +834,12 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         if (function->is_dynamic) {
         } else {
         }
+
+        push_inst_(program, PREPARE);
+        for (size_t i = 0; i < putargr_stack_p; i++)
+            push_inst_r(program, PUTARGR, putargr_stack[i]);
+        push_inst_i(program, CALL, function->addr);
+
         return function->value_type + 1;
         break;
     }
@@ -1000,6 +1011,8 @@ void compileDecl(KaosIR* program, Decl* decl)
         function->addr = label_counter++;
         push_inst_i(program, PROLOG, function->addr);
 
+        compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
             compileSpec(program, decl->v.func_decl->decision);
@@ -1015,11 +1028,296 @@ void compileDecl(KaosIR* program, Decl* decl)
     }
 }
 
+void declareSpecList(KaosIR* program, SpecList* spec_list)
+{
+    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
+        declareSpec(program, spec_list->specs[i - 1]);
+    }
+}
+
 void compileSpecList(KaosIR* program, SpecList* spec_list)
 {
     for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
         compileSpec(program, spec_list->specs[i - 1]);
     }
+}
+
+unsigned short declareSpec(KaosIR* program, Spec* spec)
+{
+    switch (spec->kind) {
+        case FieldListSpec_kind:
+            declareSpecList(program, spec->v.field_list_spec->list);
+            break;
+        case FieldSpec_kind: {
+            enum Type type = compileSpec(program, spec->v.field_spec->type_spec);
+            enum Type secondary_type = K_ANY;
+            if (spec->v.field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
+                secondary_type = spec->v.field_spec->type_spec->v.type_spec->type;
+
+            Symbol* parameter = NULL;
+            union Value value;
+            value.i = 0;
+
+            switch (type) {
+            case K_BOOL:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
+                break;
+            case K_NUMBER:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
+                break;
+            case K_STRING:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
+                break;
+            case K_LIST:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
+                break;
+            case K_DICT:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
+                break;
+            case K_ANY:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_ANY, value, V_REF);
+                break;
+            default:
+                break;
+            }
+            parameter->secondary_type = secondary_type;
+
+            // parameter->addr = program->heap;
+            // program->heap += 2;
+            addFunctionParameterNew(function_mode, parameter);
+            break;
+        }
+        case OptionalFieldSpec_kind: {
+            enum Type type = compileSpec(program, spec->v.optional_field_spec->type_spec);
+            enum Type secondary_type = K_ANY;
+            if (spec->v.optional_field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
+                secondary_type = spec->v.optional_field_spec->type_spec->v.type_spec->type;
+
+            Symbol* parameter = NULL;
+            union Value value;
+            value.i = 0;
+
+            switch (type) {
+            case K_BOOL:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
+                break;
+            case K_NUMBER:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
+                break;
+            case K_STRING:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
+                break;
+            case K_LIST:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
+                break;
+            case K_DICT:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
+                break;
+            case K_ANY:
+                parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_ANY, value, V_REF);
+                break;
+            default:
+                break;
+            }
+            parameter->secondary_type = secondary_type;
+
+            // parameter->addr = program->heap;
+            // program->heap += 2;
+
+            addFunctionParameterNew(function_mode, parameter);
+
+            // Load the default value
+            Expr* expr = spec->v.optional_field_spec->expr;
+            enum ValueType value_type = compileExpr(program, expr) - 1;
+            // i64 addr = parameter->addr;
+
+            switch (type) {
+            case K_BOOL:
+                break;
+            case K_NUMBER:
+                if (value_type == V_FLOAT) {
+                } else {
+                }
+                break;
+            case K_STRING: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case BasicLit_kind:
+                    len = strlen(expr->v.basic_lit->value.s);
+                    break;
+                case BinaryExpr_kind:
+                    is_dynamic = true;
+                    break;
+                case IndexExpr_kind:
+                    len = 1;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                } else {
+                    for (size_t i = len; i > 0; i--) {
+                    }
+                }
+                break;
+            }
+            case K_ANY: {
+                switch (value_type) {
+                case V_BOOL:
+                    break;
+                case V_INT: {
+                    break;
+                }
+                case V_FLOAT: {
+                    break;
+                }
+                case V_STRING: {
+                    size_t len = 0;
+                    bool is_dynamic = false;
+
+                    switch (expr->kind) {
+                    case BasicLit_kind:
+                        len = strlen(expr->v.basic_lit->value.s);
+                        break;
+                    case BinaryExpr_kind:
+                        len =
+                            strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
+                            +
+                            strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
+                        break;
+                    case IndexExpr_kind:
+                        len = 1;
+                        break;
+                    case Ident_kind:
+                        is_dynamic = true;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (is_dynamic) {
+                    } else {
+                        for (size_t i = len; i > 0; i--) {
+                        }
+                    }
+                    break;
+                }
+                case V_LIST: {
+                    size_t len = 0;
+                    bool is_dynamic = false;
+
+                    switch (expr->kind) {
+                    case CompositeLit_kind:
+                        len = expr->v.composite_lit->elts->expr_count;
+                        break;
+                    case Ident_kind:
+                        is_dynamic = true;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (is_dynamic) {
+                    } else {
+                        // program->heap += len;
+                        for (size_t i = len; i > 0; i--) {
+                        }
+                        // program->heap += len;
+                    }
+                    break;
+                }
+                case V_DICT: {
+                    size_t len = 0;
+                    bool is_dynamic = false;
+
+                    switch (expr->kind) {
+                    case CompositeLit_kind:
+                        len = expr->v.composite_lit->elts->expr_count;
+                        break;
+                    case Ident_kind:
+                        is_dynamic = true;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (is_dynamic) {
+                    } else {
+                        // program->heap += len * 2;
+                        for (size_t i = len; i > 0; i--) {
+                        }
+                        // program->heap += len * 2;
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
+            }
+            case K_LIST: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                } else {
+                    // program->heap += len;
+                    for (size_t i = len; i > 0; i--) {
+                    }
+                    // program->heap += len;
+                }
+                break;
+            }
+            case K_DICT: {
+                size_t len = 0;
+                bool is_dynamic = false;
+
+                switch (expr->kind) {
+                case CompositeLit_kind:
+                    len = expr->v.composite_lit->elts->expr_count;
+                    break;
+                case Ident_kind:
+                    is_dynamic = true;
+                    break;
+                default:
+                    break;
+                }
+
+                if (is_dynamic) {
+                } else {
+                    // program->heap += len * 2;
+                    for (size_t i = len; i > 0; i--) {
+                    }
+                    // program->heap += len * 2;
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    return 0;
 }
 
 unsigned short compileSpec(KaosIR* program, Spec* spec)
@@ -1046,270 +1344,30 @@ unsigned short compileSpec(KaosIR* program, Spec* spec)
         break;
     case FieldSpec_kind: {
         enum Type type = compileSpec(program, spec->v.field_spec->type_spec);
-        enum Type secondary_type = K_ANY;
-        if (spec->v.field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
-            secondary_type = spec->v.field_spec->type_spec->v.type_spec->type;
 
-        Symbol* parameter = NULL;
-        union Value value;
-        value.i = 0;
+        push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
 
         switch (type) {
         case K_BOOL:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
             break;
         case K_NUMBER:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_STRING:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
             break;
         case K_LIST:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
             break;
         case K_DICT:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
             break;
         case K_ANY:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_ANY, value, V_REF);
             break;
-        default:
-            break;
-        }
-        parameter->secondary_type = secondary_type;
-
-        // parameter->addr = program->heap;
-        // program->heap += 2;
-        addFunctionParameterNew(function_mode, parameter);
-        break;
-    }
-    case OptionalFieldSpec_kind: {
-        enum Type type = compileSpec(program, spec->v.optional_field_spec->type_spec);
-        enum Type secondary_type = K_ANY;
-        if (spec->v.optional_field_spec->type_spec->v.type_spec->sub_type_spec != NULL)
-            secondary_type = spec->v.optional_field_spec->type_spec->v.type_spec->type;
-
-        Symbol* parameter = NULL;
-        union Value value;
-        value.i = 0;
-
-        switch (type) {
-        case K_BOOL:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_BOOL, value, V_REF);
-            break;
-        case K_NUMBER:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_NUMBER, value, V_REF);
-            break;
-        case K_STRING:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_STRING, value, V_REF);
-            break;
-        case K_LIST:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_LIST, value, V_REF);
-            break;
-        case K_DICT:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_DICT, value, V_REF);
-            break;
-        case K_ANY:
-            parameter = addSymbol(spec->v.field_spec->ident->v.ident->name, K_ANY, value, V_REF);
-            break;
-        default:
-            break;
-        }
-        parameter->secondary_type = secondary_type;
-
-        // parameter->addr = program->heap;
-        // program->heap += 2;
-
-        addFunctionParameterNew(function_mode, parameter);
-
-        // Load the default value
-        Expr* expr = spec->v.optional_field_spec->expr;
-        enum ValueType value_type = compileExpr(program, expr) - 1;
-        // i64 addr = parameter->addr;
-
-        switch (type) {
-        case K_BOOL:
-            break;
-        case K_NUMBER:
-            if (value_type == V_FLOAT) {
-            } else {
-            }
-            break;
-        case K_STRING: {
-            size_t len = 0;
-            bool is_dynamic = false;
-
-            switch (expr->kind) {
-            case BasicLit_kind:
-                len = strlen(expr->v.basic_lit->value.s);
-                break;
-            case BinaryExpr_kind:
-                is_dynamic = true;
-                break;
-            case IndexExpr_kind:
-                len = 1;
-                break;
-            case Ident_kind:
-                is_dynamic = true;
-                break;
-            default:
-                break;
-            }
-
-            if (is_dynamic) {
-            } else {
-                for (size_t i = len; i > 0; i--) {
-                }
-            }
-            break;
-        }
-        case K_ANY: {
-            switch (value_type) {
-            case V_BOOL:
-                break;
-            case V_INT: {
-                break;
-            }
-            case V_FLOAT: {
-                break;
-            }
-            case V_STRING: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (expr->kind) {
-                case BasicLit_kind:
-                    len = strlen(expr->v.basic_lit->value.s);
-                    break;
-                case BinaryExpr_kind:
-                    len =
-                        strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
-                        +
-                        strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
-                    break;
-                case IndexExpr_kind:
-                    len = 1;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                if (is_dynamic) {
-                } else {
-                    for (size_t i = len; i > 0; i--) {
-                    }
-                }
-                break;
-            }
-            case V_LIST: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (expr->kind) {
-                case CompositeLit_kind:
-                    len = expr->v.composite_lit->elts->expr_count;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                if (is_dynamic) {
-                } else {
-                    // program->heap += len;
-                    for (size_t i = len; i > 0; i--) {
-                    }
-                    // program->heap += len;
-                }
-                break;
-            }
-            case V_DICT: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (expr->kind) {
-                case CompositeLit_kind:
-                    len = expr->v.composite_lit->elts->expr_count;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                if (is_dynamic) {
-                } else {
-                    // program->heap += len * 2;
-                    for (size_t i = len; i > 0; i--) {
-                    }
-                    // program->heap += len * 2;
-                }
-                break;
-            }
-            default:
-                break;
-            }
-            break;
-        }
-        case K_LIST: {
-            size_t len = 0;
-            bool is_dynamic = false;
-
-            switch (expr->kind) {
-            case CompositeLit_kind:
-                len = expr->v.composite_lit->elts->expr_count;
-                break;
-            case Ident_kind:
-                is_dynamic = true;
-                break;
-            default:
-                break;
-            }
-
-            if (is_dynamic) {
-            } else {
-                // program->heap += len;
-                for (size_t i = len; i > 0; i--) {
-                }
-                // program->heap += len;
-            }
-            break;
-        }
-        case K_DICT: {
-            size_t len = 0;
-            bool is_dynamic = false;
-
-            switch (expr->kind) {
-            case CompositeLit_kind:
-                len = expr->v.composite_lit->elts->expr_count;
-                break;
-            case Ident_kind:
-                is_dynamic = true;
-                break;
-            default:
-                break;
-            }
-
-            if (is_dynamic) {
-            } else {
-                // program->heap += len * 2;
-                for (size_t i = len; i > 0; i--) {
-                }
-                // program->heap += len * 2;
-            }
-            break;
-        }
         default:
             break;
         }
         break;
     }
+    case OptionalFieldSpec_kind:
+        break;
     case ImportSpec_kind: {
         if (spec->v.import_spec->handled)
             break;
@@ -1859,6 +1917,13 @@ void load_any(KaosIR* program, Symbol* symbol)
     // i64 addr = symbol->addr;
 }
 
+void load_ref(KaosIR* program, Symbol* symbol)
+{
+    i64 addr = symbol->addr;
+    push_inst_r_i(program, GETARG, R0, addr);
+    push_inst_r_i(program, GETARG, R1, addr + 1);
+}
+
 char* compile_module_selector(Expr* module_selector)
 {
     char* name = NULL;
@@ -1907,7 +1972,7 @@ bool declare_function(Stmt* stmt, File* file, KaosIR* program)
 
             startFunctionScope(function_mode);
             function_mode->optional_parameters_addr = program->size - 1;
-            compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+            declareSpec(program, decl->v.func_decl->type->v.func_type->params);
             endFunction();
 
             return true;
@@ -1938,7 +2003,7 @@ bool declare_function(Stmt* stmt, File* file, KaosIR* program)
 
     startFunctionScope(function_mode);
     function_mode->optional_parameters_addr = program->size - 1;
-    compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+    declareSpec(program, decl->v.func_decl->type->v.func_type->params);
 
     if (strcmp(file->module_path, file->context) != 0) {
         _Function* context_function = declareFunction(
