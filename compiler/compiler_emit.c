@@ -98,6 +98,10 @@ void emitBytecode(cpu *c)
     case PUTARGI:
         sprintf(str_inst, "%s %lld", "PUTARGI", c->inst->op1->value.i);
         break;
+    // retval
+    case RETVAL:
+        sprintf(str_inst, "%s R(%d)", "RETVAL", c->inst->op1->reg);
+        break;
     // call
     case CALLR:
         sprintf(str_inst, "%s R(%d)", "CALLR", c->inst->op1->reg);

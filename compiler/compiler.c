@@ -348,6 +348,8 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         enum ValueType value_type = compileExpr(program, return_stmt->x) - 1;
         function_mode->value_type = value_type;
 
+        push_inst_r(program, RETR, R1);
+
         if (!return_stmt->dont_push_callx) {
         }
         break;
@@ -860,6 +862,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         for (size_t i = 0; i < putargr_stack_p; i++)
             push_inst_r(program, PUTARGR, putargr_stack[i]);
         push_inst_i(program, CALL, function->addr);
+
+        push_inst_r(program, RETVAL, R1);
 
         return function->value_type + 1;
         break;

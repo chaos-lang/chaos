@@ -36,6 +36,7 @@ enum IROpCode {
     // >>> Function Calls <<<
     PREPARE, CALLR, CALL,
     PUTARGR, PUTARGI,
+    RETVAL,
     // >>> Transfer Operations <<<
     MOVR, MOVI, FMOV, FMOVR,
     ALLOCAI, REF_ALLOCAI,

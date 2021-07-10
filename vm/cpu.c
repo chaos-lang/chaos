@@ -161,6 +161,10 @@ void execute(cpu *c)
     case PUTARGI:
         jit_putargi(_jit, c->inst->op1->value.i);
         break;
+    // retval
+    case RETVAL:
+        jit_retval(_jit, R(c->inst->op1->reg));
+        break;
     // call
     case CALLR:
         jit_callr(_jit, R(c->inst->op1->reg));
