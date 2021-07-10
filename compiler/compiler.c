@@ -226,6 +226,17 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 break;
             }
             case V_REF: {
+                // At first load, turn the argument into a variable in the stack
+                symbol_x->addr = stack_counter++;
+                push_inst_i_i(program, ALLOCAI, symbol_x->addr, 2 * sizeof(long long));
+                push_inst_r_i(program, REF_ALLOCAI, R2, symbol_x->addr);
+                push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+                symbol_x->value_type = V_INT;
+
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
                 break;
             }
             default:
@@ -1934,16 +1945,6 @@ void load_ref(KaosIR* program, Symbol* symbol)
     i64 addr = symbol->addr;
     push_inst_r_i(program, GETARG, R0, addr);
     push_inst_r_i(program, GETARG, R1, addr + 1);
-
-    // TODO: This enables variable editing but find a better way
-    // // At first load, turn the argument into a variable in the stack
-    // symbol->addr = stack_counter++;
-    // push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
-    // push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
-    // push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
-    // push_inst_r_i(program, MOVI, R3, sizeof(long long));
-    // push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
-    // symbol->value_type = V_INT;
 }
 
 char* compile_module_selector(Expr* module_selector)
