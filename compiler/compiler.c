@@ -349,10 +349,9 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         enum ValueType value_type = compileExpr(program, return_stmt->x) - 1;
         function_mode->value_type = value_type;
 
-        push_inst_r(program, RETR, R1);
+        if (!return_stmt->dont_push_callx)
+            push_inst_r(program, RETR, R1);
 
-        if (!return_stmt->dont_push_callx) {
-        }
         break;
     }
     case ExitStmt_kind: {
@@ -862,9 +861,13 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         push_inst_(program, PREPARE);
         for (size_t i = 0; i < putargr_stack_p; i++)
             push_inst_r(program, PUTARGR, putargr_stack[i]);
-        push_inst_i(program, CALL, function->addr);
+
+        push_inst_i_i(program, CALL, function->addr, op_counter++);
+
+        function->call_patches[function->call_patches_size++] = op_counter - 1;
 
         push_inst_r(program, RETVAL, R1);
+        push_inst_r_i(program, MOVI, R0, 1); // TODO: temp, set it according to function return type
 
         return function->value_type + 1;
         break;
@@ -872,7 +875,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case DecisionExpr_kind: {
         compileExpr(program, expr->v.decision_expr->bool_expr);
 
-        push_inst_r_i(program, BEQI, R1, 0);
+        i64 _op = op_counter++;
+
+        push_inst_r_i_i(program, BEQI, R1, 0, _op);
 
         // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
         if (expr->v.decision_expr->outcome->kind == ReturnStmt_kind)
@@ -880,11 +885,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
 
         compileStmt(program, expr->v.decision_expr->outcome);
 
-        // TODO: Add RETR here
-
         push_inst_r(program, RETR, R1);
 
-        push_inst_i(program, PATCH, op_counter++);
+        push_inst_i(program, PATCH, _op);
         break;
     }
     case DefaultExpr_kind: {
@@ -1044,7 +1047,9 @@ void compileDecl(KaosIR* program, Decl* decl)
         if (function->is_compiled)
             break;
 
-        function->addr = label_counter++;
+        for (int i = 0; i < function->call_patches_size; i++)
+            push_inst_i(program, PATCH, function->call_patches[i]);
+
         push_inst_i(program, PROLOG, function->addr);
 
         compileSpec(program, decl->v.func_decl->type->v.func_type->params);
@@ -1056,7 +1061,7 @@ void compileDecl(KaosIR* program, Decl* decl)
         function_mode->is_compiled = true;
         endFunction();
 
-        push_inst_i(program, RETI, 0);
+        push_inst_i(program, RETI, 0);  // TODO: should we remove it?
         break;
     }
     default:
@@ -1596,6 +1601,34 @@ void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
     pushProgram(program, inst);
 }
 
+void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, i64 i1, i64 i2)
+{
+    KaosOp* op1 = malloc(sizeof *op1);
+    op1->type = IR_REG;
+    op1->reg = reg1;
+
+    KaosOp* op2 = malloc(sizeof *op2);
+    op2->type = IR_VAL;
+    union IRValue value2;
+    value2.i = i1;
+    op2->value = value2;
+
+    KaosOp* op3 = malloc(sizeof *op3);
+    op3->type = IR_VAL;
+    union IRValue value3;
+    value3.i = i2;
+    op3->value = value3;
+
+    KaosInst* inst = malloc(sizeof *inst);
+    inst->op_code = op_code;
+    inst->op1 = op1;
+    inst->op2 = op2;
+    inst->op3 = op3;
+    inst->ast = ast_ref;
+
+    pushProgram(program, inst);
+}
+
 void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, f64 f)
 {
     KaosOp* op1 = malloc(sizeof *op1);
@@ -2010,6 +2043,8 @@ bool declare_function(Stmt* stmt, File* file, KaosIR* program)
 
             startFunctionScope(function_mode);
             function_mode->optional_parameters_addr = program->size - 1;
+            function_mode->addr = label_counter++;
+            push_inst_i(program, DECLARE_LABEL, function_mode->addr);
             declareSpec(program, decl->v.func_decl->type->v.func_type->params);
             endFunction();
 
@@ -2041,6 +2076,8 @@ bool declare_function(Stmt* stmt, File* file, KaosIR* program)
 
     startFunctionScope(function_mode);
     function_mode->optional_parameters_addr = program->size - 1;
+    function_mode->addr = label_counter++;
+    push_inst_i(program, DECLARE_LABEL, function_mode->addr);
     declareSpec(program, decl->v.func_decl->type->v.func_type->params);
 
     if (strcmp(file->module_path, file->context) != 0) {

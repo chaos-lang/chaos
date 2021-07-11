@@ -177,6 +177,9 @@ _Function* declareFunction(char *name, char *module, char *module_path, char *co
         end_function->next = NULL;
     }
 
+    function->call_patches = (int*)malloc(USHRT_MAX * 256 * sizeof(int));
+    function->call_patches_size = 0;
+
     return function;
 }
 

@@ -29,6 +29,7 @@ typedef struct AST AST;
 
 enum IROpCode {
     // >>> Function Declaration <<<
+    DECLARE_LABEL,
     PROLOG, MAIN_PROLOG,
     DECLARE_ARG,
     GETARG,

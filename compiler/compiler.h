@@ -48,6 +48,7 @@ void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
 void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, f64 f);
 void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2);
 void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i);
+void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, i64 i1, i64 i2);
 void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, f64 f);
 void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3);
 void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, i64 i);

@@ -64,6 +64,10 @@ void emitBytecode(cpu *c)
 
     switch (c->inst->op_code) {
     // >>> Function Declaration <<<
+    // declare_label
+    case DECLARE_LABEL:
+        sprintf(str_inst, "%s %lld", "DECLARE_LABEL", c->inst->op1->value.i);
+        break;
     // prolog
     case PROLOG:
         sprintf(str_inst, "%s label: %lld", "PROLOG", c->inst->op1->value.i);
@@ -107,7 +111,7 @@ void emitBytecode(cpu *c)
         sprintf(str_inst, "%s R(%d)", "CALLR", c->inst->op1->reg);
         break;
     case CALL:
-        sprintf(str_inst, "%s label: %lld", "CALL", c->inst->op1->value.i);
+        sprintf(str_inst, "%s label: %lld op: %lld", "CALL", c->inst->op1->value.i, c->inst->op2->value.i);
         break;
     // >>> Transfer Operations <<<
     // mov
@@ -278,7 +282,7 @@ void emitBytecode(cpu *c)
         sprintf(str_inst, "%s R(%d) R(%d)", "BEQR", c->inst->op1->reg, c->inst->op2->reg);
         break;
     case BEQI:
-        sprintf(str_inst, "%s R(%d) %lld", "BEQI", c->inst->op1->reg, c->inst->op2->value.i);
+        sprintf(str_inst, "%s R(%d) %lld op: %lld", "BEQI", c->inst->op1->reg, c->inst->op2->value.i, c->inst->op3->value.i);
         break;
     // patch
     case PATCH:

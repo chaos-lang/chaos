@@ -70,6 +70,8 @@ typedef struct _Function {
     _Function* ref;
     bool is_dynamic;
     bool is_compiled;
+    int *call_patches;
+    int call_patches_size;
 } _Function;
 
 _Function* function_cursor;

@@ -39,6 +39,8 @@ char *reg_names[] = {
 i64* ast_stack = NULL;
 i64 ast_stack_p = 0;
 
+bool temp_disable_debug = false;
+
 cpu *new_cpu(KaosIR* program, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
@@ -109,11 +111,17 @@ void execute(cpu *c)
 
     switch (c->inst->op_code) {
     // >>> Function Declaration <<<
+    // declare_label
+    case DECLARE_LABEL: {
+        jit_label* __f = jit_get_label(_jit);
+        push_label(label_array, __f);
+        break;
+    }
     // prolog
     case PROLOG: {
         jit_label* __f = jit_get_label(_jit);
+        label_array->arr[c->inst->op1->value.i] = __f;
         jit_prolog(_jit, &_f);
-        push_label(label_array, __f);
         break;
     }
     case MAIN_PROLOG:
@@ -154,6 +162,7 @@ void execute(cpu *c)
     // >>> Function Calls <<<
     // prepare
     case PREPARE:
+        temp_disable_debug = true;
         jit_prepare(_jit);
         break;
     // putarg
@@ -171,9 +180,12 @@ void execute(cpu *c)
     case CALLR:
         jit_callr(_jit, R(c->inst->op1->reg));
         break;
-    case CALL:
-        jit_call(_jit, label_array->arr[c->inst->op1->value.i]);
+    case CALL: {
+        jit_op* __op = jit_call(_jit, label_array->arr[c->inst->op1->value.i]);
+        push_op(op_array, __op);
+        temp_disable_debug = false;
         break;
+    }
     // >>> Transfer Operations <<<
     // mov
     case MOVR:
@@ -342,13 +354,13 @@ void execute(cpu *c)
     // >>> Branch Operations <<<
     // beq
     case BEQR: {
-        jit_op* __pc = jit_beqr(_jit, JIT_FORWARD, R(c->inst->op1->reg), R(c->inst->op2->reg));
-        push_op(op_array, __pc);
+        jit_op* __op = jit_beqr(_jit, JIT_FORWARD, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        push_op(op_array, __op);
         break;
     }
     case BEQI: {
-        jit_op* __pc = jit_beqi(_jit, JIT_FORWARD, R(c->inst->op1->reg), c->inst->op2->value.i);
-        push_op(op_array, __pc);
+        jit_op* __op = jit_beqi(_jit, JIT_FORWARD, R(c->inst->op1->reg), c->inst->op2->value.i);
+        push_op(op_array, __op);
         break;
     }
     // patch
@@ -442,7 +454,7 @@ void execute(cpu *c)
         break;
     }
 
-    if (c->debug_level > 4)
+    if (c->debug_level > 4 && !temp_disable_debug)
         debug(_jit);
 }
 
