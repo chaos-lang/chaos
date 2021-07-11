@@ -216,5 +216,12 @@ rosetta-update:
 benchmark:
 	./benchmark.sh
 
+bench-langs:
+	hyperfine --warmup 3 \
+		'chaos dev.kaos' \
+		'python3 dev.py' \
+		'ruby dev.rb' \
+		'php dev.php'
+
 profile:
 	./profile.sh

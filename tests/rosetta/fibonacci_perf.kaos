@@ -1,9 +1,3 @@
-num def fibo_error()
-    print "Incorrect input"
-    num r = 0
-    return r
-end
-
 num def sum(num j)
     num x = fibo(j - 1)
     num y = fibo(j - 2)
@@ -12,15 +6,10 @@ num def sum(num j)
 end
 
 num def fibo(num n)
-    num zero = 0
-    num one = 1
-    num c = n
 end {
-    n < 0   : fibo_error(),
-    n == 0  : return zero,
-    n == 1  : return one,
-    default : sum(c)
+    n < 3   : return 1,
+    default : sum(n)
 }
 
 
-print fibo(28)
+print fibo(40)
