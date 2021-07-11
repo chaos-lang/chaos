@@ -438,7 +438,6 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             load_dict(program, symbol);
             break;
         case V_REF:
-            load_ref(program, symbol);
             break;
         default:
             load_any(program, symbol);
@@ -1053,6 +1052,20 @@ void compileDecl(KaosIR* program, Decl* decl)
         push_inst_i(program, PROLOG, function->addr);
 
         compileSpec(program, decl->v.func_decl->type->v.func_type->params);
+
+        for (int i = 0; i < function->parameter_count; i++) {
+            Symbol* parameter = function->parameters[i];
+            push_inst_r_i(program, GETARG, R0, (i * 2));
+            push_inst_r_i(program, GETARG, R1, (i * 2) + 1);
+
+            parameter->addr = stack_counter++;
+            push_inst_i_i(program, ALLOCAI, parameter->addr, 2 * sizeof(long long));
+            push_inst_r_i(program, REF_ALLOCAI, R2, parameter->addr);
+            push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+            push_inst_r_i(program, MOVI, R3, sizeof(long long));
+            push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+            parameter->value_type = V_INT;  // TODO: temp, set it according to parameter type
+        }
 
         compileStmt(program, decl->v.func_decl->body);
         if (decl->v.func_decl->decision != NULL)
@@ -1986,13 +1999,6 @@ void load_dict(KaosIR* program, Symbol* symbol)
 void load_any(KaosIR* program, Symbol* symbol)
 {
     // i64 addr = symbol->addr;
-}
-
-void load_ref(KaosIR* program, Symbol* symbol)
-{
-    i64 addr = symbol->addr;
-    push_inst_r_i(program, GETARG, R0, addr);
-    push_inst_r_i(program, GETARG, R1, addr + 1);
 }
 
 char* compile_module_selector(Expr* module_selector)

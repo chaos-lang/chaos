@@ -74,7 +74,6 @@ void load_string(KaosIR* program, Symbol* symbol);
 void load_list(KaosIR* program, Symbol* symbol);
 void load_dict(KaosIR* program, Symbol* symbol);
 void load_any(KaosIR* program, Symbol* symbol);
-void load_ref(KaosIR* program, Symbol* symbol);
 
 char* compile_module_selector(Expr* module_selector);
 bool declare_function(Stmt* stmt, File* file, KaosIR* program);
