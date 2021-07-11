@@ -33,6 +33,7 @@ File* import_parent_context = NULL;
 
 AST* ast_ref = NULL;
 i64 label_counter = 0;
+i64 op_counter = 0;
 int stack_counter = 0;
 i64 register_offset = 0;
 
@@ -871,11 +872,19 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case DecisionExpr_kind: {
         compileExpr(program, expr->v.decision_expr->bool_expr);
 
+        push_inst_r_i(program, BEQI, R1, 0);
+
         // This check is here to mitigate two CALLX in ReturnStmt and FuncDecl
         if (expr->v.decision_expr->outcome->kind == ReturnStmt_kind)
             expr->v.decision_expr->outcome->v.return_stmt->dont_push_callx = true;
 
         compileStmt(program, expr->v.decision_expr->outcome);
+
+        // TODO: Add RETR here
+
+        push_inst_r(program, RETR, R1);
+
+        push_inst_i(program, PATCH, op_counter++);
         break;
     }
     case DefaultExpr_kind: {
@@ -884,6 +893,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             expr->v.default_expr->outcome->v.return_stmt->dont_push_callx = true;
 
         compileStmt(program, expr->v.default_expr->outcome);
+
+        push_inst_r(program, RETR, R1);
         break;
     }
     default:

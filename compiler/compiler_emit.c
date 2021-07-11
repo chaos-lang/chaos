@@ -272,6 +272,18 @@ void emitBytecode(cpu *c)
     case LER:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "LER", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
+    // >>> Branch Operations <<<
+    // beq
+    case BEQR:
+        sprintf(str_inst, "%s R(%d) R(%d)", "BEQR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
+    case BEQI:
+        sprintf(str_inst, "%s R(%d) %lld", "BEQI", c->inst->op1->reg, c->inst->op2->value.i);
+        break;
+    // patch
+    case PATCH:
+        sprintf(str_inst, "%s op: %lld", "PATCH", c->inst->op1->value.i);
+        break;
     // >>> Non-Atomic Instructions <<<
     // Dynamic Instructions (prefixed with `DYN_`)
     // Dynamic Arithmetic

@@ -45,6 +45,13 @@ typedef struct jit_label_array {
     i64 hlt_count;
 } jit_label_array;
 
+typedef struct jit_op_array {
+    jit_op** arr;
+    i64 capacity;
+    i64 size;
+    i64 hlt_count;
+} jit_op_array;
+
 cpu *new_cpu(KaosIR* program, unsigned short debug_level);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
@@ -55,6 +62,10 @@ void execute(cpu *c);
 jit_label_array* init_label_array();
 void push_label(jit_label_array* label_array, jit_label* label);
 jit_label* get_label(jit_label_array* label_array, i64 i);
+
+jit_op_array* init_op_array();
+void push_op(jit_op_array* op_array, jit_op* op);
+jit_op* get_op(jit_op_array* op_array, i64 i);
 
 void cpu_print(i64 r0, i64 r1, i64 r2, f64 fr1);
 void cpu_print_bool(i64 i);

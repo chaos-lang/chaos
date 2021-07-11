@@ -29,6 +29,7 @@ plfv _f;
 jit_op *skip_data;
 
 jit_label_array* label_array = NULL;
+jit_op_array* op_array = NULL;
 
 char *reg_names[] = {
     "R0", "R1", "R2",  "R3",  "R4",  "R5",  "R6",  "R7",
@@ -59,6 +60,7 @@ void free_cpu(cpu *c)
 void run_cpu(cpu *c)
 {
     label_array = init_label_array();
+    op_array = init_op_array();
     _jit = jit_init();
 
     // jit_declare_arg(_jit, JIT_SIGNED_NUM, sizeof(long));
@@ -337,6 +339,22 @@ void execute(cpu *c)
     case LER:
         jit_ler(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
+    // >>> Branch Operations <<<
+    // beq
+    case BEQR: {
+        jit_op* __pc = jit_beqr(_jit, JIT_FORWARD, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        push_op(op_array, __pc);
+        break;
+    }
+    case BEQI: {
+        jit_op* __pc = jit_beqi(_jit, JIT_FORWARD, R(c->inst->op1->reg), c->inst->op2->value.i);
+        push_op(op_array, __pc);
+        break;
+    }
+    // patch
+    case PATCH:
+        jit_patch(_jit, op_array->arr[c->inst->op1->value.i]);
+        break;
     // >>> Non-Atomic Instructions <<<
     // Dynamic Instructions (prefixed with `DYN_`)
     // Dynamic Arithmetic
@@ -450,6 +468,30 @@ void push_label(jit_label_array* label_array, jit_label* label)
 jit_label* get_label(jit_label_array* label_array, i64 i)
 {
     return label_array->arr[i];
+}
+
+jit_op_array* init_op_array()
+{
+    jit_op_array* op_array = malloc(sizeof *op_array);
+    op_array->capacity = 0;
+    op_array->arr = NULL;
+    op_array->size = 0;
+    return op_array;
+}
+
+void push_op(jit_op_array* op_array, jit_op* op)
+{
+    if (op_array->capacity == 0) {
+        op_array->arr = (jit_op**)malloc((++op_array->capacity) * sizeof(jit_op*));
+    } else {
+        op_array->arr = (jit_op**)realloc(op_array->arr, (++op_array->capacity) * sizeof(jit_op*));
+    }
+    op_array->arr[op_array->size++] = op;
+}
+
+jit_op* get_op(jit_op_array* op_array, i64 i)
+{
+    return op_array->arr[i];
 }
 
 void cpu_print(i64 r0, i64 r1, i64 r2, f64 fr1)

@@ -60,6 +60,9 @@ enum IROpCode {
     NOTR,
     //  >>> Compare Instructions <<<
     EQR, NER, GTR, LTR, GER, LER,
+    // >>> Branch Operations <<<
+    BEQR, BEQI,
+    PATCH,
     // >>> Non-Atomic Instructions <<<
     // Dynamic Arithmetic
     DYN_ADD, DYN_SUB, DYN_MUL, DYN_DIV, DYN_NEG,
