@@ -1,0 +1,25 @@
+name: "Benchmark"
+
+on: [push, pull_request]
+
+jobs:
+  main:
+    name: benchmark
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo make requirements
+
+    - name: Build
+      run: |
+        make clean
+        make
+        sudo make install
+
+    - name: Run the tests
+      run: |
+        make bench

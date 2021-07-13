@@ -1,0 +1,15 @@
+num def sum(num j)
+    num x = fib(j - 1)
+    num y = fib(j - 2)
+    num z = x + y
+    return z
+end
+
+num def fib(num n)
+end {
+    n < 3   : return 1,
+    default : sum(n)
+}
+
+
+print fib(40)

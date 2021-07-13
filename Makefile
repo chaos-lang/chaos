@@ -61,7 +61,7 @@ prof-use:
 	export CHAOS_EXTRA_FLAGS='-s -O3 -fprofile-use'
 	${MAKE} chaos
 
-bench:
+prof-old:
 	export CHAOS_COMPILER=gcc
 	export CHAOS_EXTRA_FLAGS='-pg'
 	${MAKE} chaos
@@ -213,8 +213,8 @@ rosetta-test-compiler:
 rosetta-update:
 	./tests/rosetta/update.sh
 
-benchmark:
-	./benchmark.sh
+bench:
+	./tests/benchmark/bench.sh
 
 bench-langs:
 	hyperfine --warmup 3 \
