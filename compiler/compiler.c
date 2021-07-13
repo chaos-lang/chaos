@@ -868,9 +868,13 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
 
         if (function->should_inline) {
             Decl* decl = function->ast;
+            FunctionCall* scope_override_backup = scope_override;
+            startFunctionScope(function);
             compileStmt(program, decl->v.func_decl->body);
             if (decl->v.func_decl->decision != NULL)
                 compileSpec(program, decl->v.func_decl->decision);
+            popExecutedFunctionStack();
+            scope_override = scope_override_backup;
         } else {
             push_inst_(program, PREPARE);
             for (size_t i = 0; i < putargr_stack_p; i++)
