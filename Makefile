@@ -221,7 +221,8 @@ bench-langs:
 		'chaos dev.kaos' \
 		'python3 dev.py' \
 		'ruby dev.rb' \
-		'php dev.php'
+		'php dev.php' \
+		'lua dev.lua'
 
 profile:
 	./profile.sh

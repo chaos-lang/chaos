@@ -79,6 +79,10 @@ char* compile_module_selector(Expr* module_selector);
 bool declare_function(Stmt* stmt, File* file, KaosIR* program);
 void declare_functions(ASTRoot* ast_root, KaosIR* program);
 void compile_functions(ASTRoot* ast_root, KaosIR* program);
+void determine_inline_functions(ASTRoot* ast_root);
+bool determine_inline_function(ASTRoot* ast_root, _Function* function);
+bool does_decision_have_a_call(Expr* expr, _Function* function);
+bool does_stmt_have_a_call(Stmt* stmt, _Function* function);
 
 void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type);
 void strongly_type_basic_check(unsigned short code, char *str1, char *str2, enum Type type, enum ValueType value_type);

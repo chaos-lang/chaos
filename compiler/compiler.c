@@ -48,6 +48,9 @@ KaosIR* compile(ASTRoot* ast_root)
     // Declare functions in all parsed files
     declare_functions(ast_root, program);
 
+    // Determine whether the functions should be inlined or not
+    determine_inline_functions(ast_root);
+
     // Compile functions in all parsed files
     compile_functions(ast_root, program);
 
@@ -652,6 +655,12 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             enum ValueType value_type = compileExpr(program, expr) - 1;
             Symbol* parameter = function->parameters[i - 1];
 
+            if (function->should_inline) {
+                Symbol* symbol_upper = getSymbol(expr_list->exprs[i - 1]->v.ident->name);
+                Symbol* symbol_new = createCloneFromSymbol(parameter->name, symbol_upper->type, symbol_upper, symbol_upper->type);
+                symbol_new->addr = symbol_upper->addr;
+            }
+
             strongly_type(parameter, NULL, function, expr, value_type);
 
             enum Type type = parameter->type;
@@ -857,16 +866,23 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         } else {
         }
 
-        push_inst_(program, PREPARE);
-        for (size_t i = 0; i < putargr_stack_p; i++)
-            push_inst_r(program, PUTARGR, putargr_stack[i]);
+        if (function->should_inline) {
+            Decl* decl = function->ast;
+            compileStmt(program, decl->v.func_decl->body);
+            if (decl->v.func_decl->decision != NULL)
+                compileSpec(program, decl->v.func_decl->decision);
+        } else {
+            push_inst_(program, PREPARE);
+            for (size_t i = 0; i < putargr_stack_p; i++)
+                push_inst_r(program, PUTARGR, putargr_stack[i]);
 
-        push_inst_i_i(program, CALL, function->addr, op_counter++);
+            push_inst_i_i(program, CALL, function->addr, op_counter++);
 
-        function->call_patches[function->call_patches_size++] = op_counter - 1;
+            function->call_patches[function->call_patches_size++] = op_counter - 1;
 
-        push_inst_r(program, RETVAL, R1);
-        push_inst_r_i(program, MOVI, R0, 1); // TODO: temp, set it according to function return type
+            push_inst_r(program, RETVAL, R1);
+            push_inst_r_i(program, MOVI, R0, 1); // TODO: temp, set it according to function return type
+        }
 
         return function->value_type + 1;
         break;
@@ -1042,6 +1058,14 @@ void compileDecl(KaosIR* program, Decl* decl)
     }
     case FuncDecl_kind: {
         _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+        if (function->should_inline) {
+            function->ast = decl;
+            function_mode->is_compiled = true;
+            endFunction();
+            break;
+        }
+
+        function->ast = decl;
 
         if (function->is_compiled)
             break;
@@ -2143,6 +2167,111 @@ void compile_functions(ASTRoot* ast_root, KaosIR* program)
 
         popModuleStack();
     }
+}
+
+void determine_inline_functions(ASTRoot* ast_root)
+{
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
+
+        // Foreach function look for other functions' decision blocks for calls
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
+                Decl* decl = stmt->v.decl_stmt->decl;
+                _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+                function->should_inline = determine_inline_function(ast_root, function);
+                endFunction();
+            }
+        }
+
+        popModuleStack();
+    }
+}
+
+bool determine_inline_function(ASTRoot* ast_root, _Function* function)
+{
+    unsigned long call_counter = 0;
+    // Look for all functions' decision blocks for all the files compiled
+    for (unsigned long i = 0; i < ast_root->file_count; i++) {
+        File* file = ast_root->files[i];
+        current_file_index = i;
+        StmtList* stmt_list = file->stmt_list;
+        pushModuleStack(file->module_path, file->module);
+
+        for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
+            Stmt* stmt = stmt_list->stmts[j - 1];
+            if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
+                Decl* decl = stmt->v.decl_stmt->decl;
+                _Function* _function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+                if (function == _function)
+                    continue;
+                if (decl->v.func_decl->decision != NULL) {
+                    ExprList* expr_list = decl->v.func_decl->decision->v.decision_block->decisions;
+                    for (unsigned long i = expr_list->expr_count; 0 < i; i--) {
+                        Expr* expr = expr_list->exprs[i - 1];
+                        if (does_decision_have_a_call(expr, function)) {
+                            call_counter++;
+                        }
+                    }
+                }
+                endFunction();
+            }
+        }
+
+        popModuleStack();
+    }
+
+    if (call_counter == 1)
+        return true;
+    else
+        return false;
+}
+
+bool does_decision_have_a_call(Expr* expr, _Function* function)
+{
+    Stmt* stmt = NULL;
+    switch (expr->kind) {
+    case DecisionExpr_kind:
+        stmt = expr->v.decision_expr->outcome;
+        break;
+    case DefaultExpr_kind:
+        stmt = expr->v.default_expr->outcome;
+        break;
+    default:
+        break;
+    }
+
+    return does_stmt_have_a_call(stmt, function);
+}
+
+bool does_stmt_have_a_call(Stmt* stmt, _Function* function)
+{
+    if (stmt->kind == ExprStmt_kind && stmt->v.expr_stmt->x->kind == CallExpr_kind) {
+        Expr* expr = stmt->v.expr_stmt->x;
+        _Function* _function = NULL;
+        switch (expr->v.call_expr->fun->kind) {
+        case Ident_kind:
+            _function = getFunction(expr->v.call_expr->fun->v.ident->name, NULL);
+            break;
+        case SelectorExpr_kind:
+            _function = getFunction(
+                expr->v.call_expr->fun->v.selector_expr->sel->v.ident->name,
+                expr->v.call_expr->fun->v.selector_expr->x->v.ident->name
+            );
+            break;
+        default:
+            break;
+        }
+
+        if (function == _function)
+            return true;
+    }
+
+    return false;
 }
 
 void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type)

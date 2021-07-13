@@ -44,6 +44,8 @@ typedef struct FunctionCall FunctionCall;
 #include "../utilities/helpers.h"
 #include "module.h"
 
+typedef struct Decl Decl;
+
 extern enum Phase phase;
 enum BlockType { B_EXPRESSION, B_FUNCTION };
 
@@ -72,6 +74,8 @@ typedef struct _Function {
     bool is_compiled;
     int *call_patches;
     int call_patches_size;
+    Decl* ast;
+    bool should_inline;
 } _Function;
 
 _Function* function_cursor;
