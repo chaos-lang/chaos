@@ -648,6 +648,17 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         i64* putargr_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
         i64 putargr_stack_p = 0;
 
+        // Scope override generics for the function inlining
+        FunctionCall* scope_override_backup = NULL;
+        FunctionCall* function_inline_scope = NULL;
+        if (function->should_inline) {
+            scope_override_backup = scope_override;
+            startFunctionScope(function);
+            function_inline_scope = scope_override;
+            popExecutedFunctionStack();
+            scope_override = scope_override_backup;
+        }
+
         for (unsigned long i = 1; i < expr_list->expr_count + 1; i++) {
             register_offset = (i - 1) * 2;
 
@@ -656,8 +667,13 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             Symbol* parameter = function->parameters[i - 1];
 
             if (function->should_inline) {
+                // Make the parameters available the inlined function's scope
                 Symbol* symbol_upper = getSymbol(expr_list->exprs[i - 1]->v.ident->name);
+                scope_override = function_inline_scope;
+                pushExecutedFunctionStack(function_inline_scope);
                 Symbol* symbol_new = createCloneFromSymbol(parameter->name, symbol_upper->type, symbol_upper, symbol_upper->type);
+                popExecutedFunctionStack();
+                scope_override = scope_override_backup;
                 symbol_new->addr = symbol_upper->addr;
             }
 
@@ -867,9 +883,10 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
 
         if (function->should_inline) {
+            // Inline the function's body and decision block
             Decl* decl = function->ast;
-            FunctionCall* scope_override_backup = scope_override;
-            startFunctionScope(function);
+            scope_override = function_inline_scope;
+            pushExecutedFunctionStack(function_inline_scope);
             compileStmt(program, decl->v.func_decl->body);
             if (decl->v.func_decl->decision != NULL)
                 compileSpec(program, decl->v.func_decl->decision);
