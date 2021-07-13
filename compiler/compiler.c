@@ -182,22 +182,20 @@ void compileStmt(KaosIR* program, Stmt* stmt)
             switch (symbol_x->value_type) {
             case V_BOOL:
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
-                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R6, R3, R1, sizeof(long long));
                 break;
             case V_INT:
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
-                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R6, R3, R1, sizeof(long long));
                 break;
             case V_FLOAT:
                 push_inst_r_i(program, MOVI, R3, sizeof(double));
-                push_inst_r_r_r_i(program, FSTXR, R2, R3, R1, sizeof(double));
+                push_inst_r_r_r_i(program, FSTXR, R6, R3, R1, sizeof(double));
                 break;
-            case V_STRING: {
-                size_t len = symbol_x->len;
-                for (size_t i = 0; i < len; i++) {
-                }
+            case V_STRING:
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R6, R3, R1, sizeof(long long));
                 break;
-            }
             case V_ANY: {
                 break;
             }
@@ -396,22 +394,24 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         case V_STRING: {
             size_t len = strlen(expr->v.basic_lit->value.s);
             i64 addr = stack_counter++;
-            push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char));
-            push_inst_r_i(program, REF_ALLOCAI, R2, addr);
-            push_inst_r_i(program, MOVI, R3, 0);
+            push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char) + sizeof(size_t));
+            push_inst_r_i(program, REF_ALLOCAI, R1, addr);
+
+            push_inst_r_i(program, MOVI, R2, sizeof(size_t));
+            push_inst_r_i(program, MOVI, R3, len);
+            push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(size_t));
 
             for (size_t i = 0; i < len; i++) {
-                push_inst_r_i(program, MOVI, R3, i * sizeof(char));
-                push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.s[i]);
-                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(char));
+                push_inst_r_i(program, MOVI, R2, i * sizeof(char) + sizeof(size_t));
+                push_inst_r_i(program, MOVI, R3, expr->v.basic_lit->value.s[i]);
+                push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
             }
 
-            push_inst_r_i(program, MOVI, R3, len);
-            push_inst_r_i(program, MOVI, R1, '\0');
-            push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(char));
+            push_inst_r_i(program, MOVI, R2, len * sizeof(char) + sizeof(size_t));
+            push_inst_r_i(program, MOVI, R3, '\0');
+            push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
 
             push_inst_r_i(program, MOVI, R0 + register_offset, V_STRING);
-            push_inst_r_i(program, MOVI, R1 + register_offset, len);
             break;
         }
         default:
@@ -980,6 +980,11 @@ void compileDecl(KaosIR* program, Decl* decl)
             }
             break;
         case K_STRING:
+            store_string(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                false
+            );
             break;
         case K_VOID:
             break;
@@ -1901,7 +1906,7 @@ Symbol* store_float(KaosIR* program, char *name, bool is_any)
     return symbol;
 }
 
-Symbol* store_string(KaosIR* program, char *name, size_t len, bool is_any, bool is_dynamic)
+Symbol* store_string(KaosIR* program, char *name, bool is_any)
 {
     union Value value;
     value.i = 0;
@@ -1911,15 +1916,12 @@ Symbol* store_string(KaosIR* program, char *name, size_t len, bool is_any, bool 
     else {
         symbol = addSymbol(name, K_STRING, value, V_STRING);
     }
-    // symbol->addr = program->heap;
-    symbol->len = len;
-    symbol->is_dynamic = is_dynamic;
-
-    if (is_dynamic) {
-    } else {
-        for (size_t i = len; i > 0; i--) {
-        }
-    }
+    symbol->addr = stack_counter++;
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
+    push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
     return symbol;
 }
@@ -2003,14 +2005,10 @@ void load_float(KaosIR* program, Symbol* symbol)
 void load_string(KaosIR* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
-
-    if (symbol->is_dynamic) {
-    } else {
-        size_t len = symbol->len;
-        addr += len - 1;
-        for (size_t i = len; i > 0; i--) {
-        }
-    }
+    push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+    push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
 }
 
 void load_list(KaosIR* program, Symbol* symbol)

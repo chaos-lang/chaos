@@ -506,7 +506,7 @@ jit_op* get_op(jit_op_array* op_array, i64 i)
     return op_array->arr[i];
 }
 
-void cpu_print(i64 r0, i64 r1, i64 r2, f64 fr1)
+void cpu_print(i64 r0, i64 r1, f64 fr1)
 {
     switch (r0) {
     case V_BOOL:
@@ -519,7 +519,7 @@ void cpu_print(i64 r0, i64 r1, i64 r2, f64 fr1)
         cpu_print_float(fr1);
         break;
     case V_STRING:
-        cpu_print_string(r2);
+        cpu_print_string(r1);
         break;
     case V_LIST:
         break;
@@ -547,6 +547,7 @@ void cpu_print_float(f64 f)
 
 void cpu_print_string(i64 addr)
 {
+    addr += sizeof(size_t);
     char *s = (char*)addr;
     printf("%s\n", s);
 }

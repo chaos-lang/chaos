@@ -62,7 +62,7 @@ void shift_registers(KaosIR* program);
 Symbol* store_bool(KaosIR* program, char *name, bool is_any);
 Symbol* store_int(KaosIR* program, char *name, bool is_any);
 Symbol* store_float(KaosIR* program, char *name, bool is_any);
-Symbol* store_string(KaosIR* program, char *name, size_t len, bool is_any, bool is_dynamic);
+Symbol* store_string(KaosIR* program, char *name, bool is_any);
 Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic);
 Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic);
 Symbol* store_any(KaosIR* program, char *name);
