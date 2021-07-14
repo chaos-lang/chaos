@@ -100,12 +100,12 @@ lex.yy.c:
 	flex lexer/lexer.l
 
 jit-backend:
-	cd myjit
-	${MAKE} jitlib-core.o
-	${MAKE} myjit-disassembler
+	cd myjit && \
+	${MAKE} jitlib-core.o && \
+	${MAKE} myjit-disassembler && \
 	cp myjit-disasm ..
 
-chaos: lex.yy.c parser.tab.c parser.tab.h myjit
+chaos: lex.yy.c parser.tab.c parser.tab.h jit-backend
 	${CHAOS_COMPILER} -c -g -Werror -Wall -fcommon -DCHAOS_INTERPRETER parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c ${CHAOS_EXTRA_FLAGS} && \
 	${CHAOS_COMPILER} -o chaos -g -Wall -std=c99 -pedantic *.o myjit/jitlib-core.o -lreadline -lm -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl
 

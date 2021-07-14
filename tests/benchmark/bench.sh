@@ -1,10 +1,10 @@
 #!/bin/bash
 
 hyperfine --warmup 3 \
-    'chaos dev.kaos' \
-    'python3 dev.py' \
-    'ruby dev.rb' \
-    'php dev.php' \
+    'chaos tests/benchmark/fib.kaos' \
+    'python3 tests/benchmark/fib.py' \
+    'ruby tests/benchmark/fib.rb' \
+    'php tests/benchmark/fib.php' \
     --export-json hyperfine.json
 
 chaos_mean=$(jq '.[][0].mean' hyperfine.json)
@@ -12,18 +12,25 @@ python_mean=$(jq '.[][1].mean' hyperfine.json)
 ruby_mean=$(jq '.[][2].mean' hyperfine.json)
 php_mean=$(jq '.[][3].mean' hyperfine.json)
 
-echo $chaos_mean
-echo $python_mean
-echo $ruby_mean
-echo $php_mean
+echo "Chaos mean: ${chaos_mean}"
+echo "Python mean: ${python_mean}"
+echo "Ruby mean: ${ruby_mean}"
+echo "PHP mean: ${php_mean}"
 
-python_crit=$(bc -l <<< "13.5 * $chaos_mean" )
-ruby_crit=$(bc -l <<< "4.5 * $chaos_mean" )
-php_crit=$(bc -l <<< "3.4 * $chaos_mean" )
+if [ "$CI" == "true" ]
+then
+    python_crit=$(bc -l <<< "10.0 * $chaos_mean" )
+    ruby_crit=$(bc -l <<< "3.5 * $chaos_mean" )
+    php_crit=$(bc -l <<< "30.0 * $chaos_mean" )
+else
+    python_crit=$(bc -l <<< "13.5 * $chaos_mean" )
+    ruby_crit=$(bc -l <<< "4.5 * $chaos_mean" )
+    php_crit=$(bc -l <<< "3.4 * $chaos_mean" )
+fi
 
-echo $python_crit
-echo $ruby_crit
-echo $php_crit
+echo "Python criteria: ${python_crit}"
+echo "Ruby criteria: ${ruby_crit}"
+echo "PHP criteria: ${php_crit}"
 
 crits=($python_crit $ruby_crit $php_crit)
 means=($python_mean $ruby_mean $php_mean)
