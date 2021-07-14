@@ -72,7 +72,7 @@ enum IROpCode {
     // Dynamic Logic
     DYN_LAND, DYN_LOR, DYN_LNOT,
     // Dynamic Printing
-    DYN_PRNT,
+    DYN_PRNT, DYN_ECHO,
     DEBUG,
     HLT,
     NUM_INSTRUCTIONS

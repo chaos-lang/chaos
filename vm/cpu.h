@@ -67,7 +67,7 @@ jit_op_array* init_op_array();
 void push_op(jit_op_array* op_array, jit_op* op);
 jit_op* get_op(jit_op_array* op_array, i64 i);
 
-void cpu_print(i64 r0, i64 r1, f64 fr1);
+void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl);
 void cpu_print_bool(i64 i);
 void cpu_print_int(i64 i);
 void cpu_print_float(f64 f);

@@ -145,6 +145,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         if (stmt->v.echo_stmt->mod != NULL && stmt->v.echo_stmt->mod->kind == PrettySpec_kind) {
         } else {
         }
+        push_inst_(program, DYN_ECHO);
         break;
     case PrintStmt_kind:
         compileExpr(program, stmt->v.print_stmt->x);

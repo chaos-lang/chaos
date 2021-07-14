@@ -336,6 +336,9 @@ void emitBytecode(cpu *c)
     case DYN_PRNT:
         sprintf(str_inst, "%s", "DYN_PRNT");
         break;
+    case DYN_ECHO:
+        sprintf(str_inst, "%s", "DYN_ECHO");
+        break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
         break;

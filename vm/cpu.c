@@ -442,8 +442,18 @@ void execute(cpu *c)
         jit_prepare(_jit);
         jit_putargr(_jit, R(0));
         jit_putargr(_jit, R(1));
-        jit_putargr(_jit, R(2));
         jit_fputargr(_jit, FR(1), sizeof(double));
+        jit_putargi(_jit, 1);
+        jit_callr(_jit, R(3));
+        break;
+    }
+    case DYN_ECHO: {
+        jit_movi(_jit, R(3), cpu_print);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(0));
+        jit_putargr(_jit, R(1));
+        jit_fputargr(_jit, FR(1), sizeof(double));
+        jit_putargi(_jit, 0);
         jit_callr(_jit, R(3));
         break;
     }
@@ -506,7 +516,7 @@ jit_op* get_op(jit_op_array* op_array, i64 i)
     return op_array->arr[i];
 }
 
-void cpu_print(i64 r0, i64 r1, f64 fr1)
+void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl)
 {
     switch (r0) {
     case V_BOOL:
@@ -528,28 +538,31 @@ void cpu_print(i64 r0, i64 r1, f64 fr1)
     default:
         break;
     }
+
+    if (nl != 0)
+        printf("\n");
 }
 
 void cpu_print_bool(i64 i)
 {
-    printf("%s\n", i ? "true" : "false");
+    printf("%s", i ? "true" : "false");
 }
 
 void cpu_print_int(i64 i)
 {
-    printf("%lld\n", i);
+    printf("%lld", i);
 }
 
 void cpu_print_float(f64 f)
 {
-    printf("%lg\n", f);
+    printf("%lg", f);
 }
 
 void cpu_print_string(i64 addr)
 {
     addr += sizeof(size_t);
     char *s = (char*)addr;
-    printf("%s\n", s);
+    printf("%s", s);
 }
 
 void debug(struct jit *jit)
