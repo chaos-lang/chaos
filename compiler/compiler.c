@@ -565,10 +565,29 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
         shift_registers(program);
 
-        enum ValueType type2 = compileExpr(program, expr->v.index_expr->index) - 1;
+        push_inst_r_r(program, MOVR, R5, R1);
+
+        compileExpr(program, expr->v.index_expr->index);
         if (type1 == V_STRING) {
-        } else if ((type2 == V_ANY && type1 == V_LIST) || type2 == V_INT) {
-        } else if ((type2 == V_ANY && type1 == V_DICT) || type2 == V_STRING) {
+            push_inst_r_r_i(program, MULI, R4, R1, sizeof(char));
+            push_inst_r_r_i(program, ADDI, R4, R4, sizeof(size_t));
+            push_inst_r_i(program, MOVI, R0, V_STRING);
+
+            i64 len = 1;
+            i64 addr = stack_counter++;
+            push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char) + sizeof(size_t));
+            push_inst_r_i(program, REF_ALLOCAI, R1, addr);
+
+            push_inst_r_i(program, MOVI, R2, sizeof(size_t));
+            push_inst_r_i(program, MOVI, R3, len);
+            push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(size_t));
+
+            push_inst_r_i(program, MOVI, R2, 0 * sizeof(char) + sizeof(size_t));
+            push_inst_r_r_r_i(program, LDXR, R3, R5, R4, sizeof(char));
+            push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
+
+            push_inst_r_i(program, MOVI, R2, len * sizeof(char) + sizeof(size_t));
+            push_inst_r_i(program, MOVI, R3, '\0');
         }
         return type1 + 1;
         break;
