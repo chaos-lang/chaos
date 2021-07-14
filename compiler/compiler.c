@@ -358,8 +358,11 @@ void compileStmt(KaosIR* program, Stmt* stmt)
     }
     case ExitStmt_kind: {
         if (stmt->v.exit_stmt->x == NULL) {
+            push_inst_r_i(program, MOVI, R1, 0);
         } else {
+            compileExpr(program, stmt->v.exit_stmt->x);
         }
+        push_inst_(program, DYN_EXIT);
         break;
     }
     case BreakStmt_kind: {

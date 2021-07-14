@@ -73,6 +73,9 @@ enum IROpCode {
     DYN_LAND, DYN_LOR, DYN_LNOT,
     // Dynamic Printing
     DYN_PRNT, DYN_ECHO,
+    // Dynamic Exit
+    DYN_EXIT,
+    // Debug
     DEBUG,
     HLT,
     NUM_INSTRUCTIONS

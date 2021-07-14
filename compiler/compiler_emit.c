@@ -339,6 +339,10 @@ void emitBytecode(cpu *c)
     case DYN_ECHO:
         sprintf(str_inst, "%s", "DYN_ECHO");
         break;
+    // Dynamic Exit
+    case DYN_EXIT:
+        sprintf(str_inst, "%s", "DYN_EXIT");
+        break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
         break;

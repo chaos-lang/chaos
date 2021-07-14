@@ -437,6 +437,7 @@ void execute(cpu *c)
         jit_xori(_jit, R(1), R(1), 0x00000001);
         break;
     }
+    // Dynamic Printing
     case DYN_PRNT: {
         jit_movi(_jit, R(3), cpu_print);
         jit_prepare(_jit);
@@ -457,6 +458,15 @@ void execute(cpu *c)
         jit_callr(_jit, R(3));
         break;
     }
+    // Dynamic Exit
+    case DYN_EXIT: {
+        jit_movi(_jit, R(2), exit);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        break;
+    }
+    // Debug
     case DEBUG:
         debug(_jit);
         break;
@@ -562,7 +572,7 @@ void cpu_print_string(i64 addr)
 {
     addr += sizeof(size_t);
     char *s = (char*)addr;
-    printf("%s", s);
+    printf("%s", escape_the_sequences_in_string_literal(s));
 }
 
 void debug(struct jit *jit)
