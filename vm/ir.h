@@ -75,6 +75,8 @@ enum IROpCode {
     DYN_PRNT, DYN_ECHO,
     // Dynamic Exit
     DYN_EXIT,
+    // Dynamic Delete
+    DYN_STR_INDEX_DELETE,
     // Debug
     DEBUG,
     HLT,

@@ -73,6 +73,8 @@ void cpu_print_int(i64 i);
 void cpu_print_float(f64 f);
 void cpu_print_string(i64 addr);
 
+void cpu_delete_string_index(i64 index, i64 addr);
+
 void debug(struct jit *jit);
 
 #define DYN_BINARY_ARITH(_fn, _ffn) \

@@ -466,6 +466,15 @@ void execute(cpu *c)
         jit_callr(_jit, R(2));
         break;
     }
+    // Dynamic Delete
+    case DYN_STR_INDEX_DELETE: {
+        jit_movi(_jit, R(2), cpu_delete_string_index);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(5));
+        jit_callr(_jit, R(2));
+        break;
+    }
     // Debug
     case DEBUG:
         debug(_jit);
@@ -573,6 +582,13 @@ void cpu_print_string(i64 addr)
     addr += sizeof(size_t);
     char *s = (char*)addr;
     printf("%s", escape_the_sequences_in_string_literal(s));
+}
+
+void cpu_delete_string_index(i64 index, i64 addr)
+{
+    addr += sizeof(size_t);
+    char *s = (char*)addr;
+    memmove(&s[index], &s[index + 1], strlen(s) - index);
 }
 
 void debug(struct jit *jit)

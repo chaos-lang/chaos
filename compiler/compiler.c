@@ -337,6 +337,9 @@ void compileStmt(KaosIR* program, Stmt* stmt)
 
             if (symbol->type != K_LIST && symbol->type != K_DICT && symbol->type != K_STRING)
                 throw_error(E_UNRECOGNIZED_COMPLEX_DATA_TYPE, getTypeName(symbol->type), symbol->name);
+
+            push_inst_(program, DYN_STR_INDEX_DELETE);
+
             break;
         }
         default:
