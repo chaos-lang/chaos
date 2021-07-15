@@ -162,7 +162,8 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         break;
     case AssignStmt_kind: {
         compileExpr(program, stmt->v.assign_stmt->x);
-        shift_registers(program);
+        push_inst_r_r(program, MOVR, R9, R2);
+        // shift_registers(program);
         compileExpr(program, stmt->v.assign_stmt->y);
         switch (stmt->v.assign_stmt->x->kind) {
         case Ident_kind: {
@@ -183,19 +184,19 @@ void compileStmt(KaosIR* program, Stmt* stmt)
             switch (symbol_x->value_type) {
             case V_BOOL:
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
-                push_inst_r_r_r_i(program, STXR, R6, R3, R1, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
             case V_INT:
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
-                push_inst_r_r_r_i(program, STXR, R6, R3, R1, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
             case V_FLOAT:
                 push_inst_r_i(program, MOVI, R3, sizeof(double));
-                push_inst_r_r_r_i(program, FSTXR, R6, R3, R1, sizeof(double));
+                push_inst_r_r_r_i(program, FSTXR, R9, R3, R1, sizeof(double));
                 break;
             case V_STRING:
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
-                push_inst_r_r_r_i(program, STXR, R6, R3, R1, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
             case V_ANY: {
                 break;
@@ -299,9 +300,9 @@ void compileStmt(KaosIR* program, Stmt* stmt)
 
             switch (symbol->type) {
             case K_STRING:
-                if (symbol->value_type == V_REF) {
-                } else {
-                }
+                push_inst_r_i(program, MOVI, R2, sizeof(size_t));
+                push_inst_r_r_r_i(program, LDXR, R3, R1, R2, sizeof(char));
+                push_inst_r_r_r_i(program, STXR, R5, R4, R3, sizeof(char));
                 break;
             case K_LIST:
                 if (symbol->value_type == V_REF) {
@@ -565,8 +566,6 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         enum ValueType type1 = compileExpr(program, expr->v.index_expr->x) - 1;
         shift_registers(program);
 
-        push_inst_r_r(program, MOVR, R5, R1);
-
         compileExpr(program, expr->v.index_expr->index);
         if (type1 == V_STRING) {
             push_inst_r_r_i(program, MULI, R4, R1, sizeof(char));
@@ -588,7 +587,11 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
 
             push_inst_r_i(program, MOVI, R2, len * sizeof(char) + sizeof(size_t));
             push_inst_r_i(program, MOVI, R3, '\0');
+            push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
         }
+
+        // R5 holds to pointer to size_t + string + '\n'
+        // R4 holds size to the place size_t + N number of chars
         return type1 + 1;
         break;
     }
