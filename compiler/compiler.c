@@ -405,9 +405,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char) + sizeof(size_t));
             push_inst_r_i(program, REF_ALLOCAI, R1, addr);
 
-            push_inst_r_i(program, MOVI, R2, sizeof(size_t));
             push_inst_r_i(program, MOVI, R3, len);
-            push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(size_t));
+            push_inst_r_r_i(program, STR, R1, R3, sizeof(size_t));
 
             for (size_t i = 0; i < len; i++) {
                 push_inst_r_i(program, MOVI, R2, i * sizeof(char) + sizeof(size_t));
@@ -571,8 +570,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
 
         compileExpr(program, expr->v.index_expr->index);
         if (type1 == V_STRING) {
-            push_inst_r_r_i(program, MULI, R4, R1, sizeof(char));
-            push_inst_r_r_i(program, ADDI, R4, R4, sizeof(size_t));
+            push_inst_(program, DYN_STR_INDEX);
             push_inst_r_i(program, MOVI, R0, V_STRING);
 
             i64 len = 1;

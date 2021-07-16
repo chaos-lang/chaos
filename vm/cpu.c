@@ -475,6 +475,24 @@ void execute(cpu *c)
         jit_callr(_jit, R(2));
         break;
     }
+    // Dynamic Index
+    case DYN_STR_INDEX: {
+        // R(1) holds the index value and the offset result should be in R(4)
+        // Jump if the index is positive
+        jit_op* positive_label = jit_bgti(_jit, JIT_FORWARD, R(1), -1);
+        // Load the string length to R(2)
+        jit_ldr(_jit, R(2), R(5), sizeof(size_t));
+        // Turn negative index into positive index
+        jit_addr(_jit, R(1), R(2), R(1));
+        // The index is positive
+        jit_patch(_jit, positive_label);
+        // offset = index * sizeof(char)
+        jit_muli(_jit, R(4), R(1), sizeof(char));
+        // offset += sizeof(size_t)
+        jit_addi(_jit, R(4), R(4), sizeof(size_t));
+        // Index offset is available in R(4)
+        break;
+    }
     // Debug
     case DEBUG:
         debug(_jit);
@@ -586,6 +604,8 @@ void cpu_print_string(i64 addr)
 
 void cpu_delete_string_index(i64 index, i64 addr)
 {
+    size_t* t = (size_t*)addr;
+    *t = *t - 1;
     addr += sizeof(size_t);
     char *s = (char*)addr;
     memmove(&s[index], &s[index + 1], strlen(s) - index);
