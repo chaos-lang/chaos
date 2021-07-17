@@ -371,7 +371,21 @@ void execute(cpu *c)
     // Dynamic Instructions (prefixed with `DYN_`)
     // Dynamic Arithmetic
     case DYN_ADD: {
+        jit_op* num_op_label_1 = jit_bnei(_jit, JIT_FORWARD, R(0), V_STRING);
+        jit_op* num_op_label_2 = jit_bnei(_jit, JIT_FORWARD, R(4), V_STRING);
+
+        jit_movi(_jit, R(2), cpu_string_concat);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(5));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
+        jit_op* string_concat_op_label = jit_jmpi(_jit, JIT_FORWARD);
+
+        jit_patch(_jit, num_op_label_1);
+        jit_patch(_jit, num_op_label_2);
         DYN_BINARY_ARITH(jit_addr, jit_faddr);
+        jit_patch(_jit, string_concat_op_label);
         break;
     }
     case DYN_SUB: {
@@ -609,6 +623,38 @@ void cpu_delete_string_index(i64 index, i64 addr)
     addr += sizeof(size_t);
     char *s = (char*)addr;
     memmove(&s[index], &s[index + 1], strlen(s) - index);
+}
+
+i64 cpu_string_concat(i64 addr1, i64 addr2)
+{
+    size_t* t1 = (size_t*)addr1;
+    size_t* t2 = (size_t*)addr2;
+    size_t t3 = *t1 + *t2;
+    addr1 += sizeof(size_t);
+    addr2 += sizeof(size_t);
+    char *s1 = (char*)addr1;
+    char *s2 = (char*)addr2;
+
+    // Allocate a new space to store the concatenated string
+    i64 p = (i64)malloc((t3 + 1) * sizeof(char) + sizeof(size_t));
+
+    // Set the new string size
+    size_t* p_t = (size_t*)p;
+    *p_t = t3;
+
+    // Copy the first string
+    p += sizeof(size_t);
+    char *p_s = (char*)p;
+    strcpy(p_s, s1);
+
+    // Copy the second string
+    p += *t1 * sizeof(char);
+    char *p_s2 = (char*)p;
+    strcpy(p_s2, s2);
+
+    // Reset the pointer and return
+    p -= sizeof(size_t) + *t1 * sizeof(char);
+    return p;
 }
 
 void debug(struct jit *jit)
