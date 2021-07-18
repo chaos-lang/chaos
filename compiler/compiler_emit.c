@@ -276,6 +276,15 @@ void emitBytecode(cpu *c)
     case LER:
         sprintf(str_inst, "%s R(%d) R(%d) R(%d)", "LER", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
+    // >>> Conversions <<<
+    // extr
+    case EXTR:
+        sprintf(str_inst, "%s FR(%d) R(%d)", "EXTR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
+    // truncr
+    case TRUNCR:
+        sprintf(str_inst, "%s R(%d) FR(%d)", "TRUNCR", c->inst->op1->reg, c->inst->op2->reg);
+        break;
     // >>> Branch Operations <<<
     // beq
     case BEQR:
@@ -350,6 +359,13 @@ void emitBytecode(cpu *c)
     // Dynamic Index
     case DYN_STR_INDEX:
         sprintf(str_inst, "%s", "DYN_STR_INDEX");
+        break;
+    // Dynamic Type Conversion
+    case DYN_BOOL_TO_STR:
+        sprintf(str_inst, "%s", "DYN_BOOL_TO_STR");
+        break;
+    case DYN_STR_TO_BOOL:
+        sprintf(str_inst, "%s", "DYN_STR_TO_BOOL");
         break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");

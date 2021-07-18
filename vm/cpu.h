@@ -75,6 +75,8 @@ void cpu_print_string(i64 addr);
 
 void cpu_delete_string_index(i64 index, i64 addr);
 i64 cpu_string_concat(i64 addr1, i64 addr2);
+i64 cpu_boolean_to_string(i64 val);
+i64 cpu_string_to_boolean(i64 addr);
 
 void debug(struct jit *jit);
 
@@ -94,13 +96,13 @@ void debug(struct jit *jit);
     /* Check if left-hand operand is a float and cast it to float if it's not a float */ \
     jit_op* float_op_label_3 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
     jit_movi(_jit, R(0), V_FLOAT); \
-    jit_extr(_jit, FR(2), R(1)); \
+    jit_extr(_jit, FR(1), R(1)); \
     jit_patch(_jit, float_op_label_3); \
 \
     /* Check if right-hand operand is a float and cast it to float if it's not a float */ \
     jit_op* float_op_label_4 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
     jit_fmovr(_jit, FR(0), FR(1)); \
-    jit_extr(_jit, FR(1), R(5)); \
+    jit_extr(_jit, FR(2), R(5)); \
     jit_patch(_jit, float_op_label_4); \
 \
     /* Do the float operation */ \

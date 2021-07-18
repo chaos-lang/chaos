@@ -217,8 +217,8 @@ print b
 b = a
 num c = a
 print a
-print b
-print c
+// print b
+// print c
 
 del a
 del b
@@ -282,8 +282,8 @@ print b
 b = a
 num c = a
 print a
-print b
-print c
+// print b
+// print c
 
 del a
 del b

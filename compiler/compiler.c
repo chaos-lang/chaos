@@ -169,20 +169,49 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(stmt->v.assign_stmt->x->v.ident->name);
             Symbol* symbol_y = NULL;
-            if (stmt->v.assign_stmt->y->kind == Ident_kind)
+
+            enum ValueType target_value_type = 0;
+            if (stmt->v.assign_stmt->y->kind == Ident_kind) {
                 symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
+                target_value_type = symbol_y->value_type;
+            } else if (stmt->v.assign_stmt->y->kind == BasicLit_kind) {
+                BasicLit* basic_lit = stmt->v.assign_stmt->y->v.basic_lit;
+                target_value_type = basic_lit->value_type;
+            }
+
             // i64 addr = symbol_x->addr;
             if (symbol_x->type == K_ANY)
                 symbol_x->value_type = V_ANY;
             else if (symbol_x->type == K_NUMBER && symbol_y != NULL && (
                 symbol_y->value_type == V_INT || symbol_y->value_type == V_FLOAT
-            ))
+            )) {
+                if (symbol_y->value_type == V_FLOAT) {
+                    push_inst_r_i(program, MOVI, R0, V_FLOAT);
+                    push_inst_r_r_i(program, STR, R9, R0, sizeof(long long));
+                } else if (symbol_y->value_type == V_INT) {
+                    push_inst_r_i(program, MOVI, R0, V_INT);
+                    push_inst_r_r_i(program, STR, R9, R0, sizeof(long long));
+                }
                 symbol_x->value_type = symbol_y->value_type;
+            }
 
             strongly_type(symbol_x, symbol_y, NULL, stmt->v.assign_stmt->y, symbol_x->value_type);
 
+            if (symbol_x->type == K_ANY) {
+                push_inst_r_i(program, MOVI, R0, target_value_type);
+                push_inst_r_r_i(program, STR, R9, R0, sizeof(long long));
+            }
+
+            // printf("target_value_type: %d\n", target_value_type);
+            // printf("symbol_x->value_type: %d\n", symbol_x->value_type);
             switch (symbol_x->value_type) {
             case V_BOOL:
+                if (symbol_y != NULL && symbol_y->type == K_ANY) {
+                    if (target_value_type == V_FLOAT)
+                        push_inst_r_r(program, TRUNCR, R1, R1);
+                    else if (target_value_type == V_STRING)
+                        push_inst_(program, DYN_STR_TO_BOOL);
+                }
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
                 push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
@@ -191,10 +220,14 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
             case V_FLOAT:
+                if (symbol_y != NULL && symbol_y->type == K_ANY && target_value_type != V_FLOAT)
+                    push_inst_r_r(program, EXTR, R1, R1);
                 push_inst_r_i(program, MOVI, R3, sizeof(double));
                 push_inst_r_r_r_i(program, FSTXR, R9, R3, R1, sizeof(double));
                 break;
             case V_STRING:
+                if (symbol_y != NULL && symbol_y->type == K_ANY && target_value_type == V_BOOL)
+                    push_inst_(program, DYN_BOOL_TO_STR);
                 push_inst_r_i(program, MOVI, R3, sizeof(long long));
                 push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
@@ -981,10 +1014,17 @@ void compileDecl(KaosIR* program, Decl* decl)
         // enum Type secondary_type = K_ANY;
         // if (decl->v.var_decl->type_spec->v.type_spec->sub_type_spec != NULL)
         //     secondary_type = decl->v.var_decl->type_spec->v.type_spec->type;
-        // Symbol* symbol = NULL;
+        Symbol* symbol = NULL;
 
         switch (type) {
         case K_BOOL:
+            if ((decl->v.var_decl->expr->kind != BinaryExpr_kind && decl->v.var_decl->expr->kind != UnaryExpr_kind) && value_type == V_FLOAT)
+                push_inst_r_r(program, TRUNCR, R1, R1);
+            else if (value_type == V_STRING)
+                push_inst_(program, DYN_STR_TO_BOOL);
+
+            if ((decl->v.var_decl->expr->kind != BinaryExpr_kind && decl->v.var_decl->expr->kind != UnaryExpr_kind))
+                push_inst_r_i(program, MOVI, R0, V_BOOL);
             store_bool(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
@@ -993,12 +1033,16 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         case K_NUMBER:
             if (value_type == V_FLOAT) {
+                if ((decl->v.var_decl->expr->kind != BinaryExpr_kind && decl->v.var_decl->expr->kind != UnaryExpr_kind))
+                    push_inst_r_i(program, MOVI, R0, V_FLOAT);
                 store_float(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     false
                 );
             } else {
+                if ((decl->v.var_decl->expr->kind != BinaryExpr_kind && decl->v.var_decl->expr->kind != UnaryExpr_kind))
+                    push_inst_r_i(program, MOVI, R0, V_INT);
                 store_int(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
@@ -1007,6 +1051,11 @@ void compileDecl(KaosIR* program, Decl* decl)
             }
             break;
         case K_STRING:
+            if (value_type == V_BOOL)
+                push_inst_(program, DYN_BOOL_TO_STR);
+
+            if ((decl->v.var_decl->expr->kind != BinaryExpr_kind && decl->v.var_decl->expr->kind != UnaryExpr_kind))
+                push_inst_r_i(program, MOVI, R0, V_STRING);
             store_string(
                 program,
                 decl->v.var_decl->ident->v.ident->name,
@@ -1015,8 +1064,51 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         case K_VOID:
             break;
-        case K_ANY:
+        case K_ANY: {
+            switch (value_type) {
+            case V_BOOL:
+                symbol = store_bool(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    true
+                );
+                break;
+            case V_INT: {
+                symbol = store_int(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    true
+                );
+                break;
+            }
+            case V_FLOAT: {
+                symbol = store_float(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    true
+                );
+                break;
+            }
+            case V_STRING: {
+                symbol = store_string(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name,
+                    false
+                );
+                break;
+            }
+            case V_LIST:
+                break;
+            case V_DICT:
+                break;
+            case V_REF:
+                break;
+            default:
+                break;
+            }
+            symbol->type = K_ANY;
             break;
+        }
         case K_LIST:
             break;
         case K_DICT:

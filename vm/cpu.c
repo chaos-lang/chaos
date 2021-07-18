@@ -351,6 +351,15 @@ void execute(cpu *c)
     case LER:
         jit_ler(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
         break;
+    // >>> Conversions <<<
+    // extr
+    case EXTR:
+        jit_extr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+    // truncr
+    case TRUNCR:
+        jit_truncr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg));
+        break;
     // >>> Branch Operations <<<
     // beq
     case BEQR: {
@@ -507,6 +516,23 @@ void execute(cpu *c)
         // Index offset is available in R(4)
         break;
     }
+    // Dynamic Type Conversion
+    case DYN_BOOL_TO_STR: {
+        jit_movi(_jit, R(2), cpu_boolean_to_string);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
+        break;
+    }
+    case DYN_STR_TO_BOOL: {
+        jit_movi(_jit, R(2), cpu_string_to_boolean);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
+        break;
+    }
     // Debug
     case DEBUG:
         debug(_jit);
@@ -657,6 +683,40 @@ i64 cpu_string_concat(i64 addr1, i64 addr2)
     return p;
 }
 
+i64 cpu_boolean_to_string(i64 val)
+{
+    i64 p = 0;
+    size_t* p_t = 0;
+    if (val == 0) {
+        p = (i64)malloc((strlen("false") + 1) * sizeof(size_t));
+        p_t = (size_t*)p;
+        *p_t = 5;
+        p += sizeof(size_t);
+        char *p_s = (char*)p;
+        strcpy(p_s, "false");
+    } else {
+        p = (i64)malloc((strlen("true") + 1) * sizeof(size_t));
+        p_t = (size_t*)p;
+        *p_t = 4;
+        p += sizeof(size_t);
+        char *p_s = (char*)p;
+        strcpy(p_s, "true");
+    }
+
+    p -= sizeof(size_t);
+    return p;
+}
+
+i64 cpu_string_to_boolean(i64 addr)
+{
+    addr += sizeof(size_t);
+    char *s = (char*)addr;
+    if (strlen(s) == 0)
+        return 0;
+    else
+        return 1;
+}
+
 void debug(struct jit *jit)
 {
     jit_msg(jit, " ----------------------------------------------------------\n");
@@ -667,7 +727,9 @@ void debug(struct jit *jit)
     jit_msgr(jit, "[R4: %lld] ", R(4));
     jit_msgr(jit, "[R5: %lld] ", R(5));
     jit_msgr(jit, "[R6: %lld] ", R(6));
-    jit_msgr(jit, "[R7: %lld] | ", R(7));
+    jit_msgr(jit, "[R7: %lld] ", R(7));
+    jit_msgr(jit, "[R8: %lld] ", R(8));
+    jit_msgr(jit, "[R9: %lld] |", R(9));
     jit_fmsgr(jit, "[FR0: %lf] ", FR(0));
     jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
     jit_fmsgr(jit, "[FR2: %lf] ", FR(2));

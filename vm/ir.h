@@ -61,6 +61,8 @@ enum IROpCode {
     NOTR,
     //  >>> Compare Instructions <<<
     EQR, NER, GTR, LTR, GER, LER,
+    // >>> Conversions <<<
+    EXTR, TRUNCR,
     // >>> Branch Operations <<<
     BEQR, BEQI,
     PATCH,
@@ -79,6 +81,9 @@ enum IROpCode {
     DYN_STR_INDEX_DELETE,
     // Dynamic Index
     DYN_STR_INDEX,
+    // Dynamic Type Conversion
+    DYN_BOOL_TO_STR,
+    DYN_STR_TO_BOOL,
     // Debug
     DEBUG,
     HLT,
