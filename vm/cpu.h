@@ -72,6 +72,7 @@ void cpu_print_bool(i64 i);
 void cpu_print_int(i64 i);
 void cpu_print_float(f64 f);
 void cpu_print_string(i64 addr);
+void cpu_print_list(i64 addr);
 
 void cpu_delete_string_index(i64 index, i64 addr);
 i64 cpu_string_concat(i64 addr1, i64 addr2);

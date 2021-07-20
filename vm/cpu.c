@@ -609,6 +609,7 @@ void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl)
         cpu_print_string(r1);
         break;
     case V_LIST:
+        cpu_print_list(r1);
         break;
     case V_DICT:
         break;
@@ -640,6 +641,34 @@ void cpu_print_string(i64 addr)
     addr += sizeof(size_t);
     char *s = (char*)addr;
     printf("%s", escape_the_sequences_in_string_literal(s));
+}
+
+void cpu_print_list(i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    printf("[");
+    for (size_t i = 0; i < *len; i++) {
+        i64 _addr = *(i64*)addr;
+        addr += sizeof(long long);
+        i64 type = *(i64*)_addr;
+        _addr += sizeof(long long);
+        i64 val = *(i64*)_addr;
+        switch (type) {
+        case V_BOOL:
+            cpu_print_bool(val);
+            break;
+        case V_INT:
+            cpu_print_int(val);
+            break;
+        default:
+            break;
+        }
+        if (i + 1 != *len) {
+            printf(", ");
+        }
+    }
+    printf("]");
 }
 
 void cpu_delete_string_index(i64 index, i64 addr)
