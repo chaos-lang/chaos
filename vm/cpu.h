@@ -71,7 +71,7 @@ void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl);
 void cpu_print_bool(i64 i);
 void cpu_print_int(i64 i);
 void cpu_print_float(f64 f);
-void cpu_print_string(i64 addr);
+void cpu_print_string(i64 addr, bool quoted);
 void cpu_print_list(i64 addr);
 
 void cpu_delete_string_index(i64 index, i64 addr);

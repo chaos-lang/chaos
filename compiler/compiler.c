@@ -683,11 +683,19 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 switch (basic_lit->value_type) {
                 case V_BOOL:
                 case V_INT:
+                case V_STRING:
                     push_inst_i_i(program, ALLOCAI, elt_addr, 2 * sizeof(long long));
                     push_inst_r_i(program, REF_ALLOCAI, R2, elt_addr);
                     push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
                     push_inst_r_i(program, MOVI, R3, sizeof(long long));
                     push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+                    break;
+                case V_FLOAT:
+                    push_inst_i_i(program, ALLOCAI, elt_addr, 2 * sizeof(double));
+                    push_inst_r_i(program, REF_ALLOCAI, R2, elt_addr);
+                    push_inst_r_r_i(program, STR, R2, R0, sizeof(double));
+                    push_inst_r_i(program, MOVI, R3, sizeof(double));
+                    push_inst_r_r_r_i(program, FSTXR, R2, R3, R1, sizeof(double));
                     break;
                 default:
                     break;

@@ -606,7 +606,7 @@ void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl)
         cpu_print_float(fr1);
         break;
     case V_STRING:
-        cpu_print_string(r1);
+        cpu_print_string(r1, false);
         break;
     case V_LIST:
         cpu_print_list(r1);
@@ -636,11 +636,14 @@ void cpu_print_float(f64 f)
     printf("%lg", f);
 }
 
-void cpu_print_string(i64 addr)
+void cpu_print_string(i64 addr, bool quoted)
 {
     addr += sizeof(size_t);
     char *s = (char*)addr;
-    printf("%s", escape_the_sequences_in_string_literal(s));
+    if (quoted)
+        printf("'%s'", escape_the_sequences_in_string_literal(s));
+    else
+        printf("%s", escape_the_sequences_in_string_literal(s));
 }
 
 void cpu_print_list(i64 addr)
@@ -653,13 +656,20 @@ void cpu_print_list(i64 addr)
         addr += sizeof(long long);
         i64 type = *(i64*)_addr;
         _addr += sizeof(long long);
-        i64 val = *(i64*)_addr;
+        i64 val_i = *(i64*)_addr;
+        f64 val_f = *(f64*)_addr;
         switch (type) {
         case V_BOOL:
-            cpu_print_bool(val);
+            cpu_print_bool(val_i);
             break;
         case V_INT:
-            cpu_print_int(val);
+            cpu_print_int(val_i);
+            break;
+        case V_FLOAT:
+            cpu_print_float(val_f);
+            break;
+        case V_STRING:
+            cpu_print_string(val_i, true);
             break;
         default:
             break;
