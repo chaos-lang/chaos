@@ -516,6 +516,15 @@ void execute(cpu *c)
         // Index offset is available in R(4)
         break;
     }
+    case DYN_LIST_INDEX: {
+        jit_movi(_jit, R(2), cpu_list_index_access);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(5));
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
     // Dynamic Type Conversion
     case DYN_BOOL_TO_STR: {
         jit_movi(_jit, R(2), cpu_boolean_to_string);
@@ -679,6 +688,28 @@ void cpu_print_list(i64 addr)
         }
     }
     printf("]");
+}
+
+i64 cpu_list_index_access(i64 addr, i64 i)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    if (i < 0)
+        i = *len + i;
+    // printf("len: %lu\n", *len);
+    // printf("i: %lld\n", i);
+
+    addr += sizeof(long long) * i;
+    i64 _addr = *(i64*)addr;
+    // i64 type = *(i64*)_addr;
+    // _addr += sizeof(long long);
+    // i64 val_i = *(i64*)_addr;
+    // f64 val_f = *(f64*)_addr;
+    // printf("type: %lld\n", type);
+    // printf("val_i: %lld\n", val_i);
+    // printf("val_f: %f\n", val_f);
+
+    return _addr;
 }
 
 void cpu_delete_string_index(i64 index, i64 addr)

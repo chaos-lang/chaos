@@ -602,7 +602,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         shift_registers(program);
 
         compileExpr(program, expr->v.index_expr->index);
-        if (type1 == V_STRING) {
+        switch (type1) {
+        case V_STRING: {
             push_inst_(program, DYN_STR_INDEX);
             push_inst_r_i(program, MOVI, R0, V_STRING);
 
@@ -622,6 +623,18 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_i(program, MOVI, R2, len * sizeof(char) + sizeof(size_t));
             push_inst_r_i(program, MOVI, R3, '\0');
             push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
+            break;
+        }
+        case V_LIST: {
+            push_inst_(program, DYN_LIST_INDEX);
+            push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+            push_inst_r_i(program, MOVI, R3, sizeof(long long));
+            push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
+            push_inst_r_r_r_i(program, FLDXR, R1, R2, R3, sizeof(double));
+            break;
+        }
+        default:
+            break;
         }
 
         // R5 holds to pointer to size_t + string + '\n'

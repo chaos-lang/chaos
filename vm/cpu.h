@@ -78,6 +78,7 @@ void cpu_delete_string_index(i64 index, i64 addr);
 i64 cpu_string_concat(i64 addr1, i64 addr2);
 i64 cpu_boolean_to_string(i64 val);
 i64 cpu_string_to_boolean(i64 addr);
+i64 cpu_list_index_access(i64 addr, i64 i);
 
 void debug(struct jit *jit);
 

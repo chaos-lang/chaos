@@ -360,6 +360,9 @@ void emitBytecode(cpu *c)
     case DYN_STR_INDEX:
         sprintf(str_inst, "%s", "DYN_STR_INDEX");
         break;
+    case DYN_LIST_INDEX:
+        sprintf(str_inst, "%s", "DYN_LIST_INDEX");
+        break;
     // Dynamic Type Conversion
     case DYN_BOOL_TO_STR:
         sprintf(str_inst, "%s", "DYN_BOOL_TO_STR");

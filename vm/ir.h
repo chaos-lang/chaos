@@ -80,7 +80,7 @@ enum IROpCode {
     // Dynamic Delete
     DYN_STR_INDEX_DELETE,
     // Dynamic Index
-    DYN_STR_INDEX,
+    DYN_STR_INDEX, DYN_LIST_INDEX,
     // Dynamic Type Conversion
     DYN_BOOL_TO_STR,
     DYN_STR_TO_BOOL,
