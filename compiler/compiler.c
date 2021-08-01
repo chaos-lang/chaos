@@ -338,9 +338,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 push_inst_r_r_r_i(program, STXR, R5, R4, R3, sizeof(char));
                 break;
             case K_LIST:
-                if (symbol->value_type == V_REF) {
-                } else {
-                }
+                push_inst_(program, DYN_LIST_INDEX_UPDATE);
                 break;
             case K_DICT:
                 if (symbol->value_type == V_REF) {
@@ -602,6 +600,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         shift_registers(program);
 
         compileExpr(program, expr->v.index_expr->index);
+        push_inst_r_r(program, MOVR, R10, R1);
         switch (type1) {
         case V_STRING: {
             push_inst_(program, DYN_STR_INDEX);

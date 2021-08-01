@@ -363,6 +363,10 @@ void emitBytecode(cpu *c)
     case DYN_LIST_INDEX:
         sprintf(str_inst, "%s", "DYN_LIST_INDEX");
         break;
+    // Dynamic Index Update
+    case DYN_LIST_INDEX_UPDATE:
+        sprintf(str_inst, "%s", "DYN_LIST_INDEX_UPDATE");
+        break;
     // Dynamic Type Conversion
     case DYN_BOOL_TO_STR:
         sprintf(str_inst, "%s", "DYN_BOOL_TO_STR");

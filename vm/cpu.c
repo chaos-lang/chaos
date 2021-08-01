@@ -525,6 +525,18 @@ void execute(cpu *c)
         jit_retval(_jit, R(2));
         break;
     }
+    // Dynamic Index Update
+    case DYN_LIST_INDEX_UPDATE: {
+        jit_movi(_jit, R(2), cpu_list_index_update);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(5));
+        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(0));
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
     // Dynamic Type Conversion
     case DYN_BOOL_TO_STR: {
         jit_movi(_jit, R(2), cpu_boolean_to_string);
@@ -712,6 +724,20 @@ i64 cpu_list_index_access(i64 addr, i64 i)
     return _addr;
 }
 
+void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    if (i < 0)
+        i = *len + i;
+
+    addr += sizeof(long long) * i;
+    i64 _addr = *(i64*)addr;
+    *(i64*)_addr = r0;
+    _addr += sizeof(long long);
+    *(i64*)_addr = r1;
+}
+
 void cpu_delete_string_index(i64 index, i64 addr)
 {
     size_t* t = (size_t*)addr;
@@ -799,7 +825,8 @@ void debug(struct jit *jit)
     jit_msgr(jit, "[R6: %lld] ", R(6));
     jit_msgr(jit, "[R7: %lld] ", R(7));
     jit_msgr(jit, "[R8: %lld] ", R(8));
-    jit_msgr(jit, "[R9: %lld] |", R(9));
+    jit_msgr(jit, "[R9: %lld] ", R(9));
+    jit_msgr(jit, "[R10: %lld] |", R(10));
     jit_fmsgr(jit, "[FR0: %lf] ", FR(0));
     jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
     jit_fmsgr(jit, "[FR2: %lf] ", FR(2));
