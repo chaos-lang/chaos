@@ -75,6 +75,7 @@ void cpu_print_string(i64 addr, bool quoted);
 void cpu_print_list(i64 addr);
 
 void cpu_delete_string_index(i64 index, i64 addr);
+void cpu_delete_list_index(i64 index, i64 addr);
 i64 cpu_string_concat(i64 addr1, i64 addr2);
 i64 cpu_boolean_to_string(i64 val);
 i64 cpu_string_to_boolean(i64 addr);
