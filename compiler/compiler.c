@@ -695,7 +695,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             compileExpr(program, expr_list->exprs[i - 1]);
             Expr* expr = expr_list->exprs[i - 1];
             i64 elt_addr = stack_counter++;
-            if (expr->kind == BasicLit_kind) {
+
+            switch (expr->kind) {
+            case BasicLit_kind: {
                 BasicLit* basic_lit = expr->v.basic_lit;
                 switch (basic_lit->value_type) {
                 case V_BOOL:
@@ -717,11 +719,24 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 default:
                     break;
                 }
+                break;
+            }
+            case CompositeLit_kind: {
+                push_inst_i_i(program, ALLOCAI, elt_addr, 2 * sizeof(long long));
+                push_inst_r_i(program, REF_ALLOCAI, R2, elt_addr);
+                push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+                break;
+            }
+            default:
+                break;
             }
             // if (expr_list->exprs[i - 1]->kind != KeyValueExpr_kind) {
             // } else {
             //     value_type = V_DICT;
             // }
+            push_inst_r_i(program, REF_ALLOCAI, R10, list_addr);
             push_inst_r_i(program, MOVI, R3, sizeof(size_t) + (j++) * sizeof(long long));
             push_inst_r_r_r_i(program, STXR, R10, R3, R2, sizeof(long long));
         }
