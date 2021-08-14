@@ -700,6 +700,9 @@ void cpu_print_list(i64 addr)
         case V_STRING:
             cpu_print_string(val_i, true);
             break;
+        case V_LIST:
+            cpu_print_list(*(i64*)_addr);
+            break;
         default:
             break;
         }

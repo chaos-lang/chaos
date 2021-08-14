@@ -2167,8 +2167,13 @@ Symbol* store_any(KaosIR* program, char *name)
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_ANY, value, V_ANY);
-    // symbol->addr = program->heap;
     symbol->is_dynamic = true;
+    symbol->addr = stack_counter++;
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
+    push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
     return symbol;
 }
@@ -2234,7 +2239,11 @@ void load_dict(KaosIR* program, Symbol* symbol)
 
 void load_any(KaosIR* program, Symbol* symbol)
 {
-    // i64 addr = symbol->addr;
+    i64 addr = symbol->addr;
+    push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+    push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
 }
 
 char* compile_module_selector(Expr* module_selector)
