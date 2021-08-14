@@ -363,6 +363,8 @@ void compileStmt(KaosIR* program, Stmt* stmt)
             break;
         }
         case IndexExpr_kind: {
+            compileExpr(program, stmt->v.del_stmt->ident->v.index_expr->x);
+            push_inst_r_r(program, MOVR, R10, R1);
             compileExpr(program, stmt->v.del_stmt->ident->v.index_expr->index);
             Symbol* symbol = getSymbol(stmt->v.del_stmt->ident->v.index_expr->x->v.ident->name);
 
@@ -1147,8 +1149,13 @@ void compileDecl(KaosIR* program, Decl* decl)
                 );
                 break;
             }
-            case V_LIST:
+            case V_LIST: {
+                symbol = store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
                 break;
+            }
             case V_DICT:
                 break;
             case V_REF:

@@ -491,11 +491,11 @@ void execute(cpu *c)
     }
     // Dynamic Delete
     case DYN_STR_INDEX_DELETE: {
-        jit_movi(_jit, R(2), cpu_delete_string_index);
+        jit_movi(_jit, R(3), cpu_delete_string_index);
         jit_prepare(_jit);
         jit_putargr(_jit, R(1));
-        jit_putargr(_jit, R(5));
-        jit_callr(_jit, R(2));
+        jit_putargr(_jit, R(10));
+        jit_callr(_jit, R(3));
         break;
     }
     case DYN_LIST_INDEX_DELETE: {
@@ -735,7 +735,6 @@ i64 cpu_list_index_access(i64 addr, i64 i)
 void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
 {
     size_t* len = (size_t*)addr;
-    printf("len: %lu\n", *len);
     addr += sizeof(size_t);
     if (i < 0)
         i = *len + i;
@@ -747,22 +746,28 @@ void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
     *(i64*)_addr = r1;
 }
 
-void cpu_delete_string_index(i64 index, i64 addr)
-{
-    size_t* t = (size_t*)addr;
-    *t = *t - 1;
-    addr += sizeof(size_t);
-    char *s = (char*)addr;
-    memmove(&s[index], &s[index + 1], strlen(s) - index);
-}
-
-void cpu_delete_list_index(i64 index, i64 addr)
+void cpu_delete_string_index(i64 i, i64 addr)
 {
     size_t* len = (size_t*)addr;
+    if (i < 0)
+        i = *len + i;
+
+    addr += sizeof(size_t);
+    char *s = (char*)addr;
+    memmove(&s[i], &s[i + 1], (*len - i) * sizeof(char));
+    *len -= 1;
+}
+
+void cpu_delete_list_index(i64 i, i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    if (i < 0)
+        i = *len + i;
+
     addr += sizeof(size_t);
     i64* arr = (i64*)addr;
+    memmove(&arr[i], &arr[i + 1], (*len - (size_t)i) * sizeof(i64));
     *len -= 1;
-    memmove(&arr[index], &arr[index + 1], *len - (size_t)index);
 }
 
 i64 cpu_string_concat(i64 addr1, i64 addr2)
