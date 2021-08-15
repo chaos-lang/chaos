@@ -729,6 +729,14 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
                 break;
             }
+            case Ident_kind: {
+                push_inst_i_i(program, ALLOCAI, elt_addr, 2 * sizeof(long long));
+                push_inst_r_i(program, REF_ALLOCAI, R2, elt_addr);
+                push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+                break;
+            }
             default:
                 break;
             }
@@ -2144,16 +2152,19 @@ Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic)
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
 
-    // symbol->addr = program->heap;
     symbol->len = len;
     symbol->is_dynamic = is_dynamic;
 
     symbol->addr = stack_counter++;
     push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
     push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
-    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
-    push_inst_r_i(program, MOVI, R3, sizeof(long long));
-    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+    if (is_dynamic)
+        push_inst_(program, DYN_NEW_LIST);
+    else {
+        push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+    }
 
     return symbol;
 }

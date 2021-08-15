@@ -562,6 +562,16 @@ void execute(cpu *c)
         jit_retval(_jit, R(1));
         break;
     }
+    // Dynamic Create New List
+    case DYN_NEW_LIST: {
+        jit_movi(_jit, R(3), cpu_new_list);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(2));
+        jit_callr(_jit, R(3));
+        jit_retval(_jit, R(1));
+        break;
+    }
     // Debug
     case DEBUG:
         debug(_jit);
@@ -737,6 +747,10 @@ i64 cpu_list_index_access(i64 addr, i64 i)
 
 void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
 {
+    // TODO: Below example not working
+    // list z = [1.1, 1.2, 1.3]
+    // z[0] = 3.14
+    // print z
     size_t* len = (size_t*)addr;
     addr += sizeof(size_t);
     if (i < 0)
@@ -747,6 +761,76 @@ void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
     *(i64*)_addr = r0;
     _addr += sizeof(long long);
     *(i64*)_addr = r1;
+}
+
+i64 cpu_new_common(i64 type, i64 val)
+{
+    i64 p = (i64)malloc(2 * sizeof(i64));
+    i64 orig_p = p;
+    i64* p1 = (i64*)p;
+    *p1 = type;
+    p += sizeof(i64);
+    i64* p2 = (i64*)p;
+    *p2 = val;
+    return orig_p;
+}
+
+i64 cpu_new_string(i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    char* s = (char*)addr;
+    i64 new_str = (i64)malloc((*len + 1) * sizeof(char) + sizeof(size_t));
+    i64 orig_new_str = new_str;
+    size_t* new_len = (size_t*)new_str;
+    *new_len = *len;
+    new_str += sizeof(size_t);
+    char* new_s = (char*)new_str;
+    memcpy(new_s, s, (*len + 1) * sizeof(char));
+    return cpu_new_common(V_STRING, orig_new_str);
+}
+
+void cpu_new_list(i64 addr, i64 new_addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    i64 ref_addr = (i64)malloc(sizeof(i64) * *len + sizeof(size_t));
+    i64 orig_ref_addr = ref_addr;
+    size_t* new_len = (size_t*)ref_addr;
+    *new_len = *len;
+    ref_addr += sizeof(size_t);
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 _addr = *(i64*)addr;
+        i64 type = *(i64*)_addr;
+        _addr += sizeof(i64);
+        i64* p = (i64*)ref_addr;
+        switch (type) {
+        case V_BOOL:
+        case V_INT:
+        case V_FLOAT:
+            *p = cpu_new_common(type, *(i64*)_addr);
+            break;
+        case V_STRING:
+            *p = cpu_new_string(*(i64*)_addr);
+            break;
+        case V_LIST:
+            *p = (i64)malloc(2 * sizeof(i64));
+            cpu_new_list(*(i64*)_addr, *p);
+            break;
+        default:
+            break;
+        }
+
+        addr += sizeof(i64);
+        ref_addr += sizeof(i64);
+    }
+
+    i64* p1 = (i64*)new_addr;
+    *p1 = V_LIST;
+    new_addr += sizeof(i64);
+    i64* p2 = (i64*)new_addr;
+    *p2 = orig_ref_addr;
 }
 
 void cpu_delete_string_index(i64 i, i64 addr)

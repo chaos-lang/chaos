@@ -82,6 +82,10 @@ i64 cpu_string_to_boolean(i64 addr);
 i64 cpu_list_index_access(i64 addr, i64 i);
 void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1);
 
+i64 cpu_new_common(i64 type, i64 val);
+i64 cpu_new_string(i64 addr);
+void cpu_new_list(i64 addr, i64 new_addr);
+
 void debug(struct jit *jit);
 
 #define DYN_BINARY_ARITH(_fn, _ffn) \

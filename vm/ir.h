@@ -86,6 +86,8 @@ enum IROpCode {
     // Dynamic Type Conversion
     DYN_BOOL_TO_STR,
     DYN_STR_TO_BOOL,
+    // Dynamic Create New List
+    DYN_NEW_LIST,
     // Debug
     DEBUG,
     HLT,

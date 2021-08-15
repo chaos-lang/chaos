@@ -377,6 +377,10 @@ void emitBytecode(cpu *c)
     case DYN_STR_TO_BOOL:
         sprintf(str_inst, "%s", "DYN_STR_TO_BOOL");
         break;
+    // Dynamic Create New List
+    case DYN_NEW_LIST:
+        sprintf(str_inst, "%s", "DYN_NEW_LIST");
+        break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
         break;
