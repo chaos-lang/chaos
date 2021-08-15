@@ -506,8 +506,8 @@ void execute(cpu *c)
         jit_callr(_jit, R(3));
         break;
     }
-    // Dynamic Index
-    case DYN_STR_INDEX: {
+    // Dynamic Index Access
+    case DYN_STR_INDEX_ACCESS: {
         // R(1) holds the index value and the offset result should be in R(4)
         // Jump if the index is positive
         jit_op* positive_label = jit_bgti(_jit, JIT_FORWARD, R(1), -1);
@@ -524,8 +524,17 @@ void execute(cpu *c)
         // Index offset is available in R(4)
         break;
     }
-    case DYN_LIST_INDEX: {
+    case DYN_LIST_INDEX_ACCESS: {
         jit_movi(_jit, R(2), cpu_list_index_access);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(5));
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
+    case DYN_DICT_KEY_SEARCH: {
+        jit_movi(_jit, R(2), cpu_dict_key_search);
         jit_prepare(_jit);
         jit_putargr(_jit, R(5));
         jit_putargr(_jit, R(1));
@@ -769,6 +778,36 @@ i64 cpu_list_index_access(i64 addr, i64 i)
     // printf("val_f: %f\n", val_f);
 
     return _addr;
+}
+
+i64 cpu_dict_key_search(i64 addr, i64 search_key_addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+
+    search_key_addr += sizeof(size_t);
+    char* search_key = (char*)search_key_addr;
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+        addr += sizeof(i64);
+
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+        i64 value_ref = *(i64*)key_value_pair;
+
+        key_ref += sizeof(i64);
+        i64 key_addr = *(i64*)key_ref;
+        key_addr += sizeof(size_t);
+        char* key = (char*)key_addr;
+
+        if (strcmp(search_key, key) == 0)
+            return value_ref;
+    }
+
+    // TODO: throw error
+
+    return 0;
 }
 
 void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)

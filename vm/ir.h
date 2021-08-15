@@ -79,8 +79,8 @@ enum IROpCode {
     DYN_EXIT,
     // Dynamic Delete
     DYN_STR_INDEX_DELETE, DYN_LIST_INDEX_DELETE,
-    // Dynamic Index
-    DYN_STR_INDEX, DYN_LIST_INDEX,
+    // Dynamic Index Access
+    DYN_STR_INDEX_ACCESS, DYN_LIST_INDEX_ACCESS, DYN_DICT_KEY_SEARCH,
     // Dynamic Index Update
     DYN_LIST_INDEX_UPDATE,
     // Dynamic Type Conversion

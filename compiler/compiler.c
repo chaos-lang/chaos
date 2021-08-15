@@ -615,7 +615,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         push_inst_r_r(program, MOVR, R10, R1);
         switch (type1) {
         case V_STRING: {
-            push_inst_(program, DYN_STR_INDEX);
+            push_inst_(program, DYN_STR_INDEX_ACCESS);
             push_inst_r_i(program, MOVI, R0, V_STRING);
 
             i64 len = 1;
@@ -636,8 +636,12 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
             break;
         }
-        case V_LIST: {
-            push_inst_(program, DYN_LIST_INDEX);
+        case V_LIST:
+        case V_DICT: {
+            if (type1 == V_LIST)
+                push_inst_(program, DYN_LIST_INDEX_ACCESS);
+            else
+                push_inst_(program, DYN_DICT_KEY_SEARCH);
             push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
             push_inst_r_i(program, MOVI, R3, sizeof(long long));
             push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
