@@ -691,7 +691,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     }
     case CompositeLit_kind: {
         ExprList* expr_list = expr->v.composite_lit->elts;
-        enum ValueType value_type = V_LIST;
+        enum ValueType value_type = expr->v.composite_lit->type->kind == ListType_kind ? V_LIST : V_DICT;
         i64 list_addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, list_addr, sizeof(size_t) + expr_list->expr_count * sizeof(long long));
         push_inst_r_i(program, REF_ALLOCAI, R10, list_addr);
@@ -728,15 +728,9 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 }
                 break;
             }
-            case CompositeLit_kind: {
-                push_inst_i_i(program, ALLOCAI, elt_addr, 2 * sizeof(long long));
-                push_inst_r_i(program, REF_ALLOCAI, R2, elt_addr);
-                push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
-                push_inst_r_i(program, MOVI, R3, sizeof(long long));
-                push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
-                break;
-            }
-            case Ident_kind: {
+            case CompositeLit_kind:
+            case Ident_kind:
+            case KeyValueExpr_kind: {
                 push_inst_i_i(program, ALLOCAI, elt_addr, 2 * sizeof(long long));
                 push_inst_r_i(program, REF_ALLOCAI, R2, elt_addr);
                 push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
@@ -757,13 +751,31 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
         // compileSpec(program, expr->v.composite_lit->type);
         push_inst_r_r(program, MOVR, R1, R10);
-        push_inst_r_i(program, MOVI, R0, V_LIST);
+        push_inst_r_i(program, MOVI, R0, value_type);
         return value_type + 1;
         break;
     }
     case KeyValueExpr_kind: {
-        compileExpr(program, expr->v.key_value_expr->value);
+        i64 key_addr = stack_counter++;
         compileExpr(program, expr->v.key_value_expr->key);
+        push_inst_i_i(program, ALLOCAI, key_addr, 2 * sizeof(long long));
+        push_inst_r_i(program, REF_ALLOCAI, R2, key_addr);
+        push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+
+        push_inst_r_r(program, MOVR, R9, R2);
+
+        i64 value_addr = stack_counter++;
+        compileExpr(program, expr->v.key_value_expr->value);
+        push_inst_i_i(program, ALLOCAI, value_addr, 2 * sizeof(long long));
+        push_inst_r_i(program, REF_ALLOCAI, R2, value_addr);
+        push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+
+        push_inst_r_r(program, MOVR, R0, R9);
+        push_inst_r_r(program, MOVR, R1, R2);
         break;
     }
     case CallExpr_kind: {
@@ -1219,8 +1231,29 @@ void compileDecl(KaosIR* program, Decl* decl)
             );
             break;
         }
-        case K_DICT:
+        case K_DICT: {
+            size_t len = 0;
+            bool is_dynamic = false;
+
+            switch (decl->v.var_decl->expr->kind) {
+            case CompositeLit_kind:
+                len = decl->v.var_decl->expr->v.composite_lit->elts->expr_count;
+                break;
+            case Ident_kind:
+                is_dynamic = true;
+                break;
+            default:
+                break;
+            }
+
+            symbol = store_dict(
+                program,
+                decl->v.var_decl->ident->v.ident->name,
+                len,
+                is_dynamic
+            );
             break;
+        }
         }
         break;
     }
@@ -2182,15 +2215,15 @@ Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_DICT, value, V_DICT);
 
-    // symbol->addr = program->heap;
     symbol->len = len;
     symbol->is_dynamic = is_dynamic;
 
-    if (is_dynamic) {
-    } else {
-        for (size_t i = len; i > 0; i--) {
-        }
-    }
+    symbol->addr = stack_counter++;
+    push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
+    push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
+    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
     return symbol;
 }
@@ -2259,15 +2292,10 @@ void load_list(KaosIR* program, Symbol* symbol)
 void load_dict(KaosIR* program, Symbol* symbol)
 {
     i64 addr = symbol->addr;
-
-    if (symbol->is_dynamic) {
-    } else {
-        size_t len = symbol->len;
-        addr += len * 2 - 1 + 2;
-        for (size_t i = len; i > 0; i--) {
-        }
-        addr--;
-    }
+    push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+    push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+    push_inst_r_i(program, MOVI, R3, sizeof(long long));
+    push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
 }
 
 void load_any(KaosIR* program, Symbol* symbol)

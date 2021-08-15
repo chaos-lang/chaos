@@ -651,6 +651,7 @@ void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl)
         cpu_print_list(r1);
         break;
     case V_DICT:
+        cpu_print_dict(r1);
         break;
     default:
         break;
@@ -685,42 +686,67 @@ void cpu_print_string(i64 addr, bool quoted)
         printf("%s", escape_the_sequences_in_string_literal(s));
 }
 
+void cpu_print_flex(i64 addr)
+{
+    i64 type = *(i64*)addr;
+    addr += sizeof(long long);
+    i64 val_i = *(i64*)addr;
+    f64 val_f = *(f64*)addr;
+    switch (type) {
+    case V_BOOL:
+        cpu_print_bool(val_i);
+        break;
+    case V_INT:
+        cpu_print_int(val_i);
+        break;
+    case V_FLOAT:
+        cpu_print_float(val_f);
+        break;
+    case V_STRING:
+        cpu_print_string(val_i, true);
+        break;
+    case V_LIST:
+        cpu_print_list(*(i64*)addr);
+        break;
+    default:
+        break;
+    }
+}
+
 void cpu_print_list(i64 addr)
 {
     size_t* len = (size_t*)addr;
     addr += sizeof(size_t);
     printf("[");
     for (size_t i = 0; i < *len; i++) {
-        i64 _addr = *(i64*)addr;
+        cpu_print_flex(*(i64*)addr);
         addr += sizeof(long long);
-        i64 type = *(i64*)_addr;
-        _addr += sizeof(long long);
-        i64 val_i = *(i64*)_addr;
-        f64 val_f = *(f64*)_addr;
-        switch (type) {
-        case V_BOOL:
-            cpu_print_bool(val_i);
-            break;
-        case V_INT:
-            cpu_print_int(val_i);
-            break;
-        case V_FLOAT:
-            cpu_print_float(val_f);
-            break;
-        case V_STRING:
-            cpu_print_string(val_i, true);
-            break;
-        case V_LIST:
-            cpu_print_list(*(i64*)_addr);
-            break;
-        default:
-            break;
-        }
         if (i + 1 != *len) {
             printf(", ");
         }
     }
     printf("]");
+}
+
+void cpu_print_dict(i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    printf("{");
+    for (size_t i = 0; i < *len; i++) {
+        i64 _addr = *(i64*)addr;
+        addr += sizeof(long long);
+        i64 key = *(i64*)_addr;
+        _addr += sizeof(long long);
+        i64 value = *(i64*)_addr;
+        cpu_print_flex(key);
+        printf(": ");
+        cpu_print_flex(value);
+        if (i + 1 != *len) {
+            printf(", ");
+        }
+    }
+    printf("}");
 }
 
 i64 cpu_list_index_access(i64 addr, i64 i)
