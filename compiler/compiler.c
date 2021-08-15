@@ -171,12 +171,15 @@ void compileStmt(KaosIR* program, Stmt* stmt)
             Symbol* symbol_y = NULL;
 
             enum ValueType target_value_type = 0;
+            bool set_to_target_value_type = false;
             if (stmt->v.assign_stmt->y->kind == Ident_kind) {
                 symbol_y = getSymbol(stmt->v.assign_stmt->y->v.ident->name);
                 target_value_type = symbol_y->value_type;
+                set_to_target_value_type = true;
             } else if (stmt->v.assign_stmt->y->kind == BasicLit_kind) {
                 BasicLit* basic_lit = stmt->v.assign_stmt->y->v.basic_lit;
                 target_value_type = basic_lit->value_type;
+                set_to_target_value_type = true;
             }
 
             // i64 addr = symbol_x->addr;
@@ -197,7 +200,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
 
             strongly_type(symbol_x, symbol_y, NULL, stmt->v.assign_stmt->y, symbol_x->value_type);
 
-            if (symbol_x->type == K_ANY) {
+            if (symbol_x->type == K_ANY && set_to_target_value_type) {
                 push_inst_r_i(program, MOVI, R0, target_value_type);
                 push_inst_r_r_i(program, STR, R9, R0, sizeof(long long));
             }
@@ -232,6 +235,10 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
             case V_ANY: {
+                if (!set_to_target_value_type)
+                    push_inst_r_r_i(program, STR, R9, R0, sizeof(long long));
+                push_inst_r_i(program, MOVI, R3, sizeof(long long));
+                push_inst_r_r_r_i(program, STXR, R9, R3, R1, sizeof(long long));
                 break;
             }
             case V_LIST: {
