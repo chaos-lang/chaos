@@ -532,19 +532,11 @@ void execute(cpu *c)
         // Index offset is available in R(4)
         break;
     }
-    case DYN_LIST_INDEX_ACCESS: {
-        jit_movi(_jit, R(2), cpu_list_index_access);
+    case DYN_COMPOSITE_ACCESS: {
+        jit_movi(_jit, R(2), cpu_composite_access);
         jit_prepare(_jit);
         jit_putargr(_jit, R(5));
-        jit_putargr(_jit, R(1));
-        jit_callr(_jit, R(2));
-        jit_retval(_jit, R(2));
-        break;
-    }
-    case DYN_DICT_KEY_SEARCH: {
-        jit_movi(_jit, R(2), cpu_dict_key_search);
-        jit_prepare(_jit);
-        jit_putargr(_jit, R(5));
+        jit_putargr(_jit, R(4));
         jit_putargr(_jit, R(1));
         jit_callr(_jit, R(2));
         jit_retval(_jit, R(2));
@@ -787,6 +779,14 @@ void cpu_print_dict(i64 addr)
         }
     }
     printf("}");
+}
+
+i64 cpu_composite_access(i64 addr, i64 type, i64 val)
+{
+    if (type == V_LIST)
+        return cpu_list_index_access(addr, val);
+    else
+        return cpu_dict_key_search(addr, val);
 }
 
 i64 cpu_list_index_access(i64 addr, i64 i)

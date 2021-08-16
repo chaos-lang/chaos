@@ -82,6 +82,7 @@ void cpu_delete_dict_key(i64 search_key_addr, i64 addr);
 i64 cpu_string_concat(i64 addr1, i64 addr2);
 i64 cpu_boolean_to_string(i64 val);
 i64 cpu_string_to_boolean(i64 addr);
+i64 cpu_composite_access(i64 addr, i64 type, i64 val);
 i64 cpu_list_index_access(i64 addr, i64 i);
 i64 cpu_dict_key_search(i64 addr, i64 search_key_addr);
 void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1);

@@ -366,11 +366,8 @@ void emitBytecode(cpu *c)
     case DYN_STR_INDEX_ACCESS:
         sprintf(str_inst, "%s", "DYN_STR_INDEX_ACCESS");
         break;
-    case DYN_LIST_INDEX_ACCESS:
-        sprintf(str_inst, "%s", "DYN_LIST_INDEX_ACCESS");
-        break;
-    case DYN_DICT_KEY_SEARCH:
-        sprintf(str_inst, "%s", "DYN_DICT_KEY_SEARCH");
+    case DYN_COMPOSITE_ACCESS:
+        sprintf(str_inst, "%s", "DYN_COMPOSITE_ACCESS");
         break;
     // Dynamic Index Update
     case DYN_LIST_INDEX_UPDATE:
