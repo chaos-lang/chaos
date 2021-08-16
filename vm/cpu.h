@@ -90,6 +90,7 @@ void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1);
 i64 cpu_new_common(i64 type, i64 val);
 i64 cpu_new_string(i64 addr);
 void cpu_new_list(i64 addr, i64 new_addr);
+void cpu_new_dict(i64 addr, i64 new_addr);
 
 void debug(struct jit *jit);
 

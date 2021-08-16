@@ -775,8 +775,6 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         push_inst_r_i(program, MOVI, R3, sizeof(long long));
         push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
-        push_inst_r_r(program, MOVR, R9, R2);
-
         i64 value_addr = stack_counter++;
         compileExpr(program, expr->v.key_value_expr->value);
         push_inst_i_i(program, ALLOCAI, value_addr, 2 * sizeof(long long));
@@ -785,8 +783,8 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         push_inst_r_i(program, MOVI, R3, sizeof(long long));
         push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
-        push_inst_r_r(program, MOVR, R0, R9);
-        push_inst_r_r(program, MOVR, R1, R2);
+        push_inst_r_i(program, REF_ALLOCAI, R0, key_addr);
+        push_inst_r_i(program, REF_ALLOCAI, R1, value_addr);
         break;
     }
     case CallExpr_kind: {
@@ -1178,38 +1176,38 @@ void compileDecl(KaosIR* program, Decl* decl)
                     true
                 );
                 break;
-            case V_INT: {
+            case V_INT:
                 symbol = store_int(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     true
                 );
                 break;
-            }
-            case V_FLOAT: {
+            case V_FLOAT:
                 symbol = store_float(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     true
                 );
                 break;
-            }
-            case V_STRING: {
+            case V_STRING:
                 symbol = store_string(
                     program,
                     decl->v.var_decl->ident->v.ident->name,
                     false
                 );
                 break;
-            }
-            case V_LIST: {
+            case V_LIST:
                 symbol = store_any(
                     program,
                     decl->v.var_decl->ident->v.ident->name
                 );
                 break;
-            }
             case V_DICT:
+                symbol = store_any(
+                    program,
+                    decl->v.var_decl->ident->v.ident->name
+                );
                 break;
             case V_REF:
                 break;
@@ -2232,9 +2230,13 @@ Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
     symbol->addr = stack_counter++;
     push_inst_i_i(program, ALLOCAI, symbol->addr, 2 * sizeof(long long));
     push_inst_r_i(program, REF_ALLOCAI, R2, symbol->addr);
-    push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
-    push_inst_r_i(program, MOVI, R3, sizeof(long long));
-    push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+    if (is_dynamic)
+        push_inst_(program, DYN_NEW_DICT);
+    else {
+        push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+    }
 
     return symbol;
 }

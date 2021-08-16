@@ -387,6 +387,9 @@ void emitBytecode(cpu *c)
     case DYN_NEW_LIST:
         sprintf(str_inst, "%s", "DYN_NEW_LIST");
         break;
+    case DYN_NEW_DICT:
+        sprintf(str_inst, "%s", "DYN_NEW_DICT");
+        break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
         break;

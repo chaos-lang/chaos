@@ -600,6 +600,15 @@ void execute(cpu *c)
         jit_retval(_jit, R(1));
         break;
     }
+    case DYN_NEW_DICT: {
+        jit_movi(_jit, R(3), cpu_new_dict);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(2));
+        jit_callr(_jit, R(3));
+        jit_retval(_jit, R(1));
+        break;
+    }
     // Debug
     case DEBUG:
         debug(_jit);
@@ -735,6 +744,9 @@ void cpu_print_flex(i64 addr)
         break;
     case V_LIST:
         cpu_print_list(*(i64*)addr);
+        break;
+    case V_DICT:
+        cpu_print_dict(*(i64*)addr);
         break;
     default:
         break;
@@ -934,6 +946,10 @@ void cpu_new_list(i64 addr, i64 new_addr)
             *p = (i64)malloc(2 * sizeof(i64));
             cpu_new_list(*(i64*)_addr, *p);
             break;
+        case V_DICT:
+            *p = (i64)malloc(2 * sizeof(i64));
+            cpu_new_dict(*(i64*)_addr, *p);
+            break;
         default:
             break;
         }
@@ -944,6 +960,68 @@ void cpu_new_list(i64 addr, i64 new_addr)
 
     i64* p1 = (i64*)new_addr;
     *p1 = V_LIST;
+    new_addr += sizeof(i64);
+    i64* p2 = (i64*)new_addr;
+    *p2 = orig_ref_addr;
+}
+
+void cpu_new_dict(i64 addr, i64 new_addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    i64 ref_addr = (i64)malloc(sizeof(i64) * *len + sizeof(size_t));
+    i64 orig_ref_addr = ref_addr;
+    size_t* new_len = (size_t*)ref_addr;
+    *new_len = *len;
+    ref_addr += sizeof(size_t);
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+        i64 value_ref = *(i64*)key_value_pair;
+        key_ref += sizeof(i64);
+
+        i64 new_key_value_pair = (i64)malloc(2 * sizeof(i64));
+        i64* p = (i64*)ref_addr;
+        *p = new_key_value_pair;
+
+        i64* new_key = (i64*)new_key_value_pair;
+        *new_key = cpu_new_string(*(i64*)key_ref);
+        new_key_value_pair += sizeof(i64);
+        i64* new_value = (i64*)new_key_value_pair;
+
+        i64 type = *(i64*)value_ref;
+        value_ref += sizeof(i64);
+
+        switch (type) {
+        case V_BOOL:
+        case V_INT:
+        case V_FLOAT:
+            *new_value = cpu_new_common(type, *(i64*)value_ref);
+            break;
+        case V_STRING:
+            *new_value = cpu_new_string(*(i64*)value_ref);
+            break;
+        case V_LIST:
+            *new_value = (i64)malloc(2 * sizeof(i64));
+            cpu_new_list(*(i64*)value_ref, *new_value);
+            break;
+        case V_DICT:
+            *new_value = (i64)malloc(2 * sizeof(i64));
+            cpu_new_dict(*(i64*)value_ref, *new_value);
+            break;
+        default:
+            break;
+        }
+
+        addr += sizeof(i64);
+        ref_addr += sizeof(i64);
+    }
+
+    i64* p1 = (i64*)new_addr;
+    *p1 = V_DICT;
     new_addr += sizeof(i64);
     i64* p2 = (i64*)new_addr;
     *p2 = orig_ref_addr;
