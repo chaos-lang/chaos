@@ -348,9 +348,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 push_inst_(program, DYN_LIST_INDEX_UPDATE);
                 break;
             case K_DICT:
-                if (symbol->value_type == V_REF) {
-                } else {
-                }
+                push_inst_(program, DYN_DICT_KEY_UPDATE);
                 break;
             default:
                 break;

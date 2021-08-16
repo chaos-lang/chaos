@@ -352,7 +352,7 @@ void emitBytecode(cpu *c)
     case DYN_EXIT:
         sprintf(str_inst, "%s", "DYN_EXIT");
         break;
-    // Dynamic Delete
+    // Dynamic Index Delete
     case DYN_STR_INDEX_DELETE:
         sprintf(str_inst, "%s", "DYN_STR_INDEX_DELETE");
         break;

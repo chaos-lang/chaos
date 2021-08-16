@@ -489,7 +489,7 @@ void execute(cpu *c)
         jit_callr(_jit, R(2));
         break;
     }
-    // Dynamic Delete
+    // Dynamic Index Delete
     case DYN_STR_INDEX_DELETE: {
         jit_movi(_jit, R(3), cpu_delete_string_index);
         jit_prepare(_jit);
@@ -545,6 +545,17 @@ void execute(cpu *c)
     // Dynamic Index Update
     case DYN_LIST_INDEX_UPDATE: {
         jit_movi(_jit, R(2), cpu_list_index_update);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(5));
+        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(0));
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
+    case DYN_DICT_KEY_UPDATE: {
+        jit_movi(_jit, R(2), cpu_dict_key_update);
         jit_prepare(_jit);
         jit_putargr(_jit, R(5));
         jit_putargr(_jit, R(10));
@@ -826,6 +837,38 @@ void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
     *(i64*)_addr = r0;
     _addr += sizeof(long long);
     *(i64*)_addr = r1;
+}
+
+void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+
+    search_key_addr += sizeof(size_t);
+    char* search_key = (char*)search_key_addr;
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+        addr += sizeof(i64);
+
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+        i64 value_ref = *(i64*)key_value_pair;
+
+        key_ref += sizeof(i64);
+        i64 key_addr = *(i64*)key_ref;
+        key_addr += sizeof(size_t);
+        char* key = (char*)key_addr;
+
+        if (strcmp(search_key, key) == 0) {
+            *(i64*)value_ref = r0;
+            value_ref += sizeof(i64);
+            *(i64*)value_ref = r1;
+            return;
+        }
+    }
+
+    // TODO: throw error
 }
 
 i64 cpu_new_common(i64 type, i64 val)
