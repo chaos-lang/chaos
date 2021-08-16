@@ -162,6 +162,8 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         break;
     case AssignStmt_kind: {
         compileExpr(program, stmt->v.assign_stmt->x);
+        push_inst_r_r(program, MOVR, R12, R5);
+        push_inst_r_r(program, MOVR, R13, R11);
         push_inst_r_r(program, MOVR, R9, R2);
         // shift_registers(program);
         compileExpr(program, stmt->v.assign_stmt->y);
@@ -198,7 +200,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 symbol_x->value_type = symbol_y->value_type;
             }
 
-            strongly_type(symbol_x, symbol_y, NULL, stmt->v.assign_stmt->y, symbol_x->value_type);
+            // strongly_type(symbol_x, symbol_y, NULL, stmt->v.assign_stmt->y, symbol_x->value_type);
 
             if (symbol_x->type == K_ANY && set_to_target_value_type) {
                 push_inst_r_i(program, MOVI, R0, target_value_type);
@@ -336,7 +338,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
                 break;
             }
 
-            strongly_type(symbol, NULL, NULL, stmt->v.assign_stmt->y, symbol->value_type);
+            // strongly_type(symbol, NULL, NULL, stmt->v.assign_stmt->y, symbol->value_type);
 
             switch (symbol->type) {
             case K_STRING:
@@ -369,7 +371,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         }
         case IndexExpr_kind: {
             compileExpr(program, stmt->v.del_stmt->ident->v.index_expr->x);
-            push_inst_r_r(program, MOVR, R10, R1);
+            push_inst_r_r(program, MOVR, R11, R1);
             compileExpr(program, stmt->v.del_stmt->ident->v.index_expr->index);
             Symbol* symbol = getSymbol(stmt->v.del_stmt->ident->v.index_expr->x->v.ident->name);
 
@@ -619,7 +621,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         shift_registers(program);
 
         compileExpr(program, expr->v.index_expr->index);
-        push_inst_r_r(program, MOVR, R10, R1);
+        push_inst_r_r(program, MOVR, R11, R1);
         switch (type1) {
         case V_STRING: {
             push_inst_(program, DYN_STR_INDEX_ACCESS);
@@ -773,12 +775,15 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
         i64 value_addr = stack_counter++;
-        compileExpr(program, expr->v.key_value_expr->value);
+        enum ValueType value_type = compileExpr(program, expr->v.key_value_expr->value) - 1;
         push_inst_i_i(program, ALLOCAI, value_addr, 2 * sizeof(long long));
         push_inst_r_i(program, REF_ALLOCAI, R2, value_addr);
         push_inst_r_r_i(program, STR, R2, R0, sizeof(long long));
         push_inst_r_i(program, MOVI, R3, sizeof(long long));
-        push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
+        if (value_type == V_FLOAT)
+            push_inst_r_r_r_i(program, FSTXR, R2, R3, R1, sizeof(double));
+        else
+            push_inst_r_r_r_i(program, STXR, R2, R3, R1, sizeof(long long));
 
         push_inst_r_i(program, REF_ALLOCAI, R0, key_addr);
         push_inst_r_i(program, REF_ALLOCAI, R1, value_addr);

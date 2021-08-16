@@ -494,7 +494,7 @@ void execute(cpu *c)
         jit_movi(_jit, R(3), cpu_delete_string_index);
         jit_prepare(_jit);
         jit_putargr(_jit, R(1));
-        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(11));
         jit_callr(_jit, R(3));
         break;
     }
@@ -502,7 +502,7 @@ void execute(cpu *c)
         jit_movi(_jit, R(3), cpu_delete_list_index);
         jit_prepare(_jit);
         jit_putargr(_jit, R(1));
-        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(11));
         jit_callr(_jit, R(3));
         break;
     }
@@ -510,7 +510,7 @@ void execute(cpu *c)
         jit_movi(_jit, R(3), cpu_delete_dict_key);
         jit_prepare(_jit);
         jit_putargr(_jit, R(1));
-        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(11));
         jit_callr(_jit, R(3));
         break;
     }
@@ -546,10 +546,11 @@ void execute(cpu *c)
     case DYN_LIST_INDEX_UPDATE: {
         jit_movi(_jit, R(2), cpu_list_index_update);
         jit_prepare(_jit);
-        jit_putargr(_jit, R(5));
-        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(12));
+        jit_putargr(_jit, R(13));
         jit_putargr(_jit, R(0));
         jit_putargr(_jit, R(1));
+        jit_fputargr(_jit, FR(1), sizeof(double));
         jit_callr(_jit, R(2));
         jit_retval(_jit, R(2));
         break;
@@ -557,10 +558,11 @@ void execute(cpu *c)
     case DYN_DICT_KEY_UPDATE: {
         jit_movi(_jit, R(2), cpu_dict_key_update);
         jit_prepare(_jit);
-        jit_putargr(_jit, R(5));
-        jit_putargr(_jit, R(10));
+        jit_putargr(_jit, R(12));
+        jit_putargr(_jit, R(13));
         jit_putargr(_jit, R(0));
         jit_putargr(_jit, R(1));
+        jit_fputargr(_jit, FR(1), sizeof(double));
         jit_callr(_jit, R(2));
         jit_retval(_jit, R(2));
         break;
@@ -841,12 +843,8 @@ i64 cpu_dict_key_search(i64 addr, i64 search_key_addr)
     return 0;
 }
 
-void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
+void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1, f64 fr1)
 {
-    // TODO: Below example not working
-    // list z = [1.1, 1.2, 1.3]
-    // z[0] = 3.14
-    // print z
     size_t* len = (size_t*)addr;
     addr += sizeof(size_t);
     if (i < 0)
@@ -856,10 +854,13 @@ void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1)
     i64 _addr = *(i64*)addr;
     *(i64*)_addr = r0;
     _addr += sizeof(long long);
-    *(i64*)_addr = r1;
+    if (r0 == V_FLOAT)
+        *(f64*)_addr = fr1;
+    else
+        *(i64*)_addr = r1;
 }
 
-void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1)
+void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1, f64 fr1)
 {
     size_t* len = (size_t*)addr;
     addr += sizeof(size_t);
@@ -883,7 +884,10 @@ void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1)
         if (strcmp(search_key, key) == 0) {
             *(i64*)value_ref = r0;
             value_ref += sizeof(i64);
-            *(i64*)value_ref = r1;
+            if (r0 == V_FLOAT)
+                *(f64*)value_ref = fr1;
+            else
+                *(i64*)value_ref = r1;
             return;
         }
     }
@@ -1159,7 +1163,8 @@ void debug(struct jit *jit)
     jit_msgr(jit, "[R7: %lld] ", R(7));
     jit_msgr(jit, "[R8: %lld] ", R(8));
     jit_msgr(jit, "[R9: %lld] ", R(9));
-    jit_msgr(jit, "[R10: %lld] |", R(10));
+    jit_msgr(jit, "[R10: %lld] ", R(10));
+    jit_msgr(jit, "[R11: %lld] |", R(11));
     jit_fmsgr(jit, "[FR0: %lf] ", FR(0));
     jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
     jit_fmsgr(jit, "[FR2: %lf] ", FR(2));

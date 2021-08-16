@@ -85,8 +85,8 @@ i64 cpu_string_to_boolean(i64 addr);
 i64 cpu_composite_access(i64 addr, i64 type, i64 val);
 i64 cpu_list_index_access(i64 addr, i64 i);
 i64 cpu_dict_key_search(i64 addr, i64 search_key_addr);
-void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1);
-void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1);
+void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1, f64 fr1);
+void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1, f64 fr1);
 
 i64 cpu_new_common(i64 type, i64 val);
 i64 cpu_new_string(i64 addr);
