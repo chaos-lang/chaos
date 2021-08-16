@@ -506,6 +506,14 @@ void execute(cpu *c)
         jit_callr(_jit, R(3));
         break;
     }
+    case DYN_DICT_KEY_DELETE: {
+        jit_movi(_jit, R(3), cpu_delete_dict_key);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(10));
+        jit_callr(_jit, R(3));
+        break;
+    }
     // Dynamic Index Access
     case DYN_STR_INDEX_ACCESS: {
         // R(1) holds the index value and the offset result should be in R(4)
@@ -963,6 +971,35 @@ void cpu_delete_list_index(i64 i, i64 addr)
     i64* arr = (i64*)addr;
     memmove(&arr[i], &arr[i + 1], (*len - (size_t)i) * sizeof(i64));
     *len -= 1;
+}
+
+void cpu_delete_dict_key(i64 search_key_addr, i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    i64* arr = (i64*)addr;
+
+    search_key_addr += sizeof(size_t);
+    char* search_key = (char*)search_key_addr;
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+        addr += sizeof(i64);
+
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+
+        key_ref += sizeof(i64);
+        i64 key_addr = *(i64*)key_ref;
+        key_addr += sizeof(size_t);
+        char* key = (char*)key_addr;
+
+        if (strcmp(search_key, key) == 0) {
+            memmove(&arr[i], &arr[i + 1], (*len - (size_t)i) * sizeof(i64));
+            *len -= 1;
+            return;
+        }
+    }
 }
 
 i64 cpu_string_concat(i64 addr1, i64 addr2)

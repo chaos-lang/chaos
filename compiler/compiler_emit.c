@@ -359,6 +359,9 @@ void emitBytecode(cpu *c)
     case DYN_LIST_INDEX_DELETE:
         sprintf(str_inst, "%s", "DYN_LIST_INDEX_DELETE");
         break;
+    case DYN_DICT_KEY_DELETE:
+        sprintf(str_inst, "%s", "DYN_DICT_KEY_DELETE");
+        break;
     // Dynamic Index Access
     case DYN_STR_INDEX_ACCESS:
         sprintf(str_inst, "%s", "DYN_STR_INDEX_ACCESS");
