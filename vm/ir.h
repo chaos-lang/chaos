@@ -74,7 +74,7 @@ enum IROpCode {
     // Dynamic Logic
     DYN_LAND, DYN_LOR, DYN_LNOT,
     // Dynamic Printing
-    DYN_PRNT, DYN_ECHO,
+    DYN_PRNT, DYN_ECHO, DYN_PRETTY_PRNT, DYN_PRETTY_ECHO,
     // Dynamic Exit
     DYN_EXIT,
     // Dynamic Index Delete

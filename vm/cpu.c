@@ -462,23 +462,19 @@ void execute(cpu *c)
     }
     // Dynamic Printing
     case DYN_PRNT: {
-        jit_movi(_jit, R(3), cpu_print);
-        jit_prepare(_jit);
-        jit_putargr(_jit, R(0));
-        jit_putargr(_jit, R(1));
-        jit_fputargr(_jit, FR(1), sizeof(double));
-        jit_putargi(_jit, 1);
-        jit_callr(_jit, R(3));
+        cpu_dyn_print(1, 0);
         break;
     }
     case DYN_ECHO: {
-        jit_movi(_jit, R(3), cpu_print);
-        jit_prepare(_jit);
-        jit_putargr(_jit, R(0));
-        jit_putargr(_jit, R(1));
-        jit_fputargr(_jit, FR(1), sizeof(double));
-        jit_putargi(_jit, 0);
-        jit_callr(_jit, R(3));
+        cpu_dyn_print(0, 0);
+        break;
+    }
+    case DYN_PRETTY_PRNT: {
+        cpu_dyn_print(1, 1);
+        break;
+    }
+    case DYN_PRETTY_ECHO: {
+        cpu_dyn_print(0, 1);
         break;
     }
     // Dynamic Exit
@@ -663,7 +659,19 @@ jit_op* get_op(jit_op_array* op_array, i64 i)
     return op_array->arr[i];
 }
 
-void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl)
+void cpu_dyn_print(i64 newline, i64 pretty)
+{
+    jit_movi(_jit, R(3), cpu_print);
+    jit_prepare(_jit);
+    jit_putargr(_jit, R(0));
+    jit_putargr(_jit, R(1));
+    jit_fputargr(_jit, FR(1), sizeof(double));
+    jit_putargi(_jit, newline);
+    jit_putargi(_jit, pretty);
+    jit_callr(_jit, R(3));
+}
+
+void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl, i64 pretty)
 {
     switch (r0) {
     case V_BOOL:
@@ -679,10 +687,10 @@ void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl)
         cpu_print_string(r1, false);
         break;
     case V_LIST:
-        cpu_print_list(r1);
+        cpu_print_list(r1, pretty, 0);
         break;
     case V_DICT:
-        cpu_print_dict(r1);
+        cpu_print_dict(r1, pretty, 0);
         break;
     default:
         break;
@@ -717,7 +725,7 @@ void cpu_print_string(i64 addr, bool quoted)
         printf("%s", escape_the_sequences_in_string_literal(s));
 }
 
-void cpu_print_flex(i64 addr)
+void cpu_print_flex(i64 addr, i64 pretty, unsigned long iter)
 {
     i64 type = *(i64*)addr;
     addr += sizeof(long long);
@@ -737,47 +745,81 @@ void cpu_print_flex(i64 addr)
         cpu_print_string(val_i, true);
         break;
     case V_LIST:
-        cpu_print_list(*(i64*)addr);
+        cpu_print_list(*(i64*)addr, pretty, iter);
         break;
     case V_DICT:
-        cpu_print_dict(*(i64*)addr);
+        cpu_print_dict(*(i64*)addr, pretty, iter);
         break;
     default:
         break;
     }
 }
 
-void cpu_print_list(i64 addr)
+void cpu_print_list(i64 addr, i64 pretty, unsigned long iter)
 {
     size_t* len = (size_t*)addr;
     addr += sizeof(size_t);
     printf("[");
+    if (pretty)
+        printf("\n");
+    iter++;
     for (size_t i = 0; i < *len; i++) {
-        cpu_print_flex(*(i64*)addr);
+        if (pretty)
+            for (unsigned long j = 0; j < iter; j++) {
+                printf(__KAOS_TAB__);
+            }
+        cpu_print_flex(*(i64*)addr, pretty, iter);
         addr += sizeof(long long);
         if (i + 1 != *len) {
-            printf(", ");
+            if (pretty)
+                printf(",\n");
+            else
+                printf(", ");
+        }
+    }
+    if (pretty)
+        printf("\n");
+    if (pretty) {
+        for (unsigned long j = 0; j < (iter - 1); j++) {
+            printf(__KAOS_TAB__);
         }
     }
     printf("]");
 }
 
-void cpu_print_dict(i64 addr)
+void cpu_print_dict(i64 addr, i64 pretty, unsigned long iter)
 {
     size_t* len = (size_t*)addr;
     addr += sizeof(size_t);
     printf("{");
+    if (pretty)
+        printf("\n");
+    iter++;
     for (size_t i = 0; i < *len; i++) {
+        if (pretty)
+            for (unsigned long j = 0; j < iter; j++) {
+                printf(__KAOS_TAB__);
+            }
         i64 _addr = *(i64*)addr;
         addr += sizeof(long long);
         i64 key = *(i64*)_addr;
         _addr += sizeof(long long);
         i64 value = *(i64*)_addr;
-        cpu_print_flex(key);
+        cpu_print_flex(key, pretty, iter);
         printf(": ");
-        cpu_print_flex(value);
+        cpu_print_flex(value, pretty, iter);
         if (i + 1 != *len) {
-            printf(", ");
+            if (pretty)
+                printf(",\n");
+            else
+                printf(", ");
+        }
+    }
+    if (pretty)
+        printf("\n");
+    if (pretty) {
+        for (unsigned long j = 0; j < (iter - 1); j++) {
+            printf(__KAOS_TAB__);
         }
     }
     printf("}");

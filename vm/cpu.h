@@ -67,14 +67,15 @@ jit_op_array* init_op_array();
 void push_op(jit_op_array* op_array, jit_op* op);
 jit_op* get_op(jit_op_array* op_array, i64 i);
 
-void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl);
+void cpu_dyn_print(i64 newline, i64 pretty);
+void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl, i64 pretty);
 void cpu_print_bool(i64 i);
 void cpu_print_int(i64 i);
 void cpu_print_float(f64 f);
 void cpu_print_string(i64 addr, bool quoted);
-void cpu_print_flex(i64 addr);
-void cpu_print_list(i64 addr);
-void cpu_print_dict(i64 addr);
+void cpu_print_flex(i64 addr, i64 pretty, unsigned long iter);
+void cpu_print_list(i64 addr, i64 pretty, unsigned long iter);
+void cpu_print_dict(i64 addr, i64 pretty, unsigned long iter);
 
 void cpu_delete_string_index(i64 index, i64 addr);
 void cpu_delete_list_index(i64 index, i64 addr);
