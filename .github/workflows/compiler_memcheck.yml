@@ -36,41 +36,41 @@ jobs:
             image: alpine:latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
     - name: Install dependencies (debian/ubuntu)
       run: |
         apt update
-        apt install -y make valgrind
-        make requirements
+        apt install -y make valgrind git
       if: matrix.target == 'ubuntu' || matrix.target == 'debian'
 
     - name: Install dependencies (centos)
       run: |
-        yum install -y which make valgrind
-        make requirements
+        yum install -y which make valgrind git
       if: matrix.target == 'centos'
 
     - name: Install dependencies (fedora)
       run: |
-        dnf install -y which make valgrind findutils
-        make requirements
+        dnf install -y which make valgrind findutils git
       if: matrix.target == 'fedora'
 
     - name: Install dependencies (archlinux)
       run: |
-        pacman -Syu --noconfirm which make valgrind
-        make requirements
+        pacman -Syu --noconfirm which make valgrind git
       if: matrix.target == 'archlinux'
 
     - name: Install dependencies (alpine)
       run: |
         apk update
-        apk add linux-headers bash which make valgrind
-        make requirements
+        apk add linux-headers bash which make valgrind git
       if: matrix.target == 'alpine'
+
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        make requirements
 
     - name: Build (gcc)
       run: |
