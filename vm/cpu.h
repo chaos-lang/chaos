@@ -33,6 +33,7 @@
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
+#undef _XOPEN_SOURCE
 #include "../myjit/myjit/jitlib.h"
 
 i64* ast_stack;
