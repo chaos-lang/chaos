@@ -1,4 +1,4 @@
-name: Linter Checks
+name: "[test] Linter Checks"
 
 on: [push, pull_request]
 

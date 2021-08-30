@@ -1,4 +1,4 @@
-name: "Address Sanitizer"
+name: "[sanitizer] Address Sanitizer"
 
 on: [push, pull_request]
 

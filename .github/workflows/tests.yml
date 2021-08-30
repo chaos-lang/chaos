@@ -1,4 +1,4 @@
-name: "Automated Tests"
+name: "[test] Automated Tests"
 
 on: [push, pull_request]
 

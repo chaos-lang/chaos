@@ -1,4 +1,4 @@
-name: "[AST] Abstract Syntax Tree Validations"
+name: "[ast] Abstract Syntax Tree Validations"
 
 on: [push, pull_request]
 

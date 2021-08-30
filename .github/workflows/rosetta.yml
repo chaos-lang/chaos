@@ -1,4 +1,4 @@
-name: "Test Rosetta Code Examples"
+name: "[rosetta] Test Rosetta Code Examples"
 
 on: [push, pull_request]
 

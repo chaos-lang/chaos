@@ -1,4 +1,4 @@
-name: "Undefined Behavior Sanitizer"
+name: "[sanitizer] Undefined Behavior Sanitizer"
 
 on: [push, pull_request]
 

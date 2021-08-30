@@ -1,4 +1,4 @@
-name: "Command-line Arguments"
+name: "[test] Command-line Arguments"
 
 on: [push, pull_request]
 
