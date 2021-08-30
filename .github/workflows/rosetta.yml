@@ -112,7 +112,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
+        mv /usr/local/bin/gcc-9 /usr/local/bin/gcc
         make requirements
         brew install gnu-sed
 

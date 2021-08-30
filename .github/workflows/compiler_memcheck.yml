@@ -103,7 +103,7 @@ jobs:
 
   #   - name: Install dependencies
   #     run: |
-  #       mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
+  #       mv /usr/local/bin/gcc-9 /usr/local/bin/gcc
   #       wget -O /tmp/DrMemory-MacOS-2.3.18309.tar.gz https://github.com/DynamoRIO/drmemory/releases/download/release_2.3.18309C/DrMemory-MacOS-2.3.18309.tar.gz
   #       tar -C /tmp/ -xvf /tmp/DrMemory-MacOS-2.3.18309.tar.gz
   #       mv /tmp/DrMemory-MacOS-2.3.18309/ /tmp/DrMemory/
