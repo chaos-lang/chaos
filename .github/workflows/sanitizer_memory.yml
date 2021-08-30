@@ -1,4 +1,4 @@
-name: "[interpreter] Memory Sanitizer"
+name: "Memory Sanitizer"
 
 on: [push, pull_request]
 

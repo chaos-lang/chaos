@@ -1,4 +1,4 @@
-name: "[compiler] Automated Tests"
+name: "Memory Leak Checks"
 
 on: [push, pull_request]
 
@@ -39,28 +39,28 @@ jobs:
     - name: Install dependencies (debian/ubuntu)
       run: |
         apt update
-        apt install -y make git
+        apt install -y make valgrind git
       if: matrix.target == 'ubuntu' || matrix.target == 'debian'
 
     - name: Install dependencies (centos)
       run: |
-        yum install -y which make git
+        yum install -y which make valgrind git
       if: matrix.target == 'centos'
 
     - name: Install dependencies (fedora)
       run: |
-        dnf install -y which make findutils git
+        dnf install -y which make valgrind findutils git
       if: matrix.target == 'fedora'
 
     - name: Install dependencies (archlinux)
       run: |
-        pacman -Syu --noconfirm which make git
+        pacman -Syu --noconfirm which make valgrind git
       if: matrix.target == 'archlinux'
 
     - name: Install dependencies (alpine)
       run: |
         apk update
-        apk add linux-headers bash which make git
+        apk add linux-headers bash which make valgrind git
       if: matrix.target == 'alpine'
 
     - name: Checkout
@@ -78,9 +78,9 @@ jobs:
         make
         make install
 
-    - name: Run the tests (gcc)
+    - name: Run the memory leak checks (gcc)
       run: |
-        make test-compiler
+        make memcheck
 
     - name: Build (clang)
       run: |
@@ -88,13 +88,9 @@ jobs:
         make clang
         make install
 
-    - name: Run the tests (clang)
+    - name: Run the memory leak checks (clang)
       run: |
-        make test-compiler
-
-    - name: Uninstall
-      run: |
-        make uninstall
+        make memcheck
 
   macos:
     name: macos
@@ -109,8 +105,10 @@ jobs:
     - name: Install dependencies
       run: |
         mv /usr/local/bin/gcc-9 /usr/local/bin/gcc
+        wget -O /tmp/DrMemory-MacOS-2.3.18309.tar.gz https://github.com/DynamoRIO/drmemory/releases/download/release_2.3.18309C/DrMemory-MacOS-2.3.18309.tar.gz
+        tar -C /tmp/ -xvf /tmp/DrMemory-MacOS-2.3.18309.tar.gz
+        mv /tmp/DrMemory-MacOS-2.3.18309/ /tmp/DrMemory/
         make requirements
-        brew install gnu-sed
 
     - name: Build (gcc)
       run: |
@@ -119,9 +117,9 @@ jobs:
         make
         make install
 
-    - name: Run the tests (gcc)
+    - name: Run the memory leak checks (gcc)
       run: |
-        make test-compiler
+        make memcheck
 
     - name: Build (clang)
       run: |
@@ -130,14 +128,9 @@ jobs:
         make clang
         make install
 
-    - name: Run the tests (clang)
+    - name: Run the memory leak checks (clang)
       run: |
-        make test-compiler
-
-    - name: Uninstall
-      run: |
-        source ~/.bash_profile
-        make uninstall
+        make memcheck
 
   windows:
     name: windows
@@ -152,6 +145,7 @@ jobs:
     - name: Install dependencies
       shell: cmd
       run: |
+        choco install drmemory.portable --version=2.3.0 --confirm
         call make.bat requirements
 
     - name: Build (gcc)
@@ -161,10 +155,10 @@ jobs:
         call make.bat
         call make.bat install
 
-    - name: Run the tests (gcc)
+    - name: Run the memory leak checks (gcc)
       shell: cmd
       run: |
-        call make.bat test-compiler
+        call make.bat memcheck
 
     - name: Build (clang)
       shell: cmd
@@ -174,13 +168,7 @@ jobs:
         call make.bat clang
         call make.bat install
 
-    - name: Run the tests (clang)
+    - name: Run the memory leak checks (clang)
       shell: cmd
       run: |
-        call RefreshEnv.cmd
-        call make.bat test-compiler
-
-    - name: Uninstall
-      shell: cmd
-      run: |
-        call make.bat uninstall
+        call make.bat memcheck

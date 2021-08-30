@@ -1,4 +1,4 @@
-name: "[compiler] Address Sanitizer"
+name: "Address Sanitizer"
 
 on: [push, pull_request]
 
@@ -20,9 +20,9 @@ jobs:
     - name: Build (clang)
       run: |
         make clean
-        make clang
+        make clang-dev-sanitizer-address
         sudo make install
 
     - name: Run the tests (clang)
       run: |
-        make test-compiler-dev-sanitizer-address
+        make test
