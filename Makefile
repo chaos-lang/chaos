@@ -7,7 +7,8 @@ UNAME_S := $(shell uname -s)
 
 default:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS='-s -O3'
+	export CHAOS_COMPILER_FLAGS='-O3'
+	export CHAOS_LINKER_FLAGS='-s'
 	${MAKE} chaos
 
 requirements:
@@ -38,47 +39,49 @@ endif
 
 clang:
 	export CHAOS_COMPILER=clang
-	export CHAOS_EXTRA_FLAGS='-s -O3'
+	export CHAOS_COMPILER_FLAGS='-O3'
+	export CHAOS_LINKER_FLAGS='-s'
 	${MAKE} chaos
 
 dev:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
+	export CHAOS_COMPILER_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev:
 	export CHAOS_COMPILER=clang
-	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
+	export CHAOS_COMPILER_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 prof:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS='-O3 -fprofile-generate'
+	export CHAOS_COMPILER_FLAGS='-O3 -fprofile-generate'
 	${MAKE} chaos
 
 prof-use:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS='-s -O3 -fprofile-use'
+	export CHAOS_COMPILER_FLAGS='-O3 -fprofile-use'
+	export CHAOS_LINKER_FLAGS='-s'
 	${MAKE} chaos
 
 prof-old:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS='-pg'
+	export CHAOS_COMPILER_FLAGS='-pg'
 	${MAKE} chaos
 
 clang-dev-sanitizer-memory:
 	export CHAOS_COMPILER='clang -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-optimize-sibling-calls -g'
-	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
+	export CHAOS_COMPILER_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev-sanitizer-address:
 	export CHAOS_COMPILER='clang -fsanitize=address -fno-omit-frame-pointer -g '
-	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
+	export CHAOS_COMPILER_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-dev-sanitizer-undefined_behavior:
 	export CHAOS_COMPILER='clang -fsanitize=undefined -g'
-	export CHAOS_EXTRA_FLAGS='-Og -ggdb'
+	export CHAOS_COMPILER_FLAGS='-Og -ggdb'
 	${MAKE} chaos
 
 clang-coverage:
@@ -87,7 +90,7 @@ clang-coverage:
 
 free-debug:
 	export CHAOS_COMPILER=gcc
-	export CHAOS_EXTRA_FLAGS='-DCHAOS_DEBUG -Og -ggdb'
+	export CHAOS_COMPILER_FLAGS='-DCHAOS_DEBUG -Og -ggdb'
 	${MAKE} chaos
 
 help.h:
@@ -106,8 +109,8 @@ jit-backend:
 	cp myjit-disasm ..
 
 chaos: lex.yy.c parser.tab.c parser.tab.h jit-backend
-	${CHAOS_COMPILER} -c -g -Werror -Wall -fcommon -DCHAOS_INTERPRETER parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c ${CHAOS_EXTRA_FLAGS} && \
-	${CHAOS_COMPILER} -o chaos -g -Wall -std=c99 -pedantic *.o myjit/jitlib-core.o -lreadline -lm -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl
+	${CHAOS_COMPILER} -c -g -Werror -Wall -fcommon -DCHAOS_INTERPRETER parser.tab.c lex.yy.c parser/*.c utilities/*.c ast/*.c vm/*.c interpreter/*.c compiler/*.c Chaos.c ${CHAOS_COMPILER_FLAGS} && \
+	${CHAOS_COMPILER} -o chaos -g -Wall -std=c99 -pedantic *.o myjit/jitlib-core.o -lreadline -lm -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include -ldl ${CHAOS_LINKER_FLAGS}
 
 clean:
 	rm -rf chaos parser.tab.c lex.yy.c parser.tab.h
