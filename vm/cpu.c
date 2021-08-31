@@ -360,7 +360,7 @@ void execute(cpu *c)
     case TRUNCR:
         jit_truncr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg));
         break;
-    // >>> Branch Operations <<<
+    // >>> Branch Operations & Jumps <<<
     // beq
     case BEQR: {
         jit_op* __op = jit_beqr(_jit, JIT_FORWARD, R(c->inst->op1->reg), R(c->inst->op2->reg));
@@ -372,6 +372,10 @@ void execute(cpu *c)
         push_op(op_array, __op);
         break;
     }
+    // jmpi
+    case JMPI:
+        jit_jmpi(_jit, label_array->arr[c->inst->op1->value.i]);
+        break;
     // patch
     case PATCH:
         jit_patch(_jit, op_array->arr[c->inst->op1->value.i]);

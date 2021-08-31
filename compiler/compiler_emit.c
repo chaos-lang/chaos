@@ -285,13 +285,17 @@ void emitBytecode(cpu *c)
     case TRUNCR:
         sprintf(str_inst, "%s R(%d) FR(%d)", "TRUNCR", c->inst->op1->reg, c->inst->op2->reg);
         break;
-    // >>> Branch Operations <<<
+    // >>> Branch Operations & Jumps <<<
     // beq
     case BEQR:
         sprintf(str_inst, "%s R(%d) R(%d)", "BEQR", c->inst->op1->reg, c->inst->op2->reg);
         break;
     case BEQI:
         sprintf(str_inst, "%s R(%d) %lld op: %lld", "BEQI", c->inst->op1->reg, c->inst->op2->value.i, c->inst->op3->value.i);
+        break;
+    // jmpi
+    case JMPI:
+        sprintf(str_inst, "%s op: %lld", "JMPI", c->inst->op1->value.i);
         break;
     // patch
     case PATCH:

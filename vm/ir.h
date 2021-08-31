@@ -63,8 +63,9 @@ enum IROpCode {
     EQR, NER, GTR, LTR, GER, LER,
     // >>> Conversions <<<
     EXTR, TRUNCR,
-    // >>> Branch Operations <<<
+    // >>> Branch Operations & Jumps <<<
     BEQR, BEQI,
+    JMPI,
     PATCH,
     // >>> Non-Atomic Instructions <<<
     // Dynamic Arithmetic

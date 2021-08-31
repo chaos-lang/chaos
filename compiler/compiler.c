@@ -1273,6 +1273,27 @@ void compileDecl(KaosIR* program, Decl* decl)
     case TimesDo_kind: {
         compileExpr(program, decl->v.times_do->x);
 
+        i64 addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        i64 loop_start = label_counter++;
+        push_inst_i(program, DECLARE_LABEL, loop_start);
+
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        i64 loop_end = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 0, loop_end);
+
+        push_inst_r_r_i(program, SUBI, R1, R1, 1);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        compileStmt(program, decl->v.times_do->body);
+
+        push_inst_i(program, JMPI, loop_start);
+        push_inst_i(program, PATCH, loop_end);
         break;
     }
     case ForeachAsList_kind: {
