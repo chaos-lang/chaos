@@ -1,4 +1,4 @@
-name: "[compiler] Address Sanitizer"
+name: "[sanitizer] Address Sanitizer"
 
 on: [push, pull_request]
 
@@ -8,7 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -17,9 +20,9 @@ jobs:
     - name: Build (clang)
       run: |
         make clean
-        make clang
+        make clang-dev-sanitizer-address
         sudo make install
 
     - name: Run the tests (clang)
       run: |
-        make test-compiler-dev-sanitizer-address
+        make test

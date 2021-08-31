@@ -41,7 +41,6 @@ typedef void (*lib_func)();
 #endif
 
 #include "../vm/types.h"
-#include "../vm/instructions.h"
 #include "../vm/cpu.h"
 #include "function.h"
 #include "../Chaos.h"

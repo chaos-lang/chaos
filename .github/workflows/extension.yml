@@ -1,4 +1,4 @@
-name: "[compiler] Chaos C Extension Feature Tests"
+name: "[test] Chaos C Extension Feature Tests"
 
 on: [push, pull_request]
 
@@ -8,7 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -24,7 +27,7 @@ jobs:
 
     - name: Run the tests (gcc)
       run: |
-        make test-compiler-extensions-linux-gcc
+        make test-extensions-linux-gcc
         rm tests/extensions/spells/example/example.so
 
     - name: Build (clang)
@@ -35,7 +38,7 @@ jobs:
 
     - name: Run the tests (clang)
       run: |
-        make test-compiler-extensions-linux-clang
+        make test-extensions-linux-clang
         rm tests/extensions/spells/example/example.so
 
   macos:
@@ -43,11 +46,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
-        mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
+        mv /usr/local/bin/gcc-9 /usr/local/bin/gcc
         make requirements
 
     - name: Build (gcc)
@@ -60,7 +66,7 @@ jobs:
     - name: Run the tests (gcc)
       run: |
         source ~/.bash_profile
-        make test-compiler-extensions-macos-gcc
+        make test-extensions-macos-gcc
         rm tests/extensions/spells/example/example.dylib
 
     - name: Build (clang)
@@ -72,7 +78,7 @@ jobs:
 
     - name: Run the tests (clang)
       run: |
-        make test-compiler-extensions-macos-clang
+        make test-extensions-macos-clang
         rm tests/extensions/spells/example/example.dylib
 
   windows:
@@ -80,7 +86,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       shell: cmd
@@ -97,7 +106,7 @@ jobs:
     - name: Run the tests (gcc)
       shell: cmd
       run: |
-        call make.bat test-compiler-extensions-windows-gcc
+        call make.bat test-extensions-windows-gcc
         del tests\extensions\spells\example\example.dll
 
     - name: Build (clang)
@@ -112,5 +121,5 @@ jobs:
       shell: cmd
       run: |
         call RefreshEnv.cmd
-        call make.bat test-compiler-extensions-windows-clang
+        call make.bat test-extensions-windows-clang
         del tests\extensions\spells\example\example.dll

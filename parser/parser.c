@@ -172,7 +172,7 @@ int initParser(int argc, char** argv) {
         greet();
         phase = INIT_PROGRAM;
         interactive_program = initProgram();
-        interactive_c = new_cpu(interactive_program->arr, USHRT_MAX * 32, 0, interactive_program->ast_ref->arr, debug_level);
+        interactive_c = new_cpu(interactive_program, debug_level);
         initCallJumps();
     } else {
         program_code = fileGetContents(program_file_path);
@@ -214,19 +214,19 @@ int initParser(int argc, char** argv) {
                 exit(0);
         }
 
-        i64_array* program = compile(_ast_root);
+        KaosIR* program = compile(_ast_root);
 
         if (debug_level > 1) {
-            printf("\nDebug Bytecode:\n");
+            printf("\nJIT Abstraction Layer:\n");
             emit(program);
             if (debug_level == 2)
                 exit(0);
         }
 
         if (debug_level > 2)
-            printf("\nProgram Output:\n");
+            printf("\nJIT Runtime:\n");
 
-        cpu *c = new_cpu(program->arr, program->heap, program->start, program->ast_ref->arr, debug_level);
+        cpu *c = new_cpu(program, debug_level);
         run_cpu(c);
         free_cpu(c);
         // if (!is_interactive) {
@@ -268,11 +268,11 @@ void compile_interactive()
         compiling_a_function = false;
         current_file_index = 0;
 
-        push_instr(interactive_program, HLT);
+        push_inst_(interactive_program, HLT);
         interactive_program->hlt_count++;
-        interactive_c->pc = interactive_program->size - 1;
+        interactive_c->ic = interactive_program->size - 1;
         if (interactive_c->debug_level > 1) {
-            printf("\nDebug Bytecode:\n");
+            printf("\nJIT Abstraction Layer:\n");
             emit(interactive_program);
         }
 
@@ -288,24 +288,23 @@ void compile_interactive()
             compiling_a_function = true;
         compileStmt(interactive_program, stmt);
         compiling_a_function = false;
-        push_instr(interactive_program, HLT);
+        push_inst_(interactive_program, HLT);
         interactive_program->hlt_count++;
         if (!is_function)
             fillCallJumps(interactive_program);
     }
 
     if (interactive_c->debug_level > 1) {
-        printf("\nDebug Bytecode:\n");
+        printf("\nJIT Abstraction Layer:\n");
         emit(interactive_program);
     }
 
     if (!any_stmts)
         return;
 
-    interactive_c->program = interactive_program->arr;
-    interactive_c->ast_ref = interactive_program->ast_ref->arr;
+    interactive_c->program = interactive_program;
     if (is_function)
-        interactive_c->pc = interactive_program->size - 1;
+        interactive_c->ic = interactive_program->size - 1;
     else
         run_cpu(interactive_c);
 }

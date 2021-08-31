@@ -22,648 +22,755 @@
 
 #include "cpu.h"
 
+typedef long (*plfv)();
+struct jit *_jit;
+plfv _main;
+plfv _f;
+jit_op *skip_data;
+
+jit_label_array* label_array = NULL;
+jit_op_array* op_array = NULL;
+
 char *reg_names[] = {
-    "R0A", "R1A", "R2A", "R3A", "R4A", "R5A", "R6A", "R7A",
-    "R0B", "R1B", "R2B", "R3B", "R4B", "R5B", "R6B", "R7B"
+    "R0", "R1", "R2",  "R3",  "R4",  "R5",  "R6",  "R7",
+    "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"
 };
 
 i64* ast_stack = NULL;
 i64 ast_stack_p = 0;
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level)
+bool temp_disable_debug = false;
+
+cpu *new_cpu(KaosIR* program, unsigned short debug_level)
 {
     cpu *c = malloc(sizeof(cpu));
     c->program = program;
-    c->mems = (i64**)malloc(USHRT_MAX * 256 * sizeof(i64*));
-    c->memp = 0;
-    c->mem = (i64*)malloc((heap_size + 1) * sizeof(i64));
-    c->stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
-    c->sp = USHRT_MAX * 2 - 1;
-    c->heap_size = heap_size + 1;
-    c->pc = -1 + start;
-    c->inst = 0;
-    c->heap = heap_size;
+    c->ic = 0;
     c->debug_level = debug_level;
-    c->jmpb = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
-    c->jmpbp = 0;
-    c->brk = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
-    c->brkp = 0;
-    c->cont = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
-    c->contp = 0;
-    c->ast_ref = ast_ref;
-    for (unsigned i = 0; i < NUM_REGISTERS; i++) {
-        c->r[i] = 0;
-    }
 
-    ast_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
+    c->stack = (int*)malloc(USHRT_MAX * 256 * sizeof(int));
+
+    // ast_stack = (i64*)malloc(USHRT_MAX * 256 * sizeof(i64));
     return c;
 }
 
 void free_cpu(cpu *c)
 {
     free(c);
-    // free(ast_stack);
-    // ast_stack = NULL;
-    // ast_stack_p = 0;
 }
 
 void run_cpu(cpu *c)
 {
+    label_array = init_label_array();
+    op_array = init_op_array();
+    _jit = jit_init();
+
+    // jit_declare_arg(_jit, JIT_SIGNED_NUM, sizeof(long));
+    // jit_getarg(_jit, R(0), 0);
+
     do {
         fetch(c);
         execute(c);
-    } while (c->inst != HLT);
+    } while (c->inst->op_code != HLT);
+
+    jit_reti(_jit, 0);
+
+    if (c->debug_level > 2)
+        jit_check_code(_jit, JIT_WARN_ALL);
+
+    jit_generate_code(_jit);
+
+    if (c->debug_level == 3 || c->debug_level == 5) {
+        printf("\n>>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<");
+        jit_dump_ops(_jit, JIT_DEBUG_OPS);
+        printf(">>>>>>>>>> JIT_DEBUG_OPS <<<<<<<<<\n");
+        jit_dump_ops(_jit, JIT_DEBUG_CODE);
+    }
+
+    if (c->debug_level == 4) {
+        jit_dump_ops(_jit, JIT_DEBUG_COMBINED);
+    }
+
+    _main();
 }
 
 void eat_until_hlt(cpu *c)
 {
     do {
-        fetch_without_ast_stack(c);
-    } while (c->inst != HLT);
+    } while (c->inst->op_code != HLT);
 }
 
 void fetch(cpu *c)
 {
-    c->pc++;
-    c->inst = c->program[c->pc];
-    c->dest = c->program[c->pc + 1];
-    c->src = c->program[c->pc + 2];
-
-    ast_stack[ast_stack_p] = c->ast_ref[c->pc];
-}
-
-void fetch_without_ast_stack(cpu *c)
-{
-    c->pc++;
-    c->inst = c->program[c->pc];
-    c->dest = c->program[c->pc + 1];
-    c->src = c->program[c->pc + 2];
+    c->inst = c->program->arr[c->ic++];
 }
 
 void execute(cpu *c)
 {
-    i64 pc_start = c->pc;
+    // i64 ic_start = c->ic;
 
-    switch (c->inst) {
-    case CLF:
-        clear_flags(c);
+    switch (c->inst->op_code) {
+    // >>> Function Declaration <<<
+    // declare_label
+    case DECLARE_LABEL: {
+        jit_label* __f = jit_get_label(_jit);
+        push_label(label_array, __f);
         break;
-    case CMP:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            fset_flags(c, f1, f2);
-        } else {
-            set_flags(c, c->r[c->dest], c->r[c->src]);
+    }
+    // prolog
+    case PROLOG: {
+        jit_label* __f = jit_get_label(_jit);
+        label_array->arr[c->inst->op1->value.i] = __f;
+        jit_prolog(_jit, &_f);
+        break;
+    }
+    case MAIN_PROLOG:
+        jit_prolog(_jit, &_main);
+        if (c->debug_level > 4) {
+            // Fixes the "uninitialized register" warning that caused by the usage in the `debug` function
+            // Initialize the integers registers
+            jit_movi(_jit, R(0), 0);
+            jit_movi(_jit, R(1), 0);
+            jit_movi(_jit, R(2), 0);
+            jit_movi(_jit, R(3), 0);
+            jit_movi(_jit, R(4), 0);
+            jit_movi(_jit, R(5), 0);
+            jit_movi(_jit, R(6), 0);
+            jit_movi(_jit, R(7), 0);
+            // Initialize the floating-point registers
+            jit_fmovi(_jit, FR(0), 0.0);
+            jit_fmovi(_jit, FR(1), 0.0);
+            jit_fmovi(_jit, FR(2), 0.0);
+            jit_fmovi(_jit, FR(3), 0.0);
         }
-        c->pc += 2;
         break;
-    case CMPI:
-        set_flags(c, c->r[c->dest], c->src);
-        c->pc += 2;
+    // declare_arg
+    case DECLARE_ARG:
+        jit_declare_arg(_jit, c->inst->op1->value.i, c->inst->op2->value.i);
         break;
-    case MOV:
-        c->r[c->dest] = c->r[c->src];
-        c->pc += 2;
+    // getarg
+    case GETARG:
+        jit_getarg(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
         break;
-    case STI:
-        cpu_store(c, c->dest, c->r[c->src]);
-        c->pc += 2;
+    // ret
+    case RETR:
+        jit_retr(_jit, R(c->inst->op1->reg));
         break;
-    case STR:
-        cpu_store(c, c->r[c->dest], c->r[c->src]);
-        c->pc += 2;
+    case RETI:
+        jit_reti(_jit, c->inst->op1->value.i);
         break;
-    case LDI:
-        c->r[c->dest] = c->mem[c->src];
-        c->pc += 2;
+    // >>> Function Calls <<<
+    // prepare
+    case PREPARE:
+        temp_disable_debug = true;
+        jit_prepare(_jit);
         break;
-    case LDR:
-        c->r[c->dest] = c->mem[c->r[c->src]];
-        c->pc += 2;
+    // putarg
+    case PUTARGR:
+        jit_putargr(_jit, R(c->inst->op1->reg));
         break;
-    case LII:
-        c->r[c->dest] = c->src;
-        c->pc += 2;
+    case PUTARGI:
+        jit_putargi(_jit, c->inst->op1->value.i);
         break;
-    case PUSH:
-        c->stack[--c->sp] = c->r[c->program[++c->pc]];
+    // retval
+    case RETVAL:
+        jit_retval(_jit, R(c->inst->op1->reg));
         break;
-    case POP:
-        if (c->sp + 1 > USHRT_MAX * 2 - 1) {
-            eat_until_hlt(c);
-            throw_error(E_STACK_OVERFLOW);
-        }
-        c->r[c->program[++c->pc]] = c->stack[c->sp++];
-        break;
-    case INC:
-        c->r[c->dest]++;
-        c->pc++;
-        break;
-    case DEC:
-        c->r[c->dest]--;
-        c->pc++;
-        break;
-    case ADD:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 + f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] += c->r[c->src];
-        }
-        c->pc += 2;
-        break;
-    case SUB:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 - f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] -= c->r[c->src];
-        }
-        c->pc += 2;
-        break;
-    case MUL:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 * f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] *= c->r[c->src];
-        }
-        c->pc += 2;
-        break;
-    case DIV:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = f1 / f2;
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] /= c->r[c->src];
-        }
-        c->pc += 2;
-        break;
-    case MOD:
-        if (c->r[R0A] == V_FLOAT || c->r[R0B] == V_FLOAT) {
-            f64 f1;
-            f64 f2;
-            i64 i1 = c->r[c->dest];
-            i64 i2 = c->r[c->src];
-            if (c->r[R0A] == V_FLOAT) {
-                memcpy(&f1, &i1, sizeof f1);
-            } else {
-                c->r[R0A] = V_FLOAT;
-                f1 = (f64)c->r[c->dest];
-            }
-            if (c->r[R0B] == V_FLOAT) {
-                memcpy(&f2, &i2, sizeof f2);
-            } else {
-                f2 = (f64)c->r[c->src];
-            }
-            f1 = fmodl(f1, f2);
-            i64 i;
-            memcpy(&i, &f1, sizeof f1);
-            c->r[c->dest] = i;
-        } else {
-            c->r[c->dest] %= c->r[c->src];
-        }
-        c->pc += 2;
-        break;
-    case JLZ:
-        if (c->ltz) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
-        break;
-    case JGZ:
-        if (c->gtz) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
-        break;
-    case JEZ:
-        if (c->zero) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
-        break;
-    case JNZ:
-        if (!c->zero) {
-            ++(c->pc);
-            c->pc = c->program[c->pc];
-        }
-        else c->pc++;
-        break;
-    case JMP:
-        ++(c->pc);
-        c->pc = c->program[c->pc];
-        break;
-    case JMPB:
-        c->pc = c->jmpb[--c->jmpbp];
-        break;
-    case SJMPB:
-        c->jmpb[c->jmpbp++] = c->dest;
-        c->pc++;
-        break;
-    case BRK:
-        c->pc = c->brk[--c->brkp];
-        break;
-    case SBRK:
-        c->brk[c->brkp++] = c->dest;
-        c->pc++;
-        break;
-    case CONT:
-        c->pc = c->cont[--c->contp];
-        break;
-    case SCONT:
-        c->cont[c->contp++] = c->dest;
-        c->pc++;
+    // call
+    case CALLR:
+        jit_callr(_jit, R(c->inst->op1->reg));
         break;
     case CALL: {
-        i64 *new_mem = (i64*)malloc(c->heap_size * sizeof(i64));
-        c->mems[c->memp++] = c->mem;
-        memcpy(new_mem, c->mem, c->heap_size * sizeof(i64));
-        c->mem = new_mem;
-        c->mems[c->memp++] = c->mem;
-
-        ast_stack_p++;
+        jit_op* __op = jit_call(_jit, label_array->arr[c->inst->op1->value.i]);
+        push_op(op_array, __op);
+        temp_disable_debug = false;
         break;
     }
-    case CALLX: {
-        --c->memp;
-        c->mem = c->mems[--c->memp];
-        free(c->mems[c->memp + 1]);
-
-        ast_stack_p--;
+    // >>> Transfer Operations <<<
+    // mov
+    case MOVR:
+        jit_movr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+    case MOVI:
+        jit_movi(_jit, R(c->inst->op1->reg), c->inst->op2->value.i);
+        break;
+    // fmov
+    case FMOV:
+        jit_fmovi(_jit, FR(c->inst->op1->reg), c->inst->op2->value.f);
+        break;
+    case FMOVR:
+        jit_fmovr(_jit, FR(c->inst->op1->reg), FR(c->inst->op2->reg));
+        break;
+    // alloc
+    case ALLOCAI: {
+        int i = jit_allocai(_jit, c->inst->op2->value.i);
+        c->stack[c->inst->op1->value.i] = i;
         break;
     }
-    case CALLEXT: {
-        _Function* function = (void *)c->dest;
-        callFunctionFromDynamicLibrary(function, c);
-        c->pc++;
+    case REF_ALLOCAI:
+        jit_addi(_jit, R(c->inst->op1->reg), R_FP, c->stack[c->inst->op2->value.i]);
+        break;
+    // >>> Load Operations <<<
+    // ldr
+    case LDR:
+        jit_ldr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case LDXR:
+        jit_ldxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    // fldr
+    case FLDR:
+        jit_fldr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case FLDXR:
+        jit_fldxr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    // >>> Store Operations <<<
+    // str
+    case STR:
+        jit_str(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case STXR:
+        jit_stxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    // fstr
+    case FSTR:
+        jit_fstr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    case FSTXR:
+        jit_fstxr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), FR(c->inst->op3->reg), c->inst->op4->value.i);
+        break;
+    // >>> Binary Arithmetic Operations <<<
+    // add
+    case ADDR:
+        jit_addr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case ADDI:
+        jit_addi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // sub
+    case SUBR:
+        jit_subr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case SUBI:
+        jit_subi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // mul
+    case MULR:
+        jit_mulr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case MULI:
+        jit_muli(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // div
+    case DIVR:
+        jit_divr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case DIVI:
+        jit_divi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // mod
+    case MODR:
+        jit_modr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case MODI:
+        jit_modi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // Binary Logic
+    // and
+    case ANDR:
+        jit_andr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case ANDI:
+        jit_andi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // or
+    case ORR:
+        jit_orr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case ORI:
+        jit_ori(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // xor
+    case XORR:
+        jit_xorr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case XORI:
+        jit_xori(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // Binary Shift
+    // lsh
+    case LSHR:
+        jit_lshr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case LSHI:
+        jit_lshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // rsh
+    case RSHR:
+        jit_rshr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    case RSHI:
+        jit_rshi(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), c->inst->op3->value.i);
+        break;
+    // >>> Unary Arithmetic Operations <<<
+    // negr
+    case NEGR:
+        jit_negr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+    // fnegr
+    case FNEGR:
+        jit_fnegr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+    // notr
+    case NOTR:
+        jit_notr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+    // >>> Compare Instructions <<<
+    // eqr
+    case EQR:
+        jit_eqr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ner
+    case NER:
+        jit_ner(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // gtr
+    case GTR:
+        jit_gtr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ltr
+    case LTR:
+        jit_ltr(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ger
+    case GER:
+        jit_ger(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // ler
+    case LER:
+        jit_ler(_jit, R(c->inst->op1->reg), R(c->inst->op2->reg), R(c->inst->op3->reg));
+        break;
+    // >>> Conversions <<<
+    // extr
+    case EXTR:
+        jit_extr(_jit, FR(c->inst->op1->reg), R(c->inst->op2->reg));
+        break;
+    // truncr
+    case TRUNCR:
+        jit_truncr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg));
+        break;
+    // >>> Branch Operations <<<
+    // beq
+    case BEQR: {
+        jit_op* __op = jit_beqr(_jit, JIT_FORWARD, R(c->inst->op1->reg), R(c->inst->op2->reg));
+        push_op(op_array, __op);
         break;
     }
-    case SHL:
-        c->r[c->dest] <<= c->r[c->src];
-        c->pc += 2;
-        break;
-    case SHR:
-        c->r[c->dest] >>= c->r[c->src];
-        c->pc += 2;
-        break;
-    case BAND:
-        c->r[c->dest] &= c->r[c->src];
-        c->pc += 2;
-        break;
-    case BOR:
-        c->r[c->dest] |= c->r[c->src];
-        c->pc += 2;
-        break;
-    case BNOT:
-        c->r[c->dest] = ~c->r[c->dest];
-        c->pc++;
-        break;
-    case BXOR:
-        c->r[c->dest] ^= c->r[c->src];
-        c->pc += 2;
-        break;
-    case LAND:
-        c->r[c->dest] = c->r[c->dest] && c->r[c->src];
-        c->pc += 2;
-        break;
-    case LOR:
-        c->r[c->dest] = c->r[c->dest] || c->r[c->src];
-        c->pc += 2;
-        break;
-    case LNOT:
-        c->r[c->dest] = !c->r[c->dest];
-        c->pc++;
-        break;
-    case DLDR: {
-        i64 addr = c->mem[c->r[c->dest]];
-        c->r[R0A] = c->mem[addr++];
-        cpu_load_dynamic(c, addr);
-        c->pc++;
+    case BEQI: {
+        jit_op* __op = jit_beqi(_jit, JIT_FORWARD, R(c->inst->op1->reg), c->inst->op2->value.i);
+        push_op(op_array, __op);
         break;
     }
-    case DSTR:
-        c->r[c->dest] = c->heap;
-        cpu_store_dynamic(c);
-        c->pc++;
+    // patch
+    case PATCH:
+        jit_patch(_jit, op_array->arr[c->inst->op1->value.i]);
         break;
-    case DPOP:
-        cpu_pop_dynamic(c);
-        break;
-    case DDEL: {
-        i64 addr = c->r[c->dest];
-        enum ValueType value_type = c->mem[addr];
-        addr++;
-        i64 index = c->r[c->src];
-        i64 len = c->mem[addr++];
-        cpu_store(c, addr - 1, len - 1);
-        if (index < 0)
-            index = len + index;
+    // >>> Non-Atomic Instructions <<<
+    // Dynamic Instructions (prefixed with `DYN_`)
+    // Dynamic Arithmetic
+    case DYN_ADD: {
+        jit_op* num_op_label_1 = jit_bnei(_jit, JIT_FORWARD, R(0), V_STRING);
+        jit_op* num_op_label_2 = jit_bnei(_jit, JIT_FORWARD, R(4), V_STRING);
 
-        if (value_type == V_STRING || value_type == V_LIST) {
-            for (i64 i = 0; i < len; i++) {
-                if (i < index) {
-                    addr++;
-                    continue;
-                }
-                cpu_store(c, addr, c->mem[addr + 1]);
-                addr++;
-            }
-        } else if (value_type == V_DICT) {
-            char *key = build_string(c, c->r[R1A]);
-            i64 shift_index = 0;
-            i64 _addr = addr;
-            for (size_t i = 0; i < len; i++) {
-                addr = c->mem[_addr + 2 * i + 1];
-                char *dict_key = build_string_from_addr(c, addr);
+        jit_movi(_jit, R(2), cpu_string_concat);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(5));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
+        jit_op* string_concat_op_label = jit_jmpi(_jit, JIT_FORWARD);
 
-                if (strcmp(dict_key, key) == 0) {
-                    shift_index = i;
-                    break;
-                }
-                free(dict_key);
-            }
-            free(key);
-
-            for (i64 i = shift_index; i < (len - 1); i++) {
-                cpu_store(c, _addr + 2 * i + 1, c->mem[_addr + 2 * (i + 1) + 1]);
-                cpu_store(c, _addr + 2 * i, c->mem[_addr + 2 * (i + 1)]);
-            }
-        }
-        c->pc += 2;
+        jit_patch(_jit, num_op_label_1);
+        jit_patch(_jit, num_op_label_2);
+        DYN_BINARY_ARITH(jit_addr, jit_faddr);
+        jit_patch(_jit, string_concat_op_label);
         break;
     }
-    case PRNT:
-        switch (c->r[R0A]) {
-        case V_BOOL:
-            print_bool(c);
-            break;
-        case V_INT:
-            print_int(c);
-            break;
-        case V_FLOAT:
-            print_float(c);
-            break;
-        case V_STRING:
-            print_string(c, false);
-            break;
-        case V_LIST:
-            print_list(c, false, 0);
-            break;
-        case V_DICT:
-            print_dict(c, false, 0);
-            break;
-        default:
-            break;
-        }
+    case DYN_SUB: {
+        DYN_BINARY_ARITH(jit_subr, jit_fsubr);
         break;
-    case PPRNT:
-        switch (c->r[R0A]) {
-        case V_BOOL:
-            print_bool(c);
-            break;
-        case V_INT:
-            print_int(c);
-            break;
-        case V_FLOAT:
-            print_float(c);
-            break;
-        case V_STRING:
-            print_string(c, false);
-            break;
-        case V_LIST:
-            print_list(c, true, 0);
-            break;
-        case V_DICT:
-            print_dict(c, true, 0);
-            break;
-        default:
-            break;
-        }
+    }
+    case DYN_MUL: {
+        DYN_BINARY_ARITH(jit_mulr, jit_fmulr);
         break;
-    case LIND:
-        cpu_list_index_access(c, c->r[c->dest], c->r[c->src]);
-        c->pc += 2;
+    }
+    case DYN_DIV: {
+        DYN_BINARY_ARITH(jit_divr, jit_fdivr);
         break;
-    case KSRCH:
-        cpu_dict_key_search(c, c->r[c->dest], c->r[c->src]);
-        c->pc += 2;
+    }
+    case DYN_NEG: {
+        DYN_UNARY_ARITH(jit_negr, jit_fnegr);
         break;
-    case EXIT:
-        if (is_interactive)
-            print_bye_bye();
-        exit(c->r[R1A]);
+    }
+    case DYN_EQR: {
+        DYN_BINARY_COMPARISON(jit_beqr, jit_fbeqr);
         break;
-    case THRW:
-        c->pc += 2;
-        if (c->gtz) {
-            i64 err_code = c->dest;
-            i64 i = c->r[c->src];
-            if (is_interactive) {
-                eat_until_hlt(c);
-            }
-            throw_error(err_code, NULL, NULL, i);
-        }
+    }
+    case DYN_NER: {
+        DYN_BINARY_COMPARISON(jit_bner, jit_fbner);
         break;
+    }
+    case DYN_GTR: {
+        DYN_BINARY_COMPARISON(jit_bgtr, jit_fbgtr);
+        break;
+    }
+    case DYN_LTR: {
+        DYN_BINARY_COMPARISON(jit_bltr, jit_fbltr);
+        break;
+    }
+    case DYN_GER: {
+        DYN_BINARY_COMPARISON(jit_bger, jit_fbger);
+        break;
+    }
+    case DYN_LER: {
+        DYN_BINARY_COMPARISON(jit_bler, jit_fbler);
+        break;
+    }
+    // Dynamic Logic
+    case DYN_LAND: {
+        jit_gti(_jit, R(1), R(1), 0);
+        jit_op* land_false_label = jit_beqi(_jit, JIT_FORWARD, R(1), 0);
+        jit_gti(_jit, R(1), R(5), 0);
+        jit_patch(_jit, land_false_label);
+        break;
+    }
+    case DYN_LOR: {
+        jit_gti(_jit, R(1), R(1), 0);
+        jit_op* lor_true_label = jit_bnei(_jit, JIT_FORWARD, R(1), 0);
+        jit_gti(_jit, R(1), R(5), 0);
+        jit_patch(_jit, lor_true_label);
+        break;
+    }
+    case DYN_LNOT: {
+        jit_op* float_op_label = jit_bnei(_jit, JIT_FORWARD, R(0), V_FLOAT);
+        jit_truncr(_jit, R(1), FR(1));
+        jit_patch(_jit, float_op_label);
+        jit_gti(_jit, R(1), R(1), 0);
+        jit_xori(_jit, R(1), R(1), 0x00000001);
+        break;
+    }
+    // Dynamic Printing
+    case DYN_PRNT: {
+        cpu_dyn_print(1, 0);
+        break;
+    }
+    case DYN_ECHO: {
+        cpu_dyn_print(0, 0);
+        break;
+    }
+    case DYN_PRETTY_PRNT: {
+        cpu_dyn_print(1, 1);
+        break;
+    }
+    case DYN_PRETTY_ECHO: {
+        cpu_dyn_print(0, 1);
+        break;
+    }
+    // Dynamic Exit
+    case DYN_EXIT: {
+        jit_movi(_jit, R(2), exit);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        break;
+    }
+    // Dynamic Index Delete
+    case DYN_STR_INDEX_DELETE: {
+        jit_movi(_jit, R(3), cpu_delete_string_index);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(11));
+        jit_callr(_jit, R(3));
+        break;
+    }
+    case DYN_LIST_INDEX_DELETE: {
+        jit_movi(_jit, R(3), cpu_delete_list_index);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(11));
+        jit_callr(_jit, R(3));
+        break;
+    }
+    case DYN_DICT_KEY_DELETE: {
+        jit_movi(_jit, R(3), cpu_delete_dict_key);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(11));
+        jit_callr(_jit, R(3));
+        break;
+    }
+    // Dynamic Index Access
+    case DYN_STR_INDEX_ACCESS: {
+        // R(1) holds the index value and the offset result should be in R(4)
+        // Jump if the index is positive
+        jit_op* positive_label = jit_bgti(_jit, JIT_FORWARD, R(1), -1);
+        // Load the string length to R(2)
+        jit_ldr(_jit, R(2), R(5), sizeof(size_t));
+        // Turn negative index into positive index
+        jit_addr(_jit, R(1), R(2), R(1));
+        // The index is positive
+        jit_patch(_jit, positive_label);
+        // offset = index * sizeof(char)
+        jit_muli(_jit, R(4), R(1), sizeof(char));
+        // offset += sizeof(size_t)
+        jit_addi(_jit, R(4), R(4), sizeof(size_t));
+        // Index offset is available in R(4)
+        break;
+    }
+    case DYN_COMPOSITE_ACCESS: {
+        jit_movi(_jit, R(2), cpu_composite_access);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(5));
+        jit_putargr(_jit, R(4));
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
+    // Dynamic Index Update
+    case DYN_LIST_INDEX_UPDATE: {
+        jit_movi(_jit, R(2), cpu_list_index_update);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(12));
+        jit_putargr(_jit, R(13));
+        jit_putargr(_jit, R(0));
+        jit_putargr(_jit, R(1));
+        jit_fputargr(_jit, FR(1), sizeof(double));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
+    case DYN_DICT_KEY_UPDATE: {
+        jit_movi(_jit, R(2), cpu_dict_key_update);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(12));
+        jit_putargr(_jit, R(13));
+        jit_putargr(_jit, R(0));
+        jit_putargr(_jit, R(1));
+        jit_fputargr(_jit, FR(1), sizeof(double));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(2));
+        break;
+    }
+    // Dynamic Type Conversion
+    case DYN_BOOL_TO_STR: {
+        jit_movi(_jit, R(2), cpu_boolean_to_string);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
+        break;
+    }
+    case DYN_STR_TO_BOOL: {
+        jit_movi(_jit, R(2), cpu_string_to_boolean);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
+        break;
+    }
+    // Dynamic Create New List
+    case DYN_NEW_LIST: {
+        jit_movi(_jit, R(3), cpu_new_list);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(2));
+        jit_callr(_jit, R(3));
+        jit_retval(_jit, R(1));
+        break;
+    }
+    case DYN_NEW_DICT: {
+        jit_movi(_jit, R(3), cpu_new_dict);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(2));
+        jit_callr(_jit, R(3));
+        jit_retval(_jit, R(1));
+        break;
+    }
+    // Debug
     case DEBUG:
-        debug(c, pc_start);
+        debug(_jit);
         break;
     default:
         break;
     }
 
-    if (c->debug_level > 2)
-        debug(c, pc_start);
+    if (c->debug_level > 4 && !temp_disable_debug)
+        debug(_jit);
 }
 
-void print_registers(cpu *c, i64 pc_start)
+jit_label_array* init_label_array()
 {
-    printf("[PC: %lld] ", pc_start);
-    for (int i = 0; i < NUM_REGISTERS; i++) {
-        printf("[%s: %lld] ", getRegName(i), c->r[i]);
+    jit_label_array* label_array = malloc(sizeof *label_array);
+    label_array->capacity = 0;
+    label_array->arr = NULL;
+    label_array->size = 0;
+    return label_array;
+}
+
+void push_label(jit_label_array* label_array, jit_label* label)
+{
+    if (label_array->capacity == 0) {
+        label_array->arr = (jit_label**)malloc((++label_array->capacity) * sizeof(jit_label*));
+    } else {
+        label_array->arr = (jit_label**)realloc(label_array->arr, (++label_array->capacity) * sizeof(jit_label*));
     }
-    printf("\n");
+    label_array->arr[label_array->size++] = label;
 }
 
-char *getRegName(i64 i)
+jit_label* get_label(jit_label_array* label_array, i64 i)
 {
-    return reg_names[i];
+    return label_array->arr[i];
 }
 
-char *build_string(cpu *c, i64 len)
+jit_op_array* init_op_array()
 {
-    char *s = malloc(len + 1);
-    for (size_t i = 0; i < len; i++) {
-        s[i] = (int)c->stack[c->sp++] + '0';
+    jit_op_array* op_array = malloc(sizeof *op_array);
+    op_array->capacity = 0;
+    op_array->arr = NULL;
+    op_array->size = 0;
+    return op_array;
+}
+
+void push_op(jit_op_array* op_array, jit_op* op)
+{
+    if (op_array->capacity == 0) {
+        op_array->arr = (jit_op**)malloc((++op_array->capacity) * sizeof(jit_op*));
+    } else {
+        op_array->arr = (jit_op**)realloc(op_array->arr, (++op_array->capacity) * sizeof(jit_op*));
     }
-    s[len] = '\0';
-
-    return s;
+    op_array->arr[op_array->size++] = op;
 }
 
-char *build_string_from_addr(cpu *c, i64 addr)
+jit_op* get_op(jit_op_array* op_array, i64 i)
 {
-    i64 len = c->mem[addr];
-    char *s = malloc(len + 1);
-    for (size_t i = 0; i < len; i++) {
-        s[i] = (int)c->mem[--addr] + '0';
+    return op_array->arr[i];
+}
+
+void cpu_dyn_print(i64 newline, i64 pretty)
+{
+    jit_movi(_jit, R(3), cpu_print);
+    jit_prepare(_jit);
+    jit_putargr(_jit, R(0));
+    jit_putargr(_jit, R(1));
+    jit_fputargr(_jit, FR(1), sizeof(double));
+    jit_putargi(_jit, newline);
+    jit_putargi(_jit, pretty);
+    jit_callr(_jit, R(3));
+}
+
+void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl, i64 pretty)
+{
+    switch (r0) {
+    case V_BOOL:
+        cpu_print_bool(r1);
+        break;
+    case V_INT:
+        cpu_print_int(r1);
+        break;
+    case V_FLOAT:
+        cpu_print_float(fr1);
+        break;
+    case V_STRING:
+        cpu_print_string(r1, false);
+        break;
+    case V_LIST:
+        cpu_print_list(r1, pretty, 0);
+        break;
+    case V_DICT:
+        cpu_print_dict(r1, pretty, 0);
+        break;
+    default:
+        break;
     }
-    s[len] = '\0';
 
-    return s;
+    if (nl != 0)
+        printf("\n");
 }
 
-void print_bool(cpu *c)
+void cpu_print_bool(i64 i)
 {
-    printf("%s", c->r[R1A] ? "true" : "false");
+    printf("%s", i ? "true" : "false");
 }
 
-void print_int(cpu *c)
+void cpu_print_int(i64 i)
 {
-    printf("%lld", c->r[R1A]);
+    printf("%lld", i);
 }
 
-void print_float(cpu *c)
+void cpu_print_float(f64 f)
 {
-    i64 i = c->r[R1A];
-    f64 f;
-    memcpy(&f, &i, sizeof f);
     printf("%lg", f);
 }
 
-void print_string(cpu *c, bool quoted)
+void cpu_print_string(i64 addr, bool quoted)
 {
-    size_t len = c->r[R1A];
-    char *s = build_string(c, len);
+    addr += sizeof(size_t);
+    char *s = (char*)addr;
     if (quoted)
         printf("'%s'", escape_the_sequences_in_string_literal(s));
     else
         printf("%s", escape_the_sequences_in_string_literal(s));
-    free(s);
 }
 
-void print_list(cpu *c, bool pretty, unsigned long iter)
+void cpu_print_flex(i64 addr, i64 pretty, unsigned long iter)
 {
-    size_t len = c->r[R1A];
+    i64 type = *(i64*)addr;
+    addr += sizeof(long long);
+    i64 val_i = *(i64*)addr;
+    f64 val_f = *(f64*)addr;
+    switch (type) {
+    case V_BOOL:
+        cpu_print_bool(val_i);
+        break;
+    case V_INT:
+        cpu_print_int(val_i);
+        break;
+    case V_FLOAT:
+        cpu_print_float(val_f);
+        break;
+    case V_STRING:
+        cpu_print_string(val_i, true);
+        break;
+    case V_LIST:
+        cpu_print_list(*(i64*)addr, pretty, iter);
+        break;
+    case V_DICT:
+        cpu_print_dict(*(i64*)addr, pretty, iter);
+        break;
+    default:
+        break;
+    }
+}
+
+void cpu_print_list(i64 addr, i64 pretty, unsigned long iter)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
     printf("[");
     if (pretty)
         printf("\n");
     iter++;
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < *len; i++) {
         if (pretty)
             for (unsigned long j = 0; j < iter; j++) {
                 printf(__KAOS_TAB__);
             }
-        c->r[R0A] = c->stack[c->sp++];
-        c->r[R1A] = c->stack[c->sp++];
-        switch (c->r[R0A]) {
-        case V_BOOL:
-            print_bool(c);
-            break;
-        case V_INT:
-            print_int(c);
-            break;
-        case V_FLOAT:
-            print_float(c);
-            break;
-        case V_STRING:
-            print_string(c, true);
-            break;
-        case V_LIST:
-            print_list(c, pretty, iter);
-            break;
-        case V_DICT:
-            print_dict(c, pretty, iter);
-            break;
-        default:
-            break;
-        }
-        if (i + 1 != len) {
+        cpu_print_flex(*(i64*)addr, pretty, iter);
+        addr += sizeof(long long);
+        if (i + 1 != *len) {
             if (pretty)
                 printf(",\n");
             else
@@ -680,47 +787,28 @@ void print_list(cpu *c, bool pretty, unsigned long iter)
     printf("]");
 }
 
-void print_dict(cpu *c, bool pretty, unsigned long iter)
+void cpu_print_dict(i64 addr, i64 pretty, unsigned long iter)
 {
-    size_t len = c->r[R1A];
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
     printf("{");
     if (pretty)
         printf("\n");
     iter++;
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < *len; i++) {
         if (pretty)
             for (unsigned long j = 0; j < iter; j++) {
                 printf(__KAOS_TAB__);
             }
-        c->r[R0A] = c->stack[c->sp++];
-        c->r[R1A] = c->stack[c->sp++];
-        print_string(c, true);
+        i64 _addr = *(i64*)addr;
+        addr += sizeof(long long);
+        i64 key = *(i64*)_addr;
+        _addr += sizeof(long long);
+        i64 value = *(i64*)_addr;
+        cpu_print_flex(key, pretty, iter);
         printf(": ");
-        c->r[R0A] = c->stack[c->sp++];
-        c->r[R1A] = c->stack[c->sp++];
-        switch (c->r[R0A]) {
-        case V_BOOL:
-            print_bool(c);
-            break;
-        case V_INT:
-            print_int(c);
-            break;
-        case V_FLOAT:
-            print_float(c);
-            break;
-        case V_STRING:
-            print_string(c, true);
-            break;
-        case V_LIST:
-            print_list(c, pretty, iter);
-            break;
-        case V_DICT:
-            print_dict(c, pretty, iter);
-            break;
-        default:
-            break;
-        }
-        if (i + 1 != len) {
+        cpu_print_flex(value, pretty, iter);
+        if (i + 1 != *len) {
             if (pretty)
                 printf(",\n");
             else
@@ -737,383 +825,391 @@ void print_dict(cpu *c, bool pretty, unsigned long iter)
     printf("}");
 }
 
-void cpu_store_dynamic(cpu *c)
+i64 cpu_composite_access(i64 addr, i64 type, i64 val)
 {
-    switch (c->r[R0A]) {
-        case V_BOOL:
-            cpu_store_common(c);
-            break;
-        case V_INT:
-            cpu_store_common(c);
-            break;
-        case V_FLOAT:
-            cpu_store_common(c);
-            break;
-        case V_STRING:
-            cpu_store_string(c);
-            break;
-        case V_LIST:
-            cpu_store_list(c);
-            break;
-        case V_DICT:
-            cpu_store_dict(c);
-            break;
-        default:
-            break;
-    }
+    if (type == V_LIST)
+        return cpu_list_index_access(addr, val);
+    else
+        return cpu_dict_key_search(addr, val);
 }
 
-void cpu_store_common(cpu *c)
+i64 cpu_list_index_access(i64 addr, i64 i)
 {
-    cpu_store(c, c->heap++, c->r[R0A]);
-    c->r[R1A] = c->stack[c->sp++];
-    cpu_store(c, c->heap++, c->r[R1A]);
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    if (i < 0)
+        i = *len + i;
+    // printf("len: %lu\n", *len);
+    // printf("i: %lld\n", i);
+
+    addr += sizeof(long long) * i;
+    i64 _addr = *(i64*)addr;
+    // i64 type = *(i64*)_addr;
+    // _addr += sizeof(long long);
+    // i64 val_i = *(i64*)_addr;
+    // f64 val_f = *(f64*)_addr;
+    // printf("type: %lld\n", type);
+    // printf("val_i: %lld\n", val_i);
+    // printf("val_f: %f\n", val_f);
+
+    return _addr;
 }
 
-void cpu_store_string(cpu *c)
+i64 cpu_dict_key_search(i64 addr, i64 search_key_addr)
 {
-    cpu_store_common(c);
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_store(c, c->heap++, c->r[R0A]);
-    }
-}
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
 
-void cpu_store_list(cpu *c)
-{
-    cpu_store_common(c);
-    c->heap += c->r[R1A];
-    i64 _heap = c->heap - 1;
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        cpu_store(c, _heap--, c->heap);
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_store_dynamic(c);
-    }
-}
+    search_key_addr += sizeof(size_t);
+    char* search_key = (char*)search_key_addr;
 
-void cpu_store_dict(cpu *c)
-{
-    cpu_store_common(c);
-    c->heap += c->r[R1A] * 2;
-    i64 _heap = c->heap - 1;
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        cpu_store(c, _heap--, c->heap);
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_store_string(c);
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+        addr += sizeof(i64);
 
-        cpu_store(c, _heap--, c->heap);
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_store_dynamic(c);
-    }
-}
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+        i64 value_ref = *(i64*)key_value_pair;
 
-void cpu_load_dynamic(cpu *c, i64 addr)
-{
-    switch (c->r[R0A]) {
-        case V_BOOL:
-            addr = cpu_load_common(c, addr);
-            break;
-        case V_INT:
-            addr = cpu_load_common(c, addr);
-            break;
-        case V_FLOAT:
-            addr = cpu_load_common(c, addr);
-            break;
-        case V_STRING:
-            addr = cpu_load_string(c, addr);
-            break;
-        case V_LIST:
-            addr = cpu_load_list(c, addr);
-            break;
-        case V_DICT:
-            addr = cpu_load_dict(c, addr);
-            break;
-        default:
-            break;
-    }
-}
+        key_ref += sizeof(i64);
+        i64 key_addr = *(i64*)key_ref;
+        key_addr += sizeof(size_t);
+        char* key = (char*)key_addr;
 
-i64 cpu_load_common(cpu *c, i64 addr)
-{
-    c->r[R1A] = c->mem[addr++];
-    c->stack[--c->sp] = c->r[R1A];
-    c->stack[--c->sp] = c->r[R0A];
-    return addr;
-}
-
-i64 cpu_load_string(cpu *c, i64 addr)
-{
-    c->r[R1A] = c->mem[addr++];
-    i64 _R0A = c->r[R0A];
-    i64 _R1A = c->r[R1A];
-    addr += c->r[R1A] - 1;
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R2A] = c->mem[addr--];
-        c->stack[--c->sp] = c->r[R2A];
-    }
-    addr += c->r[R1A] - 1;
-    c->stack[--c->sp] = _R1A;
-    c->stack[--c->sp] = _R0A;
-    return addr;
-}
-
-i64 cpu_load_list(cpu *c, i64 addr)
-{
-    c->r[R1A] = c->mem[addr++];
-    i64 _R0A = c->r[R0A];
-    i64 _R1A = c->r[R1A];
-    i64 _addr = addr;
-    size_t len = c->r[R1A];
-    for (size_t i = 0; i < len; i++) {
-        addr = c->mem[_addr + i];
-        c->r[R0A] = c->mem[addr++];
-        cpu_load_dynamic(c, addr);
-    }
-    addr = _addr + len;
-    c->stack[--c->sp] = _R1A;
-    c->stack[--c->sp] = _R0A;
-    return addr;
-}
-
-i64 cpu_load_dict(cpu *c, i64 addr)
-{
-    c->r[R1A] = c->mem[addr++];
-    i64 _R0A = c->r[R0A];
-    i64 _R1A = c->r[R1A];
-    i64 _addr = addr;
-    size_t len = c->r[R1A];
-    for (size_t i = 0; i < len; i++) {
-        addr = c->mem[_addr + 2 * i];
-        c->r[R0A] = c->mem[addr++];
-        cpu_load_dynamic(c, addr);
-
-        addr = c->mem[_addr + 2 * i + 1];
-        c->r[R0A] = c->mem[addr++];
-        cpu_load_string(c, addr);
-    }
-    addr = _addr + 2 * len;
-    c->stack[--c->sp] = _R1A;
-    c->stack[--c->sp] = _R0A;
-    return addr;
-}
-
-void cpu_eat_string(cpu *c)
-{
-    i64 len = c->stack[c->sp++];
-    for (size_t i = len; i > 0; i--) {
-        c->r[R0A] = c->stack[c->sp++];
-    }
-}
-
-void cpu_eat_dynamic(cpu *c)
-{
-    switch (c->r[R0A]) {
-        case V_BOOL:
-            c->sp++;
-            break;
-        case V_INT:
-            c->sp++;
-            break;
-        case V_FLOAT:
-            c->sp++;
-            break;
-        case V_STRING: {
-            cpu_eat_string(c);
-            break;
-        }
-        case V_LIST: {
-            i64 len = c->stack[c->sp++];
-            for (size_t i = len; i > 0; i--) {
-                c->r[R0A] = c->stack[c->sp++];
-                cpu_eat_dynamic(c);
-            }
-            break;
-        }
-        case V_DICT: {
-            i64 len = c->stack[c->sp++];
-            for (size_t i = len; i > 0; i--) {
-                c->r[R0A] = c->stack[c->sp++];
-                cpu_eat_string(c);
-
-                c->r[R0A] = c->stack[c->sp++];
-                cpu_eat_dynamic(c);
-            }
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-void cpu_pop_dynamic(cpu *c)
-{
-    switch (c->r[R0A]) {
-        case V_BOOL:
-            cpu_pop_common(c);
-            break;
-        case V_INT:
-            cpu_pop_common(c);
-            break;
-        case V_FLOAT:
-            cpu_pop_common(c);
-            break;
-        case V_STRING:
-            cpu_pop_string(c);
-            break;
-        case V_LIST:
-            cpu_pop_list(c);
-            break;
-        case V_DICT:
-            cpu_pop_dict(c);
-            break;
-        default:
-            break;
-    }
-}
-
-void cpu_pop_common(cpu *c)
-{
-    c->r[R1A] = c->stack[c->sp++];
-}
-
-void cpu_pop_string(cpu *c)
-{
-    cpu_pop_common(c);
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->stack[c->sp++];
-    }
-}
-
-void cpu_pop_list(cpu *c)
-{
-    cpu_pop_common(c);
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_pop_dynamic(c);
-    }
-}
-
-void cpu_pop_dict(cpu *c)
-{
-    cpu_pop_common(c);
-    for (size_t i = c->r[R1A]; i > 0; i--) {
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_pop_string(c);
-
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_pop_dynamic(c);
-    }
-}
-
-void cpu_list_index_access(cpu *c, i64 list_len, i64 index)
-{
-    if (index < 0)
-        index = list_len + index;
-
-    if (index < 0 || index >= list_len) {
-        if (is_interactive) {
-            c->pc += 2;
-            eat_until_hlt(c);
-        }
-        throw_error(E_INDEX_OUT_OF_RANGE, NULL, NULL, index);
+        if (strcmp(search_key, key) == 0)
+            return value_ref;
     }
 
-    for (i64 i = 0; i < list_len; i++) {
-        if (i == index) {
-            c->r[R4A] = i;
+    // TODO: throw error
 
-            i64 addr = c->heap;
-            c->r[R0A] = c->stack[c->sp++];
-            cpu_store_dynamic(c);
-
-            while (i < list_len - 1) {
-                c->r[R0A] = c->stack[c->sp++];
-                cpu_eat_dynamic(c);
-                i++;
-            }
-
-            c->r[R0A] = c->mem[addr++];
-            cpu_load_dynamic(c, addr);
-
-            c->r[R0A] = c->stack[c->sp++];
-            cpu_pop_common(c);
-            return;
-        } else {
-            c->r[R0A] = c->stack[c->sp++];
-            cpu_pop_dynamic(c);
-        }
-    }
+    return 0;
 }
 
-void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len)
+void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1, f64 fr1)
 {
-    char *key = build_string(c, key_len);
-    for (i64 i = dict_len + 1; i > 0; i--) {
-        c->r[R0A] = c->stack[c->sp++];
-        cpu_pop_common(c);
-        char *dict_key = build_string(c, c->r[R1A]);
-        c->r[R0A] = c->stack[c->sp++];
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    if (i < 0)
+        i = *len + i;
 
-        if (strcmp(dict_key, key) == 0) {
-            c->r[R4A] = dict_len - i + 1;
-            free(key);
-            free(dict_key);
+    addr += sizeof(long long) * i;
+    i64 _addr = *(i64*)addr;
+    *(i64*)_addr = r0;
+    _addr += sizeof(long long);
+    if (r0 == V_FLOAT)
+        *(f64*)_addr = fr1;
+    else
+        *(i64*)_addr = r1;
+}
 
-            i64 addr = c->heap;
-            cpu_store_dynamic(c);
+void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1, f64 fr1)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
 
-            while (i > 2) {
-                cpu_eat_string(c);
-                cpu_eat_dynamic(c);
-                i--;
-            }
+    search_key_addr += sizeof(size_t);
+    char* search_key = (char*)search_key_addr;
 
-            c->r[R0A] = c->mem[addr++];
-            cpu_load_dynamic(c, addr);
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+        addr += sizeof(i64);
 
-            c->r[R0A] = c->stack[c->sp++];
-            cpu_pop_common(c);
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+        i64 value_ref = *(i64*)key_value_pair;
+
+        key_ref += sizeof(i64);
+        i64 key_addr = *(i64*)key_ref;
+        key_addr += sizeof(size_t);
+        char* key = (char*)key_addr;
+
+        if (strcmp(search_key, key) == 0) {
+            *(i64*)value_ref = r0;
+            value_ref += sizeof(i64);
+            if (r0 == V_FLOAT)
+                *(f64*)value_ref = fr1;
+            else
+                *(i64*)value_ref = r1;
             return;
         }
-        free(dict_key);
-
-        cpu_pop_dynamic(c);
     }
-    free(key);
+
+    // TODO: throw error
 }
 
-void debug(cpu *c, i64 pc_start)
+i64 cpu_new_common(i64 type, i64 val)
 {
-    printf(" ----------------------------------------------------------\n");
-    print_registers(c, pc_start);
-    print_stack(c);
-    print_heap(c);
+    i64 p = (i64)malloc(2 * sizeof(i64));
+    i64 orig_p = p;
+    i64* p1 = (i64*)p;
+    *p1 = type;
+    p += sizeof(i64);
+    i64* p2 = (i64*)p;
+    *p2 = val;
+    return orig_p;
 }
 
-void print_stack(cpu *c)
+i64 cpu_new_string(i64 addr)
 {
-    for (i64 i = c->sp; i < USHRT_MAX * 2 - 1; i++) {
-        printf("[SP: %lld] %lld\n", i, c->stack[i]);
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    char* s = (char*)addr;
+    i64 new_str = (i64)malloc((*len + 1) * sizeof(char) + sizeof(size_t));
+    i64 orig_new_str = new_str;
+    size_t* new_len = (size_t*)new_str;
+    *new_len = *len;
+    new_str += sizeof(size_t);
+    char* new_s = (char*)new_str;
+    memcpy(new_s, s, (*len + 1) * sizeof(char));
+    return cpu_new_common(V_STRING, orig_new_str);
+}
+
+void cpu_new_list(i64 addr, i64 new_addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    i64 ref_addr = (i64)malloc(sizeof(i64) * *len + sizeof(size_t));
+    i64 orig_ref_addr = ref_addr;
+    size_t* new_len = (size_t*)ref_addr;
+    *new_len = *len;
+    ref_addr += sizeof(size_t);
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 _addr = *(i64*)addr;
+        i64 type = *(i64*)_addr;
+        _addr += sizeof(i64);
+        i64* p = (i64*)ref_addr;
+        switch (type) {
+        case V_BOOL:
+        case V_INT:
+        case V_FLOAT:
+            *p = cpu_new_common(type, *(i64*)_addr);
+            break;
+        case V_STRING:
+            *p = cpu_new_string(*(i64*)_addr);
+            break;
+        case V_LIST:
+            *p = (i64)malloc(2 * sizeof(i64));
+            cpu_new_list(*(i64*)_addr, *p);
+            break;
+        case V_DICT:
+            *p = (i64)malloc(2 * sizeof(i64));
+            cpu_new_dict(*(i64*)_addr, *p);
+            break;
+        default:
+            break;
+        }
+
+        addr += sizeof(i64);
+        ref_addr += sizeof(i64);
+    }
+
+    i64* p1 = (i64*)new_addr;
+    *p1 = V_LIST;
+    new_addr += sizeof(i64);
+    i64* p2 = (i64*)new_addr;
+    *p2 = orig_ref_addr;
+}
+
+void cpu_new_dict(i64 addr, i64 new_addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    i64 ref_addr = (i64)malloc(sizeof(i64) * *len + sizeof(size_t));
+    i64 orig_ref_addr = ref_addr;
+    size_t* new_len = (size_t*)ref_addr;
+    *new_len = *len;
+    ref_addr += sizeof(size_t);
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+        i64 value_ref = *(i64*)key_value_pair;
+        key_ref += sizeof(i64);
+
+        i64 new_key_value_pair = (i64)malloc(2 * sizeof(i64));
+        i64* p = (i64*)ref_addr;
+        *p = new_key_value_pair;
+
+        i64* new_key = (i64*)new_key_value_pair;
+        *new_key = cpu_new_string(*(i64*)key_ref);
+        new_key_value_pair += sizeof(i64);
+        i64* new_value = (i64*)new_key_value_pair;
+
+        i64 type = *(i64*)value_ref;
+        value_ref += sizeof(i64);
+
+        switch (type) {
+        case V_BOOL:
+        case V_INT:
+        case V_FLOAT:
+            *new_value = cpu_new_common(type, *(i64*)value_ref);
+            break;
+        case V_STRING:
+            *new_value = cpu_new_string(*(i64*)value_ref);
+            break;
+        case V_LIST:
+            *new_value = (i64)malloc(2 * sizeof(i64));
+            cpu_new_list(*(i64*)value_ref, *new_value);
+            break;
+        case V_DICT:
+            *new_value = (i64)malloc(2 * sizeof(i64));
+            cpu_new_dict(*(i64*)value_ref, *new_value);
+            break;
+        default:
+            break;
+        }
+
+        addr += sizeof(i64);
+        ref_addr += sizeof(i64);
+    }
+
+    i64* p1 = (i64*)new_addr;
+    *p1 = V_DICT;
+    new_addr += sizeof(i64);
+    i64* p2 = (i64*)new_addr;
+    *p2 = orig_ref_addr;
+}
+
+void cpu_delete_string_index(i64 i, i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    if (i < 0)
+        i = *len + i;
+
+    addr += sizeof(size_t);
+    char *s = (char*)addr;
+    memmove(&s[i], &s[i + 1], (*len - i) * sizeof(char));
+    *len -= 1;
+}
+
+void cpu_delete_list_index(i64 i, i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    if (i < 0)
+        i = *len + i;
+
+    addr += sizeof(size_t);
+    i64* arr = (i64*)addr;
+    memmove(&arr[i], &arr[i + 1], (*len - (size_t)i) * sizeof(i64));
+    *len -= 1;
+}
+
+void cpu_delete_dict_key(i64 search_key_addr, i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    addr += sizeof(size_t);
+    i64* arr = (i64*)addr;
+
+    search_key_addr += sizeof(size_t);
+    char* search_key = (char*)search_key_addr;
+
+    for (size_t i = 0; i < *len; i++) {
+        i64 key_value_pair = *(i64*)addr;
+        addr += sizeof(i64);
+
+        i64 key_ref = *(i64*)key_value_pair;
+        key_value_pair += sizeof(i64);
+
+        key_ref += sizeof(i64);
+        i64 key_addr = *(i64*)key_ref;
+        key_addr += sizeof(size_t);
+        char* key = (char*)key_addr;
+
+        if (strcmp(search_key, key) == 0) {
+            memmove(&arr[i], &arr[i + 1], (*len - (size_t)i) * sizeof(i64));
+            *len -= 1;
+            return;
+        }
     }
 }
 
-void print_heap(cpu *c)
+i64 cpu_string_concat(i64 addr1, i64 addr2)
 {
-    i64 heap_start = 0;
-    if (is_interactive)
-        heap_start = USHRT_MAX * 32;
-    for (i64 i = heap_start; i < c->heap_size; i++) {
-        printf("[HP: %lld: %lld] ", i, c->mem[i]);
-    }
-    printf("\n");
+    size_t* t1 = (size_t*)addr1;
+    size_t* t2 = (size_t*)addr2;
+    size_t t3 = *t1 + *t2;
+    addr1 += sizeof(size_t);
+    addr2 += sizeof(size_t);
+    char *s1 = (char*)addr1;
+    char *s2 = (char*)addr2;
+
+    // Allocate a new space to store the concatenated string
+    i64 p = (i64)malloc((t3 + 1) * sizeof(char) + sizeof(size_t));
+
+    // Set the new string size
+    size_t* p_t = (size_t*)p;
+    *p_t = t3;
+
+    // Copy the first string
+    p += sizeof(size_t);
+    char *p_s = (char*)p;
+    strcpy(p_s, s1);
+
+    // Copy the second string
+    p += *t1 * sizeof(char);
+    char *p_s2 = (char*)p;
+    strcpy(p_s2, s2);
+
+    // Reset the pointer and return
+    p -= sizeof(size_t) + *t1 * sizeof(char);
+    return p;
 }
 
-void cpu_store(cpu *c, i64 heap, i64 value)
+i64 cpu_boolean_to_string(i64 val)
 {
-    if (heap > (c->heap_size - 1)) {
-        c->heap_size = heap + 1;
-        c->mem = (i64*)realloc(c->mem, c->heap_size * sizeof(i64));
-        c->mems[c->memp - 1] = c->mem;
+    i64 p = 0;
+    size_t* p_t = 0;
+    if (val == 0) {
+        p = (i64)malloc((strlen("false") + 1) * sizeof(size_t));
+        p_t = (size_t*)p;
+        *p_t = 5;
+        p += sizeof(size_t);
+        char *p_s = (char*)p;
+        strcpy(p_s, "false");
+    } else {
+        p = (i64)malloc((strlen("true") + 1) * sizeof(size_t));
+        p_t = (size_t*)p;
+        *p_t = 4;
+        p += sizeof(size_t);
+        char *p_s = (char*)p;
+        strcpy(p_s, "true");
     }
-    c->mem[heap] = value;
+
+    p -= sizeof(size_t);
+    return p;
+}
+
+i64 cpu_string_to_boolean(i64 addr)
+{
+    addr += sizeof(size_t);
+    char *s = (char*)addr;
+    if (strlen(s) == 0)
+        return 0;
+    else
+        return 1;
+}
+
+void debug(struct jit *jit)
+{
+    jit_msg(jit, " ----------------------------------------------------------\n");
+    jit_msgr(jit, "[R0: %lld] ", R(0));
+    jit_msgr(jit, "[R1: %lld] ", R(1));
+    jit_msgr(jit, "[R2: %lld] ", R(2));
+    jit_msgr(jit, "[R3: %lld] ", R(3));
+    jit_msgr(jit, "[R4: %lld] ", R(4));
+    jit_msgr(jit, "[R5: %lld] ", R(5));
+    jit_msgr(jit, "[R6: %lld] ", R(6));
+    jit_msgr(jit, "[R7: %lld] ", R(7));
+    jit_msgr(jit, "[R8: %lld] ", R(8));
+    jit_msgr(jit, "[R9: %lld] ", R(9));
+    jit_msgr(jit, "[R10: %lld] ", R(10));
+    jit_msgr(jit, "[R11: %lld] |", R(11));
+    jit_fmsgr(jit, "[FR0: %lf] ", FR(0));
+    jit_fmsgr(jit, "[FR1: %lf] ", FR(1));
+    jit_fmsgr(jit, "[FR2: %lf] ", FR(2));
+    jit_fmsgr(jit, "[FR3: %lf]", FR(3));
+    jit_msg(jit, "\n");
 }

@@ -1,14 +1,17 @@
-name: "[interpreter] Address Sanitizer"
+name: "[sanitizer] Undefined Behavior Sanitizer"
 
 on: [push, pull_request]
 
 jobs:
   main:
-    name: sanitizer_address
+    name: sanitizer_undefined_behavior
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -17,7 +20,7 @@ jobs:
     - name: Build (clang)
       run: |
         make clean
-        make clang-dev-sanitizer-address
+        make clang-dev-sanitizer-undefined_behavior
         sudo make install
 
     - name: Run the tests (clang)

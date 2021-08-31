@@ -23,60 +23,66 @@
 #ifndef KAOS_COMPILER_H
 #define KAOS_COMPILER_H
 
-#include "../ast/ast.h"
 #include "../vm/cpu.h"
+#include "../ast/ast.h"
 #include "../interpreter/module_new.h"
 
-typedef struct i64_array i64_array;
-
-typedef struct i64_array {
-    i64* arr;
-    i64 capacity;
-    i64 size;
-    i64 heap;
-    i64 start;
-    i64 hlt_count;
-    i64_array* ast_ref;
-} i64_array;
-
-i64_array* compile(ASTRoot* ast_root);
+KaosIR* compile(ASTRoot* ast_root);
 void initCallJumps();
-void fillCallJumps(i64_array* program);
-void compileImports(ASTRoot* ast_root, i64_array* program);
-void compileStmtList(i64_array* program, StmtList* stmt_list);
-void compileStmt(i64_array* program, Stmt* stmt);
-unsigned short compileExpr(i64_array* program, Expr* expr);
-void compileDecl(i64_array* program, Decl* decl);
-void compileSpecList(i64_array* program, SpecList* spec_list);
-unsigned short compileSpec(i64_array* program, Spec* spec);
+void fillCallJumps(KaosIR* program);
+void compileImports(ASTRoot* ast_root, KaosIR* program);
+void compileStmtList(KaosIR* program, StmtList* stmt_list);
+void compileStmt(KaosIR* program, Stmt* stmt);
+unsigned short compileExpr(KaosIR* program, Expr* expr);
+void compileDecl(KaosIR* program, Decl* decl);
+void declareSpecList(KaosIR* program, SpecList* spec_list);
+void compileSpecList(KaosIR* program, SpecList* spec_list);
+unsigned short declareSpec(KaosIR* program, Spec* spec);
+unsigned short compileSpec(KaosIR* program, Spec* spec);
 
-void push_instr(i64_array* program, i64 el);
-void pushProgram(i64_array* program, i64 el);
-i64 popProgram(i64_array* program);
-void freeProgram(i64_array* program);
-i64_array* initProgram();
-void shift_registers(i64_array* program, size_t shift);
+void push_inst_(KaosIR* program, enum IROpCode op_code);
+void push_inst_i(KaosIR* program, enum IROpCode op_code, i64 i);
+void push_inst_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg);
+void push_inst_i_i(KaosIR* program, enum IROpCode op_code, i64 i1, i64 i2);
+void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i);
+void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, f64 f);
+void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2);
+void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i);
+void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, i64 i1, i64 i2);
+void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, f64 f);
+void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3);
+void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, i64 i);
 
-Symbol* store_bool(i64_array* program, char *name, bool is_any);
-Symbol* store_int(i64_array* program, char *name, bool is_any);
-Symbol* store_float(i64_array* program, char *name, bool is_any);
-Symbol* store_string(i64_array* program, char *name, size_t len, bool is_any, bool is_dynamic);
-Symbol* store_list(i64_array* program, char *name, size_t len, bool is_dynamic);
-Symbol* store_dict(i64_array* program, char *name, size_t len, bool is_dynamic);
-Symbol* store_any(i64_array* program, char *name);
+void pushProgram(KaosIR* program, KaosInst* el);
+KaosInst* popProgram(KaosIR* program);
+void freeProgram(KaosIR* program);
+KaosIR* initProgram();
+void shift_registers(KaosIR* program);
 
-void load_bool(i64_array* program, Symbol* symbol);
-void load_int(i64_array* program, Symbol* symbol);
-void load_float(i64_array* program, Symbol* symbol);
-void load_string(i64_array* program, Symbol* symbol);
-void load_list(i64_array* program, Symbol* symbol);
-void load_dict(i64_array* program, Symbol* symbol);
-void load_any(i64_array* program, Symbol* symbol);
+Symbol* store_bool(KaosIR* program, char *name, bool is_any);
+Symbol* store_int(KaosIR* program, char *name, bool is_any);
+Symbol* store_float(KaosIR* program, char *name, bool is_any);
+Symbol* store_string(KaosIR* program, char *name, bool is_any);
+Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic);
+Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic);
+Symbol* store_any(KaosIR* program, char *name);
+
+void load_bool(KaosIR* program, Symbol* symbol);
+void load_int(KaosIR* program, Symbol* symbol);
+void load_float(KaosIR* program, Symbol* symbol);
+void load_string(KaosIR* program, Symbol* symbol);
+void load_list(KaosIR* program, Symbol* symbol);
+void load_dict(KaosIR* program, Symbol* symbol);
+void load_any(KaosIR* program, Symbol* symbol);
 
 char* compile_module_selector(Expr* module_selector);
-bool declare_function(Stmt* stmt, File* file, i64_array* program);
-void declare_functions(ASTRoot* ast_root, i64_array* program);
-void compile_functions(ASTRoot* ast_root, i64_array* program);
+bool declare_function(Stmt* stmt, File* file, KaosIR* program);
+void declare_functions(ASTRoot* ast_root, KaosIR* program);
+void compile_functions(ASTRoot* ast_root, KaosIR* program);
+void determine_inline_functions(ASTRoot* ast_root);
+bool determine_inline_function(ASTRoot* ast_root, _Function* function);
+bool does_decision_have_a_call(Expr* expr, _Function* function);
+bool does_stmt_have_a_call(Stmt* stmt, _Function* function);
 
 void strongly_type(Symbol* symbol_x, Symbol* symbol_y, _Function* function, Expr* expr, enum ValueType value_type);
 void strongly_type_basic_check(unsigned short code, char *str1, char *str2, enum Type type, enum ValueType value_type);

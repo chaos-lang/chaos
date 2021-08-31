@@ -1,15 +1,15 @@
 num def sum(num j)
-    num x = fibo(j - 1)
-    num y = fibo(j - 2)
+    num x = fib(j - 1)
+    num y = fib(j - 2)
     num z = x + y
     return z
 end
 
-num def fibo(num n)
+num def fib(num n)
 end {
     n < 3   : return 1,
     default : sum(n)
 }
 
 
-print fibo(40)
+print fib(40)

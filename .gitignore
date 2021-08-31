@@ -57,3 +57,7 @@ gmon.out
 *.bench
 .benchmark
 *.gcda
+hyperfine.json
+
+# MyJIT Disassembler
+myjit-disasm

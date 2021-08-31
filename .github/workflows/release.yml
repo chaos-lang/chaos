@@ -36,39 +36,41 @@ jobs:
             image: alpine:latest
 
     steps:
-    - uses: actions/checkout@v1
-
     - name: Install dependencies (debian/ubuntu)
       run: |
         apt update
-        DEBIAN_FRONTEND=noninteractive apt install -y make git valgrind
-        make requirements
+        DEBIAN_FRONTEND=noninteractive apt install -y make git valgrind git
       if: matrix.target == 'ubuntu' || matrix.target == 'debian'
 
     - name: Install dependencies (centos)
       run: |
-        yum install -y which make git valgrind
-        make requirements
+        yum install -y which make git valgrind git
       if: matrix.target == 'centos'
 
     - name: Install dependencies (fedora)
       run: |
-        dnf install -y which make findutils git valgrind
-        make requirements
+        dnf install -y which make findutils git valgrind git
       if: matrix.target == 'fedora'
 
     - name: Install dependencies (archlinux)
       run: |
-        pacman -Syu --noconfirm which make git valgrind
-        make requirements
+        pacman -Syu --noconfirm which make git valgrind git
       if: matrix.target == 'archlinux'
 
     - name: Install dependencies (alpine)
       run: |
         apk update
-        apk add linux-headers bash which make git valgrind
-        make requirements
+        apk add linux-headers bash which make git valgrind git
       if: matrix.target == 'alpine'
+
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        make requirements
 
     - name: Build (gcc)
       run: |
@@ -99,11 +101,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
-        mv /usr/local/bin/gcc-8 /usr/local/bin/gcc
+        mv /usr/local/bin/gcc-9 /usr/local/bin/gcc
         make requirements
         brew install gnu-sed
 
@@ -141,7 +146,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       shell: cmd

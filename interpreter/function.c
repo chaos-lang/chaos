@@ -177,6 +177,10 @@ _Function* declareFunction(char *name, char *module, char *module_path, char *co
         end_function->next = NULL;
     }
 
+    function->call_patches = (int*)malloc(USHRT_MAX * 256 * sizeof(int));
+    function->call_patches_size = 0;
+    function->should_inline = false;
+
     return function;
 }
 
@@ -220,6 +224,7 @@ void addFunctionParameterNew(_Function* function, Symbol* parameter) {
     );
     function->parameters[function->parameter_count - 1] = parameter;
     parameter->param_of = function;
+    parameter->addr = (function->parameter_count - 1) * 2;
 }
 
 void endFunction() {

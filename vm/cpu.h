@@ -28,64 +28,159 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "types.h"
-#include "instructions.h"
-#include "flags.h"
+#include "ir.h"
 
 #include "../enums.h"
 #include "../utilities/helpers.h"
 
+#undef _XOPEN_SOURCE
+#include "../myjit/myjit/jitlib.h"
+
 i64* ast_stack;
 i64 ast_stack_p;
 
-cpu *new_cpu(i64 *program, i64 heap_size, i64 start, i64 *ast_ref, unsigned short debug_level);
+typedef struct jit_label_array {
+    jit_label** arr;
+    i64 capacity;
+    i64 size;
+    i64 hlt_count;
+} jit_label_array;
+
+typedef struct jit_op_array {
+    jit_op** arr;
+    i64 capacity;
+    i64 size;
+    i64 hlt_count;
+} jit_op_array;
+
+cpu *new_cpu(KaosIR* program, unsigned short debug_level);
 void free_cpu(cpu *c);
 void run_cpu(cpu *c);
 void eat_until_hlt(cpu *c);
 void fetch(cpu *c);
-void fetch_without_ast_stack(cpu *c);
 void execute(cpu *c);
 
-void print_registers(cpu *c, i64 pc_start);
-char *getRegName(i64 i);
-char *build_string(cpu *c, i64 len);
-char *build_string_from_addr(cpu *c, i64 addr);
+jit_label_array* init_label_array();
+void push_label(jit_label_array* label_array, jit_label* label);
+jit_label* get_label(jit_label_array* label_array, i64 i);
 
-void print_bool(cpu *c);
-void print_int(cpu *c);
-void print_float(cpu *c);
-void print_string(cpu *c, bool quoted);
-void print_list(cpu *c, bool pretty, unsigned long iter);
-void print_dict(cpu *c, bool pretty, unsigned long iter);
+jit_op_array* init_op_array();
+void push_op(jit_op_array* op_array, jit_op* op);
+jit_op* get_op(jit_op_array* op_array, i64 i);
 
-void cpu_store_dynamic(cpu *c);
-void cpu_store_common(cpu *c);
-void cpu_store_string(cpu *c);
-void cpu_store_list(cpu *c);
-void cpu_store_dict(cpu *c);
+void cpu_dyn_print(i64 newline, i64 pretty);
+void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl, i64 pretty);
+void cpu_print_bool(i64 i);
+void cpu_print_int(i64 i);
+void cpu_print_float(f64 f);
+void cpu_print_string(i64 addr, bool quoted);
+void cpu_print_flex(i64 addr, i64 pretty, unsigned long iter);
+void cpu_print_list(i64 addr, i64 pretty, unsigned long iter);
+void cpu_print_dict(i64 addr, i64 pretty, unsigned long iter);
 
-void cpu_load_dynamic(cpu *c, i64 addr);
-i64 cpu_load_common(cpu *c, i64 addr);
-i64 cpu_load_string(cpu *c, i64 addr);
-i64 cpu_load_list(cpu *c, i64 addr);
-i64 cpu_load_dict(cpu *c, i64 addr);
+void cpu_delete_string_index(i64 index, i64 addr);
+void cpu_delete_list_index(i64 index, i64 addr);
+void cpu_delete_dict_key(i64 search_key_addr, i64 addr);
+i64 cpu_string_concat(i64 addr1, i64 addr2);
+i64 cpu_boolean_to_string(i64 val);
+i64 cpu_string_to_boolean(i64 addr);
+i64 cpu_composite_access(i64 addr, i64 type, i64 val);
+i64 cpu_list_index_access(i64 addr, i64 i);
+i64 cpu_dict_key_search(i64 addr, i64 search_key_addr);
+void cpu_list_index_update(i64 addr, i64 i, i64 r0, i64 r1, f64 fr1);
+void cpu_dict_key_update(i64 addr, i64 search_key_addr, i64 r0, i64 r1, f64 fr1);
 
-void cpu_eat_string(cpu *c);
-void cpu_eat_dynamic(cpu *c);
+i64 cpu_new_common(i64 type, i64 val);
+i64 cpu_new_string(i64 addr);
+void cpu_new_list(i64 addr, i64 new_addr);
+void cpu_new_dict(i64 addr, i64 new_addr);
 
-void cpu_pop_dynamic(cpu *c);
-void cpu_pop_common(cpu *c);
-void cpu_pop_string(cpu *c);
-void cpu_pop_list(cpu *c);
-void cpu_pop_dict(cpu *c);
+void debug(struct jit *jit);
 
-void cpu_list_index_access(cpu *c, i64 list_len, i64 index);
-void cpu_dict_key_search(cpu *c, i64 dict_len, i64 key_len);
+#define DYN_BINARY_ARITH(_fn, _ffn) \
+    /* Check if any of the operands are float */ \
+    jit_op* float_op_label_1 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+    jit_op* float_op_label_2 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
+\
+    /* It's an integer operation, do the operation */ \
+    _fn(_jit, R(1), R(1), R(5)); \
+    jit_op* float_op_label_5 = jit_jmpi(_jit, JIT_FORWARD); \
+\
+    /* It's a float operation. Set the jump point to dodge the integer operation TODO: reduce to one */ \
+    jit_patch(_jit, float_op_label_1); \
+    jit_patch(_jit, float_op_label_2); \
+\
+    /* Check if left-hand operand is a float and cast it to float if it's not a float */ \
+    jit_op* float_op_label_3 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+    jit_movi(_jit, R(0), V_FLOAT); \
+    jit_extr(_jit, FR(1), R(1)); \
+    jit_patch(_jit, float_op_label_3); \
+\
+    /* Check if right-hand operand is a float and cast it to float if it's not a float */ \
+    jit_op* float_op_label_4 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
+    jit_fmovr(_jit, FR(0), FR(1)); \
+    jit_extr(_jit, FR(2), R(5)); \
+    jit_patch(_jit, float_op_label_4); \
+\
+    /* Do the float operation */ \
+    _ffn(_jit, FR(1), FR(2), FR(1)); \
+\
+    /* Set the jump point to dodge the float operation */ \
+    jit_patch(_jit, float_op_label_5); \
 
-void debug(cpu *c, i64 pc_start);
-void print_stack(cpu *c);
-void print_heap(cpu *c);
+#define DYN_UNARY_ARITH(_fn, _ffn) \
+    /* Check if the operand is float */ \
+    jit_op* float_op_label_1 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+\
+    /* It's an integer operation, do the operation */ \
+    _fn(_jit, R(1), R(1)); \
+    jit_op* float_op_label_2 = jit_jmpi(_jit, JIT_FORWARD); \
+\
+    /* It's a float operation. Set the jump point to dodge the integer operation */ \
+    jit_patch(_jit, float_op_label_1); \
+\
+    /* Do the float operation */ \
+    _ffn(_jit, FR(1), FR(1)); \
+\
+    /* Set the jump point to dodge the float operation */ \
+    jit_patch(_jit, float_op_label_2); \
 
-void cpu_store(cpu *c, i64 heap, i64 value);
+#define DYN_BINARY_COMPARISON(_fn, _ffn) \
+    /* Check if any of the operands are float */ \
+    jit_op* float_op_label_1 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+    jit_op* float_op_label_2 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
+\
+    /* It's an integer operation, do the operation */ \
+    jit_movi(_jit, R(3), 1); \
+    jit_op* float_comp_label_true_int = _fn(_jit, JIT_FORWARD, R(1), R(5)); \
+    jit_movi(_jit, R(3), 0); \
+    jit_patch(_jit, float_comp_label_true_int); \
+    jit_op* float_op_label_5 = jit_jmpi(_jit, JIT_FORWARD); \
+\
+    /* It's a float operation. Set the jump point to dodge the integer operation TODO: reduce to one */ \
+    jit_patch(_jit, float_op_label_1); \
+    jit_patch(_jit, float_op_label_2); \
+\
+    /* Check if left-hand operand is a float and cast it to float if it's not a float */ \
+    jit_op* float_op_label_3 = jit_beqi(_jit, JIT_FORWARD, R(0), V_FLOAT); \
+    jit_movi(_jit, R(0), V_FLOAT); \
+    jit_extr(_jit, FR(1), R(1)); \
+    jit_patch(_jit, float_op_label_3); \
+\
+    /* Check if right-hand operand is a float and cast it to float if it's not a float */ \
+    jit_op* float_op_label_4 = jit_beqi(_jit, JIT_FORWARD, R(4), V_FLOAT); \
+    jit_fmovr(_jit, FR(0), FR(1)); \
+    jit_extr(_jit, FR(2), R(5)); \
+    jit_patch(_jit, float_op_label_4); \
+\
+    /* Do the float operation */ \
+    jit_movi(_jit, R(3), 1); \
+    jit_op* float_comp_label_true_float = _ffn(_jit, JIT_FORWARD, FR(1), FR(2)); \
+    jit_movi(_jit, R(3), 0); \
+    jit_patch(_jit, float_comp_label_true_float); \
+\
+    /* Set the jump point to dodge the float operation */ \
+    jit_patch(_jit, float_op_label_5); \
+    jit_movr(_jit, R(1), R(3)); \
 
 #endif

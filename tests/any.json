@@ -2370,22 +2370,6 @@
                     }
                 },
                 {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "c"
-                    }
-                },
-                {
                     "_type": "DelStmt",
                     "ident": {
                         "_type": "Ident",
@@ -3027,22 +3011,6 @@
                     "x": {
                         "_type": "Ident",
                         "name": "a"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "b"
-                    }
-                },
-                {
-                    "_type": "PrintStmt",
-                    "mod": null,
-                    "x": {
-                        "_type": "Ident",
-                        "name": "c"
                     }
                 },
                 {
