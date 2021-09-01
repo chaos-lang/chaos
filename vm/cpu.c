@@ -535,9 +535,9 @@ void execute(cpu *c)
     case DYN_COMPOSITE_ACCESS: {
         jit_movi(_jit, R(2), cpu_composite_access);
         jit_prepare(_jit);
-        jit_putargr(_jit, R(5));
-        jit_putargr(_jit, R(4));
-        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(c->inst->op1->reg));
+        jit_putargr(_jit, R(c->inst->op2->reg));
+        jit_putargr(_jit, R(c->inst->op3->reg));
         jit_callr(_jit, R(2));
         jit_retval(_jit, R(2));
         break;
@@ -601,6 +601,15 @@ void execute(cpu *c)
         jit_putargr(_jit, R(2));
         jit_callr(_jit, R(3));
         jit_retval(_jit, R(1));
+        break;
+    }
+    // Dynamic Looping
+    case DYN_GET_LIST_LEN: {
+        jit_movi(_jit, R(3), cpu_get_list_len);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(c->inst->op2->reg));
+        jit_callr(_jit, R(3));
+        jit_retval(_jit, R(c->inst->op1->reg));
         break;
     }
     // Debug
@@ -1194,6 +1203,12 @@ i64 cpu_string_to_boolean(i64 addr)
         return 0;
     else
         return 1;
+}
+
+i64 cpu_get_list_len(i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    return (i64)*len;
 }
 
 void debug(struct jit *jit)

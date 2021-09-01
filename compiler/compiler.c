@@ -649,7 +649,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
         case V_LIST:
         case V_DICT: {
-            push_inst_(program, DYN_COMPOSITE_ACCESS);
+            push_inst_r_r_r(program, DYN_COMPOSITE_ACCESS, R5, R4, R1);
             push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
             push_inst_r_i(program, MOVI, R3, sizeof(long long));
             push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
@@ -1301,13 +1301,14 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         // size_t len = 0;
         // bool is_dynamic = false;
+        Symbol* symbol_x = NULL;
 
         switch (decl->v.foreach_as_list->x->kind) {
         case CompositeLit_kind:
             // len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
             break;
         case Ident_kind: {
-            Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
+            symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
             if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_LIST, symbol_x->name);
             // is_dynamic = true;
@@ -1317,20 +1318,53 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         }
 
-        // Symbol* _symbol = store_list(
-        //     program,
-        //     NULL,
-        //     len,
-        //     is_dynamic
-        // );
+        push_inst_r_r(program, DYN_GET_LIST_LEN, R1, R10);
 
-        // Symbol* el_symbol = store_any(
-        //     program,
-        //     decl->v.foreach_as_list->el->v.ident->name
-        // );
+        i64 addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        i64 len_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_r_i(program, STR, R3, R1, sizeof(i64));
+
+        i64 loop_start = label_counter++;
+        push_inst_i(program, DECLARE_LABEL, loop_start);
+
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_r_i(program, LDR, R11, R3, sizeof(i64));
+        push_inst_r_r_r(program, SUBR, R11, R11, R1);
+
+        i64 loop_end = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 0, loop_end);
+
+        push_inst_r_r_i(program, SUBI, R1, R1, 1);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        push_inst_r_i(program, MOVI, R0, V_LIST);
+
+        push_inst_r_r_r(program, DYN_COMPOSITE_ACCESS, R10, R0, R11);
+        push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, FLDXR, R1, R2, R3, sizeof(double));
+
+        Symbol* el_symbol = store_any(
+            program,
+            decl->v.foreach_as_list->el->v.ident->name
+        );
 
         compileStmt(program, decl->v.foreach_as_list->body);
-        // removeSymbol(el_symbol);
+
+        removeSymbol(el_symbol);
+
+        push_inst_i(program, JMPI, loop_start);
+        push_inst_i(program, PATCH, loop_end);
         break;
     }
     case ForeachAsDict_kind: {

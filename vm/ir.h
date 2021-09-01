@@ -89,6 +89,8 @@ enum IROpCode {
     DYN_STR_TO_BOOL,
     // Dynamic Create New List
     DYN_NEW_LIST, DYN_NEW_DICT,
+    // Dynamic Looping
+    DYN_GET_LIST_LEN,
     // Debug
     DEBUG,
     HLT,
