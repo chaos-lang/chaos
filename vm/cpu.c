@@ -532,7 +532,7 @@ void execute(cpu *c)
         // Index offset is available in R(4)
         break;
     }
-    case DYN_COMPOSITE_ACCESS: {
+    case DYN_COMP_ACCESS: {
         jit_movi(_jit, R(2), cpu_composite_access);
         jit_prepare(_jit);
         jit_putargr(_jit, R(c->inst->op1->reg));
@@ -604,7 +604,7 @@ void execute(cpu *c)
         break;
     }
     // Dynamic Composite Helpers
-    case DYN_GET_COMPOSITE_LEN: {
+    case DYN_GET_COMP_SIZE: {
         jit_movi(_jit, R(3), cpu_get_composite_len);
         jit_prepare(_jit);
         jit_putargr(_jit, R(c->inst->op2->reg));

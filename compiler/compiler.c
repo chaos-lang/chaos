@@ -656,7 +656,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
         case V_LIST:
         case V_DICT: {
-            push_inst_r_r_r(program, DYN_COMPOSITE_ACCESS, R5, R4, R1);
+            push_inst_r_r_r(program, DYN_COMP_ACCESS, R5, R4, R1);
             push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
             push_inst_r_i(program, MOVI, R3, sizeof(long long));
             push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
@@ -1348,25 +1348,30 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         }
 
-        push_inst_r_r(program, DYN_GET_COMPOSITE_LEN, R1, R10);
-
         i64 addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
         push_inst_r_i(program, REF_ALLOCAI, R2, addr);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
+        push_inst_r_r(program, DYN_GET_COMP_SIZE, R1, R1);
+
         i64 len_addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
-        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        i64 len_bak_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_bak_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
         push_inst_r_r_i(program, STR, R3, R1, sizeof(i64));
 
         i64 loop_start = label_counter++;
         push_inst_i(program, DECLARE_LABEL, loop_start);
 
-        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
         push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
 
-        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
         push_inst_r_r_i(program, LDR, R11, R3, sizeof(i64));
         push_inst_r_r_r(program, SUBR, R11, R11, R1);
 
@@ -1377,8 +1382,10 @@ void compileDecl(KaosIR* program, Decl* decl)
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
         push_inst_r_i(program, MOVI, R0, V_LIST);
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
 
-        push_inst_r_r_r(program, DYN_COMPOSITE_ACCESS, R10, R0, R11);
+        push_inst_r_r_r(program, DYN_COMP_ACCESS, R1, R0, R11);
         push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
         push_inst_r_i(program, MOVI, R3, sizeof(long long));
         push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
@@ -1417,25 +1424,30 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         }
 
-        push_inst_r_r(program, DYN_GET_COMPOSITE_LEN, R1, R10);
-
         i64 addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
         push_inst_r_i(program, REF_ALLOCAI, R2, addr);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
+        push_inst_r_r(program, DYN_GET_COMP_SIZE, R1, R1);
+
         i64 len_addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
-        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        i64 len_bak_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_bak_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
         push_inst_r_r_i(program, STR, R3, R1, sizeof(i64));
 
         i64 loop_start = label_counter++;
         push_inst_i(program, DECLARE_LABEL, loop_start);
 
-        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
         push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
 
-        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
         push_inst_r_r_i(program, LDR, R11, R3, sizeof(i64));
         push_inst_r_r_r(program, SUBR, R11, R11, R1);
 
@@ -1447,8 +1459,10 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         // Don't worry `V_LIST` was intentional
         push_inst_r_i(program, MOVI, R0, V_LIST);
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
 
-        push_inst_r_r_r(program, DYN_COMPOSITE_ACCESS, R10, R0, R11);
+        push_inst_r_r_r(program, DYN_COMP_ACCESS, R1, R0, R11);
         push_inst_r_r_i(program, LDR, R11, R2, sizeof(long long));
         push_inst_r_i(program, MOVI, R3, sizeof(long long));
         push_inst_r_r_r_i(program, LDXR, R12, R2, R3, sizeof(long long));

@@ -376,8 +376,8 @@ void emitBytecode(cpu *c)
     case DYN_STR_INDEX_ACCESS:
         sprintf(str_inst, "%s", "DYN_STR_INDEX_ACCESS");
         break;
-    case DYN_COMPOSITE_ACCESS:
-        sprintf(str_inst, "%s addr: R(%d) R(%d) R(%d)", "DYN_COMPOSITE_ACCESS", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
+    case DYN_COMP_ACCESS:
+        sprintf(str_inst, "%s addr: R(%d) R(%d) R(%d)", "DYN_COMP_ACCESS", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     // Dynamic Index Update
     case DYN_LIST_INDEX_UPDATE:
@@ -398,8 +398,8 @@ void emitBytecode(cpu *c)
         sprintf(str_inst, "%s", "DYN_NEW_DICT");
         break;
     // Dynamic Composite Helpers
-    case DYN_GET_COMPOSITE_LEN:
-        sprintf(str_inst, "%s R(%d) R(%d)", "DYN_GET_COMPOSITE_LEN", c->inst->op1->reg, c->inst->op2->reg);
+    case DYN_GET_COMP_SIZE:
+        sprintf(str_inst, "%s R(%d) R(%d)", "DYN_GET_COMP_SIZE", c->inst->op1->reg, c->inst->op2->reg);
         break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");

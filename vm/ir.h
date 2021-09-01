@@ -81,7 +81,7 @@ enum IROpCode {
     // Dynamic Index Delete
     DYN_STR_INDEX_DELETE, DYN_LIST_INDEX_DELETE, DYN_DICT_KEY_DELETE,
     // Dynamic Index Access
-    DYN_STR_INDEX_ACCESS, DYN_COMPOSITE_ACCESS,
+    DYN_STR_INDEX_ACCESS, DYN_COMP_ACCESS,
     // Dynamic Index Update
     DYN_LIST_INDEX_UPDATE, DYN_DICT_KEY_UPDATE,
     // Dynamic Type Conversion
@@ -90,7 +90,7 @@ enum IROpCode {
     // Dynamic Create New List
     DYN_NEW_LIST, DYN_NEW_DICT,
     // Dynamic Composite Helpers
-    DYN_GET_COMPOSITE_LEN,
+    DYN_GET_COMP_SIZE,
     // Debug
     DEBUG,
     HLT,
