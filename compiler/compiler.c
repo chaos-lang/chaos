@@ -454,6 +454,13 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_f(program, FMOV, R1 + register_offset, expr->v.basic_lit->value.f);
             break;
         case V_STRING: {
+            /*
+              0      8                     size+8       size+9
+              +------+ +-----------------+ +-----------------+
+              | size | |     string      | | null-terminator |
+              +------+ +-----------------+ +-----------------+
+               size_t     size * char             char
+            */
             size_t len = strlen(expr->v.basic_lit->value.s);
             i64 addr = stack_counter++;
             push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char) + sizeof(size_t));
@@ -702,6 +709,15 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         break;
     }
     case CompositeLit_kind: {
+        /*
+          0      8              size+8
+          +------+ +-----------------+
+          | size | |    elements     |
+          +------+ +-----------------+
+           size_t      size * i64
+                        ref (list)
+                    key-value (dict)
+        */
         ExprList* expr_list = expr->v.composite_lit->elts;
         enum ValueType value_type = expr->v.composite_lit->type->kind == ListType_kind ? V_LIST : V_DICT;
         i64 list_addr = stack_counter++;
@@ -768,6 +784,21 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         break;
     }
     case KeyValueExpr_kind: {
+        /*
+          0      8     16       24      32
+          +------+-----+  +------+-------+
+          | type | ref |  | type | value |
+          +------+-----+  +------+-------+
+            i64    i64      i64   i64/f64
+               key             value
+          ________________________________
+
+          0      8      16
+          +------+------+
+          | key | value |
+          +------+------+
+            i64    i64
+        */
         i64 key_addr = stack_counter++;
         compileExpr(program, expr->v.key_value_expr->key);
         push_inst_i_i(program, ALLOCAI, key_addr, 2 * sizeof(long long));
@@ -1301,14 +1332,13 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         // size_t len = 0;
         // bool is_dynamic = false;
-        Symbol* symbol_x = NULL;
 
         switch (decl->v.foreach_as_list->x->kind) {
         case CompositeLit_kind:
             // len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
             break;
         case Ident_kind: {
-            symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
+            Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
             if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_LIST, symbol_x->name);
             // is_dynamic = true;
@@ -1318,7 +1348,7 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         }
 
-        push_inst_r_r(program, DYN_GET_LIST_LEN, R1, R10);
+        push_inst_r_r(program, DYN_GET_COMPOSITE_LEN, R1, R10);
 
         i64 addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
@@ -1387,27 +1417,68 @@ void compileDecl(KaosIR* program, Decl* decl)
             break;
         }
 
-        // Symbol* _symbol = store_dict(
-        //     program,
-        //     NULL,
-        //     len,
-        //     is_dynamic
-        // );
+        push_inst_r_r(program, DYN_GET_COMPOSITE_LEN, R1, R10);
 
-        // Symbol* key_symbol = store_any(
-        //     program,
-        //     decl->v.foreach_as_dict->key->v.ident->name
-        // );
+        i64 addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
-        // Symbol* value_symbol = store_any(
-        //     program,
-        //     decl->v.foreach_as_dict->value->v.ident->name
-        // );
+        i64 len_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_r_i(program, STR, R3, R1, sizeof(i64));
+
+        i64 loop_start = label_counter++;
+        push_inst_i(program, DECLARE_LABEL, loop_start);
+
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_addr);
+        push_inst_r_r_i(program, LDR, R11, R3, sizeof(i64));
+        push_inst_r_r_r(program, SUBR, R11, R11, R1);
+
+        i64 loop_end = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 0, loop_end);
+
+        push_inst_r_r_i(program, SUBI, R1, R1, 1);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        // Don't worry `V_LIST` was intentional
+        push_inst_r_i(program, MOVI, R0, V_LIST);
+
+        push_inst_r_r_r(program, DYN_COMPOSITE_ACCESS, R10, R0, R11);
+        push_inst_r_r_i(program, LDR, R11, R2, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R12, R2, R3, sizeof(long long));
+
+        push_inst_r_r_i(program, LDR, R0, R11, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R1, R11, R3, sizeof(long long));
+
+        Symbol* key_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->key->v.ident->name
+        );
+
+        push_inst_r_r_i(program, LDR, R0, R12, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R1, R12, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, FLDXR, R1, R12, R3, sizeof(double));
+
+        Symbol* value_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->value->v.ident->name
+        );
 
         compileStmt(program, decl->v.foreach_as_dict->body);
 
-        // removeSymbol(key_symbol);
-        // removeSymbol(value_symbol);
+        removeSymbol(key_symbol);
+        removeSymbol(value_symbol);
+
+        push_inst_i(program, JMPI, loop_start);
+        push_inst_i(program, PATCH, loop_end);
         break;
     }
     case FuncDecl_kind: {
@@ -2176,6 +2247,13 @@ void shift_registers(KaosIR* program)
 
 Symbol* store_bool(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8       16
+      +------+-------+
+      | type | value |
+      +------+-------+
+        i64     i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2196,6 +2274,13 @@ Symbol* store_bool(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_int(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8       16
+      +------+-------+
+      | type | value |
+      +------+-------+
+        i64     i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2216,6 +2301,13 @@ Symbol* store_int(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_float(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8       16
+      +------+-------+
+      | type | value |
+      +------+-------+
+        i64     f64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2236,6 +2328,13 @@ Symbol* store_float(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_string(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2256,6 +2355,13 @@ Symbol* store_string(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
@@ -2279,6 +2385,13 @@ Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic)
 
 Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_DICT, value, V_DICT);
@@ -2302,6 +2415,13 @@ Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
 
 Symbol* store_any(KaosIR* program, char *name)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_ANY, value, V_ANY);

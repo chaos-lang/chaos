@@ -603,9 +603,9 @@ void execute(cpu *c)
         jit_retval(_jit, R(1));
         break;
     }
-    // Dynamic Looping
-    case DYN_GET_LIST_LEN: {
-        jit_movi(_jit, R(3), cpu_get_list_len);
+    // Dynamic Composite Helpers
+    case DYN_GET_COMPOSITE_LEN: {
+        jit_movi(_jit, R(3), cpu_get_composite_len);
         jit_prepare(_jit);
         jit_putargr(_jit, R(c->inst->op2->reg));
         jit_callr(_jit, R(3));
@@ -1205,7 +1205,7 @@ i64 cpu_string_to_boolean(i64 addr)
         return 1;
 }
 
-i64 cpu_get_list_len(i64 addr)
+i64 cpu_get_composite_len(i64 addr)
 {
     size_t* len = (size_t*)addr;
     return (i64)*len;

@@ -397,9 +397,9 @@ void emitBytecode(cpu *c)
     case DYN_NEW_DICT:
         sprintf(str_inst, "%s", "DYN_NEW_DICT");
         break;
-    // Dynamic Looping
-    case DYN_GET_LIST_LEN:
-        sprintf(str_inst, "%s R(%d) R(%d)", "DYN_GET_LIST_LEN", c->inst->op1->reg, c->inst->op2->reg);
+    // Dynamic Composite Helpers
+    case DYN_GET_COMPOSITE_LEN:
+        sprintf(str_inst, "%s R(%d) R(%d)", "DYN_GET_COMPOSITE_LEN", c->inst->op1->reg, c->inst->op2->reg);
         break;
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
