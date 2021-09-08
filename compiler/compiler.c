@@ -57,6 +57,8 @@ KaosIR* compile(ASTRoot* ast_root)
     StmtList* stmt_list = ast_root->files[0]->stmt_list;
     current_file_index = 0;
 
+    startFunctionNew(__KAOS_MAIN_FUNCTION__);
+
     // Compile other statements in the first parsed file
     if (stmt_list->stmt_count > 0)
         ast_ref = stmt_list->stmts[stmt_list->stmt_count - 1]->ast;
@@ -71,6 +73,9 @@ KaosIR* compile(ASTRoot* ast_root)
             compileStmt(program, stmt);
     }
     push_inst_i(program, RETI, 0);
+
+    function_mode->is_compiled = true;
+    endFunction();
 
     push_inst_(program, HLT);
     program->hlt_count++;
@@ -2626,6 +2631,17 @@ void declare_functions(ASTRoot* ast_root, KaosIR* program)
         current_file_index = i;
         StmtList* stmt_list = file->stmt_list;
         pushModuleStack(file->module_path, file->module);
+
+        if (i == 0) {
+            function_mode = declareFunction(
+                __KAOS_MAIN_FUNCTION__,
+                file->module,
+                file->module_path,
+                file->context,
+                K_VOID,
+                K_VOID
+            );
+        }
 
         // Declare functions
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {
