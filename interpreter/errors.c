@@ -144,14 +144,8 @@ void throw_error_base(
     case E_BREAK_CALL_OUTSIDE_LOOP:
         sprintf(error_msg, "Call to a function with `break` from outside a loop: %s", str1);
         break;
-    case E_CONTINUE_CALL_OUTSIDE_LOOP:
-        sprintf(error_msg, "Call to a function with `continue` from outside a loop: %s", str1);
-        break;
     case E_BREAK_CALL_MULTILINE_LOOP:
         sprintf(error_msg, "Call to a function with `break` from a multiline loop: %s", str1);
-        break;
-    case E_CONTINUE_CALL_MULTILINE_LOOP:
-        sprintf(error_msg, "Call to a function with `continue` from a multiline loop: %s", str1);
         break;
     case E_STACK_OVERFLOW:
         sprintf(error_msg, "Stack overflow! Report this error to https://github.com/chaos-lang/chaos/issues");

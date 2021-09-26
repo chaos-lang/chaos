@@ -432,9 +432,6 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         push_inst_(program, DYN_BREAK);
         break;
     }
-    case ContinueStmt_kind: {
-        break;
-    }
     default:
         break;
     }

@@ -235,13 +235,6 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         break;
-    case ContinueStmt_kind:
-        printf(
-            "%*c\"_type\": \"ContinueStmt\"\n",
-            indent,
-            __KAOS_INDENT_CHAR__
-        );
-        break;
     default:
         break;
     }

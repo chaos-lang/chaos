@@ -172,7 +172,6 @@ enum StmtKind {
     FunctionTableStmt_kind=10,
     BlockStmt_kind=11,
     BreakStmt_kind=12,
-    ContinueStmt_kind=13,
 };
 
 typedef struct Stmt {
@@ -190,7 +189,6 @@ typedef struct Stmt {
         struct FunctionTableStmt* function_table_stmt;
         struct BlockStmt* block_stmt;
         struct BreakStmt* break_stmt;
-        struct ContinueStmt* continue_stmt;
     } v;
 } Stmt;
 
@@ -246,10 +244,6 @@ typedef struct BlockStmt {
 typedef struct BreakStmt {
     enum StmtKind kind;
 } BreakStmt;
-
-typedef struct ContinueStmt {
-    enum StmtKind kind;
-} ContinueStmt;
 
 
 // Spec
@@ -473,7 +467,6 @@ Stmt* delStmt(Expr* ident, int lineno);
 Stmt* exitStmt(Expr* x, int lineno);
 Stmt* functionTableStmt(int lineno);
 Stmt* breakStmt(int lineno);
-Stmt* continueStmt(int lineno);
 Stmt* blockStmt(StmtList* stmt_list, int lineno);
 Spec* buildSpec(enum SpecKind kind, int lineno);
 Spec* typeSpec(enum Type type, Spec* sub_type_spec, int lineno);

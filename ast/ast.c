@@ -355,15 +355,6 @@ Stmt* breakStmt(int lineno)
     return stmt;
 }
 
-Stmt* continueStmt(int lineno)
-{
-    ContinueStmt* continue_stmt = (struct ContinueStmt*)calloc(1, sizeof(ContinueStmt));
-    continue_stmt->kind = ContinueStmt_kind;
-    Stmt* stmt = buildStmt(ContinueStmt_kind, lineno);
-    stmt->v.continue_stmt = continue_stmt;
-    return stmt;
-}
-
 
 // Spec
 

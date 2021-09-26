@@ -284,6 +284,5 @@ default:
 "def"                           {shell_indicator_block_counter++; return T_DEF;}
 "import"                        {return T_IMPORT;}
 "break"                         {return T_BREAK;}
-"continue"                      {return T_CONTINUE;}
 [a-zA-Z_][a-zA-Z0-9_]*          {yylval.sval=strdup(yytext); return T_VAR;}
 %%

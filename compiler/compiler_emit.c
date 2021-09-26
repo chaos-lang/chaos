@@ -401,7 +401,7 @@ void emitBytecode(cpu *c)
     case DYN_GET_COMP_SIZE:
         sprintf(str_inst, "%s R(%d) R(%d)", "DYN_GET_COMP_SIZE", c->inst->op1->reg, c->inst->op2->reg);
         break;
-    // Dynamic Loop Break/Continue
+    // Dynamic Loop Break
     case DYN_BREAK:
         sprintf(str_inst, "%s", "DYN_BREAK");
         break;

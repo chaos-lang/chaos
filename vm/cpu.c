@@ -613,7 +613,7 @@ void execute(cpu *c)
         jit_retval(_jit, R(c->inst->op1->reg));
         break;
     }
-    // Dynamic Loop Break/Continue
+    // Dynamic Loop Break
     case DYN_BREAK: {
         jit_movi(_jit, R(2), cpu_set_break_current_loop);
         jit_prepare(_jit);

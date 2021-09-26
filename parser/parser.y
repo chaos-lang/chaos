@@ -74,7 +74,7 @@ extern unsigned long long shell_indicator_block_counter;
 %token T_NEWLINE T_EXIT
 %token T_PRINT T_ECHO T_PRETTY
 %token T_VAR_BOOL T_VAR_NUMBER T_VAR_STRING T_VAR_LIST T_VAR_DICT T_VAR_ANY T_NULL
-%token T_DEL T_RETURN T_VOID T_DEFAULT T_BREAK T_CONTINUE
+%token T_DEL T_RETURN T_VOID T_DEFAULT T_BREAK
 %token T_SYMBOL_TABLE T_FUNCTION_TABLE
 %token T_TIMES_DO T_FOREACH T_AS T_END T_DEF T_IMPORT T_FROM T_BACKSLASH T_INFINITE
 %token T_EQL T_NEQ T_GTR T_LSS T_GEQ T_LEQ
@@ -91,7 +91,7 @@ extern unsigned long long shell_indicator_block_counter;
 %type<expr> selector_expr call_expr decision_expr default_expr
 %type<stmt> stmt assign_stmt print_stmt echo_stmt return_stmt expr_stmt decl_stmt del_stmt exit_stmt
 %type<stmt> function_table_stmt
-%type<stmt> block_stmt break_stmt continue_stmt
+%type<stmt> block_stmt break_stmt
 %type<spec> type_spec sub_type_spec pretty_spec import parent_dir_spec asterisk_spec
 %type<spec> field_spec optional_field_spec field_list_spec optional_field_list_spec
 %type<spec> decision_block
@@ -437,9 +437,6 @@ decision_expr:
     | bool_expr T_COLON break_stmt {
         $$ = decisionExpr($1, $3, yylineno);
     }
-    | bool_expr T_COLON continue_stmt {
-        $$ = decisionExpr($1, $3, yylineno);
-    }
 ;
 
 default_expr:
@@ -450,9 +447,6 @@ default_expr:
         $$ = defaultExpr($3, yylineno);
     }
     | T_DEFAULT T_COLON break_stmt {
-        $$ = defaultExpr($3, yylineno);
-    }
-    | T_DEFAULT T_COLON continue_stmt {
         $$ = defaultExpr($3, yylineno);
     }
 ;
@@ -614,12 +608,6 @@ block_stmt:
 break_stmt:
     T_BREAK {
         $$ = breakStmt(yylineno);
-    }
-;
-
-continue_stmt:
-    T_CONTINUE {
-        $$ = continueStmt(yylineno);
     }
 ;
 
