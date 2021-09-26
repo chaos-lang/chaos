@@ -1118,6 +1118,9 @@ char *getToken(enum Token tok)
     case INFINITE_tok:
         return TT_INFINITE;
         break;
+    case BREAK_tok:
+        return TT_BREAK;
+        break;
     default:
         break;
     }

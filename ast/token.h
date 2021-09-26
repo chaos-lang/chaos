@@ -76,6 +76,7 @@
 #define TT_AS "as"
 #define TT_FROM "from"
 #define TT_INFINITE "INFINITE"
+#define TT_BREAK "break"
 
 enum Token {
     ILLEGAL_tok,
@@ -131,6 +132,7 @@ enum Token {
     AS_tok,
     FROM_tok,
     INFINITE_tok,
+    BREAK_tok,
 };
 
 #endif
