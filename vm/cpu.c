@@ -40,6 +40,7 @@ i64* ast_stack = NULL;
 i64 ast_stack_p = 0;
 
 bool temp_disable_debug = false;
+bool break_current_loop = false;
 
 cpu *new_cpu(KaosIR* program, unsigned short debug_level)
 {
@@ -610,6 +611,20 @@ void execute(cpu *c)
         jit_putargr(_jit, R(c->inst->op2->reg));
         jit_callr(_jit, R(3));
         jit_retval(_jit, R(c->inst->op1->reg));
+        break;
+    }
+    // Dynamic Loop Break/Continue
+    case DYN_BREAK: {
+        jit_movi(_jit, R(2), cpu_set_break_current_loop);
+        jit_prepare(_jit);
+        jit_callr(_jit, R(2));
+        break;
+    }
+    case DYN_BREAK_HANDLE: {
+        jit_movi(_jit, R(2), cpu_get_break_current_loop);
+        jit_prepare(_jit);
+        jit_callr(_jit, R(2));
+        jit_retval(_jit, R(1));
         break;
     }
     // Debug
@@ -1209,6 +1224,21 @@ i64 cpu_get_composite_len(i64 addr)
 {
     size_t* len = (size_t*)addr;
     return (i64)*len;
+}
+
+void cpu_set_break_current_loop()
+{
+    break_current_loop = true;
+}
+
+i64 cpu_get_break_current_loop()
+{
+    i64 val = 0;
+    if (break_current_loop) {
+        val = 1;
+        break_current_loop = false;
+    }
+    return val;
 }
 
 void debug(struct jit *jit)

@@ -429,6 +429,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         break;
     }
     case BreakStmt_kind: {
+        push_inst_(program, DYN_BREAK);
         break;
     }
     case ContinueStmt_kind: {
@@ -1328,8 +1329,13 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         compileStmt(program, decl->v.times_do->body);
 
+        push_inst_(program, DYN_BREAK_HANDLE);
+        i64 loop_end_break = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 1, loop_end_break);
+
         push_inst_i(program, JMPI, loop_start);
         push_inst_i(program, PATCH, loop_end);
+        push_inst_i(program, PATCH, loop_end_break);
         break;
     }
     case ForeachAsList_kind: {
@@ -1405,8 +1411,13 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         removeSymbol(el_symbol);
 
+        push_inst_(program, DYN_BREAK_HANDLE);
+        i64 loop_end_break = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 1, loop_end_break);
+
         push_inst_i(program, JMPI, loop_start);
         push_inst_i(program, PATCH, loop_end);
+        push_inst_i(program, PATCH, loop_end_break);
         break;
     }
     case ForeachAsDict_kind: {
@@ -1496,8 +1507,13 @@ void compileDecl(KaosIR* program, Decl* decl)
         removeSymbol(key_symbol);
         removeSymbol(value_symbol);
 
+        push_inst_(program, DYN_BREAK_HANDLE);
+        i64 loop_end_break = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 1, loop_end_break);
+
         push_inst_i(program, JMPI, loop_start);
         push_inst_i(program, PATCH, loop_end);
+        push_inst_i(program, PATCH, loop_end_break);
         break;
     }
     case FuncDecl_kind: {

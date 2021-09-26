@@ -91,6 +91,8 @@ enum IROpCode {
     DYN_NEW_LIST, DYN_NEW_DICT,
     // Dynamic Composite Helpers
     DYN_GET_COMP_SIZE,
+    // Dynamic Loop Break/Continue
+    DYN_BREAK, DYN_BREAK_HANDLE,
     // Debug
     DEBUG,
     HLT,
