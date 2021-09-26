@@ -60,6 +60,7 @@
 #define TT_INC "++"
 #define TT_DEC "--"
 #define TT_COLON ":"
+#define TT_ARROW "->"
 #define TT_EXIT "exit"
 #define TT_PRINT "print"
 #define TT_ECHO "echo"
@@ -116,6 +117,7 @@ enum Token {
     INC_tok,
     DEC_tok,
     COLON_tok,
+    ARROW_tok,
     EXIT_tok,
     PRINT_tok,
     ECHO_tok,

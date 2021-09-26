@@ -1070,6 +1070,9 @@ char *getToken(enum Token tok)
     case COLON_tok:
         return TT_COLON;
         break;
+    case ARROW_tok:
+        return TT_ARROW;
+        break;
     case EXIT_tok:
         return TT_EXIT;
         break;

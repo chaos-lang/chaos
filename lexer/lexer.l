@@ -238,6 +238,7 @@ default:
 "//".*"\n"                      {yylineno++; return T_NEWLINE;}
 "#".*"\n"                       {yylineno++; return T_NEWLINE;}
 ":"                             {return T_COLON;}
+"->"                            {return T_ARROW;}
 "exit"                          {return T_EXIT;}
 "quit"                          {return T_EXIT;}
 "print"                         {return T_PRINT;}
