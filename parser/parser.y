@@ -690,19 +690,31 @@ func_decl:
 
 times_do_decl:
     expr T_TIMES_DO T_ARROW call_expr {
-        $$ = timesDo($1, $4, yylineno);
+        $$ = timesDo($1, NULL, $4, yylineno);
+    }
+    | expr T_TIMES_DO ident T_ARROW call_expr {
+        $$ = timesDo($1, $3, $5, yylineno);
+    }
+    | expr T_TIMES_DO T_AS ident T_ARROW call_expr {
+        $$ = timesDo($1, $4, $6, yylineno);
     }
 ;
 
 foreach_as_list_decl:
     T_FOREACH expr T_AS ident T_ARROW call_expr {
-        $$ = foreachAsList($2, $4, $6, yylineno);
+        $$ = foreachAsList($2, NULL, $4, $6, yylineno);
+    }
+    | T_FOREACH expr T_AS ident T_COMMA ident T_ARROW call_expr {
+        $$ = foreachAsList($2, $4, $6, $8, yylineno);
     }
 ;
 
 foreach_as_dict_decl:
     T_FOREACH expr T_AS ident T_COLON ident T_ARROW call_expr {
-        $$ = foreachAsDict($2, $4, $6, $8, yylineno);
+        $$ = foreachAsDict($2, NULL, $4, $6, $8, yylineno);
+    }
+    | T_FOREACH expr T_AS ident T_COMMA ident T_COLON ident T_ARROW call_expr {
+        $$ = foreachAsDict($2, $4, $6, $8, $10, yylineno);
     }
 ;
 

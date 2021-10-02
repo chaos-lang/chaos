@@ -1301,12 +1301,22 @@ void compileDecl(KaosIR* program, Decl* decl)
         break;
     }
     case TimesDo_kind: {
+        Symbol* index_symbol = NULL;
+        i64 len_addr = 0;
+
         compileExpr(program, decl->v.times_do->x);
 
         i64 addr = stack_counter++;
         push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
         push_inst_r_i(program, REF_ALLOCAI, R2, addr);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.times_do->index != NULL) {
+            len_addr = stack_counter++;
+            push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
+            push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+            push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+        }
 
         i64 loop_start = label_counter++;
         push_inst_i(program, DECLARE_LABEL, loop_start);
@@ -1320,7 +1330,24 @@ void compileDecl(KaosIR* program, Decl* decl)
         push_inst_r_r_i(program, SUBI, R1, R1, 1);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
+        if (decl->v.times_do->index != NULL) {
+            push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+            push_inst_r_r_i(program, LDR, R3, R2, sizeof(i64));
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
+            push_inst_r_r_r(program, SUBR, R1, R3, R1);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+
+            index_symbol = store_any(
+                program,
+                decl->v.times_do->index->v.ident->name
+            );
+        }
+
         compileExpr(program, decl->v.times_do->call_expr);
+
+        if (decl->v.times_do->index != NULL) {
+            removeSymbol(index_symbol);
+        }
 
         push_inst_(program, DYN_BREAK_HANDLE);
         i64 loop_end_break = op_counter++;
@@ -1332,20 +1359,15 @@ void compileDecl(KaosIR* program, Decl* decl)
         break;
     }
     case ForeachAsList_kind: {
+        Symbol* index_symbol = NULL;
+
         compileExpr(program, decl->v.foreach_as_list->x);
 
-        // size_t len = 0;
-        // bool is_dynamic = false;
-
         switch (decl->v.foreach_as_list->x->kind) {
-        case CompositeLit_kind:
-            // len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
-            break;
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
             if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_LIST, symbol_x->name);
-            // is_dynamic = true;
             break;
         }
         default:
@@ -1384,6 +1406,18 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         push_inst_r_r_i(program, SUBI, R1, R1, 1);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.foreach_as_list->index != NULL) {
+            push_inst_r_r_i(program, LDR, R3, R3, sizeof(i64));
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
+            push_inst_r_r_r(program, SUBR, R1, R3, R1);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+
+            index_symbol = store_any(
+                program,
+                decl->v.foreach_as_list->index->v.ident->name
+            );
+        }
 
         push_inst_r_i(program, MOVI, R0, V_LIST);
         push_inst_r_i(program, REF_ALLOCAI, R2, addr);
@@ -1402,6 +1436,10 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         compileExpr(program, decl->v.foreach_as_list->call_expr);
 
+        if (decl->v.foreach_as_list->index != NULL) {
+            removeSymbol(index_symbol);
+        }
+
         removeSymbol(el_symbol);
 
         push_inst_(program, DYN_BREAK_HANDLE);
@@ -1414,19 +1452,15 @@ void compileDecl(KaosIR* program, Decl* decl)
         break;
     }
     case ForeachAsDict_kind: {
+        Symbol* index_symbol = NULL;
+
         compileExpr(program, decl->v.foreach_as_dict->x);
-        // size_t len = 0;
-        // bool is_dynamic = false;
 
         switch (decl->v.foreach_as_dict->x->kind) {
-        case CompositeLit_kind:
-            // len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
-            break;
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(decl->v.foreach_as_dict->x->v.ident->name);
             if (symbol_x->type != K_DICT && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_DICT, symbol_x->name);
-            // is_dynamic = true;
             break;
         }
         default:
@@ -1465,6 +1499,18 @@ void compileDecl(KaosIR* program, Decl* decl)
 
         push_inst_r_r_i(program, SUBI, R1, R1, 1);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.foreach_as_dict->index != NULL) {
+            push_inst_r_r_i(program, LDR, R3, R3, sizeof(i64));
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
+            push_inst_r_r_r(program, SUBR, R1, R3, R1);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+
+            index_symbol = store_any(
+                program,
+                decl->v.foreach_as_dict->index->v.ident->name
+            );
+        }
 
         // Don't worry `V_LIST` was intentional
         push_inst_r_i(program, MOVI, R0, V_LIST);
@@ -1496,6 +1542,10 @@ void compileDecl(KaosIR* program, Decl* decl)
         );
 
         compileExpr(program, decl->v.foreach_as_dict->call_expr);
+
+        if (decl->v.foreach_as_dict->index != NULL) {
+            removeSymbol(index_symbol);
+        }
 
         removeSymbol(key_symbol);
         removeSymbol(value_symbol);

@@ -190,3 +190,28 @@ void def loop19()
 end
 
 3 + 5 times do -> loop19()
+
+
+// Index variable in loops
+void def loop20(num i)
+    print i
+    print "hey"
+end
+
+void def loop21(num i, num x)
+    print i
+    print x
+end
+
+void def loop22(num i, str key, str val)
+    print i
+    print key
+    print val
+end
+
+3 times do i -> loop20(i)
+3 times do as i -> loop20(i)
+
+foreach [1, 2, 3] as i, x -> loop21(i, x)
+
+foreach {'a': 'foo', 'b': 'bar', 'c': 'baz'} as i, key : val -> loop22(i, key, val)
