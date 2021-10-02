@@ -172,7 +172,6 @@ enum StmtKind {
     FunctionTableStmt_kind=10,
     BlockStmt_kind=11,
     BreakStmt_kind=12,
-    ContinueStmt_kind=13,
 };
 
 typedef struct Stmt {
@@ -190,7 +189,6 @@ typedef struct Stmt {
         struct FunctionTableStmt* function_table_stmt;
         struct BlockStmt* block_stmt;
         struct BreakStmt* break_stmt;
-        struct ContinueStmt* continue_stmt;
     } v;
 } Stmt;
 
@@ -246,10 +244,6 @@ typedef struct BlockStmt {
 typedef struct BreakStmt {
     enum StmtKind kind;
 } BreakStmt;
-
-typedef struct ContinueStmt {
-    enum StmtKind kind;
-} ContinueStmt;
 
 
 // Spec
@@ -376,20 +370,23 @@ typedef struct VarDecl {
 
 typedef struct TimesDo {
     struct Expr* x;
-    struct Stmt* body;
+    struct Expr* index;
+    struct Expr* call_expr;
 } TimesDo;
 
 typedef struct ForeachAsList {
     struct Expr* x;
+    struct Expr* index;
     struct Expr* el;
-    struct Stmt* body;
+    struct Expr* call_expr;
 } ForeachAsList;
 
 typedef struct ForeachAsDict {
     struct Expr* x;
+    struct Expr* index;
     struct Expr* key;
     struct Expr* value;
-    struct Stmt* body;
+    struct Expr* call_expr;
 } ForeachAsDict;
 
 typedef struct FuncDecl {
@@ -473,7 +470,6 @@ Stmt* delStmt(Expr* ident, int lineno);
 Stmt* exitStmt(Expr* x, int lineno);
 Stmt* functionTableStmt(int lineno);
 Stmt* breakStmt(int lineno);
-Stmt* continueStmt(int lineno);
 Stmt* blockStmt(StmtList* stmt_list, int lineno);
 Spec* buildSpec(enum SpecKind kind, int lineno);
 Spec* typeSpec(enum Type type, Spec* sub_type_spec, int lineno);
@@ -490,9 +486,9 @@ Spec* optionalFieldSpec(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 Spec* decisionBlock(ExprList* decisions, int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
-Decl* timesDo(Expr* x, Stmt* body, int lineno);
-Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno);
-Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno);
+Decl* timesDo(Expr* x, Expr* index, Expr* call_expr, int lineno);
+Decl* foreachAsList(Expr* x, Expr* index, Expr* el, Expr* call_expr, int lineno);
+Decl* foreachAsDict(Expr* x, Expr* index, Expr* key, Expr* value, Expr* call_expr, int lineno);
 Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno);
 void initASTRoot();
 void addFile();

@@ -57,6 +57,8 @@ KaosIR* compile(ASTRoot* ast_root)
     StmtList* stmt_list = ast_root->files[0]->stmt_list;
     current_file_index = 0;
 
+    startFunctionNew(__KAOS_MAIN_FUNCTION__);
+
     // Compile other statements in the first parsed file
     if (stmt_list->stmt_count > 0)
         ast_ref = stmt_list->stmts[stmt_list->stmt_count - 1]->ast;
@@ -71,6 +73,9 @@ KaosIR* compile(ASTRoot* ast_root)
             compileStmt(program, stmt);
     }
     push_inst_i(program, RETI, 0);
+
+    function_mode->is_compiled = true;
+    endFunction();
 
     push_inst_(program, HLT);
     program->hlt_count++;
@@ -424,9 +429,7 @@ void compileStmt(KaosIR* program, Stmt* stmt)
         break;
     }
     case BreakStmt_kind: {
-        break;
-    }
-    case ContinueStmt_kind: {
+        push_inst_(program, DYN_BREAK);
         break;
     }
     default:
@@ -442,18 +445,25 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_BOOL);
-            push_inst_r_i(program, MOVI, R1 + register_offset, expr->v.basic_lit->value.b ? 1 : 0);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
+            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_INT);
-            push_inst_r_i(program, MOVI, R1 + register_offset, expr->v.basic_lit->value.i);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_FLOAT);
-            push_inst_r_f(program, FMOV, R1 + register_offset, expr->v.basic_lit->value.f);
+            push_inst_r_i(program, MOVI, R0, V_FLOAT);
+            push_inst_r_f(program, FMOV, R1, expr->v.basic_lit->value.f);
             break;
         case V_STRING: {
+            /*
+              0      8                     size+8       size+9
+              +------+ +-----------------+ +-----------------+
+              | size | |     string      | | null-terminator |
+              +------+ +-----------------+ +-----------------+
+               size_t     size * char             char
+            */
             size_t len = strlen(expr->v.basic_lit->value.s);
             i64 addr = stack_counter++;
             push_inst_i_i(program, ALLOCAI, addr, (len + 1) * sizeof(char) + sizeof(size_t));
@@ -472,7 +482,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_i(program, MOVI, R3, '\0');
             push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
 
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_STRING);
+            push_inst_r_i(program, MOVI, R0, V_STRING);
             break;
         }
         default:
@@ -649,7 +659,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         }
         case V_LIST:
         case V_DICT: {
-            push_inst_(program, DYN_COMPOSITE_ACCESS);
+            push_inst_r_r_r(program, DYN_COMP_ACCESS, R5, R4, R1);
             push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
             push_inst_r_i(program, MOVI, R3, sizeof(long long));
             push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
@@ -702,6 +712,15 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         break;
     }
     case CompositeLit_kind: {
+        /*
+          0      8              size+8
+          +------+ +-----------------+
+          | size | |    elements     |
+          +------+ +-----------------+
+           size_t      size * i64
+                        ref (list)
+                    key-value (dict)
+        */
         ExprList* expr_list = expr->v.composite_lit->elts;
         enum ValueType value_type = expr->v.composite_lit->type->kind == ListType_kind ? V_LIST : V_DICT;
         i64 list_addr = stack_counter++;
@@ -768,6 +787,21 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
         break;
     }
     case KeyValueExpr_kind: {
+        /*
+          0      8     16       24      32
+          +------+-----+  +------+-------+
+          | type | ref |  | type | value |
+          +------+-----+  +------+-------+
+            i64    i64      i64   i64/f64
+               key             value
+          ________________________________
+
+          0      8      16
+          +------+------+
+          | key | value |
+          +------+------+
+            i64    i64
+        */
         i64 key_addr = stack_counter++;
         compileExpr(program, expr->v.key_value_expr->key);
         push_inst_i_i(program, ALLOCAI, key_addr, 2 * sizeof(long long));
@@ -826,16 +860,16 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             scope_override = scope_override_backup;
         }
 
-        for (unsigned long i = 1; i < expr_list->expr_count + 1; i++) {
-            register_offset = (i - 1) * 2;
+        for (unsigned long i = 0; i < expr_list->expr_count; i++) {
+            register_offset = i * 2;
 
-            Expr* expr = expr_list->exprs[expr_list->expr_count - i];
+            Expr* expr = expr_list->exprs[i];
             enum ValueType value_type = compileExpr(program, expr) - 1;
-            Symbol* parameter = function->parameters[i - 1];
+            Symbol* parameter = function->parameters[i];
 
             if (function->should_inline) {
                 // Make the parameters available the inlined function's scope
-                Symbol* symbol_upper = getSymbol(expr_list->exprs[i - 1]->v.ident->name);
+                Symbol* symbol_upper = getSymbol(expr_list->exprs[i]->v.ident->name);
                 scope_override = function_inline_scope;
                 pushExecutedFunctionStack(function_inline_scope);
                 Symbol* symbol_new = createCloneFromSymbol(parameter->name, symbol_upper->type, symbol_upper, symbol_upper->type);
@@ -844,7 +878,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 symbol_new->addr = symbol_upper->addr;
             }
 
-            strongly_type(parameter, NULL, function, expr, value_type);
+            // strongly_type(parameter, NULL, function, expr, value_type);
 
             enum Type type = parameter->type;
             // i64 addr = parameter->addr;
@@ -853,22 +887,18 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 continue;
             }
 
+            putargr_stack[putargr_stack_p++] = R0 + register_offset;
+            putargr_stack[putargr_stack_p++] = R1 + register_offset;
+
             switch (type) {
             case K_BOOL:
-                putargr_stack[putargr_stack_p++] = R0 + register_offset;
-                putargr_stack[putargr_stack_p++] = R1 + register_offset;
                 break;
             case K_NUMBER:
-                putargr_stack[putargr_stack_p++] = R0 + register_offset;
-                putargr_stack[putargr_stack_p++] = R1 + register_offset;
                 if (value_type == V_FLOAT) {
                 } else {
                 }
                 break;
             case K_STRING: {
-                putargr_stack[putargr_stack_p++] = R0 + register_offset;
-                putargr_stack[putargr_stack_p++] = R1 + register_offset;
-
                 size_t len = 0;
                 bool is_dynamic = false;
 
@@ -1271,88 +1301,262 @@ void compileDecl(KaosIR* program, Decl* decl)
         break;
     }
     case TimesDo_kind: {
+        Symbol* index_symbol = NULL;
+        i64 len_addr = 0;
+
         compileExpr(program, decl->v.times_do->x);
 
+        i64 addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.times_do->index != NULL) {
+            len_addr = stack_counter++;
+            push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
+            push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+            push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+        }
+
+        i64 loop_start = label_counter++;
+        push_inst_i(program, DECLARE_LABEL, loop_start);
+
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        i64 loop_end = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 0, loop_end);
+
+        push_inst_r_r_i(program, SUBI, R1, R1, 1);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.times_do->index != NULL) {
+            push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+            push_inst_r_r_i(program, LDR, R3, R2, sizeof(i64));
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
+            push_inst_r_r_r(program, SUBR, R1, R3, R1);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+
+            index_symbol = store_any(
+                program,
+                decl->v.times_do->index->v.ident->name
+            );
+        }
+
+        compileExpr(program, decl->v.times_do->call_expr);
+
+        if (decl->v.times_do->index != NULL) {
+            removeSymbol(index_symbol);
+        }
+
+        push_inst_(program, DYN_BREAK_HANDLE);
+        i64 loop_end_break = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 1, loop_end_break);
+
+        push_inst_i(program, JMPI, loop_start);
+        push_inst_i(program, PATCH, loop_end);
+        push_inst_i(program, PATCH, loop_end_break);
         break;
     }
     case ForeachAsList_kind: {
+        Symbol* index_symbol = NULL;
+
         compileExpr(program, decl->v.foreach_as_list->x);
 
-        // size_t len = 0;
-        // bool is_dynamic = false;
-
         switch (decl->v.foreach_as_list->x->kind) {
-        case CompositeLit_kind:
-            // len = decl->v.foreach_as_list->x->v.composite_lit->elts->expr_count;
-            break;
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(decl->v.foreach_as_list->x->v.ident->name);
             if (symbol_x->type != K_LIST && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_LIST, symbol_x->name);
-            // is_dynamic = true;
             break;
         }
         default:
             break;
         }
 
-        // Symbol* _symbol = store_list(
-        //     program,
-        //     NULL,
-        //     len,
-        //     is_dynamic
-        // );
+        i64 addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
-        // Symbol* el_symbol = store_any(
-        //     program,
-        //     decl->v.foreach_as_list->el->v.ident->name
-        // );
+        push_inst_r_r(program, DYN_GET_COMP_SIZE, R1, R1);
 
-        compileStmt(program, decl->v.foreach_as_list->body);
-        // removeSymbol(el_symbol);
+        i64 len_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        i64 len_bak_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_bak_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
+        push_inst_r_r_i(program, STR, R3, R1, sizeof(i64));
+
+        i64 loop_start = label_counter++;
+        push_inst_i(program, DECLARE_LABEL, loop_start);
+
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
+        push_inst_r_r_i(program, LDR, R11, R3, sizeof(i64));
+        push_inst_r_r_r(program, SUBR, R11, R11, R1);
+
+        i64 loop_end = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 0, loop_end);
+
+        push_inst_r_r_i(program, SUBI, R1, R1, 1);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.foreach_as_list->index != NULL) {
+            push_inst_r_r_i(program, LDR, R3, R3, sizeof(i64));
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
+            push_inst_r_r_r(program, SUBR, R1, R3, R1);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+
+            index_symbol = store_any(
+                program,
+                decl->v.foreach_as_list->index->v.ident->name
+            );
+        }
+
+        push_inst_r_i(program, MOVI, R0, V_LIST);
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        push_inst_r_r_r(program, DYN_COMP_ACCESS, R1, R0, R11);
+        push_inst_r_r_i(program, LDR, R0, R2, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R1, R2, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, FLDXR, R1, R2, R3, sizeof(double));
+
+        Symbol* el_symbol = store_any(
+            program,
+            decl->v.foreach_as_list->el->v.ident->name
+        );
+
+        compileExpr(program, decl->v.foreach_as_list->call_expr);
+
+        if (decl->v.foreach_as_list->index != NULL) {
+            removeSymbol(index_symbol);
+        }
+
+        removeSymbol(el_symbol);
+
+        push_inst_(program, DYN_BREAK_HANDLE);
+        i64 loop_end_break = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 1, loop_end_break);
+
+        push_inst_i(program, JMPI, loop_start);
+        push_inst_i(program, PATCH, loop_end);
+        push_inst_i(program, PATCH, loop_end_break);
         break;
     }
     case ForeachAsDict_kind: {
+        Symbol* index_symbol = NULL;
+
         compileExpr(program, decl->v.foreach_as_dict->x);
-        // size_t len = 0;
-        // bool is_dynamic = false;
 
         switch (decl->v.foreach_as_dict->x->kind) {
-        case CompositeLit_kind:
-            // len = decl->v.foreach_as_dict->x->v.composite_lit->elts->expr_count;
-            break;
         case Ident_kind: {
             Symbol* symbol_x = getSymbol(decl->v.foreach_as_dict->x->v.ident->name);
             if (symbol_x->type != K_DICT && symbol_x->type != K_ANY)
                 throw_error(E_NOT_A_DICT, symbol_x->name);
-            // is_dynamic = true;
             break;
         }
         default:
             break;
         }
 
-        // Symbol* _symbol = store_dict(
-        //     program,
-        //     NULL,
-        //     len,
-        //     is_dynamic
-        // );
+        i64 addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
-        // Symbol* key_symbol = store_any(
-        //     program,
-        //     decl->v.foreach_as_dict->key->v.ident->name
-        // );
+        push_inst_r_r(program, DYN_GET_COMP_SIZE, R1, R1);
 
-        // Symbol* value_symbol = store_any(
-        //     program,
-        //     decl->v.foreach_as_dict->value->v.ident->name
-        // );
+        i64 len_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
-        compileStmt(program, decl->v.foreach_as_dict->body);
+        i64 len_bak_addr = stack_counter++;
+        push_inst_i_i(program, ALLOCAI, len_bak_addr, 1 * sizeof(i64));
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
+        push_inst_r_r_i(program, STR, R3, R1, sizeof(i64));
 
-        // removeSymbol(key_symbol);
-        // removeSymbol(value_symbol);
+        i64 loop_start = label_counter++;
+        push_inst_i(program, DECLARE_LABEL, loop_start);
+
+        push_inst_r_i(program, REF_ALLOCAI, R2, len_addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        push_inst_r_i(program, REF_ALLOCAI, R3, len_bak_addr);
+        push_inst_r_r_i(program, LDR, R11, R3, sizeof(i64));
+        push_inst_r_r_r(program, SUBR, R11, R11, R1);
+
+        i64 loop_end = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 0, loop_end);
+
+        push_inst_r_r_i(program, SUBI, R1, R1, 1);
+        push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
+
+        if (decl->v.foreach_as_dict->index != NULL) {
+            push_inst_r_r_i(program, LDR, R3, R3, sizeof(i64));
+            push_inst_r_r_i(program, ADDI, R1, R1, 1);
+            push_inst_r_r_r(program, SUBR, R1, R3, R1);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+
+            index_symbol = store_any(
+                program,
+                decl->v.foreach_as_dict->index->v.ident->name
+            );
+        }
+
+        // Don't worry `V_LIST` was intentional
+        push_inst_r_i(program, MOVI, R0, V_LIST);
+        push_inst_r_i(program, REF_ALLOCAI, R2, addr);
+        push_inst_r_r_i(program, LDR, R1, R2, sizeof(i64));
+
+        push_inst_r_r_r(program, DYN_COMP_ACCESS, R1, R0, R11);
+        push_inst_r_r_i(program, LDR, R11, R2, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R12, R2, R3, sizeof(long long));
+
+        push_inst_r_r_i(program, LDR, R0, R11, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R1, R11, R3, sizeof(long long));
+
+        Symbol* key_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->key->v.ident->name
+        );
+
+        push_inst_r_r_i(program, LDR, R0, R12, sizeof(long long));
+        push_inst_r_i(program, MOVI, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, LDXR, R1, R12, R3, sizeof(long long));
+        push_inst_r_r_r_i(program, FLDXR, R1, R12, R3, sizeof(double));
+
+        Symbol* value_symbol = store_any(
+            program,
+            decl->v.foreach_as_dict->value->v.ident->name
+        );
+
+        compileExpr(program, decl->v.foreach_as_dict->call_expr);
+
+        if (decl->v.foreach_as_dict->index != NULL) {
+            removeSymbol(index_symbol);
+        }
+
+        removeSymbol(key_symbol);
+        removeSymbol(value_symbol);
+
+        push_inst_(program, DYN_BREAK_HANDLE);
+        i64 loop_end_break = op_counter++;
+        push_inst_r_i_i(program, BEQI, R1, 1, loop_end_break);
+
+        push_inst_i(program, JMPI, loop_start);
+        push_inst_i(program, PATCH, loop_end);
+        push_inst_i(program, PATCH, loop_end_break);
         break;
     }
     case FuncDecl_kind: {
@@ -1407,15 +1611,15 @@ void compileDecl(KaosIR* program, Decl* decl)
 
 void declareSpecList(KaosIR* program, SpecList* spec_list)
 {
-    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
-        declareSpec(program, spec_list->specs[i - 1]);
+    for (unsigned long i = 0; i < spec_list->spec_count; i++) {
+        declareSpec(program, spec_list->specs[i]);
     }
 }
 
 void compileSpecList(KaosIR* program, SpecList* spec_list)
 {
-    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
-        compileSpec(program, spec_list->specs[i - 1]);
+    for (unsigned long i = 0; i < spec_list->spec_count; i++) {
+        compileSpec(program, spec_list->specs[i]);
     }
 }
 
@@ -1735,8 +1939,10 @@ unsigned short compileSpec(KaosIR* program, Spec* spec)
             push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_LIST:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_DICT:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_ANY:
             break;
@@ -1815,6 +2021,8 @@ void push_inst_i(KaosIR* program, enum IROpCode op_code, i64 i)
 
 void push_inst_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg)
 {
+    reg += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg;
@@ -1852,6 +2060,8 @@ void push_inst_i_i(KaosIR* program, enum IROpCode op_code, i64 i1, i64 i2)
 
 void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i)
 {
+    reg += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg;
@@ -1873,6 +2083,8 @@ void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
 
 void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, f64 f)
 {
+    reg += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg;
@@ -1894,6 +2106,9 @@ void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
 
 void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -1913,6 +2128,9 @@ void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1,
 
 void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -1939,6 +2157,8 @@ void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, i64 i1, i64 i2)
 {
+    reg1 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -1967,6 +2187,9 @@ void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, f64 f)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -1993,6 +2216,10 @@ void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+    reg3 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2017,6 +2244,10 @@ void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, i64 i)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+    reg3 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2048,6 +2279,10 @@ void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister r
 
 void push_inst_r_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, f64 f)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+    reg3 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2121,6 +2356,13 @@ void shift_registers(KaosIR* program)
 
 Symbol* store_bool(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8       16
+      +------+-------+
+      | type | value |
+      +------+-------+
+        i64     i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2141,6 +2383,13 @@ Symbol* store_bool(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_int(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8       16
+      +------+-------+
+      | type | value |
+      +------+-------+
+        i64     i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2161,6 +2410,13 @@ Symbol* store_int(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_float(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8       16
+      +------+-------+
+      | type | value |
+      +------+-------+
+        i64     f64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2181,6 +2437,13 @@ Symbol* store_float(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_string(KaosIR* program, char *name, bool is_any)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol;
@@ -2201,6 +2464,13 @@ Symbol* store_string(KaosIR* program, char *name, bool is_any)
 
 Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_LIST, value, V_LIST);
@@ -2224,6 +2494,13 @@ Symbol* store_list(KaosIR* program, char *name, size_t len, bool is_dynamic)
 
 Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_DICT, value, V_DICT);
@@ -2247,6 +2524,13 @@ Symbol* store_dict(KaosIR* program, char *name, size_t len, bool is_dynamic)
 
 Symbol* store_any(KaosIR* program, char *name)
 {
+    /*
+      0      8     16
+      +------+-----+
+      | type | ref |
+      +------+-----+
+        i64    i64
+    */
     union Value value;
     value.i = 0;
     Symbol* symbol = addSymbol(name, K_ANY, value, V_ANY);
@@ -2437,6 +2721,17 @@ void declare_functions(ASTRoot* ast_root, KaosIR* program)
         current_file_index = i;
         StmtList* stmt_list = file->stmt_list;
         pushModuleStack(file->module_path, file->module);
+
+        if (i == 0) {
+            function_mode = declareFunction(
+                __KAOS_MAIN_FUNCTION__,
+                file->module,
+                file->module_path,
+                file->context,
+                K_VOID,
+                K_VOID
+            );
+        }
 
         // Declare functions
         for (unsigned long j = stmt_list->stmt_count; 0 < j; j--) {

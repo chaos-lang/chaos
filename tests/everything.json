@@ -739,14 +739,35 @@
                 {
                     "_type": "DeclStmt",
                     "decl": {
-                        "_type": "ForeachAsList",
-                        "x": {
-                            "_type": "Ident",
-                            "name": "a"
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
                         },
-                        "el": {
+                        "name": {
                             "_type": "Ident",
-                            "name": "el"
+                            "name": "loop1"
                         },
                         "body": {
                             "_type": "BlockStmt",
@@ -756,45 +777,204 @@
                                     "mod": null,
                                     "x": {
                                         "_type": "Ident",
-                                        "name": "el"
+                                        "name": "i"
                                     }
                                 },
                                 {
-                                    "_type": "AssignStmt",
+                                    "_type": "PrintStmt",
+                                    "mod": null,
                                     "x": {
-                                        "_type": "Ident",
-                                        "name": "el"
-                                    },
-                                    "op": "=",
-                                    "y": {
                                         "_type": "BasicLit",
-                                        "value_type": "int",
-                                        "value": "5"
+                                        "value_type": "string",
+                                        "value": "hey"
                                     }
-                                },
-                                {
-                                    "_type": "DeclStmt",
-                                    "decl": {
-                                        "_type": "TimesDo",
-                                        "x": {
-                                            "_type": "BasicLit",
-                                            "value_type": "int",
-                                            "value": "2"
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
                                         },
-                                        "body": {
-                                            "_type": "BlockStmt",
-                                            "stmt_list": [
-                                                {
-                                                    "_type": "PrintStmt",
-                                                    "mod": null,
-                                                    "x": {
-                                                        "_type": "Ident",
-                                                        "name": "el"
-                                                    }
-                                                }
-                                            ]
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        }
+                                    },
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "x"
                                         }
                                     }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "loop2"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "i"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "x"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "i"
+                                        }
+                                    },
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "key"
+                                        }
+                                    },
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "String",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "val"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
+                        },
+                        "name": {
+                            "_type": "Ident",
+                            "name": "loop3"
+                        },
+                        "body": {
+                            "_type": "BlockStmt",
+                            "stmt_list": [
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "i"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "key"
+                                    }
+                                },
+                                {
+                                    "_type": "PrintStmt",
+                                    "mod": null,
+                                    "x": {
+                                        "_type": "Ident",
+                                        "name": "val"
+                                    }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
+                        },
+                        "index": {
+                            "_type": "Ident",
+                            "name": "i"
+                        },
+                        "body": {
+                            "_type": "CallExpr",
+                            "fun": {
+                                "_type": "Ident",
+                                "name": "loop1"
+                            },
+                            "args": [
+                                {
+                                    "_type": "Ident",
+                                    "name": "i"
                                 }
                             ]
                         }
@@ -803,17 +983,90 @@
                 {
                     "_type": "DeclStmt",
                     "decl": {
-                        "_type": "VarDecl",
-                        "type_spec": {
-                            "_type": "TypeSpec",
-                            "type": "Dictionary",
-                            "sub_type_spec": null
+                        "_type": "TimesDo",
+                        "x": {
+                            "_type": "BasicLit",
+                            "value_type": "int",
+                            "value": "3"
                         },
-                        "ident": {
+                        "index": {
                             "_type": "Ident",
-                            "name": "n"
+                            "name": "i"
                         },
-                        "expr": {
+                        "body": {
+                            "_type": "CallExpr",
+                            "fun": {
+                                "_type": "Ident",
+                                "name": "loop1"
+                            },
+                            "args": [
+                                {
+                                    "_type": "Ident",
+                                    "name": "i"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "CompositeLit",
+                            "type": {
+                                "_type": "ListType"
+                            },
+                            "elts": [
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "1"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "2"
+                                },
+                                {
+                                    "_type": "BasicLit",
+                                    "value_type": "int",
+                                    "value": "3"
+                                }
+                            ]
+                        },
+                        "index": {
+                            "_type": "Ident",
+                            "name": "i"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "x"
+                        },
+                        "body": {
+                            "_type": "CallExpr",
+                            "fun": {
+                                "_type": "Ident",
+                                "name": "loop2"
+                            },
+                            "args": [
+                                {
+                                    "_type": "Ident",
+                                    "name": "i"
+                                },
+                                {
+                                    "_type": "Ident",
+                                    "name": "x"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsDict",
+                        "x": {
                             "_type": "CompositeLit",
                             "type": {
                                 "_type": "DictType"
@@ -859,16 +1112,10 @@
                                     }
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "_type": "DeclStmt",
-                    "decl": {
-                        "_type": "ForeachAsDict",
-                        "x": {
+                        },
+                        "index": {
                             "_type": "Ident",
-                            "name": "n"
+                            "name": "i"
                         },
                         "key": {
                             "_type": "Ident",
@@ -879,23 +1126,23 @@
                             "name": "val"
                         },
                         "body": {
-                            "_type": "BlockStmt",
-                            "stmt_list": [
+                            "_type": "CallExpr",
+                            "fun": {
+                                "_type": "Ident",
+                                "name": "loop3"
+                            },
+                            "args": [
                                 {
-                                    "_type": "PrintStmt",
-                                    "mod": null,
-                                    "x": {
-                                        "_type": "Ident",
-                                        "name": "key"
-                                    }
+                                    "_type": "Ident",
+                                    "name": "i"
                                 },
                                 {
-                                    "_type": "PrintStmt",
-                                    "mod": null,
-                                    "x": {
-                                        "_type": "Ident",
-                                        "name": "val"
-                                    }
+                                    "_type": "Ident",
+                                    "name": "key"
+                                },
+                                {
+                                    "_type": "Ident",
+                                    "name": "val"
                                 }
                             ]
                         }

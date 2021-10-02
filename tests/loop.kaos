@@ -7,56 +7,76 @@ list a = [
 num b = 256
 str c = 'deepest loop'
 
-3 times do
-    print a
-    4 times do
-        print b
-        2 times do
-            print 1
-            print c
-        end
-    end
+void def print_num(num x)
+    print x
 end
 
-3 times do
-    print 'hey'
-    foreach a as el
-        print el
-    end
+void def print_str(str x)
+    print x
 end
+
+void def print_key_value_pair_str_str(str key, str value)
+    print key
+    print value
+end
+
+void def print_key_value_pair_str_num(str key, num value)
+    print key
+    print value
+end
+
+void def loop3(str x)
+    print 1
+    print x
+end
+
+void def loop2(num x, str y)
+    print_num(x)
+    2 times do -> loop3(y)
+end
+
+void def loop1(list x, num y, str z)
+    print x
+    4 times do -> loop2(y, z)
+end
+
+3 times do -> loop1(a, b, c)
+
+void def loop4(list x, str y)
+    print_str(y)
+    foreach x as el -> print_num(el)
+end
+
+3 times do -> loop4(a, 'hey')
 
 num n = 5
-n times do
-    print "hoy"
+n times do -> print_str("hoy")
+
+void def loop5(num x)
+    print x
+    x = 5
+    2 times do -> print_num(x)
 end
 
-foreach a as el
-    print el
-    el = 5
-    2 times do
-        print el
-    end
-end
+foreach a as el -> loop5(el)
 
 print a
 
 del n
 dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
 
-foreach n as key : val
-    print key
-    print val
+foreach n as key : val -> print_key_value_pair_str_str(key, val)
+
+void def loop6(num x, dict n)
+    print_num(x)
+    foreach n as key : val -> print_key_value_pair_str_str(key, val)
 end
 
-3 times do
-    foreach a as el
-        print el
-        foreach n as key : val
-            print key
-            print val
-        end
-    end
+void def loop7(list a, dict n)
+    foreach a as el -> loop6(el, n)
 end
+
+3 times do -> loop7(a, n)
 
 str d = "after all the loops"
 print d
@@ -65,110 +85,133 @@ print d
 // Tests related to multidimensional complex data structures
 del a
 list a = [[1, 2], [3, 4], [5, 6]]
-foreach a as i
+
+void def loop8(list i)
     print i
-    foreach i as j
-        print j
-    end
+    foreach i as j -> print_num(j)
 end
+
+foreach a as i -> loop8(i)
 
 del a
 list a = [{'a': 1, 'b': 2}, {'c': 3, 'd': 4}, {'e': 5, 'f': 6}]
-foreach a as i
+
+void def loop9(dict i)
     print i
-    foreach i as key : val
-        print key
-        print val
-    end
+    foreach i as key : val -> print_key_value_pair_str_num(key, val)
 end
+
+foreach a as i -> loop9(i)
 
 del a
 list a = [{'a': [1, 2], 'b': [3, 4]}, {'c': [5, 6], 'd': [7, 8]}, {'e': [9, 10], 'f': [11, 12]}]
-foreach a as i
-    print i
-    foreach i as key : val
-        print key
-        print val
-        foreach val as j
-            print j
-        end
-    end
+
+void def loop10(str key, list val)
+    print key
+    print val
+    foreach val as j -> print_num(j)
 end
+
+void def loop11(dict i)
+    print i
+    foreach i as key : val -> loop10(key, val)
+end
+
+foreach a as i -> loop11(i)
 
 del a
 dict a = {'a': {'a': 1, 'b': 2}, 'b': {'c': 3, 'd': 4}, 'c': {'e': 5, 'f': 6}}
-foreach a as key1 : val1
+
+void def loop12(str key1, dict val1)
     print key1
     print val1
-    foreach val1 as key2 : val2
-        print key2
-        print val2
-    end
+    foreach val1 as key2 : val2 -> print_key_value_pair_str_num(key2, val2)
 end
+
+foreach a as key1 : val1 -> loop12(key1, val1)
 
 del a
 dict a = {'a': [1, 2], 'b': [3, 4], 'c': [5, 6]}
-foreach a as key : val
+
+void def loop13(str key, list val)
     print key
     print val
-    foreach val as i
-        print i
-    end
+    foreach val as i -> print_num(i)
 end
+
+foreach a as key : val -> loop13(key, val)
 
 del a
 dict a = {'a': [{'a': 1, 'b': 2}, {'c': 3, 'd': 4}], 'b': [{'e': 5, 'f': 6}, {'g': 7, 'h': 8}], 'c': [{'x': 9, 'y': 10}, {'t': 11, 'v': 12}]}
-foreach a as key1 : val1
+
+void def loop14(dict i)
+    print i
+    foreach i as key2 : val2 -> print_key_value_pair_str_num(key2, val2)
+end
+
+void def loop15(str key1, list val1)
     print key1
     print val1
-    foreach val1 as i
-        print i
-        foreach i as key2 : val2
-            print key2
-            print val2
-        end
-    end
+    foreach val1 as i -> loop14(i)
 end
+
+foreach a as key1 : val1 -> loop15(key1, val1)
 
 del a
 dict a = {'C': [{'h': 'a', 'o': 's'}, {' ': 'L', 'a': 'n'}], 'g': [{'u': 'a', 'g': 'e'}]}
-foreach a as key1 : val1
-    print key1
-    foreach val1 as i
-        foreach i as key2 : val2
-            print key2
-            print val2
-        end
-    end
+
+void def loop16(dict i)
+    foreach i as key2 : val2 -> print_key_value_pair_str_str(key2, val2)
 end
+
+void def loop17(str key1, list val1)
+    print key1
+    foreach val1 as i -> loop16(i)
+end
+
+foreach a as key1 : val1 -> loop17(key1, val1)
 
 
 // T_INT in N times do
 del a
 list a = []
-3 times do
+
+void def loop18(list a)
     a = [1, 2, 3]
     print a
 end
 
+3 times do -> loop18(a)
+
 
 // N times do (N as a mathematical expression)
-3 + 5 times do
+void def loop19()
     print "eight times"
 end
 
+3 + 5 times do -> loop19()
 
-// Increment/Decrement inside a loop
-del a
-num a = 0
-10 times do
-    a++
-    ++a
-    print a
+
+// Index variable in loops
+void def loop20(num i)
+    print i
+    print "hey"
 end
 
-10 times do
-    a--
-    --a
-    print a
+void def loop21(num i, num x)
+    print i
+    print x
 end
+
+void def loop22(num i, str key, str val)
+    print i
+    print key
+    print val
+end
+
+3 times do i -> loop20(i)
+3 times do as i -> loop20(i)
+
+foreach [1, 2, 3] as i, x -> loop21(i, x)
+
+foreach {'a': 'foo', 'b': 'bar', 'c': 'baz'} as i, key : val -> loop22(i, key, val)

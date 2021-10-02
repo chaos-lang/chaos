@@ -40,6 +40,7 @@ i64* ast_stack = NULL;
 i64 ast_stack_p = 0;
 
 bool temp_disable_debug = false;
+bool break_current_loop = false;
 
 cpu *new_cpu(KaosIR* program, unsigned short debug_level)
 {
@@ -360,7 +361,7 @@ void execute(cpu *c)
     case TRUNCR:
         jit_truncr(_jit, R(c->inst->op1->reg), FR(c->inst->op2->reg));
         break;
-    // >>> Branch Operations <<<
+    // >>> Branch Operations & Jumps <<<
     // beq
     case BEQR: {
         jit_op* __op = jit_beqr(_jit, JIT_FORWARD, R(c->inst->op1->reg), R(c->inst->op2->reg));
@@ -372,6 +373,10 @@ void execute(cpu *c)
         push_op(op_array, __op);
         break;
     }
+    // jmpi
+    case JMPI:
+        jit_jmpi(_jit, label_array->arr[c->inst->op1->value.i]);
+        break;
     // patch
     case PATCH:
         jit_patch(_jit, op_array->arr[c->inst->op1->value.i]);
@@ -528,12 +533,12 @@ void execute(cpu *c)
         // Index offset is available in R(4)
         break;
     }
-    case DYN_COMPOSITE_ACCESS: {
+    case DYN_COMP_ACCESS: {
         jit_movi(_jit, R(2), cpu_composite_access);
         jit_prepare(_jit);
-        jit_putargr(_jit, R(5));
-        jit_putargr(_jit, R(4));
-        jit_putargr(_jit, R(1));
+        jit_putargr(_jit, R(c->inst->op1->reg));
+        jit_putargr(_jit, R(c->inst->op2->reg));
+        jit_putargr(_jit, R(c->inst->op3->reg));
         jit_callr(_jit, R(2));
         jit_retval(_jit, R(2));
         break;
@@ -596,6 +601,29 @@ void execute(cpu *c)
         jit_putargr(_jit, R(1));
         jit_putargr(_jit, R(2));
         jit_callr(_jit, R(3));
+        jit_retval(_jit, R(1));
+        break;
+    }
+    // Dynamic Composite Helpers
+    case DYN_GET_COMP_SIZE: {
+        jit_movi(_jit, R(3), cpu_get_composite_len);
+        jit_prepare(_jit);
+        jit_putargr(_jit, R(c->inst->op2->reg));
+        jit_callr(_jit, R(3));
+        jit_retval(_jit, R(c->inst->op1->reg));
+        break;
+    }
+    // Dynamic Loop Break
+    case DYN_BREAK: {
+        jit_movi(_jit, R(2), cpu_set_break_current_loop);
+        jit_prepare(_jit);
+        jit_callr(_jit, R(2));
+        break;
+    }
+    case DYN_BREAK_HANDLE: {
+        jit_movi(_jit, R(2), cpu_get_break_current_loop);
+        jit_prepare(_jit);
+        jit_callr(_jit, R(2));
         jit_retval(_jit, R(1));
         break;
     }
@@ -673,6 +701,11 @@ void cpu_dyn_print(i64 newline, i64 pretty)
 
 void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl, i64 pretty)
 {
+    // Disable printing if we're breaking from a loop.
+    // TODO: Not sure if it's the best solution.
+    if (break_current_loop)
+        return;
+
     switch (r0) {
     case V_BOOL:
         cpu_print_bool(r1);
@@ -1190,6 +1223,27 @@ i64 cpu_string_to_boolean(i64 addr)
         return 0;
     else
         return 1;
+}
+
+i64 cpu_get_composite_len(i64 addr)
+{
+    size_t* len = (size_t*)addr;
+    return (i64)*len;
+}
+
+void cpu_set_break_current_loop()
+{
+    break_current_loop = true;
+}
+
+i64 cpu_get_break_current_loop()
+{
+    i64 val = 0;
+    if (break_current_loop) {
+        val = 1;
+        break_current_loop = false;
+    }
+    return val;
 }
 
 void debug(struct jit *jit)

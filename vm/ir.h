@@ -63,8 +63,9 @@ enum IROpCode {
     EQR, NER, GTR, LTR, GER, LER,
     // >>> Conversions <<<
     EXTR, TRUNCR,
-    // >>> Branch Operations <<<
+    // >>> Branch Operations & Jumps <<<
     BEQR, BEQI,
+    JMPI,
     PATCH,
     // >>> Non-Atomic Instructions <<<
     // Dynamic Arithmetic
@@ -80,7 +81,7 @@ enum IROpCode {
     // Dynamic Index Delete
     DYN_STR_INDEX_DELETE, DYN_LIST_INDEX_DELETE, DYN_DICT_KEY_DELETE,
     // Dynamic Index Access
-    DYN_STR_INDEX_ACCESS, DYN_COMPOSITE_ACCESS,
+    DYN_STR_INDEX_ACCESS, DYN_COMP_ACCESS,
     // Dynamic Index Update
     DYN_LIST_INDEX_UPDATE, DYN_DICT_KEY_UPDATE,
     // Dynamic Type Conversion
@@ -88,6 +89,10 @@ enum IROpCode {
     DYN_STR_TO_BOOL,
     // Dynamic Create New List
     DYN_NEW_LIST, DYN_NEW_DICT,
+    // Dynamic Composite Helpers
+    DYN_GET_COMP_SIZE,
+    // Dynamic Loop Break
+    DYN_BREAK, DYN_BREAK_HANDLE,
     // Debug
     DEBUG,
     HLT,

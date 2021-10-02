@@ -95,6 +95,11 @@ i64 cpu_new_string(i64 addr);
 void cpu_new_list(i64 addr, i64 new_addr);
 void cpu_new_dict(i64 addr, i64 new_addr);
 
+i64 cpu_get_composite_len(i64 addr);
+
+void cpu_set_break_current_loop();
+i64 cpu_get_break_current_loop();
+
 void debug(struct jit *jit);
 
 #define DYN_BINARY_ARITH(_fn, _ffn) \

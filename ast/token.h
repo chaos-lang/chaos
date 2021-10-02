@@ -60,6 +60,7 @@
 #define TT_INC "++"
 #define TT_DEC "--"
 #define TT_COLON ":"
+#define TT_ARROW "->"
 #define TT_EXIT "exit"
 #define TT_PRINT "print"
 #define TT_ECHO "echo"
@@ -76,6 +77,7 @@
 #define TT_AS "as"
 #define TT_FROM "from"
 #define TT_INFINITE "INFINITE"
+#define TT_BREAK "break"
 
 enum Token {
     ILLEGAL_tok,
@@ -115,6 +117,7 @@ enum Token {
     INC_tok,
     DEC_tok,
     COLON_tok,
+    ARROW_tok,
     EXIT_tok,
     PRINT_tok,
     ECHO_tok,
@@ -131,6 +134,7 @@ enum Token {
     AS_tok,
     FROM_tok,
     INFINITE_tok,
+    BREAK_tok,
 };
 
 #endif

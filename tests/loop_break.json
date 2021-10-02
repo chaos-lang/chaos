@@ -653,14 +653,35 @@
                 {
                     "_type": "DeclStmt",
                     "decl": {
-                        "_type": "ForeachAsList",
-                        "x": {
-                            "_type": "Ident",
-                            "name": "a"
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "el"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
                         },
-                        "el": {
+                        "name": {
                             "_type": "Ident",
-                            "name": "el"
+                            "name": "loop1"
                         },
                         "body": {
                             "_type": "BlockStmt",
@@ -696,6 +717,34 @@
                                     }
                                 }
                             ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "el"
+                        },
+                        "body": {
+                            "_type": "CallExpr",
+                            "fun": {
+                                "_type": "Ident",
+                                "name": "loop1"
+                            },
+                            "args": [
+                                {
+                                    "_type": "Ident",
+                                    "name": "el"
+                                }
+                            ]
                         }
                     }
                 },
@@ -711,14 +760,35 @@
                 {
                     "_type": "DeclStmt",
                     "decl": {
-                        "_type": "ForeachAsList",
-                        "x": {
-                            "_type": "Ident",
-                            "name": "a"
+                        "_type": "FuncDecl",
+                        "type": {
+                            "_type": "FuncType",
+                            "params": {
+                                "_type": "FieldListSpec",
+                                "list": [
+                                    {
+                                        "_type": "FieldSpec",
+                                        "type_spec": {
+                                            "_type": "TypeSpec",
+                                            "type": "Number",
+                                            "sub_type_spec": null
+                                        },
+                                        "ident": {
+                                            "_type": "Ident",
+                                            "name": "el"
+                                        }
+                                    }
+                                ]
+                            },
+                            "result": {
+                                "_type": "TypeSpec",
+                                "type": "Boolean",
+                                "sub_type_spec": null
+                            }
                         },
-                        "el": {
+                        "name": {
                             "_type": "Ident",
-                            "name": "el"
+                            "name": "loop2"
                         },
                         "body": {
                             "_type": "BlockStmt",
@@ -752,6 +822,34 @@
                                             }
                                         ]
                                     }
+                                }
+                            ]
+                        },
+                        "decision": null
+                    }
+                },
+                {
+                    "_type": "DeclStmt",
+                    "decl": {
+                        "_type": "ForeachAsList",
+                        "x": {
+                            "_type": "Ident",
+                            "name": "a"
+                        },
+                        "el": {
+                            "_type": "Ident",
+                            "name": "el"
+                        },
+                        "body": {
+                            "_type": "CallExpr",
+                            "fun": {
+                                "_type": "Ident",
+                                "name": "loop2"
+                            },
+                            "args": [
+                                {
+                                    "_type": "Ident",
+                                    "name": "el"
                                 }
                             ]
                         }

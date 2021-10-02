@@ -285,13 +285,17 @@ void emitBytecode(cpu *c)
     case TRUNCR:
         sprintf(str_inst, "%s R(%d) FR(%d)", "TRUNCR", c->inst->op1->reg, c->inst->op2->reg);
         break;
-    // >>> Branch Operations <<<
+    // >>> Branch Operations & Jumps <<<
     // beq
     case BEQR:
         sprintf(str_inst, "%s R(%d) R(%d)", "BEQR", c->inst->op1->reg, c->inst->op2->reg);
         break;
     case BEQI:
         sprintf(str_inst, "%s R(%d) %lld op: %lld", "BEQI", c->inst->op1->reg, c->inst->op2->value.i, c->inst->op3->value.i);
+        break;
+    // jmpi
+    case JMPI:
+        sprintf(str_inst, "%s op: %lld", "JMPI", c->inst->op1->value.i);
         break;
     // patch
     case PATCH:
@@ -372,8 +376,8 @@ void emitBytecode(cpu *c)
     case DYN_STR_INDEX_ACCESS:
         sprintf(str_inst, "%s", "DYN_STR_INDEX_ACCESS");
         break;
-    case DYN_COMPOSITE_ACCESS:
-        sprintf(str_inst, "%s", "DYN_COMPOSITE_ACCESS");
+    case DYN_COMP_ACCESS:
+        sprintf(str_inst, "%s addr: R(%d) R(%d) R(%d)", "DYN_COMP_ACCESS", c->inst->op1->reg, c->inst->op2->reg, c->inst->op3->reg);
         break;
     // Dynamic Index Update
     case DYN_LIST_INDEX_UPDATE:
@@ -393,6 +397,18 @@ void emitBytecode(cpu *c)
     case DYN_NEW_DICT:
         sprintf(str_inst, "%s", "DYN_NEW_DICT");
         break;
+    // Dynamic Composite Helpers
+    case DYN_GET_COMP_SIZE:
+        sprintf(str_inst, "%s R(%d) R(%d)", "DYN_GET_COMP_SIZE", c->inst->op1->reg, c->inst->op2->reg);
+        break;
+    // Dynamic Loop Break
+    case DYN_BREAK:
+        sprintf(str_inst, "%s", "DYN_BREAK");
+        break;
+    case DYN_BREAK_HANDLE:
+        sprintf(str_inst, "%s", "DYN_BREAK_HANDLE");
+        break;
+    // Debug
     case DEBUG:
         sprintf(str_inst, "%s", "DEBUG");
         break;

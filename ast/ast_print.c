@@ -235,13 +235,6 @@ void printASTStmt(Stmt* stmt, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         break;
-    case ContinueStmt_kind:
-        printf(
-            "%*c\"_type\": \"ContinueStmt\"\n",
-            indent,
-            __KAOS_INDENT_CHAR__
-        );
-        break;
     default:
         break;
     }
@@ -789,12 +782,20 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         printASTExpr(decl->v.times_do->x, false, ",\n");
+        if (decl->v.times_do->index != NULL) {
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.times_do->index, false, ",\n");
+        }
         printf(
             "%*c\"body\": ",
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmt(decl->v.times_do->body, false, "\n");
+        printASTExpr(decl->v.times_do->call_expr, false, "\n");
         break;
     case ForeachAsList_kind:
         printf(
@@ -805,6 +806,14 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         printASTExpr(decl->v.foreach_as_list->x, false, ",\n");
+        if (decl->v.foreach_as_list->index != NULL) {
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_list->index, false, ",\n");
+        }
         printf(
             "%*c\"el\": ",
             indent,
@@ -816,7 +825,7 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmt(decl->v.foreach_as_list->body, false, "\n");
+        printASTExpr(decl->v.foreach_as_list->call_expr, false, "\n");
         break;
     case ForeachAsDict_kind:
         printf(
@@ -827,6 +836,14 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         printASTExpr(decl->v.foreach_as_dict->x, false, ",\n");
+        if (decl->v.foreach_as_dict->index != NULL) {
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_dict->index, false, ",\n");
+        }
         printf(
             "%*c\"key\": ",
             indent,
@@ -844,7 +861,7 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmt(decl->v.foreach_as_dict->body, false, "\n");
+        printASTExpr(decl->v.foreach_as_dict->call_expr, false, "\n");
         break;
     case FuncDecl_kind:
         printf(
@@ -1077,6 +1094,9 @@ char *getToken(enum Token tok)
     case COLON_tok:
         return TT_COLON;
         break;
+    case ARROW_tok:
+        return TT_ARROW;
+        break;
     case EXIT_tok:
         return TT_EXIT;
         break;
@@ -1124,6 +1144,9 @@ char *getToken(enum Token tok)
         break;
     case INFINITE_tok:
         return TT_INFINITE;
+        break;
+    case BREAK_tok:
+        return TT_BREAK;
         break;
     default:
         break;

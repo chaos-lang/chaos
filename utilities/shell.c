@@ -58,7 +58,6 @@ char *suggestions[1000] = {
     "import",
     "from",
     "break",
-    "continue"
 };
 
 int up_arrow_key_pressed(int count, int key) {
