@@ -370,20 +370,20 @@ typedef struct VarDecl {
 
 typedef struct TimesDo {
     struct Expr* x;
-    struct Stmt* body;
+    struct Expr* call_expr;
 } TimesDo;
 
 typedef struct ForeachAsList {
     struct Expr* x;
     struct Expr* el;
-    struct Stmt* body;
+    struct Expr* call_expr;
 } ForeachAsList;
 
 typedef struct ForeachAsDict {
     struct Expr* x;
     struct Expr* key;
     struct Expr* value;
-    struct Stmt* body;
+    struct Expr* call_expr;
 } ForeachAsDict;
 
 typedef struct FuncDecl {
@@ -483,9 +483,9 @@ Spec* optionalFieldSpec(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
 Spec* decisionBlock(ExprList* decisions, int lineno);
 Decl* buildDecl(enum DeclKind kind, int lineno);
 Decl* varDecl(Spec* type_spec, Expr* ident, Expr* expr, int lineno);
-Decl* timesDo(Expr* x, Stmt* body, int lineno);
-Decl* foreachAsList(Expr* x, Expr* el, Stmt* body, int lineno);
-Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Stmt* body, int lineno);
+Decl* timesDo(Expr* x, Expr* call_expr, int lineno);
+Decl* foreachAsList(Expr* x, Expr* el, Expr* call_expr, int lineno);
+Decl* foreachAsDict(Expr* x, Expr* key, Expr* value, Expr* call_expr, int lineno);
 Decl* funcDecl(Spec* type, Expr* name, Stmt* body, Spec* decision, int lineno);
 void initASTRoot();
 void addFile();

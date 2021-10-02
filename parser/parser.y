@@ -689,20 +689,20 @@ func_decl:
 ;
 
 times_do_decl:
-    expr T_TIMES_DO block_stmt {
-        $$ = timesDo($1, $3, yylineno);
+    expr T_TIMES_DO T_ARROW call_expr {
+        $$ = timesDo($1, $4, yylineno);
     }
 ;
 
 foreach_as_list_decl:
-    T_FOREACH expr T_AS ident block_stmt {
-        $$ = foreachAsList($2, $4, $5, yylineno);
+    T_FOREACH expr T_AS ident T_ARROW call_expr {
+        $$ = foreachAsList($2, $4, $6, yylineno);
     }
 ;
 
 foreach_as_dict_decl:
-    T_FOREACH expr T_AS ident T_COLON ident block_stmt {
-        $$ = foreachAsDict($2, $4, $6, $7, yylineno);
+    T_FOREACH expr T_AS ident T_COLON ident T_ARROW call_expr {
+        $$ = foreachAsDict($2, $4, $6, $8, yylineno);
     }
 ;
 

@@ -787,7 +787,7 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmt(decl->v.times_do->body, false, "\n");
+        printASTExpr(decl->v.times_do->call_expr, false, "\n");
         break;
     case ForeachAsList_kind:
         printf(
@@ -809,7 +809,7 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmt(decl->v.foreach_as_list->body, false, "\n");
+        printASTExpr(decl->v.foreach_as_list->call_expr, false, "\n");
         break;
     case ForeachAsDict_kind:
         printf(
@@ -837,7 +837,7 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             indent,
             __KAOS_INDENT_CHAR__
         );
-        printASTStmt(decl->v.foreach_as_dict->body, false, "\n");
+        printASTExpr(decl->v.foreach_as_dict->call_expr, false, "\n");
         break;
     case FuncDecl_kind:
         printf(

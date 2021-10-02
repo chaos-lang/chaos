@@ -701,6 +701,11 @@ void cpu_dyn_print(i64 newline, i64 pretty)
 
 void cpu_print(i64 r0, i64 r1, f64 fr1, i64 nl, i64 pretty)
 {
+    // Disable printing if we're breaking from a loop.
+    // TODO: Not sure if it's the best solution.
+    if (break_current_loop)
+        return;
+
     switch (r0) {
     case V_BOOL:
         cpu_print_bool(r1);

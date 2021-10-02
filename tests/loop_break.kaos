@@ -35,16 +35,20 @@ end {
 
 list a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 
-foreach a as el
+void def loop1(num el)
     print el
     print f4(el, 1)
 end
 
+foreach a as el -> loop1(el)
+
 print "hey"
 
-foreach a as el
+void def loop2(num el)
     print el
     print f5(el, 1)
 end
+
+foreach a as el -> loop2(el)
 
 print "hoy"

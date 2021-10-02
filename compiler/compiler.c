@@ -445,16 +445,16 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
     case BasicLit_kind:
         switch (expr->v.basic_lit->value_type) {
         case V_BOOL:
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_BOOL);
-            push_inst_r_i(program, MOVI, R1 + register_offset, expr->v.basic_lit->value.b ? 1 : 0);
+            push_inst_r_i(program, MOVI, R0, V_BOOL);
+            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.b ? 1 : 0);
             break;
         case V_INT:
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_INT);
-            push_inst_r_i(program, MOVI, R1 + register_offset, expr->v.basic_lit->value.i);
+            push_inst_r_i(program, MOVI, R0, V_INT);
+            push_inst_r_i(program, MOVI, R1, expr->v.basic_lit->value.i);
             break;
         case V_FLOAT:
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_FLOAT);
-            push_inst_r_f(program, FMOV, R1 + register_offset, expr->v.basic_lit->value.f);
+            push_inst_r_i(program, MOVI, R0, V_FLOAT);
+            push_inst_r_f(program, FMOV, R1, expr->v.basic_lit->value.f);
             break;
         case V_STRING: {
             /*
@@ -482,7 +482,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             push_inst_r_i(program, MOVI, R3, '\0');
             push_inst_r_r_r_i(program, STXR, R1, R2, R3, sizeof(char));
 
-            push_inst_r_i(program, MOVI, R0 + register_offset, V_STRING);
+            push_inst_r_i(program, MOVI, R0, V_STRING);
             break;
         }
         default:
@@ -860,16 +860,16 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
             scope_override = scope_override_backup;
         }
 
-        for (unsigned long i = 1; i < expr_list->expr_count + 1; i++) {
-            register_offset = (i - 1) * 2;
+        for (unsigned long i = 0; i < expr_list->expr_count; i++) {
+            register_offset = i * 2;
 
-            Expr* expr = expr_list->exprs[expr_list->expr_count - i];
+            Expr* expr = expr_list->exprs[i];
             enum ValueType value_type = compileExpr(program, expr) - 1;
-            Symbol* parameter = function->parameters[i - 1];
+            Symbol* parameter = function->parameters[i];
 
             if (function->should_inline) {
                 // Make the parameters available the inlined function's scope
-                Symbol* symbol_upper = getSymbol(expr_list->exprs[i - 1]->v.ident->name);
+                Symbol* symbol_upper = getSymbol(expr_list->exprs[i]->v.ident->name);
                 scope_override = function_inline_scope;
                 pushExecutedFunctionStack(function_inline_scope);
                 Symbol* symbol_new = createCloneFromSymbol(parameter->name, symbol_upper->type, symbol_upper, symbol_upper->type);
@@ -878,7 +878,7 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 symbol_new->addr = symbol_upper->addr;
             }
 
-            strongly_type(parameter, NULL, function, expr, value_type);
+            // strongly_type(parameter, NULL, function, expr, value_type);
 
             enum Type type = parameter->type;
             // i64 addr = parameter->addr;
@@ -887,22 +887,18 @@ unsigned short compileExpr(KaosIR* program, Expr* expr)
                 continue;
             }
 
+            putargr_stack[putargr_stack_p++] = R0 + register_offset;
+            putargr_stack[putargr_stack_p++] = R1 + register_offset;
+
             switch (type) {
             case K_BOOL:
-                putargr_stack[putargr_stack_p++] = R0 + register_offset;
-                putargr_stack[putargr_stack_p++] = R1 + register_offset;
                 break;
             case K_NUMBER:
-                putargr_stack[putargr_stack_p++] = R0 + register_offset;
-                putargr_stack[putargr_stack_p++] = R1 + register_offset;
                 if (value_type == V_FLOAT) {
                 } else {
                 }
                 break;
             case K_STRING: {
-                putargr_stack[putargr_stack_p++] = R0 + register_offset;
-                putargr_stack[putargr_stack_p++] = R1 + register_offset;
-
                 size_t len = 0;
                 bool is_dynamic = false;
 
@@ -1324,7 +1320,7 @@ void compileDecl(KaosIR* program, Decl* decl)
         push_inst_r_r_i(program, SUBI, R1, R1, 1);
         push_inst_r_r_i(program, STR, R2, R1, sizeof(i64));
 
-        compileStmt(program, decl->v.times_do->body);
+        compileExpr(program, decl->v.times_do->call_expr);
 
         push_inst_(program, DYN_BREAK_HANDLE);
         i64 loop_end_break = op_counter++;
@@ -1404,7 +1400,7 @@ void compileDecl(KaosIR* program, Decl* decl)
             decl->v.foreach_as_list->el->v.ident->name
         );
 
-        compileStmt(program, decl->v.foreach_as_list->body);
+        compileExpr(program, decl->v.foreach_as_list->call_expr);
 
         removeSymbol(el_symbol);
 
@@ -1499,7 +1495,7 @@ void compileDecl(KaosIR* program, Decl* decl)
             decl->v.foreach_as_dict->value->v.ident->name
         );
 
-        compileStmt(program, decl->v.foreach_as_dict->body);
+        compileExpr(program, decl->v.foreach_as_dict->call_expr);
 
         removeSymbol(key_symbol);
         removeSymbol(value_symbol);
@@ -1565,15 +1561,15 @@ void compileDecl(KaosIR* program, Decl* decl)
 
 void declareSpecList(KaosIR* program, SpecList* spec_list)
 {
-    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
-        declareSpec(program, spec_list->specs[i - 1]);
+    for (unsigned long i = 0; i < spec_list->spec_count; i++) {
+        declareSpec(program, spec_list->specs[i]);
     }
 }
 
 void compileSpecList(KaosIR* program, SpecList* spec_list)
 {
-    for (unsigned long i = spec_list->spec_count; 0 < i; i--) {
-        compileSpec(program, spec_list->specs[i - 1]);
+    for (unsigned long i = 0; i < spec_list->spec_count; i++) {
+        compileSpec(program, spec_list->specs[i]);
     }
 }
 
@@ -1893,8 +1889,10 @@ unsigned short compileSpec(KaosIR* program, Spec* spec)
             push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_LIST:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_DICT:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
             break;
         case K_ANY:
             break;
@@ -1973,6 +1971,8 @@ void push_inst_i(KaosIR* program, enum IROpCode op_code, i64 i)
 
 void push_inst_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg)
 {
+    reg += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg;
@@ -2010,6 +2010,8 @@ void push_inst_i_i(KaosIR* program, enum IROpCode op_code, i64 i1, i64 i2)
 
 void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, i64 i)
 {
+    reg += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg;
@@ -2031,6 +2033,8 @@ void push_inst_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
 
 void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, f64 f)
 {
+    reg += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg;
@@ -2052,6 +2056,9 @@ void push_inst_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg, 
 
 void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2071,6 +2078,9 @@ void push_inst_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1,
 
 void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, i64 i)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2097,6 +2107,8 @@ void push_inst_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, i64 i1, i64 i2)
 {
+    reg1 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2125,6 +2137,9 @@ void push_inst_r_i_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, f64 f)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2151,6 +2166,10 @@ void push_inst_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+    reg3 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2175,6 +2194,10 @@ void push_inst_r_r_r(KaosIR* program, enum IROpCode op_code, enum IRRegister reg
 
 void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, i64 i)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+    reg3 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
@@ -2206,6 +2229,10 @@ void push_inst_r_r_r_i(KaosIR* program, enum IROpCode op_code, enum IRRegister r
 
 void push_inst_r_r_r_f(KaosIR* program, enum IROpCode op_code, enum IRRegister reg1, enum IRRegister reg2, enum IRRegister reg3, f64 f)
 {
+    reg1 += register_offset;
+    reg2 += register_offset;
+    reg3 += register_offset;
+
     KaosOp* op1 = malloc(sizeof *op1);
     op1->type = IR_REG;
     op1->reg = reg1;
