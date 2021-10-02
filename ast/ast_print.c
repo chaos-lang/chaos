@@ -782,6 +782,14 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         printASTExpr(decl->v.times_do->x, false, ",\n");
+        if (decl->v.times_do->index != NULL) {
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.times_do->index, false, ",\n");
+        }
         printf(
             "%*c\"body\": ",
             indent,
@@ -798,6 +806,14 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         printASTExpr(decl->v.foreach_as_list->x, false, ",\n");
+        if (decl->v.foreach_as_list->index != NULL) {
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_list->index, false, ",\n");
+        }
         printf(
             "%*c\"el\": ",
             indent,
@@ -820,6 +836,14 @@ void printASTDecl(Decl* decl, bool is_list, char *end)
             __KAOS_INDENT_CHAR__
         );
         printASTExpr(decl->v.foreach_as_dict->x, false, ",\n");
+        if (decl->v.foreach_as_dict->index != NULL) {
+            printf(
+                "%*c\"index\": ",
+                indent,
+                __KAOS_INDENT_CHAR__
+            );
+            printASTExpr(decl->v.foreach_as_dict->index, false, ",\n");
+        }
         printf(
             "%*c\"key\": ",
             indent,

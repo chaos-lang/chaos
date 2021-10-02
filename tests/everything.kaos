@@ -59,17 +59,25 @@ list a = [
     3
 ]
 
-foreach a as el
-    print el
-    el = 5
-    2 times do
-        print el
-    end
+void def loop1(num i)
+    print i
+    print "hey"
 end
 
-dict n = {'a': 'foo', 'b': 'bar', 'c': 'baz'}
+void def loop2(num i, num x)
+    print i
+    print x
+end
 
-foreach n as key : val
+void def loop3(num i, str key, str val)
+    print i
     print key
     print val
 end
+
+3 times do i -> loop1(i)
+3 times do as i -> loop1(i)
+
+foreach [1, 2, 3] as i, x -> loop2(i, x)
+
+foreach {'a': 'foo', 'b': 'bar', 'c': 'baz'} as i, key : val -> loop3(i, key, val)
