@@ -1562,13 +1562,10 @@ void compileDecl(KaosIR* program, Decl* decl)
     case FuncDecl_kind: {
         _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
         if (function->should_inline) {
-            function->ast = decl;
             function_mode->is_compiled = true;
             endFunction();
             break;
         }
-
-        function->ast = decl;
 
         if (function->is_compiled)
             break;
@@ -1706,193 +1703,6 @@ unsigned short declareSpec(KaosIR* program, Spec* spec)
             // program->heap += 2;
 
             addFunctionParameterNew(function_mode, parameter);
-
-            // Load the default value
-            Expr* expr = spec->v.optional_field_spec->expr;
-            enum ValueType value_type = compileExpr(program, expr) - 1;
-            // i64 addr = parameter->addr;
-
-            switch (type) {
-            case K_BOOL:
-                break;
-            case K_NUMBER:
-                if (value_type == V_FLOAT) {
-                } else {
-                }
-                break;
-            case K_STRING: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (expr->kind) {
-                case BasicLit_kind:
-                    len = strlen(expr->v.basic_lit->value.s);
-                    break;
-                case BinaryExpr_kind:
-                    is_dynamic = true;
-                    break;
-                case IndexExpr_kind:
-                    len = 1;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                if (is_dynamic) {
-                } else {
-                    for (size_t i = len; i > 0; i--) {
-                    }
-                }
-                break;
-            }
-            case K_ANY: {
-                switch (value_type) {
-                case V_BOOL:
-                    break;
-                case V_INT: {
-                    break;
-                }
-                case V_FLOAT: {
-                    break;
-                }
-                case V_STRING: {
-                    size_t len = 0;
-                    bool is_dynamic = false;
-
-                    switch (expr->kind) {
-                    case BasicLit_kind:
-                        len = strlen(expr->v.basic_lit->value.s);
-                        break;
-                    case BinaryExpr_kind:
-                        len =
-                            strlen(expr->v.binary_expr->x->v.basic_lit->value.s)
-                            +
-                            strlen(expr->v.binary_expr->y->v.basic_lit->value.s);
-                        break;
-                    case IndexExpr_kind:
-                        len = 1;
-                        break;
-                    case Ident_kind:
-                        is_dynamic = true;
-                        break;
-                    default:
-                        break;
-                    }
-
-                    if (is_dynamic) {
-                    } else {
-                        for (size_t i = len; i > 0; i--) {
-                        }
-                    }
-                    break;
-                }
-                case V_LIST: {
-                    size_t len = 0;
-                    bool is_dynamic = false;
-
-                    switch (expr->kind) {
-                    case CompositeLit_kind:
-                        len = expr->v.composite_lit->elts->expr_count;
-                        break;
-                    case Ident_kind:
-                        is_dynamic = true;
-                        break;
-                    default:
-                        break;
-                    }
-
-                    if (is_dynamic) {
-                    } else {
-                        // program->heap += len;
-                        for (size_t i = len; i > 0; i--) {
-                        }
-                        // program->heap += len;
-                    }
-                    break;
-                }
-                case V_DICT: {
-                    size_t len = 0;
-                    bool is_dynamic = false;
-
-                    switch (expr->kind) {
-                    case CompositeLit_kind:
-                        len = expr->v.composite_lit->elts->expr_count;
-                        break;
-                    case Ident_kind:
-                        is_dynamic = true;
-                        break;
-                    default:
-                        break;
-                    }
-
-                    if (is_dynamic) {
-                    } else {
-                        // program->heap += len * 2;
-                        for (size_t i = len; i > 0; i--) {
-                        }
-                        // program->heap += len * 2;
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
-                break;
-            }
-            case K_LIST: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (expr->kind) {
-                case CompositeLit_kind:
-                    len = expr->v.composite_lit->elts->expr_count;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                if (is_dynamic) {
-                } else {
-                    // program->heap += len;
-                    for (size_t i = len; i > 0; i--) {
-                    }
-                    // program->heap += len;
-                }
-                break;
-            }
-            case K_DICT: {
-                size_t len = 0;
-                bool is_dynamic = false;
-
-                switch (expr->kind) {
-                case CompositeLit_kind:
-                    len = expr->v.composite_lit->elts->expr_count;
-                    break;
-                case Ident_kind:
-                    is_dynamic = true;
-                    break;
-                default:
-                    break;
-                }
-
-                if (is_dynamic) {
-                } else {
-                    // program->heap += len * 2;
-                    for (size_t i = len; i > 0; i--) {
-                    }
-                    // program->heap += len * 2;
-                }
-                break;
-            }
-            default:
-                break;
-            }
             break;
         }
         default:
@@ -1951,8 +1761,34 @@ unsigned short compileSpec(KaosIR* program, Spec* spec)
         }
         break;
     }
-    case OptionalFieldSpec_kind:
+    case OptionalFieldSpec_kind: {
+        enum Type type = compileSpec(program, spec->v.optional_field_spec->type_spec);
+
+        push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
+
+        switch (type) {
+        case K_BOOL:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
+            break;
+        case K_NUMBER:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
+            break;
+        case K_STRING:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
+            break;
+        case K_LIST:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
+            break;
+        case K_DICT:
+            push_inst_i_i(program, DECLARE_ARG, JIT_UNSIGNED_NUM, sizeof(i64));
+            break;
+        case K_ANY:
+            break;
+        default:
+            break;
+        }
         break;
+    }
     case ImportSpec_kind: {
         if (spec->v.import_spec->handled)
             break;
@@ -2636,6 +2472,7 @@ bool declare_function(Stmt* stmt, File* file, KaosIR* program)
         return false;
 
     Decl* decl = stmt->v.decl_stmt->decl;
+    ast_ref = decl->ast;
 
     if (file->aliases->expr_count != 0) {
         bool _return = true;
@@ -2777,7 +2614,10 @@ void determine_inline_functions(ASTRoot* ast_root)
             if (stmt->kind == DeclStmt_kind && stmt->v.decl_stmt->decl->kind == FuncDecl_kind) {
                 Decl* decl = stmt->v.decl_stmt->decl;
                 _Function* function = startFunctionNew(decl->v.func_decl->name->v.ident->name);
+                unsigned long current_file_index_bak = current_file_index;
                 function->should_inline = determine_inline_function(ast_root, function);
+                function->ast = decl;
+                current_file_index = current_file_index_bak;
                 endFunction();
             }
         }

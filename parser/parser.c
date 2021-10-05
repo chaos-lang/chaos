@@ -310,7 +310,8 @@ void compile_interactive()
 }
 
 void freeEverything() {
-    freeAllSymbols();
+    // TODO: Fix the memory leaks
+    // freeAllSymbols();
     free(scopeless->function);
     free(scopeless);
     free(dummy_scope);
