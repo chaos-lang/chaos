@@ -61,3 +61,12 @@ hyperfine.json
 
 # MyJIT Disassembler
 myjit-disasm
+
+# Generated headers
+*_export.h
+
+# Build dir
+*build*
+
+# IDEs
+.idea
