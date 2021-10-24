@@ -63,4 +63,4 @@ if (TARGET "${DEPENDANT_LIBRARY}")
 endif ()
 install(TARGETS ${installable_libs}
         DESTINATION "lib"
-        EXPORT "${EXEC_NAME}Targets")
+        EXPORT "${LIBRARY_NAME}Targets")

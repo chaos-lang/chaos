@@ -48,6 +48,11 @@ foreach (target ${targets})
     add_subdirectory("${target}")
 endforeach ()
 
+option(BUILD_DEMOS "Build demos" ON)
+if (BUILD_DEMOS)
+    add_subdirectory("myjit")
+endif (BUILD_DEMOS)
+
 #option(BUILD_TESTS "Build tests" OFF)
 #if (BUILD_TESTS)
 #    add_subdirectory("tests")
