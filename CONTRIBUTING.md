@@ -34,6 +34,7 @@ placing this command into a shell script like `dev.sh` and executing that, is th
     - https://prettydiff.com/2/guide/unrelated_parser.xhtml
     - https://www.geeksforgeeks.org/linked-list-set-1-introduction/
     - https://www.geeksforgeeks.org/symbol-table-compiler/
+    - https://www.scaler.com/topics/c/debugging-c-program/
 
  - **Good to read:**
    - https://www.gnu.org/software/bison/manual/bison.html#Examples
